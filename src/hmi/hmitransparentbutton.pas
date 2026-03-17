@@ -3,7 +3,7 @@ unit HMITransparentButton;
 interface
 
 uses
-  Classes, Sysutils, Controls, LMessages, hmi_draw_basiccontrol, BGRABitmap;
+  Classes, SysUtils, Controls, LMessages, hmi_draw_basiccontrol, BGRABitmap;
 
 type
 
@@ -27,7 +27,7 @@ implementation
 
 procedure THMITransparentButton.Paint;
 begin
-  FControlArea := TBGRABitmap.Create(Width,Height);
+  FControlArea := TBGRABitmap.Create(Width, Height);
   try
     inherited Paint;
   finally
@@ -52,8 +52,8 @@ begin
     //DebugLn('TControl.WMLButtonUp B ',dbgs(ClientRect.Left),',',dbgs(ClientRect.Top),',',dbgs(ClientRect.Right),',',dbgs(ClientRect.Bottom),' ',dbgs(Message.Pos.X),',',dbgs(Message.Pos.Y));
     //if PtInRect(ClientRect, SmallPointToPoint(Message.Pos))
     //then begin
-      //DebugLn('TControl.WMLButtonUp C');
-      Click;
+    //DebugLn('TControl.WMLButtonUp C');
+    Click;
     //end;
   end;
 

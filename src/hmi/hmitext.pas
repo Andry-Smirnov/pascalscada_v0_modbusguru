@@ -17,7 +17,11 @@ unit HMIText;
 interface
 
 uses
-  Classes, SysUtils, {$IFDEF FPC}LResources,{$ENDIF} Controls, Graphics,
+  Classes, SysUtils,
+  {$IFDEF FPC}
+LResources,
+  {$ENDIF}
+  Controls, Graphics,
   Dialogs, HMILabel, PLCTag, HMIZones, ProtocolTypes, StdCtrls, ExtCtrls;
 
 type
@@ -39,15 +43,15 @@ type
 
   THMIText = class(THMILabel)
   private
-    FTextZones:TTextZones;
-    FTestValue:Double;
-    FCurrentZone:TTextZone;
-    FOwnerZoneShowed:Boolean;
-    function  GetTextZones:TTextZones;
-    procedure SetTextZones(zt:TTextZones);
-    procedure ZoneChange(Sender:TObject);
-    procedure NeedComState(var CurState:TComponentState);
-    procedure BlinkTimer(Sender:TObject);
+    FTextZones: TTextZones;
+    FTestValue: Double;
+    FCurrentZone: TTextZone;
+    FOwnerZoneShowed: Boolean;
+    function GetTextZones: TTextZones;
+    procedure SetTextZones(zt: TTextZones);
+    procedure ZoneChange(Sender: TObject);
+    procedure NeedComState(var CurState: TComponentState);
+    procedure BlinkTimer(Sender: TObject);
   protected
 
     {$IFDEF PORTUGUES}
@@ -59,7 +63,7 @@ type
     Choose (depending of the condition of each text zone) and shows a text zone.
     }
     {$ENDIF}
-    procedure SetValue(v:Double);
+    procedure SetValue(v: Double);
 
     procedure ShowDefaultZone;
 
@@ -72,7 +76,7 @@ type
     Shows a text zone.
     }
     {$ENDIF}
-    procedure ShowZone(zone:TTextZone);
+    procedure ShowZone(zone: TTextZone);
 
     {$IFDEF PORTUGUES}
     {:
@@ -83,27 +87,27 @@ type
     Shows a text zone depending of the value of TestValue property.
     }
     {$ENDIF}
-    procedure SetTestValue(v:Double);
+    procedure SetTestValue(v: Double);
 
     //sobrescreve alguns métodos para permitir somente tags numéricos.
-    //
+
     //override some procedures to allow only numeric tags in control.
 
     //: @exclude
     procedure RefreshTagValue; override;
     //: @exclude
-    procedure SetHMITag(t:TPLCTag); override;
+    procedure SetHMITag(t: TPLCTag); override;
     //: @exclude
-    procedure WriteFaultCallBack(Sender:TObject); override;
+    procedure WriteFaultCallBack(Sender: TObject); override;
     //: @exclude
-    procedure TagChangeCallBack(Sender:TObject); override;
+    procedure TagChangeCallBack(Sender: TObject); override;
 
 
     //: @exclude
     procedure Loaded; override;
   public
     //: @exclude
-    constructor Create(AOwner:TComponent); override;
+    constructor Create(AOwner: TComponent); override;
     //: @exclude
     destructor Destroy; override;
     procedure RefreshText(Data: PtrInt);
@@ -119,7 +123,7 @@ type
     @bold(Can only be used on desing-time.)
     }
     {$ENDIF}
-    property TestValue:Double read FTestValue write SetTestValue stored false;
+    property TestValue: Double read FTestValue write SetTestValue stored False;
 
     {$IFDEF PORTUGUES}
     {:
@@ -138,95 +142,101 @@ type
     @seealso(TTextZones)
     }
     {$ENDIF}
-    property Zones:TTextZones read GetTextZones write SetTextZones nodefault;
+    property Zones: TTextZones read GetTextZones write SetTextZones nodefault;
   end;
 
 implementation
 
 uses hsstrings, Forms, hmi_animation_timers;
 
-constructor THMIText.Create(AOwner:TComponent);
+constructor THMIText.Create(AOwner: TComponent);
 begin
-   inherited Create(AOwner);
-   FTextZones:=TTextZones.Create(Self);
-   FTextZones.OnNeedCompState:=@NeedComState;
-   FTextZones.OnCollectionItemChange:=@ZoneChange;
+  inherited Create(AOwner);
+  FTextZones := TTextZones.Create(Self);
+  FTextZones.OnNeedCompState := @NeedComState;
+  FTextZones.OnCollectionItemChange := @ZoneChange;
 end;
 
 destructor THMIText.Destroy;
 begin
-   Application.RemoveAsyncCalls(Self);
-   GetAnimationTimer.RemoveCallbacksFromObject(Self);
+  Application.RemoveAsyncCalls(Self);
+  GetAnimationTimer.RemoveCallbacksFromObject(Self);
 
-   FreeAndNil(FTextZones);
+  FreeAndNil(FTextZones);
 
-   inherited Destroy;
+  inherited Destroy;
 end;
 
 procedure THMIText.RefreshText(Data: PtrInt);
 begin
-  if [csLoading,csReading,csDestroying]*ComponentState=[] then begin
-     if FTag=nil then begin
-       ShowDefaultZone;
-     end else begin
-       if Supports(FTag, ITagNumeric) then
-          SetValue((FTag as ITagNumeric).Value)
-     end;
+  if [csLoading, csReading, csDestroying] * ComponentState = [] then
+  begin
+    if FTag = nil then
+    begin
+      ShowDefaultZone;
+    end
+    else
+    begin
+      if Supports(FTag, ITagNumeric) then
+        SetValue((FTag as ITagNumeric).Value);
+    end;
   end;
 end;
 
-procedure THMIText.ZoneChange(Sender:TObject);
+procedure THMIText.ZoneChange(Sender: TObject);
 begin
   TagChangeCallBack(Self);
 end;
 
-procedure THMIText.NeedComState(var CurState:TComponentState);
+procedure THMIText.NeedComState(var CurState: TComponentState);
 begin
-   CurState:=ComponentState;
+  CurState := ComponentState;
 end;
 
-procedure THMIText.SetHMITag(t:TPLCTag);
+procedure THMIText.SetHMITag(t: TPLCTag);
 begin
   //se o tag esta entre um dos aceitos.
-  //
+
   //check if the tag is valid (only numeric tags)
-  if (t<>nil) and (not Supports(t, ITagNumeric)) then
-     raise Exception.Create(SonlyNumericTags);
+  if (t <> nil) and (not Supports(t, ITagNumeric)) then
+    raise Exception.Create(SonlyNumericTags);
 
   inherited SetHMITag(t);
 end;
 
-procedure THMIText.WriteFaultCallBack(Sender:TObject);
+procedure THMIText.WriteFaultCallBack(Sender: TObject);
 begin
   TagChangeCallBack(Self);
 end;
 
-procedure THMIText.TagChangeCallBack(Sender:TObject);
+procedure THMIText.TagChangeCallBack(Sender: TObject);
 begin
-  if (([csLoading,csReading]*ComponentState)=[]) and (Application.Flags*[AppDoNotCallAsyncQueue]=[]) then
-    Application.QueueAsyncCall(@RefreshText,0);
+  if (([csLoading, csReading] * ComponentState) = []) and (Application.Flags * [AppDoNotCallAsyncQueue] = []) then
+    Application.QueueAsyncCall(@RefreshText, 0);
 end;
 
-procedure THMIText.SetValue(v:Double);
+procedure THMIText.SetValue(v: Double);
 begin
-   FCurrentZone:=FTextZones.GetZoneFromValue(v) as TTextZone;
-   GetAnimationTimer.RemoveCallback(@BlinkTimer);
-   ShowZone(FCurrentZone);
-   FOwnerZoneShowed:=true;
-   if (FCurrentZone<>nil) and (FCurrentZone.BlinkWith<>(-1)) and (FCurrentZone.BlinkTime>0) then begin
-     GetAnimationTimer.AddTimerCallback(FCurrentZone.BlinkTime,@BlinkTimer);
-   end;
+  FCurrentZone := FTextZones.GetZoneFromValue(v) as TTextZone;
+  GetAnimationTimer.RemoveCallback(@BlinkTimer);
+  ShowZone(FCurrentZone);
+  FOwnerZoneShowed := True;
+  if (FCurrentZone <> nil) and (FCurrentZone.BlinkWith <> (-1)) and (FCurrentZone.BlinkTime > 0) then
+  begin
+    GetAnimationTimer.AddTimerCallback(FCurrentZone.BlinkTime, @BlinkTimer);
+  end;
 end;
 
 procedure THMIText.ShowDefaultZone;
 begin
-   FCurrentZone:=FTextZones.GetDefaultZone as TTextZone;
-   GetAnimationTimer.RemoveCallback(@BlinkTimer);
-   ShowZone(FCurrentZone);
-   FOwnerZoneShowed:=true;
-   if (FCurrentZone<>nil) and (FCurrentZone.BlinkWith<>(-1)) and (FCurrentZone.BlinkTime>0) then begin
-     GetAnimationTimer.AddTimerCallback(FCurrentZone.BlinkTime,@BlinkTimer);
-   end;
+  FCurrentZone := FTextZones.GetDefaultZone as TTextZone;
+  GetAnimationTimer.RemoveCallback(@BlinkTimer);
+  ShowZone(FCurrentZone);
+  FOwnerZoneShowed := True;
+  if (FCurrentZone <> nil) and (FCurrentZone.BlinkWith <> (-1)) and (FCurrentZone.BlinkTime > 0) then
+  begin
+    GetAnimationTimer.AddTimerCallback(FCurrentZone.BlinkTime, @BlinkTimer);
+  end;
 end;
 
 procedure THMIText.RefreshTagValue;
@@ -234,57 +244,60 @@ begin
   RefreshText(0);
 end;
 
-procedure THMIText.ShowZone(zone:TTextZone);
+procedure THMIText.ShowZone(zone: TTextZone);
 begin
-  FCurrentZone:=zone;
-  if zone=nil then begin
+  FCurrentZone := zone;
+  if zone = nil then
+  begin
     TLabel(Self).Caption := '';
-    TLabel(Self).Transparent:=true;
-  end else begin
-    TLabel(self).Caption    := Prefix+zone.Text+Sufix;
-    TLabel(self).Color      := zone.Color;
-    TLabel(self).Transparent:= zone.Transparent;
-    TLabel(self).Font       := zone.Font;
-    TLabel(self).Layout     := zone.VerticalAlignment;
-    TLabel(self).Alignment  := zone.HorizontalAlignment;
+    TLabel(Self).Transparent := True;
+  end
+  else
+  begin
+    TLabel(Self).Caption := Prefix + zone.Text + Sufix;
+    TLabel(Self).Color := zone.Color;
+    TLabel(Self).Transparent := zone.Transparent;
+    TLabel(Self).Font := zone.Font;
+    TLabel(Self).Layout := zone.VerticalAlignment;
+    TLabel(Self).Alignment := zone.HorizontalAlignment;
   end;
 end;
 
-procedure THMIText.SetTestValue(v:Double);
+procedure THMIText.SetTestValue(v: Double);
 begin
-   if [csDesigning]*ComponentState=[] then exit;
+  if [csDesigning] * ComponentState = [] then Exit;
 
-   FTestValue:=v;
-   SetValue(v);
+  FTestValue := v;
+  SetValue(v);
 end;
 
 procedure THMIText.Loaded;
 begin
-   inherited Loaded;
-   FTextZones.Loaded;
-   TagChangeCallBack(FTag);
+  inherited Loaded;
+  FTextZones.Loaded;
+  TagChangeCallBack(FTag);
 end;
 
 //timer procedure (does a blink effect)
-procedure THMIText.BlinkTimer(Sender:TObject);
+procedure THMIText.BlinkTimer(Sender: TObject);
 begin
-  if (FCurrentZone.BlinkWith<0) or (TTextZone(FTextZones.Items[FCurrentZone.BlinkWith]).BlinkTime<>FCurrentZone.BlinkTime) then
+  if (FCurrentZone.BlinkWith < 0) or (TTextZone(FTextZones.Items[FCurrentZone.BlinkWith]).BlinkTime <> FCurrentZone.BlinkTime) then
     GetAnimationTimer.RemoveCallback(@BlinkTimer); //FTimer.Enabled:=false
 
-  if (FCurrentZone.BlinkWith>=0) AND (TTextZone(FTextZones.Items[FCurrentZone.BlinkWith]).BlinkTime<>FCurrentZone.BlinkTime) and (TTextZone(FTextZones.Items[FCurrentZone.BlinkWith]).BlinkTime>0) then
-      GetAnimationTimer.AddTimerCallback(TTextZone(FTextZones.Items[FCurrentZone.BlinkWith]).BlinkTime, @BlinkTimer);
+  if (FCurrentZone.BlinkWith >= 0) and (TTextZone(FTextZones.Items[FCurrentZone.BlinkWith]).BlinkTime <> FCurrentZone.BlinkTime) and (TTextZone(FTextZones.Items[FCurrentZone.BlinkWith]).BlinkTime > 0) then
+    GetAnimationTimer.AddTimerCallback(TTextZone(FTextZones.Items[FCurrentZone.BlinkWith]).BlinkTime, @BlinkTimer);
 
   ShowZone(TTextZone(FTextZones.Items[FCurrentZone.BlinkWith]));
 end;
 
-function THMIText.GetTextZones:TTextZones;
+function THMIText.GetTextZones: TTextZones;
 begin
-   Result := FTextZones;
+  Result := FTextZones;
 end;
 
-procedure THMIText.SetTextZones(zt:TTextZones);
+procedure THMIText.SetTextZones(zt: TTextZones);
 begin
-   FTextZones.Assign(zt);
+  FTextZones.Assign(zt);
 end;
 
 end.

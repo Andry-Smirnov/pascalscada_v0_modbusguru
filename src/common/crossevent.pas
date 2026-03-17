@@ -295,7 +295,7 @@ begin
   if FEvent.IsDestroing then begin
      Result := wrAbandoned;
      pthread_mutex_unlock(@FEvent.mutex);
-     exit;
+     Exit;
   end;
   
   InterLockedIncrement(Waiters);

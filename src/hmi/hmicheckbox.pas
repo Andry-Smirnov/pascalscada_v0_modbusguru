@@ -41,69 +41,79 @@ type
   { THMICheckBox }
 
   THMICheckBox = class(TCheckBox, IHMIInterface)
-  private    
-    FRegInSecMan:Boolean;
+  private
+    FRegInSecMan: Boolean;
     FAfterSendValueToTag: TAfterSendNumericValueToTagEvent;
     FBeforeSendValueToTag: TBeforeSendNumericValueToTagEvent;
-    FTag:TPLCTag;
-    FIsEnabled,
-    FIsEnabledBySecurity:Boolean;
-    FValueTrueLoaded, FValueFalseLoaded,
-    FValueTrue, FValueFalse:Double;
-    FWriteTrue, FWriteFalse:Boolean;
-    FColorFalse, FColorTrue, FColorGrayed:TColor;
-    FCaptionFalse, FCaptionTrue, FCaptionGrayed:TCaption;
-    FFontFalse, FFontTrue, FFontGrayed:TFont;
-    FOtherValues:TOtherValues;
+    FTag: TPLCTag;
+    FIsEnabled: Boolean;
+    FIsEnabledBySecurity: Boolean;
+    FValueTrueLoaded: Double;
+    FValueFalseLoaded: Double;
+    FValueTrue: Double;
+    FValueFalse: Double;
+    FWriteTrue: Boolean;
+    FWriteFalse: Boolean;
+    FColorFalse: TColor;
+    FColorTrue: TColor;
+    FColorGrayed: TColor;
+    FCaptionFalse: TCaption;
+    FCaptionTrue: TCaption;
+    FCaptionGrayed: TCaption;
+    FFontFalse: TFont;
+    FFontTrue: TFont;
+    FFontGrayed: TFont;
+    FOtherValues: TOtherValues;
 
-    FSecurityCode:UTF8String;
-    procedure SetSecurityCode(sc:UTF8String);
+    FSecurityCode: UTF8String;
 
-    function  GetTagValue:Double;
-    procedure SetCaptionFalse (v:TCaption);
-    procedure SetCaptionTrue  (v:TCaption);
-    procedure SetCaptionGrayed(v:TCaption);
-    procedure SetColorFalse(c:TColor);
-    procedure SetColorTrue(c:TColor);
-    procedure SetColorGrayed(c:TColor);
+    procedure SetSecurityCode(sc: UTF8String);
 
-    procedure SetFontFalse(f:TFont);
-    procedure SetFontTrue(f:TFont);
-    procedure SetFontGrayed(f:TFont);
+    function GetTagValue: Double;
+    procedure SetCaptionFalse(v: TCaption);
+    procedure SetCaptionTrue(v: TCaption);
+    procedure SetCaptionGrayed(v: TCaption);
+    procedure SetColorFalse(AColor: TColor);
+    procedure SetColorTrue(AColor: TColor);
+    procedure SetColorGrayed(AColor: TColor);
 
-    function  GetState:TCheckBoxState;
+    procedure SetFontFalse(AFont: TFont);
+    procedure SetFontTrue(AFont: TFont);
+    procedure SetFontGrayed(AFont: TFont);
 
-    procedure SetWriteTrue(v:Boolean);
-    procedure SetWriteFalse(v:Boolean);
-    procedure SetValueTrue(v:Double);
-    procedure SetValueFalse(v:Double);
-    procedure SetOtherValues(v:TOtherValues);
-    procedure RefreshTagValue(x:Double);
-    procedure FontChange(Sender:TObject);
+    function GetState: TCheckBoxState;
 
-    procedure SetCaption(c:TCaption);
-    procedure SetFont(f:TFont);
+    procedure SetWriteTrue(v: Boolean);
+    procedure SetWriteFalse(v: Boolean);
+    procedure SetValueTrue(v: Double);
+    procedure SetValueFalse(v: Double);
+    procedure SetOtherValues(v: TOtherValues);
+    procedure RefreshTagValue(x: Double);
+    procedure FontChange(Sender: TObject);
 
-    function  GetAllowGrayed:Boolean;
+    procedure SetCaption(c: TCaption);
+    procedure SetFont(AFont: TFont);
 
-    procedure WriteFaultCallBack(Sender:TObject);
-    procedure TagChangeCallBack(Sender:TObject);
-    procedure RemoveTagCallBack(Sender:TObject);
+    function GetAllowGrayed: Boolean;
+
+    procedure WriteFaultCallBack(Sender: TObject);
+    procedure TagChangeCallBack(Sender: TObject);
+    procedure RemoveTagCallBack(Sender: TObject);
   protected
     //: @seealso(IHMIInterface.SetHMITag)
-    procedure SetHMITag(t:TPLCTag);                    //seta um tag
+    procedure SetHMITag(APLCTag: TPLCTag);                    //seta um tag
     //: @seealso(IHMIInterface.GetHMITag)
-    function  GetHMITag:TPLCTag;
+    function GetHMITag: TPLCTag;
 
     //: @seealso(IHMIInterface.GetControlSecurityCode)
-     function GetControlSecurityCode:UTF8String;
+    function GetControlSecurityCode: UTF8String;
     //: @seealso(IHMIInterface.CanBeAccessed)
-    procedure CanBeAccessed(a:Boolean);
+    procedure CanBeAccessed(A: Boolean);
     //: @seealso(IHMIInterface.MakeUnsecure)
     procedure MakeUnsecure;
 
     //: @exclude
-    procedure SetEnabled(e:Boolean); override;
+    procedure SetEnabled(E: Boolean); override;
 
     {$IFDEF FPC}
     //: @exclude
@@ -113,9 +123,9 @@ type
     procedure Toggle; override;
     {$ENDIF}
     //: @exclude
-    function  IntGetColor:TColor;
+    function IntGetColor: TColor;
     //: @exclude
-    procedure IntSetColor(c:TColor);
+    procedure IntSetColor(AColor: TColor);
     //: @exclude
     function GetChecked: Boolean; override;
     //: @exclude
@@ -127,9 +137,9 @@ type
     procedure Loaded; override;
   public
     //: @exclude
-    constructor Create(AOwner:TComponent); override;
+    constructor Create(AOwner: TComponent); override;
     //: @exclude
-    destructor  Destroy; override;
+    destructor Destroy; override;
     {$IFDEF FPC}
     //: @exclude
     procedure EditingDone; override;
@@ -149,7 +159,7 @@ type
     depends mainly of your development environment (Lazarus or Delphi).
     }
     {$ENDIF}
-    property AllowGrayed:Boolean read GetAllowGrayed stored false;
+    property AllowGrayed: Boolean read GetAllowGrayed stored False;
 
     {$IFDEF PORTUGUES}
     {:
@@ -165,7 +175,7 @@ type
     @true.
     }
     {$ENDIF}
-    property Checked stored false;
+    property Checked stored False;
 
     {$IFDEF PORTUGUES}
     {:
@@ -187,7 +197,7 @@ type
     @seealso(TPLCTagNumber)
     }
     {$ENDIF}
-    property PLCTag:TPLCTag read GetHMITag write SetHMITag;
+    property PLCTag: TPLCTag read GetHMITag write SetHMITag;
 
     {$IFDEF PORTUGUES}
     {:
@@ -208,7 +218,7 @@ type
     @seealso(CaptionGrayed)
     }
     {$ENDIF}
-    property Caption write SetCaption stored false;
+    property Caption write SetCaption stored False;
 
     {$IFDEF PORTUGUES}
     {:
@@ -221,7 +231,7 @@ type
     @seealso(Caption)
     }
     {$ENDIF}
-    property CaptionFalse:TCaption read FCaptionFalse write SetCaptionFalse stored true nodefault;
+    property CaptionFalse: TCaption read FCaptionFalse write SetCaptionFalse stored True nodefault;
 
     {$IFDEF PORTUGUES}
     {:
@@ -234,7 +244,7 @@ type
     @seealso(Caption)
     }
     {$ENDIF}
-    property CaptionTrue:TCaption read FCaptionTrue write SetCaptionTrue stored true nodefault;
+    property CaptionTrue: TCaption read FCaptionTrue write SetCaptionTrue stored True nodefault;
 
     {$IFDEF PORTUGUES}
     {:
@@ -248,7 +258,7 @@ type
     @seealso(Caption)
     }
     {$ENDIF}
-    property CaptionGrayed:TCaption read FCaptionGrayed write SetCaptionGrayed stored true nodefault;
+    property CaptionGrayed: TCaption read FCaptionGrayed write SetCaptionGrayed stored True nodefault;
 
     {$IFDEF PORTUGUES}
     {:
@@ -269,7 +279,7 @@ type
     @seealso(ColorGrayed)
     }
     {$ENDIF}
-    property Color read IntGetColor write IntSetColor stored false;
+    property Color read IntGetColor write IntSetColor stored False;
 
     {$IFDEF PORTUGUES}
     {:
@@ -282,7 +292,7 @@ type
     @seealso(Color)
     }
     {$ENDIF}
-    property ColorFalse:TColor read FColorFalse write SetColorFalse stored true default clBtnFace;
+    property ColorFalse: TColor read FColorFalse write SetColorFalse stored True default clBtnFace;
 
     {$IFDEF PORTUGUES}
     {:
@@ -295,7 +305,7 @@ type
     @seealso(Color)
     }
     {$ENDIF}
-    property ColorTrue:TColor read FColorTrue write SetColorTrue stored true default clBtnFace;
+    property ColorTrue: TColor read FColorTrue write SetColorTrue stored True default clBtnFace;
 
     {$IFDEF PORTUGUES}
     {:
@@ -309,7 +319,7 @@ type
     @seealso(Color)
     }
     {$ENDIF}
-    property ColorGrayed:TColor read FColorGrayed write SetColorGrayed stored true default clBtnFace;
+    property ColorGrayed: TColor read FColorGrayed write SetColorGrayed stored True default clBtnFace;
 
     {$IFDEF PORTUGUES}
     {:
@@ -330,7 +340,7 @@ type
     @seealso(FontGrayed)
     }
     {$ENDIF}
-    property Font write SetFont stored false;
+    property Font write SetFont stored False;
 
     {$IFDEF PORTUGUES}
     {:
@@ -343,7 +353,7 @@ type
     @seealso(Font)
     }
     {$ENDIF}
-    property FontFalse:TFont read FFontFalse write SetFontFalse stored true;
+    property FontFalse: TFont read FFontFalse write SetFontFalse stored True;
 
     {$IFDEF PORTUGUES}
     {:
@@ -356,7 +366,7 @@ type
     @seealso(Font)
     }
     {$ENDIF}
-    property FontTrue:TFont read FFontTrue write SetFontTrue stored true;
+    property FontTrue: TFont read FFontTrue write SetFontTrue stored True;
 
     {$IFDEF PORTUGUES}
     {:
@@ -370,7 +380,7 @@ type
     @seealso(Font)
     }
     {$ENDIF}
-    property FontGrayed:TFont read FFontGrayed write SetFontGrayed stored true;
+    property FontGrayed: TFont read FFontGrayed write SetFontGrayed stored True;
 
     {$IFDEF PORTUGUES}
     {:
@@ -387,7 +397,7 @@ type
     @seealso(TOtherValues)
     }
     {$ENDIF}
-    property OtherValuesIS:TOtherValues read FOtherValues write SetOtherValues stored true default IsGrayed;
+    property OtherValuesIS: TOtherValues read FOtherValues write SetOtherValues stored True default IsGrayed;
 
     {$IFDEF PORTUGUES}
     {:
@@ -398,7 +408,7 @@ type
     If the value of Tag is equal to @name, the checkbox is unchecked.
     }
     {$ENDIF}
-    property ValueFalse:Double read FValueFalse write SetValueFalse stored true;
+    property ValueFalse: Double read FValueFalse write SetValueFalse stored True;
 
     {$IFDEF PORTUGUES}
     {:
@@ -409,7 +419,7 @@ type
     If the value of the Tag is equal to @name, the checkbox is checked.
     }
     {$ENDIF}
-    property ValueTrue:Double read FValueTrue write SetValueTrue stored true;
+    property ValueTrue: Double read FValueTrue write SetValueTrue stored True;
 
     {$IFDEF PORTUGUES}
     {:
@@ -422,7 +432,7 @@ type
     ValueTrue value on the linked tag.
     }
     {$ENDIF}
-    property WriteTrueValue:Boolean read FWriteTrue write SetWriteTrue stored true default true;
+    property WriteTrueValue: Boolean read FWriteTrue write SetWriteTrue stored True default True;
 
     {$IFDEF PORTUGUES}
     {:
@@ -435,92 +445,98 @@ type
     ValueFalse value on the linked tag.
     }
     {$ENDIF}
-    property WriteFalseValue:Boolean read FWriteFalse write SetWriteFalse stored true default true;
+    property WriteFalseValue: Boolean read FWriteFalse write SetWriteFalse stored True default True;
 
     {$IFDEF PORTUGUES}
     //: Informa o atual estado do controle (marcado, desmarcado, acinzentado).
     {$ELSE}
     //: Tells the actual state of the control (checked, unchecked or grayed).
     {$ENDIF}
-    property State:TCheckBoxState read GetState stored false nodefault;
+    property State: TCheckBoxState read GetState stored False nodefault;
 
     //: @exclude
-    property Enabled:Boolean read FIsEnabled write SetEnabled;
+    property Enabled: Boolean read FIsEnabled write SetEnabled;
 
     {$IFDEF PORTUGUES}
     //: Codigo de segurança que libera acesso ao controle
     {$ELSE}
     //: Security code that allows access to control.
     {$ENDIF}
-    property SecurityCode:UTF8String read FSecurityCode write SetSecurityCode;
+    property SecurityCode: UTF8String read FSecurityCode write SetSecurityCode;
 
     {$IFDEF PORTUGUES}
     //: Evento disparado antes do HMIEdit enviar um valor ao tag associado
     {$ELSE}
     //: Event triggered before HMIEdit send a value to linked tag.
     {$ENDIF}
-    property BeforeSendAValueToTag:TBeforeSendNumericValueToTagEvent read FBeforeSendValueToTag write FBeforeSendValueToTag;
+    property BeforeSendAValueToTag: TBeforeSendNumericValueToTagEvent read FBeforeSendValueToTag write FBeforeSendValueToTag;
 
     {$IFDEF PORTUGUES}
     //: Evento disparado quando o HMIEdit enviou um valor ao tag associado
     {$ELSE}
     //: Event triggered when the HMIEdit sent a value to linked tag.
     {$ENDIF}
-    property AfterSendValueToTag:TAfterSendNumericValueToTagEvent read FAfterSendValueToTag write FAfterSendValueToTag;
+    property AfterSendValueToTag: TAfterSendNumericValueToTagEvent read FAfterSendValueToTag write FAfterSendValueToTag;
   end;
 
 implementation
 
-uses hsstrings, ControlSecurityManager, Forms;
+uses
+  hsstrings, ControlSecurityManager, Forms;
 
-constructor THMICheckBox.Create(AOwner:TComponent);
+constructor THMICheckBox.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FRegInSecMan:=GetControlSecurityManager.RegisterControl(Self as IHMIInterface);
-  if not FRegInSecMan then begin
+  FRegInSecMan := GetControlSecurityManager.RegisterControl(Self as IHMIInterface);
+  if not FRegInSecMan then
+  begin
     {$IFNDEF WINDOWS}
-    writeln('FIX-ME: Failed to register class ',ClassName,' instace with name="',Name,'" in the ControlSecurityManager?',{$i %FILE%},':',{$i %LINE%});
+    writeln('FIX-ME: Failed to register class ', ClassName, ' instace with name="', Name, '" in the ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
     {$ENDIF}
   end;
 
   FIsEnabled := inherited Enabled;
-  if csDesigning in componentState then begin
+  if csDesigning in componentState then
+  begin
     FValueTrue := 1;
     FValueFalse := 0;
-  end else begin
+  end
+  else
+  begin
     FValueTrue := 0;
     FValueFalse := 0;
   end;
 
-  inherited AllowGrayed := false;
+  inherited AllowGrayed := False;
 
-  FIsEnabled:=true;
-  FFontFalse  := TFont.Create;
+  FIsEnabled := True;
+  FFontFalse := TFont.Create;
   FFontFalse.OnChange := @FontChange;
-  FFontTrue   := TFont.Create;
+  FFontTrue := TFont.Create;
   FFontTrue.OnChange := @FontChange;
   FFontGrayed := TFont.Create;
   FFontGrayed.OnChange := @FontChange;
   FColorTrue := clBtnFace;
-  FColorFalse:= clBtnFace;
-  FColorGrayed:= clBtnFace;
+  FColorFalse := clBtnFace;
+  FColorGrayed := clBtnFace;
   FOtherValues := IsGrayed;
-  FWriteTrue := true;
-  FWriteFalse := true;
+  FWriteTrue := True;
+  FWriteFalse := True;
 end;
 
 destructor THMICheckBox.Destroy;
 begin
   if FRegInSecMan then
     GetControlSecurityManager.UnRegisterControl(Self as IHMIInterface)
-  else begin
+  else
+  begin
     {$IFNDEF WINDOWS}
-    writeln('FIX-ME: Why class ',ClassName,', instace name="',Name,'" ins''t registered in ControlSecurityManager?',{$i %FILE%},':',{$i %LINE%});
+    writeln('FIX-ME: Why class ', ClassName, ', instace name="', Name, '" ins''t registered in ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
     {$ENDIF}
   end;
 
   Application.RemoveAsyncCalls(Self);
-  if FTag<>nil then
+  if FTag <> nil then
     FTag.RemoveAllHandlersFromObject(Self);
   FreeAndNil(FFontFalse);
   FreeAndNil(FFontTrue);
@@ -538,8 +554,9 @@ end;
 
 procedure THMICheckBox.RefreshCheckBox(Data: PtrInt);
 begin
-  if ([csReading, csLoading, csDestroying]*ComponentState<>[]) or (FTag=nil) then begin
-    exit;
+  if ([csReading, csLoading, csDestroying]*ComponentState<>[]) or (FTag=nil) then
+  begin
+    Exit;
   end;
 
   RefreshTagValue(GetTagValue);
@@ -552,146 +569,159 @@ end;
 
 {$ENDIF}
 
-procedure THMICheckBox.SetHMITag(t:TPLCTag);
+procedure THMICheckBox.SetHMITag(APLCTag: TPLCTag);
 begin
   //se o tag é um tag numerico.
   //check if the tag is valid.
-  if (t<>nil) and (not Supports(t, ITagNumeric)) then
-     raise Exception.Create(SonlyNumericTags);
+  if (APLCTag <> nil) and (not Supports(APLCTag, ITagNumeric)) then
+    raise Exception.Create(SonlyNumericTags);
 
   //se ja estou associado a um tag, remove
   //if the control is linked with some tag, remove the link.
-  if FTag<>nil then begin
+  if FTag <> nil then
+  begin
     FTag.RemoveAllHandlersFromObject(Self);
   end;
 
   //adiona o callback para o novo tag
   //link with the new tag.
-  if t<>nil then begin
-    t.AddWriteFaultHandler(@WriteFaultCallBack);
-    t.AddTagChangeHandler(@TagChangeCallBack);
-    t.AddRemoveTagHandler(@RemoveTagCallBack);
-    FTag := t;
+  if APLCTag <> nil then
+  begin
+    APLCTag.AddWriteFaultHandler(@WriteFaultCallBack);
+    APLCTag.AddTagChangeHandler(@TagChangeCallBack);
+    APLCTag.AddRemoveTagHandler(@RemoveTagCallBack);
+    FTag := APLCTag;
     RefreshTagValue(GetTagValue);
   end;
-  FTag := t;
+  FTag := APLCTag;
 end;
 
-function  THMICheckBox.GetHMITag:TPLCTag;
+function THMICheckBox.GetHMITag: TPLCTag;
 begin
-   Result := FTag;
+  Result := FTag;
 end;
 
-function THMICheckBox.GetControlSecurityCode:UTF8String;
+function THMICheckBox.GetControlSecurityCode: UTF8String;
 begin
-   Result:=FSecurityCode;
+  Result := FSecurityCode;
 end;
 
-procedure THMICheckBox.CanBeAccessed(a:Boolean);
+procedure THMICheckBox.CanBeAccessed(A: Boolean);
 begin
-  FIsEnabledBySecurity := a;
+  FIsEnabledBySecurity := A;
   SetEnabled(FIsEnabled);
 end;
 
 procedure THMICheckBox.MakeUnsecure;
 begin
-  FSecurityCode:='';
-  CanBeAccessed(true);
+  FSecurityCode := '';
+  CanBeAccessed(True);
 end;
 
-procedure THMICheckBox.SetEnabled(e:Boolean);
+procedure THMICheckBox.SetEnabled(E: Boolean);
 begin
-  FIsEnabled:=e;
+  FIsEnabled := E;
   inherited SetEnabled(FIsEnabled and FIsEnabledBySecurity);
 end;
 
-procedure THMICheckBox.RefreshTagValue(x:Double);
+procedure THMICheckBox.RefreshTagValue(x: Double);
 begin
-  if x=FValueTrue then begin
+  if x = FValueTrue then
+  begin
     inherited State := cbChecked;
     inherited Font.Assign(FFontTrue);
     inherited Color := FColorTrue;
     inherited Caption := FCaptionTrue;
-  end else begin
-    if x=FValueFalse then begin
-      inherited State := cbUnchecked;
-      inherited Font.Assign(FFontFalse);
-      inherited Color := FColorFalse;
-      inherited Caption := FCaptionFalse;
-    end else begin
-      case FOtherValues of
-        isChecked: begin
-          inherited State := cbChecked;
-          inherited Font.Assign(FFontTrue);
-          inherited Color := FColorTrue;
-          inherited Caption := FCaptionTrue;
-        end;
-        isUnchecked: begin
-          inherited State := cbUnchecked;
-          inherited Font.Assign(FFontFalse);
-          inherited Color := FColorFalse;
-          inherited Caption := FCaptionFalse;
-        end;
-        IsGrayed: begin
-          inherited State := cbGrayed;
-          inherited Font.Assign(FFontGrayed);
-          inherited Color := FColorGrayed;
-          inherited Caption := FCaptionGrayed;
-        end;
-      end;
+  end
+  else if x = FValueFalse then
+  begin
+    inherited State := cbUnchecked;
+    inherited Font.Assign(FFontFalse);
+    inherited Color := FColorFalse;
+    inherited Caption := FCaptionFalse;
+  end
+  else
+  begin
+    case FOtherValues of
+      isChecked:  begin
+                    inherited State := cbChecked;
+                    inherited Font.Assign(FFontTrue);
+                    inherited Color := FColorTrue;
+                    inherited Caption := FCaptionTrue;
+                  end;
+      isUnchecked:  begin
+                      inherited State := cbUnchecked;
+                      inherited Font.Assign(FFontFalse);
+                      inherited Color := FColorFalse;
+                      inherited Caption := FCaptionFalse;
+                    end;
+      IsGrayed: begin
+                  inherited State := cbGrayed;
+                  inherited Font.Assign(FFontGrayed);
+                  inherited Color := FColorGrayed;
+                  inherited Caption := FCaptionGrayed;
+                end;
     end;
   end;
 end;
 
-procedure THMICheckBox.SetWriteTrue(v:Boolean);
+procedure THMICheckBox.SetWriteTrue(v: Boolean);
 begin
-  if (inherited GetChecked) and v then begin
-    if (FTag<>nil) AND Supports(FTag, ITagNumeric) then
-      (FTag as ITagNumeric).Value:=FValueTrue;
+  if (inherited GetChecked) and v then
+  begin
+    if (FTag <> nil) and Supports(FTag, ITagNumeric) then
+      (FTag as ITagNumeric).Value := FValueTrue;
   end;
-  FWriteTrue := v
+  FWriteTrue := v;
 end;
 
-procedure THMICheckBox.SetWriteFalse(v:Boolean);
+procedure THMICheckBox.SetWriteFalse(v: Boolean);
 begin
-  if (not (inherited GetChecked)) and v then begin
-    if (FTag<>nil) AND Supports(FTag, ITagNumeric) then
-      (FTag as ITagNumeric).Value:=FValueFalse;
+  if (not (inherited GetChecked)) and v then
+  begin
+    if (FTag <> nil) and Supports(FTag, ITagNumeric) then
+      (FTag as ITagNumeric).Value := FValueFalse;
   end;
-  FWriteFalse := v
+  FWriteFalse := v;
 end;
 
-procedure THMICheckBox.SetValueTrue(v:Double);
+procedure THMICheckBox.SetValueTrue(v: Double);
 begin
-  if ((ComponentState*[csReading, csLoading])<>[]) then begin
-    FValueTrueLoaded:=v;
-    exit;
+  if ((componentState * [csReading, csLoading]) <> []) then
+  begin
+    FValueTrueLoaded := v;
+    Exit;
   end;
 
-  if ((ComponentState*[csReading, csLoading])=[]) and (v=FValueFalse) then
+  if ((componentState * [csReading, csLoading]) = []) and (v = FValueFalse) then
     raise Exception.Create(StheValueMustBeDifferentOfValueFalseProperty);
 
-  if (v<>FValueTrue) and ((FTag<>nil) and Supports(FTag, ITagNumeric))then begin
-    if GetChecked and FWriteTrue then begin
-      (FTag as ITagNumeric).Value:=v;
+  if (v <> FValueTrue) and ((FTag <> nil) and Supports(FTag, ITagNumeric)) then
+  begin
+    if GetChecked and FWriteTrue then
+    begin
+      (FTag as ITagNumeric).Value := v;
     end;
   end;
   FValueTrue := v;
 end;
 
-procedure THMICheckBox.SetValueFalse(v:Double);
+procedure THMICheckBox.SetValueFalse(v: Double);
 begin
-  if ((ComponentState*[csReading, csLoading])<>[]) then begin
-    FValueFalseLoaded:=v;
-    exit;
+  if ((componentState * [csReading, csLoading]) <> []) then
+  begin
+    FValueFalseLoaded := v;
+    Exit;
   end;
 
-  if ((ComponentState*[csReading, csLoading])=[]) and (v=FValueTrue) then
+  if ((componentState * [csReading, csLoading]) = []) and (v = FValueTrue) then
     raise Exception.Create(StheValueMustBeDifferentOfValueTrueProperty);
 
-  if (v<>FValueFalse) and ((FTag<>nil) and Supports(FTag, ITagNumeric)) then begin
-    if (not GetChecked) and FWriteFalse then begin
-      (FTag as ITagNumeric).Value:=v;
+  if (v <> FValueFalse) and ((FTag <> nil) and Supports(FTag, ITagNumeric)) then
+  begin
+    if (not GetChecked) and FWriteFalse then
+    begin
+      (FTag as ITagNumeric).Value := v;
     end;
   end;
 
@@ -700,10 +730,10 @@ end;
 
 function THMICheckBox.GetChecked: Boolean;
 begin
-  if FTag=nil then
+  if FTag = nil then
     Result := inherited GetChecked
   else
-    Result := (GetTagValue=FValueTrue);
+    Result := (GetTagValue = FValueTrue);
 end;
 
 procedure THMICheckBox.SetChecked(Value: Boolean);
@@ -713,43 +743,49 @@ begin
 end;
 
 procedure THMICheckBox.UpdateTagValue;
-  procedure DoAfterSendValue(avalue:Double);
+
+  procedure DoAfterSendValue(AValue: Double);
   begin
     if Assigned(FAfterSendValueToTag) then
-      FAfterSendValueToTag(Self,avalue);
+      FAfterSendValueToTag(Self, AValue);
   end;
 
-  function SendIt(avalue:Double):Boolean;
+  function SendIt(AValue: Double): Boolean;
   begin
     if Assigned(FBeforeSendValueToTag) then
-      FBeforeSendValueToTag(Self,avalue,Result)
+      FBeforeSendValueToTag(Self, AValue, Result)
     else
-      Result:=true;
+      Result := True;
   end;
-begin
-  if (csReading in ComponentState) or (csLoading in ComponentState) or (FTag=nil) then
-    exit;
 
-  if ((FTag<>nil) and Supports(FTag, ITagNumeric)) then
-    if State=cbChecked then begin
-      if FWriteTrue and SendIt(FValueTrue) then begin
+begin
+  if (csReading in componentState) or (csLoading in componentState) or (FTag = nil) then
+    Exit;
+
+  if ((FTag <> nil) and Supports(FTag, ITagNumeric)) then
+  begin
+    if State = cbChecked then
+    begin
+      if FWriteTrue and SendIt(FValueTrue) then
+      begin
         (FTag as ITagNumeric).Value := FValueTrue;
         DoAfterSendValue(FValueTrue);
       end;
-    end else begin
-      if FWriteFalse and SendIt(FValueFalse) then begin
-        (FTag as ITagNumeric).Value := FValueFalse;
-        DoAfterSendValue(FValueFalse);
-      end;
+    end
+    else if FWriteFalse and SendIt(FValueFalse) then
+    begin
+      (FTag as ITagNumeric).Value := FValueFalse;
+      DoAfterSendValue(FValueFalse);
     end;
+  end;
 end;
 
 procedure THMICheckBox.Click;
 begin
-  if Name='batata' then
+  if Name = 'batata' then
     inherited Click
   else
-    inherited Click
+    inherited Click;
 end;
 
 procedure THMICheckBox.Loaded;
@@ -757,7 +793,7 @@ begin
   inherited Loaded;
   CanBeAccessed(GetControlSecurityManager.CanAccess(GetControlSecurityCode));
   FValueFalse := FValueFalseLoaded;
-  FValueTrue  := FValueTrueLoaded;
+  FValueTrue := FValueTrueLoaded;
   TagChangeCallBack(Self);
 end;
 
@@ -765,7 +801,7 @@ end;
 procedure THMICheckBox.DoOnChange;
 begin
   if [csLoading,csDestroying]*ComponentState<>[] then begin
-    exit;
+    Exit;
   end;
 
   EditingDone;
@@ -775,6 +811,7 @@ begin
 end;
 
 {$ELSE}
+
 procedure THMICheckBox.Toggle;
 begin
   inherited Toggle;
@@ -784,10 +821,11 @@ end;
 
 procedure THMICheckBox.SetSecurityCode(sc: UTF8String);
 begin
-  if Trim(sc)='' then
-    Self.CanBeAccessed(true)
+  if Trim(sc) = '' then
+    Self.CanBeAccessed(True)
   else
-    with GetControlSecurityManager do begin
+    with GetControlSecurityManager do
+    begin
       ValidateSecurityCode(sc);
       if not SecurityCodeExists(sc) then
         RegisterSecurityCode(sc);
@@ -795,100 +833,100 @@ begin
       Self.CanBeAccessed(CanAccess(sc));
     end;
 
-  FSecurityCode:=sc;
+  FSecurityCode := sc;
 end;
 
-function THMICheckBox.GetTagValue:Double;
+function THMICheckBox.GetTagValue: Double;
 begin
   Result := 0;
-  if Assigned(FTag) AND Supports(FTag, ITagNumeric) then
+  if Assigned(FTag) and Supports(FTag, ITagNumeric) then
     Result := (FTag as ITagNumeric).Value;
 end;
 
 
-procedure THMICheckBox.SetCaptionFalse(v:TCaption);
+procedure THMICheckBox.SetCaptionFalse(v: TCaption);
 begin
-  if v=FCaptionFalse then exit;
+  if v = FCaptionFalse then Exit;
 
   FCaptionFalse := v;
   RefreshTagValue(GetTagValue);
 end;
 
-procedure THMICheckBox.SetCaptionTrue(v:TCaption);
+procedure THMICheckBox.SetCaptionTrue(v: TCaption);
 begin
-  if v=FCaptionTrue then exit;
+  if v = FCaptionTrue then Exit;
 
   FCaptionTrue := v;
   RefreshTagValue(GetTagValue);
 end;
 
-procedure THMICheckBox.SetCaptionGrayed(v:TCaption);
+procedure THMICheckBox.SetCaptionGrayed(v: TCaption);
 begin
-  if v=FCaptionGrayed then exit;
+  if v = FCaptionGrayed then Exit;
 
   FCaptionGrayed := v;
   RefreshTagValue(GetTagValue);
 end;
 
-procedure THMICheckBox.SetColorFalse(c:TColor);
+procedure THMICheckBox.SetColorFalse(AColor: TColor);
 begin
-  if c=FColorFalse then exit;
+  if AColor = FColorFalse then Exit;
 
-  FColorFalse := c;
+  FColorFalse := AColor;
   RefreshTagValue(GetTagValue);
 end;
 
-procedure THMICheckBox.SetColorTrue(c:TColor);
+procedure THMICheckBox.SetColorTrue(AColor: TColor);
 begin
-  if c=FColorTrue then exit;
+  if AColor = FColorTrue then Exit;
 
-  FColorTrue := c;
+  FColorTrue := AColor;
   RefreshTagValue(GetTagValue);
 end;
 
-procedure THMICheckBox.SetColorGrayed(c:TColor);
+procedure THMICheckBox.SetColorGrayed(AColor: TColor);
 begin
-  if c=FColorGrayed then exit;
+  if AColor = FColorGrayed then Exit;
 
-  FColorGrayed := c;
+  FColorGrayed := AColor;
   RefreshTagValue(GetTagValue);
 end;
 
-procedure THMICheckBox.FontChange(Sender:TObject);
+procedure THMICheckBox.FontChange(Sender: TObject);
 begin
-  if csDestroying in ComponentState then exit;
+  if csDestroying in componentState then Exit;
   RefreshTagValue(GetTagValue);
 end;
 
-procedure THMICheckBox.SetOtherValues(v:TOtherValues);
+procedure THMICheckBox.SetOtherValues(v: TOtherValues);
 begin
   FOtherValues := v;
   RefreshTagValue(GetTagValue);
 end;
 
-procedure THMICheckBox.SetFontFalse(f:TFont);
+procedure THMICheckBox.SetFontFalse(AFont: TFont);
 begin
-  FFontFalse.Assign(f);
+  FFontFalse.Assign(AFont);
 end;
 
-procedure THMICheckBox.SetFontTrue(f:TFont);
+procedure THMICheckBox.SetFontTrue(AFont: TFont);
 begin
-  FFontTrue.Assign(f);
+  FFontTrue.Assign(AFont);
 end;
 
-procedure THMICheckBox.SetFontGrayed(f:TFont);
+procedure THMICheckBox.SetFontGrayed(AFont: TFont);
 begin
-  FFontGrayed.Assign(f);
+  FFontGrayed.Assign(AFont);
 end;
 
-function  THMICheckBox.GetState:TCheckBoxState;
+function THMICheckBox.GetState: TCheckBoxState;
 begin
-   Result := inherited State;
+  Result := inherited State;
 end;
 
-procedure THMICheckBox.SetCaption(c:TCaption);
+procedure THMICheckBox.SetCaption(c: TCaption);
 begin
-  if not (csDesigning in ComponentState) then exit;
+  if not (csDesigning in componentState) then Exit;
 
   FCaptionFalse := c;
   FCaptionGrayed := c;
@@ -896,34 +934,34 @@ begin
   RefreshTagValue(GetTagValue);
 end;
 
-procedure THMICheckBox.IntSetColor(c:TColor);
+procedure THMICheckBox.IntSetColor(AColor: TColor);
 begin
-  if not (csDesigning in ComponentState) then exit;
+  if not (csDesigning in componentState) then Exit;
 
-  FColorFalse := c;
-  FColorGrayed := c;
-  FColorTrue := c;
+  FColorFalse := AColor;
+  FColorGrayed := AColor;
+  FColorTrue := AColor;
   RefreshTagValue(GetTagValue);
 end;
 
-function  THMICheckBox.IntGetColor:TColor;
+function THMICheckBox.IntGetColor: TColor;
 begin
   Result := inherited Color;
 end;
 
-procedure THMICheckBox.SetFont(f:TFont);
+procedure THMICheckBox.SetFont(AFont: TFont);
 begin
-  if not (csDesigning in ComponentState) then exit;
+  if not (csDesigning in componentState) then Exit;
 
-  FFontFalse.Assign(f);
-  FFontGrayed.Assign(f);
-  FFontTrue.Assign(f);
+  FFontFalse.Assign(AFont);
+  FFontGrayed.Assign(AFont);
+  FFontTrue.Assign(AFont);
   RefreshTagValue(GetTagValue);
 end;
 
-function  THMICheckBox.GetAllowGrayed:Boolean;
+function THMICheckBox.GetAllowGrayed: Boolean;
 begin
-  result := inherited AllowGrayed;
+  Result := inherited AllowGrayed;
 end;
 
 procedure THMICheckBox.WriteFaultCallBack(Sender: TObject);
@@ -933,14 +971,14 @@ end;
 
 procedure THMICheckBox.TagChangeCallBack(Sender: TObject);
 begin
-  if Application.Flags*[AppDoNotCallAsyncQueue]=[] then
-    Application.QueueAsyncCall(@RefreshCheckBox,0);
+  if Application.Flags * [AppDoNotCallAsyncQueue] = [] then
+    Application.QueueAsyncCall(@RefreshCheckBox, 0);
 end;
 
 procedure THMICheckBox.RemoveTagCallBack(Sender: TObject);
 begin
-  if Ftag=Sender then
-    FTag:=nil;
+  if FTag = Sender then
+    FTag := nil;
 end;
 
 end.

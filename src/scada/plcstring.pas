@@ -416,7 +416,7 @@ begin
   Result := '';
 
   if Length(values)<=0 then begin
-    exit;
+    Exit;
   end;
 
   AResult:= '';
@@ -463,7 +463,7 @@ begin
                //se alcançou o tamanho da string.
                //if all string is decoded, finish.
                if Length(AResult)>=strlen then
-                 exit;
+                 Exit;
              end;
              inc(ByteP);
              ByteBitP := 0;
@@ -472,7 +472,7 @@ begin
            if ValueBitP>=BitsByType then begin
              ValueBitP := 0;
              Inc(ValueP);
-             if ValueP>High(values) then exit;
+             if ValueP>High(values) then Exit;
              ValueAux2 := Trunc(values[ValueP]);
            end;
          end;
@@ -516,7 +516,7 @@ begin
              //
              //if found the terminator, finish the string.
              if ValueAux=0 then
-               exit
+               Exit
              else
                AResult := AResult + Char(ValueAux);
              //inc(ByteP);
@@ -526,7 +526,7 @@ begin
            if ValueBitP>=BitsByType then begin
              ValueBitP := 0;
              Inc(ValueP);
-             if ValueP>High(values) then exit;
+             if ValueP>High(values) then Exit;
              ValueAux2 := Trunc(values[ValueP]);
            end;
          end;
@@ -746,7 +746,7 @@ var
   c:LongInt;
   notify:Boolean;
 begin
-  if (csDestroying in ComponentState) then exit;
+  if (csDestroying in ComponentState) then Exit;
   try
     notify := false;
     case TagCommand of
@@ -842,7 +842,7 @@ end;
 
 procedure TPLCString.SetStringType(stype:TPLCStringTypes);
 begin
-  if stype=PStringType then exit;
+  if stype=PStringType then Exit;
   PStringType := stype;
   SetBlockSize(CalcBlockSize(false));
   PValue := ArrayOfValuesToString(PValues);

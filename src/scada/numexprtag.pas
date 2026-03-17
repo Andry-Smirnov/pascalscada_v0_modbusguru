@@ -221,7 +221,7 @@ end;
 procedure TNumericExprTag.SetVarA(AValue: TPLCNumber);
 begin
   if FvarA=AValue then Exit;
-  if Assigned(AValue) and (not Supports(AValue,ITagNumeric)) then exit;
+  if Assigned(AValue) and (not Supports(AValue,ITagNumeric)) then Exit;
 
   if Assigned(FvarA) THEN begin
     FvarA.RemoveAllHandlersFromObject(Self);
@@ -241,7 +241,7 @@ end;
 procedure TNumericExprTag.SetVarB(AValue: TPLCNumber);
 begin
   if FvarB=AValue then Exit;
-  if Assigned(AValue) and (not Supports(AValue,ITagNumeric)) then exit;
+  if Assigned(AValue) and (not Supports(AValue,ITagNumeric)) then Exit;
 
   if Assigned(FvarB) THEN begin
     FvarB.RemoveAllHandlersFromObject(Self);
@@ -261,7 +261,7 @@ end;
 procedure TNumericExprTag.SetVarC(AValue: TPLCNumber);
 begin
   if FvarC=AValue then Exit;
-  if Assigned(AValue) and (not Supports(AValue,ITagNumeric)) then exit;
+  if Assigned(AValue) and (not Supports(AValue,ITagNumeric)) then Exit;
 
   if Assigned(FvarC) THEN begin
     FvarC.RemoveAllHandlersFromObject(Self);
@@ -281,7 +281,7 @@ end;
 procedure TNumericExprTag.SetVarD(AValue: TPLCNumber);
 begin
   if FvarD=AValue then Exit;
-  if Assigned(AValue) and (not Supports(AValue,ITagNumeric)) then exit;
+  if Assigned(AValue) and (not Supports(AValue,ITagNumeric)) then Exit;
 
   if Assigned(FvarD) THEN begin
     FvarD.RemoveAllHandlersFromObject(Self);
@@ -301,7 +301,7 @@ end;
 procedure TNumericExprTag.SetVarE(AValue: TPLCNumber);
 begin
   if FvarE=AValue then Exit;
-  if Assigned(AValue) and (not Supports(AValue,ITagNumeric)) then exit;
+  if Assigned(AValue) and (not Supports(AValue,ITagNumeric)) then Exit;
 
   if Assigned(FvarE) THEN begin
     FvarE.RemoveAllHandlersFromObject(Self);
@@ -321,7 +321,7 @@ end;
 procedure TNumericExprTag.SetVarF(AValue: TPLCNumber);
 begin
   if FvarF=AValue then Exit;
-  if Assigned(AValue) and (not Supports(AValue,ITagNumeric)) then exit;
+  if Assigned(AValue) and (not Supports(AValue,ITagNumeric)) then Exit;
 
   if Assigned(FvarF) THEN begin
     FvarF.RemoveAllHandlersFromObject(Self);
@@ -341,7 +341,7 @@ end;
 procedure TNumericExprTag.SetVarG(AValue: TPLCNumber);
 begin
   if FvarG=AValue then Exit;
-  if Assigned(AValue) and (not Supports(AValue,ITagNumeric)) then exit;
+  if Assigned(AValue) and (not Supports(AValue,ITagNumeric)) then Exit;
 
   if Assigned(FvarG) THEN begin
     FvarG.RemoveAllHandlersFromObject(Self);
@@ -361,7 +361,7 @@ end;
 procedure TNumericExprTag.SetVarH(AValue: TPLCNumber);
 begin
   if FvarH=AValue then Exit;
-  if Assigned(AValue) and (not Supports(AValue,ITagNumeric)) then exit;
+  if Assigned(AValue) and (not Supports(AValue,ITagNumeric)) then Exit;
 
   if Assigned(FvarH) THEN begin
     FvarH.RemoveAllHandlersFromObject(Self);
@@ -381,7 +381,7 @@ end;
 procedure TNumericExprTag.SetVarI(AValue: TPLCNumber);
 begin
   if FvarI=AValue then Exit;
-  if Assigned(AValue) and (not Supports(AValue,ITagNumeric)) then exit;
+  if Assigned(AValue) and (not Supports(AValue,ITagNumeric)) then Exit;
 
   if Assigned(FvarI) THEN begin
     FvarI.RemoveAllHandlersFromObject(Self);
@@ -401,7 +401,7 @@ end;
 procedure TNumericExprTag.SetVarJ(AValue: TPLCNumber);
 begin
   if FvarJ=AValue then Exit;
-  if Assigned(AValue) and (not Supports(AValue,ITagNumeric)) then exit;
+  if Assigned(AValue) and (not Supports(AValue,ITagNumeric)) then Exit;
 
   if Assigned(FvarJ) THEN begin
     FvarJ.RemoveAllHandlersFromObject(Self);

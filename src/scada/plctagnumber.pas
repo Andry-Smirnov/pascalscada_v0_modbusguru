@@ -300,7 +300,7 @@ var
   PreviousTimestamp:TDateTime;
 begin
   PreviousTimestamp:=PValueTimeStamp;
-  if (csDestroying in ComponentState) then exit;
+  if (csDestroying in ComponentState) then Exit;
   inherited TagCommandCallBack(ReqID, Values, ValuesTimeStamp, TagCommand, LastResult, Offset);
   TagValues:=PLCValuesToTagValues(Values, Offset);
 

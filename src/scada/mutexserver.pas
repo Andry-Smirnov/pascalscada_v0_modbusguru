@@ -259,12 +259,12 @@ begin
 
   if [csLoading,csReading]*ComponentState<>[] then begin
     FActiveLoaded:=AValue;
-    exit;
+    Exit;
   end;
 
   if [csDesigning]*ComponentState<>[] then begin
     FActive:=AValue;
-    exit;
+    Exit;
   end;
 
   if FActive=AValue then Exit;
@@ -277,7 +277,7 @@ begin
     if FSocket<0 then begin
       FActive:=false;
       //RefreshLastOSError;
-      exit;
+      Exit;
     end;
     {$ELSE}
     //WINDOWS 32 and 64 bits
@@ -285,7 +285,7 @@ begin
     if FSocket=INVALID_SOCKET then begin
       FActive:=false;
       //RefreshLastOSError;
-      exit;
+      Exit;
     end;
     {$IFEND}
 
@@ -308,13 +308,13 @@ begin
     if fpBind(FSocket,@channel,sizeof(channel))<>0 then begin
       CloseSocket(FSocket);
       FActive:=false;
-      exit;
+      Exit;
     end;
 
     if fpListen(FSocket, SOMAXCONN)<>0 then begin
       CloseSocket(FSocket);
       FActive:=false;
-      exit;
+      Exit;
     end;
     {$IFEND}
 
@@ -322,13 +322,13 @@ begin
     if bind(FSocket,channel,sizeof(channel))<>0 then begin
       CloseSocket(FSocket);
       FActive:=false;
-      exit;
+      Exit;
     end;
 
     if listen(FSocket, SOMAXCONN)<>0 then begin
       CloseSocket(FSocket);
       FActive:=false;
-      exit;
+      Exit;
     end;
     {$IFEND}
 

@@ -323,10 +323,10 @@ begin
     EnableGroup(LastAlphaKeyboard.FSymbolsKeyGroup,        ShowSymbols);
     EnableGroup(LastAlphaKeyboard.FNumbersKeyGroup,        ShowNumbers);
 
-    exit(LastAlphaKeyboard)
+    Exit(LastAlphaKeyboard)
   end else begin
     FreeAndNil(LastAlphaKeyboard);
-    exit(TpsHMIfrmAlphaKeyboard.Create(TheOwner, Target, ShowFxxKeys, ShowTab,
+    Exit(TpsHMIfrmAlphaKeyboard.Create(TheOwner, Target, ShowFxxKeys, ShowTab,
                                        ShowCaps, ShowShift, ShowCtrl, ShowAlt,
                                        ShowSymbols, ShowNumbers,
                                        ShowFastNavigation, ShowNavigation,
@@ -503,7 +503,7 @@ procedure TpsHMIfrmAlphaKeyboard.ModifierPress(Sender: TObject);
 var
   x:TSpeedButton;
 begin
-  if not (Sender is TSpeedButton) then exit;
+  if not (Sender is TSpeedButton) then Exit;
 
   x:=TSpeedButton.Create(Self);
   x.GroupIndex:=TSpeedButton(Sender).GroupIndex;
@@ -581,7 +581,7 @@ end;
 
 procedure TpsHMIfrmAlphaKeyboard.Timer1Timer(Sender: TObject);
 begin
-  if not MoveOperation then exit;
+  if not MoveOperation then Exit;
   MoveOperation:=False;
 
   if CurX>OffsetX then
@@ -597,7 +597,7 @@ end;
 
 procedure TpsHMIfrmAlphaKeyboard.BtnPress(Sender: TObject);
 begin
-  if FTarget=nil then exit;
+  if FTarget=nil then Exit;
 
   with Sender as TSpeedButton do begin
     FKeyboard.Press(Tag);
@@ -631,7 +631,7 @@ begin
     TForm(FTarget.Parent).Top:=0;
     if Application.Flags*[AppDoNotCallAsyncQueue]=[] then
       Application.QueueAsyncCall(@GotoBetterPositionDelayed, 0);
-    exit;
+    Exit;
   end;
   //auto posicionamento do popup.
   //t_point:=FTarget.ClientOrigin;

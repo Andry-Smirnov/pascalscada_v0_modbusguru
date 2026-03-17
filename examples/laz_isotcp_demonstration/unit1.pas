@@ -149,7 +149,7 @@ end;
 
 procedure TForm1.RadioButton1Click(Sender: TObject);
 begin
-  if not (Sender is TRadioButton) then exit;
+  if not (Sender is TRadioButton) then Exit;
   TIPropertyGrid1.Clear;
   with Sender as TRadioButton do
     case Tag of

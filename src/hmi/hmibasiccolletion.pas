@@ -11,22 +11,22 @@ type
 
   THMIBasicColletion = class(TCollection)
   private
-    FOwner:TPersistent;
-    FOnColletionItemChange:TNotifyEvent;
-    FOnNeedCompState:TNeedCompStateEvent;
-    FComponentState:TComponentState;
- protected
+    FOwner: TPersistent;
+    FOnColletionItemChange: TNotifyEvent;
+    FOnNeedCompState: TNeedCompStateEvent;
+    FComponentState: TComponentState;
+  protected
     //: @exclude
     function GetOwner: TPersistent; override;
     //: @exclude
     procedure NeedCurrentCompState;
 
-    procedure DoOnChange(const Item:TObject); virtual;
- public
-   //: @exclude
-   function GetComponentState:TComponentState;
-   procedure Assign(Source: TPersistent); override;
- public
+    procedure DoOnChange(const Item: TObject); virtual;
+  public
+    //: @exclude
+    function GetComponentState: TComponentState;
+    procedure Assign(Source: TPersistent); override;
+  public
 
     {$IFDEF PORTUGUES}
     {:
@@ -38,7 +38,7 @@ type
     @name is called when a colletion item was changed.
     }
     {$ENDIF}
-    property OnCollectionItemChange:TNotifyEvent read FOnColletionItemChange write FOnColletionItemChange;
+    property OnCollectionItemChange: TNotifyEvent read FOnColletionItemChange write FOnColletionItemChange;
 
     {$IFDEF PORTUGUES}
     {:
@@ -55,10 +55,10 @@ type
     @seealso(ZonesState)
     }
     {$ENDIF}
-    property OnNeedCompState:TNeedCompStateEvent read FOnNeedCompState write FOnNeedCompState;
- public
+    property OnNeedCompState: TNeedCompStateEvent read FOnNeedCompState write FOnNeedCompState;
+  public
     //: @exclude
-    constructor Create(aOwner:TPersistent; aItemClass: TCollectionItemClass); virtual;
+    constructor Create(AOwner: TPersistent; AItemClass: TCollectionItemClass); virtual;
 
     //: @exclude
     function Add: TCollectionItem;
@@ -93,7 +93,7 @@ type
     @seealso(OnNeedCompState)
     }
     {$ENDIF}
-    property  CollectionState:TComponentState read GetComponentState;
+    property CollectionState: TComponentState read GetComponentState;
   end;
 
   { THMIBasicColletionItem }
@@ -104,7 +104,7 @@ type
     procedure NotifyChange; virtual;
   public
     {: @exclude }
-    constructor Create(aCollection: TCollection); override;
+    constructor Create(ACollection: TCollection); override;
     destructor Destroy; override;
     {: @exclude }
     procedure Loaded; virtual;
@@ -121,11 +121,11 @@ begin
       DoOnChange(Self);
 end;
 
-constructor THMIBasicColletionItem.Create(aCollection: TCollection);
+constructor THMIBasicColletionItem.Create(ACollection: TCollection);
 begin
-  inherited Create(aCollection);
+  inherited Create(ACollection);
   if Collection is THMIBasicColletion then
-     THMIBasicColletion(Collection).NeedCurrentCompState;
+    THMIBasicColletion(Collection).NeedCurrentCompState;
 end;
 
 destructor THMIBasicColletionItem.Destroy;
@@ -139,23 +139,22 @@ end;
 
 { THMIBasicColletion }
 
-constructor THMIBasicColletion.Create(aOwner: TPersistent;
-  aItemClass: TCollectionItemClass);
+constructor THMIBasicColletion.Create(AOwner: TPersistent; AItemClass: TCollectionItemClass);
 begin
-  inherited Create(aItemClass);
-  FOwner:=aOwner;
+  inherited Create(AItemClass);
+  FOwner := AOwner;
 end;
 
 function THMIBasicColletion.Add: TCollectionItem;
 begin
-  Result:=inherited Add;
-  if ((GetComponentState*[csReading,csLoading])=[]) and (UpdateCount=0) then
+  Result := inherited Add;
+  if ((GetComponentState * [csReading, csLoading]) = []) and (UpdateCount = 0) then
     DoOnChange(Result);
 end;
 
 function THMIBasicColletion.GetOwner: TPersistent;
 begin
-  Result:=FOwner;
+  Result := FOwner;
 end;
 
 function THMIBasicColletion.GetComponentState: TComponentState;
@@ -166,38 +165,40 @@ end;
 
 procedure THMIBasicColletion.Assign(Source: TPersistent);
 var
-  I: Integer;
+  i: Integer;
 begin
-  If Source is THMIBasicColletion then
-    begin
+  if Source is THMIBasicColletion then
+  begin
     BeginUpdate;
     try
       Clear;
-      For I:=0 To THMIBasicColletion(Source).Count-1 do
-       Add;
+      for i := 0 to THMIBasicColletion(Source).Count - 1 do
+        Add;
 
-      For I:=0 To Self.Count-1 do begin
-       THMIBasicColletionItem(THMIBasicColletion(Source).Items[I]).AssignTo(THMIBasicColletionItem(Items[I]));
+      for i := 0 to Self.Count - 1 do
+      begin
+        THMIBasicColletionItem(THMIBasicColletion(Source).Items[i]).AssignTo(THMIBasicColletionItem(Items[i]));
       end;
     finally
       EndUpdate;
       DoOnChange(nil)
     end;
-    exit;
-    end
+    Exit;
+  end
   else
-    Inherited Assign(Source);
+    inherited Assign(Source);
 end;
 
 procedure THMIBasicColletion.NeedCurrentCompState;
 begin
-  if assigned(FOnNeedCompState) then
-     FOnNeedCompState(FComponentState);
+  if Assigned(FOnNeedCompState) then
+    FOnNeedCompState(FComponentState);
 end;
 
 procedure THMIBasicColletion.DoOnChange(const Item: TObject);
 begin
-  if (UpdateCount=0) and Assigned(FOnColletionItemChange) then begin
+  if (UpdateCount = 0) and Assigned(FOnColletionItemChange) then
+  begin
     if Assigned(Item) then
       FOnColletionItemChange(Item)
     else
@@ -207,12 +208,11 @@ end;
 
 procedure THMIBasicColletion.Loaded;
 var
-   i:LongInt;
+  i: Longint;
 begin
-   for i:=0 to Count-1 do
-     if Items[i] is THMIBasicColletionItem then
-       THMIBasicColletionItem(Items[i]).Loaded;
+  for i := 0 to Count - 1 do
+    if Items[i] is THMIBasicColletionItem then
+      THMIBasicColletionItem(Items[i]).Loaded;
 end;
 
 end.
-

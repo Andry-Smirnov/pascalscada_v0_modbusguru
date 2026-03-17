@@ -372,13 +372,13 @@ begin
     if Assigned(StructItemMapperEditor) then
     StructItemMapperEditor(Self, Self.Owner,InsertHook,CreateProc)
   else
-    raise exception.Create('None element mapper tool has been assigned!');
+    raise exception.Create('None element mapper tool has been Assigned!');
 end;
 
 procedure SetStructItemMapper(StructItemMapperTool:TOpenTagEditor);
 begin
-  if assigned(StructItemMapperEditor) then
-    raise Exception.Create('A Bit Mapper editor was already assigned.')
+  if Assigned(StructItemMapperEditor) then
+    raise Exception.Create('A Bit Mapper editor was already Assigned.')
   else
     StructItemMapperEditor:=StructItemMapperTool;
 end;

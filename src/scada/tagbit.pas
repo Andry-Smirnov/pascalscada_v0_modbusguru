@@ -176,7 +176,7 @@ end;
 
 procedure TTagBit.SetNumber(number:TPLCNumber);
 begin
-  if number=PNumber then exit;
+  if number=PNumber then Exit;
 
   if (number<>nil) and ((not Supports(number, ITagInterface)) or (not Supports(number, ITagNumeric))) then
      raise Exception.Create(SinvalidTag);

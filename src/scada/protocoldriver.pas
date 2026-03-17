@@ -865,8 +865,8 @@ begin
     FReadCS.Enter;
 
     //se for a mesma porta cai fora...
-    //if is the same communication port, exit.
-    if CommPort=PCommPort then exit;
+    //if is the same communication port, Exit.
+    if CommPort=PCommPort then Exit;
 
     if PCommPort<>nil then begin
       if PCommPort.LockedBy=PDriverID then
@@ -897,7 +897,7 @@ end;
 
 procedure TProtocolDriver.DoDelTag(TagObj:TTag);
 begin
-  if PTags.Count<=0 then exit;
+  if PTags.Count<=0 then Exit;
 
   if PTags.IndexOf(TagObj)<>-1 then begin
     (TagObj as IScanableTagInterface).SetTagValidity(false);
@@ -1072,7 +1072,7 @@ begin
     if (csReading in ComponentState) or
        (csDestroying in ComponentState) then begin
        Result := 0;
-       exit;
+       Exit;
     end;
 
     //incrementa o contador de scanReads
@@ -1119,7 +1119,7 @@ begin
   if GetIsReadOnly then begin
     tagrec.CallBack(0, Values,Now,tcScanWrite,ioReadOnlyProtocol,tagrec.RealOffset);
     Result:=0;
-    exit;
+    Exit;
   end;
 
   try
@@ -1129,7 +1129,7 @@ begin
     if (csReading in ComponentState) or
        (csDestroying in ComponentState) then begin
        Result := 0;
-       exit;
+       Exit;
     end;
 
     //incrementa o contador de ScanWrites
@@ -1185,7 +1185,7 @@ begin
     FWriteCS.Enter;
     FReadCS.Enter;
     res := DoRead(tagrec,Values,true);
-    if assigned(tagrec.CallBack) then
+    if Assigned(tagrec.CallBack) then
       tagrec.CallBack(0, Values,CrossNow,tcRead,res,tagrec.RealOffset);
   finally
     FReadCS.Leave;
@@ -1201,7 +1201,7 @@ var
 begin
   if GetIsReadOnly then begin
     tagrec.CallBack(0, Values,Now,tcWrite,ioReadOnlyProtocol,tagrec.RealOffset);
-    exit;
+    Exit;
   end;
 
   try
@@ -1214,7 +1214,7 @@ begin
     FReadCS.Enter;
 
     res := DoWrite(tagrec,Values,true);
-    if assigned(tagrec.CallBack) then
+    if Assigned(tagrec.CallBack) then
       tagrec.CallBack(0, Values,CrossNow,tcWrite,res,tagrec.RealOffset);
   finally
     FReadCS.Leave;
@@ -1286,7 +1286,7 @@ begin
 
   if GetIsReadOnly then begin
     Result:=ioReadOnlyProtocol;
-    exit;
+    Exit;
   end;
 
   try
@@ -1365,7 +1365,7 @@ begin
 
     FReadCS.Enter;
 
-    if ComponentState*[csDestroying]<>[] then exit;
+    if ComponentState*[csDestroying]<>[] then Exit;
     PortError:=false;
 
     if NeedsExternalPort then begin

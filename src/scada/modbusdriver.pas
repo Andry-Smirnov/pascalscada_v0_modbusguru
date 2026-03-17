@@ -697,13 +697,13 @@ begin
   try
     if ([csDestroying]*ComponentState<>[]) then begin
       CrossThreadSwitch;
-      exit;
+      Exit;
     end;
 
-    //avoid high cpu consumption with linked tags and not assigned communcation port
+    //avoid high cpu consumption with linked tags and not Assigned communcation port
     if (not Assigned(PCommPort)) or (PCommPort.ReallyActive=false) then begin
       NeedSleep:=1;
-      exit;
+      Exit;
     end;
 
     EntireTagList:=TReqList.Create;
@@ -778,7 +778,7 @@ begin
     values.ReadFaults := 1;
     values.LastQueryResult := ioDriverError;
     SetLength(values.Values,0);
-    exit;
+    Exit;
   end;
 
   case TagObj.ReadFunction of
@@ -844,7 +844,7 @@ begin
                res := PCommPort.IOCommandSync(iocRead,0,nil,1,DriverID,0,@IOResult2);
              until IOResult2.ReadIOResult=iorTimeOut;
              Result:=ioCommError;
-             exit;
+             Exit;
           end;
 
           if FRemainingBytes>0 then begin
@@ -915,7 +915,7 @@ begin
              res := PCommPort.IOCommandSync(iocRead,0,nil,1,DriverID,0,@IOResult2,starts,ends);
            until IOResult2.ReadIOResult=iorTimeOut;
            Result:=ioCommError;
-           exit;
+           Exit;
         end;
 
         if FRemainingBytes>0 then begin
@@ -951,7 +951,7 @@ procedure TModBusDriver.SetOutputMaxHole(v:Cardinal);
 var
   plc:LongInt;
 begin
-  if v = POutputMaxHole then exit;
+  if v = POutputMaxHole then Exit;
 
   POutputMaxHole:=v;
 
@@ -963,7 +963,7 @@ procedure TModBusDriver.SetInputMaxHole(v:Cardinal);
 var
   plc:LongInt;
 begin
-  if v = PInputMaxHole then exit;
+  if v = PInputMaxHole then Exit;
 
   PInputMaxHole:=v;
 
@@ -975,7 +975,7 @@ procedure TModBusDriver.SetRegisterMaxHole(v:Cardinal);
 var
   plc:LongInt;
 begin
-  if v = PRegistersMaxHole then exit;
+  if v = PRegistersMaxHole then Exit;
 
   PRegistersMaxHole:=v;
 
@@ -1021,8 +1021,8 @@ end;
 
 procedure SetTagBuilderToolForModBusProtocolFamily(TagBuilderTool:TOpenTagEditor);
 begin
-  if assigned(ModbusTagBuilderEditor) then
-    raise Exception.Create('A Tag Builder editor for Modbus RTU/TCP protocol family was already assigned.')
+  if Assigned(ModbusTagBuilderEditor) then
+    raise Exception.Create('A Tag Builder editor for Modbus RTU/TCP protocol family was already Assigned.')
   else
     ModbusTagBuilderEditor:=TagBuilderTool;
 end;

@@ -5,7 +5,7 @@ unit hmi_draw_rosca;
 interface
 
 uses
-  Controls, sysutils, Graphics, Classes, hmi_draw_basic_horizontal_control,
+  Controls, SysUtils, Graphics, Classes, hmi_draw_basic_horizontal_control,
   BGRABitmap, BGRABitmapTypes;
 
 type
@@ -34,47 +34,51 @@ implementation
 
 procedure THMIRoscaBasica.DrawControl;
 var
-  line_x:integer;
-  x:Array Of TPoint;
-  h: Integer;
-  eixo_h: Integer;
-  eixo_top: Integer;
-  emptyArea: TBGRABitmap;
+  LineX: Integer;
+  X: array of TPoint;
+  H: Integer;
+  EixoH: Integer;
+  EixoTop: Integer;
+  EmptyArea: TBGRABitmap;
 begin
-  emptyArea := TBGRABitmap.Create(Width,Height);
+  EmptyArea := TBGRABitmap.Create(Width, Height);
   try
-    FControlArea.Assign(emptyArea);
+    FControlArea.Assign(EmptyArea);
   finally
-    FreeAndNil(emptyArea);
+    FreeAndNil(EmptyArea);
   end;
 
   //###############################################################################
   //preenchimento do redlers, cor e diametro da linha.
   //###############################################################################
-  FControlArea.CanvasBGRA.Brush.Color:= FBodyColor;
-  FControlArea.CanvasBGRA.Pen.Color  := FBorderColor;
-  FControlArea.CanvasBGRA.Pen.Width  := FBorderWidth;
+  FControlArea.CanvasBGRA.Brush.Color := FBodyColor;
+  FControlArea.CanvasBGRA.Pen.Color := FBorderColor;
+  FControlArea.CanvasBGRA.Pen.Width := FBorderWidth;
 
   //desenha o quadrado da rosca.
   FControlArea.CanvasBGRA.Rectangle(0, 0, Width, FBodyHeight);
 
-  line_x:=0;
-  while line_x<(Width+FBodyHeight) do begin
-    h:=Length(x);
+  LineX := 0;
+  while LineX < (Width + FBodyHeight) do
+  begin
+    H := Length(X);
     //adiciona os pontos a poliline da rosca..
-    SetLength(x,h+1);
-    x[h].X:=line_x;
-    if (line_x mod (2*FBodyHeight))=0 then begin
-      x[h].Y:=0;
-    end else begin
-      x[h].Y:=FBodyHeight;
+    SetLength(X, H + 1);
+    X[H].x := LineX;
+    if (LineX Mod (2 * FBodyHeight)) = 0 then
+    begin
+      X[H].Y := 0;
+    end
+    else
+    begin
+      X[H].Y := FBodyHeight;
     end;
-    //
-    inc(line_x, FBodyHeight);
+
+    Inc(LineX, FBodyHeight);
   end;
-  //desenha a "rosca"
-  FControlArea.CanvasBGRA.Pen.Width  :=FBorderWidth+1;
-  FControlArea.CanvasBGRA.Polyline(x);
+  // Draw the "thread"
+  FControlArea.CanvasBGRA.Pen.Width := FBorderWidth + 1;
+  FControlArea.CanvasBGRA.Polyline(X);
 end;
 
 procedure THMIRoscaBasica.UpdateShape;
@@ -85,4 +89,3 @@ begin
 end;
 
 end.
-

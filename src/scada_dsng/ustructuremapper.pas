@@ -1,7 +1,7 @@
 {$i ../common/language.inc}
 {$IFDEF PORTUGUES}
 {:
-  @abstract(Unit do formulário assistente de criação de estruturas do tag TPLCStruct.)
+  @abstract(Unit do formulï¿½rio assistente de criaï¿½ï¿½o de estruturas do tag TPLCStruct.)
   @author(Fabio Luis Girardi <fabio@pascalscada.com>)
 }
 {$ELSE}
@@ -23,7 +23,7 @@ type
 
   {$IFDEF PORTUGUES}
   {:
-  Assistente de criação de estruturas usando o tag TPLCStruct.
+  Assistente de criaï¿½ï¿½o de estruturas usando o tag TPLCStruct.
 
   @author(Fabio Luis Girardi <fabio@pascalscada.com>)
   }
@@ -159,13 +159,13 @@ begin
     if TObject(FTagList.Items[t])=Sender then continue;
     if TS7TagItemEditor(FTagList.Items[t]).TagName=NewName then begin
       AcceptNewName:=false;
-      exit;
+      Exit;
     end;
     for b:=0 to TS7TagItemEditor(FTagList.Items[t]).BitCount-1 do begin
       if TS7TagItemEditor(FTagList.Items[t]).Bit[b]=Sender then continue;
       if TTagBitItemEditor(TS7TagItemEditor(FTagList.Items[t]).Bit[b]).TagName=NewName then begin
         AcceptNewName:=false;
-        exit;
+        Exit;
       end;
     end;
   end;
@@ -177,7 +177,7 @@ var
   priortop, actualTop:LongInt;
   prior:TS7TagItemEditor;
 begin
-  if not (Sender is TS7TagItemEditor) then exit;
+  if not (Sender is TS7TagItemEditor) then Exit;
 
   idx := FTagList.IndexOf(Sender);
   if idx>0 then begin
@@ -200,7 +200,7 @@ var
   nexttop, actualTop:LongInt;
   aNext:TS7TagItemEditor;
 begin
-  if not (Sender is TS7TagItemEditor) then exit;
+  if not (Sender is TS7TagItemEditor) then Exit;
 
   idx := FTagList.IndexOf(Sender);
   if (idx<>-1) and (idx<(FTagList.Count-1)) then begin
@@ -268,7 +268,7 @@ var
     Result := StringReplace(Result,'%t',n,[rfReplaceAll]);
   end;
 begin
-  if not (Sender is TS7TagItemEditor) then exit;
+  if not (Sender is TS7TagItemEditor) then Exit;
 
   s7tageditor := (Sender as TS7TagItemEditor);
 

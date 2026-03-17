@@ -14,8 +14,12 @@ unit HMIZones;
 
 interface
 
-uses Classes, SysUtils, hsutils, Controls, Graphics, hmibasiccolletion
-  {$IFNDEF FPC}, StdCtrls{$ENDIF};
+uses
+  Classes, SysUtils, hsutils, Controls, Graphics, hmibasiccolletion
+  {$IFNDEF FPC}
+  , StdCtrls
+  {$ENDIF}
+  ;
 
 type
   {$IFDEF PORTUGUES}
@@ -49,92 +53,92 @@ type
   {$ENDIF}
   TZone = class(THMIBasicColletionItem)
   private
-     FValue1,FValue2:Double;
-     FIncludeV1, FIncludeV2:Boolean;
-     FDefaultZone:Boolean;
-     FZoneType:TZoneTypes;
+    FValue1, FValue2: Double;
+    FIncludeV1, FIncludeV2: Boolean;
+    FDefaultZone: Boolean;
+    FZoneType: TZoneTypes;
 
-     procedure SetV1(v:Double);
-     procedure SetV2(v:Double);
-     procedure SetIncV1(v:Boolean);
-     procedure SetIncV2(v:Boolean);
-     procedure SetAsDefaultZone(v:Boolean);
-     procedure SetZoneType(zt:TZoneTypes);
+    procedure SetV1(v: Double);
+    procedure SetV2(v: Double);
+    procedure SetIncV1(v: Boolean);
+    procedure SetIncV2(v: Boolean);
+    procedure SetAsDefaultZone(v: Boolean);
+    procedure SetZoneType(zt: TZoneTypes);
 
   protected
-     {: @exclude }
-     function  GetDisplayName: AnsiString; override;
+    {: @exclude }
+    function GetDisplayName: Ansistring; override;
 
-     {$IFDEF PORTUGUES}
+    {$IFDEF PORTUGUES}
      {:
      Se @true torna a zona padrão, exibindo-a quando nenhuma zona for selecionada
      em função do valor do tag.
      @seealso(ZoneType)
      }
-     {$ELSE}
+    {$ELSE}
      {:
      If @true makes the zone default, showing it when no animation zone is
      selected depending of the tag value.
      @seealso(ZoneType)
      }
-     {$ENDIF}
-     property DefaultZone:Boolean read FDefaultZone write SetAsDefaultZone;
+    {$ENDIF}
+    property DefaultZone: Boolean read FDefaultZone write SetAsDefaultZone;
   public
-     procedure AssignTo(Dest: TPersistent); override;
+    procedure AssignTo(Dest: TPersistent); override;
   published
-     {$IFDEF PORTUGUES}
+    {$IFDEF PORTUGUES}
      {:
      Valor principal.
      @seealso(ZoneType)
      }
-     {$ELSE}
+    {$ELSE}
      {:
      Main value.
      @seealso(ZoneType)
      }
-     {$ENDIF}
-     property Value1:Double read FValue1 write SetV1;
+    {$ENDIF}
+    property Value1: Double read FValue1 write SetV1;
 
-     {$IFDEF PORTUGUES}
+    {$IFDEF PORTUGUES}
      {:
      Valor secundário.
      @seealso(ZoneType)
      }
-     {$ELSE}
+    {$ELSE}
      {:
      Secundary value.
      @seealso(ZoneType)
      }
-     {$ENDIF}
-     property Value2:Double read FValue2 write SetV2;
+    {$ENDIF}
+    property Value2: Double read FValue2 write SetV2;
 
-     {$IFDEF PORTUGUES}
+    {$IFDEF PORTUGUES}
      {:
      Flag auxiliar da proprieade Value1. Altera o critério de seleção.
      @seealso(ZoneType)
      }
-     {$ELSE}
+    {$ELSE}
      {:
      Auxiliar flag of Value1 property. Changes the selection criteria.
      @seealso(ZoneType)
      }
-     {$ENDIF}
-     property IncludeValue1:Boolean read FIncludeV1 write SetIncV1;
+    {$ENDIF}
+    property IncludeValue1: Boolean read FIncludeV1 write SetIncV1;
 
-     {$IFDEF PORTUGUES}
+    {$IFDEF PORTUGUES}
      {:
      Flag auxiliar da proprieade Value2. Altera o critério de seleção.
      @seealso(ZoneType)
      }
-     {$ELSE}
+    {$ELSE}
      {:
      Auxiliar flag of Value2 property. Changes the selection criteria.
      @seealso(ZoneType)
      }
-     {$ENDIF}
-     property IncludeValue2:Boolean read FIncludeV2 write SetIncV2;
+    {$ENDIF}
+    property IncludeValue2: Boolean read FIncludeV2 write SetIncV2;
 
-     {$IFDEF PORTUGUES}
+    {$IFDEF PORTUGUES}
      {:
      @name define qual vai ser a condição que vai selecionar ou descartar a zona
      em questão.
@@ -186,7 +190,7 @@ type
      @seealso(TZoneTypes)
      @seealso(DefaultZone)
      }
-     {$ELSE}
+    {$ELSE}
      {:
      @name defines what's the selection condition that will show or not the
      animation zone.
@@ -235,64 +239,64 @@ type
      @seealso(TZoneTypes)
      @seealso(DefaultZone)
      }
-     {$ENDIF}
-     property ZoneType:TZoneTypes read FZoneType write SetZoneType;
+    {$ENDIF}
+    property ZoneType: TZoneTypes read FZoneType write SetZoneType;
   end;
 
   { TAnimationZone }
 
   TAnimationZone = class(TZone)
   private
-     FBlinkTime:Cardinal;
-     FBlinkWith:TAnimationZone;
-     FBlinkWithIndex:LongInt;
-     FReferencedBy:Array of TAnimationZone;
-     function  GetBlinkWithZoneNumber:LongInt;
-     procedure SetBlinkWithZoneNumber(v:LongInt);
-     procedure SetBlinkTime(v:Cardinal);
-     procedure RemoveBlinkZone;
-     procedure AddReference(RefBy:TAnimationZone);
-     procedure RemReference(RefBy:TAnimationZone);
+    FBlinkTime: Cardinal;
+    FBlinkWith: TAnimationZone;
+    FBlinkWithIndex: Longint;
+    FReferencedBy: array of TAnimationZone;
+    function GetBlinkWithZoneNumber: Longint;
+    procedure SetBlinkWithZoneNumber(v: Longint);
+    procedure SetBlinkTime(v: Cardinal);
+    procedure RemoveBlinkZone;
+    procedure AddReference(RefBy: TAnimationZone);
+    procedure RemReference(RefBy: TAnimationZone);
   protected
-     procedure Loaded; override;
+    procedure Loaded; override;
   public
-     constructor Create(aCollection: TCollection); override;
-     destructor Destroy; override;
-     procedure AssignTo(Dest: TPersistent); override;
+    constructor Create(aCollection: TCollection); override;
+    destructor Destroy; override;
+    procedure AssignTo(Dest: TPersistent); override;
   published
-     {$IFDEF PORTUGUES}
+    {$IFDEF PORTUGUES}
      {:
      @name informa o tempo em milisegundos que a zona ficara visivel. Após esse
      tempo chama a próxima zona definida por BlinkWith.
      @seealso(BlinkWith)
      @seealso(TZone.DefaultZone)
      }
-     {$ELSE}
+    {$ELSE}
      {:
      @name is the time in milliseconds that the animation zone will stay visible.
      After this time, shows the next zone (defined by the BlinkWith property).
      @seealso(BlinkWith)
      @seealso(TZone.DefaultZone)
      }
-     {$ENDIF}
-     property BlinkTime:Cardinal read FBlinkTime write SetBlinkTime;
+    {$ENDIF}
+    property BlinkTime: Cardinal read FBlinkTime write SetBlinkTime;
 
-     {$IFDEF PORTUGUES}
+    {$IFDEF PORTUGUES}
      {:
      @name informa qual será a próxima zona a ser chamada para gerar o efeito de
      pisca/animação após o tempo de exibição da zona.
      @seealso(BlinkTime)
      }
-     {$ELSE}
+    {$ELSE}
      {:
      @name is the next zone to be shown to do a blink effect/animation after
      BlinkTime milliseconds of the current animation zone.
      @seealso(BlinkTime)
      }
-     {$ENDIF}
-     property BlinkWith:LongInt read GetBlinkWithZoneNumber write SetBlinkWithZoneNumber nodefault;
+    {$ENDIF}
+    property BlinkWith: Longint read GetBlinkWithZoneNumber write SetBlinkWithZoneNumber nodefault;
 
-     property DefaultZone;
+    property DefaultZone;
   end;
 
 
@@ -311,10 +315,10 @@ type
   {$ENDIF}
   TZones = class(THMIBasicColletion)
   public
-     //: @exclude
-     constructor Create(aOwner:TPersistent; aItemClass: TCollectionItemClass); override;
+    //: @exclude
+    constructor Create(aOwner: TPersistent; aItemClass: TCollectionItemClass); override;
 
-     {$IFDEF PORTUGUES}
+    {$IFDEF PORTUGUES}
      {:
      @name retorna uma zona em função do valor e dos critérios das zonas
      pertencentes a coleção.
@@ -326,7 +330,7 @@ type
              marcada como padrão. Se não for escolhida nenhuma zona e não há
              nenhuma zona padrão retorna @nil).
      }
-     {$ELSE}
+    {$ELSE}
      {:
      @name returns the selected animation zone, depending of select criteria of
      each animation zone.
@@ -337,10 +341,10 @@ type
      or if no zone was selected, returns the animation zone setted as default.
      If has no animation zone set as default, returns @nil).
      }
-     {$ENDIF}
-     function  GetZoneFromValue(v:Double):TZone; virtual;
+    {$ENDIF}
+    function GetZoneFromValue(v: Double): TZone; virtual;
 
-     function  GetDefaultZone:TZone;
+    function GetDefaultZone: TZone;
   end;
 
   {$IFDEF PORTUGUES}
@@ -362,19 +366,19 @@ type
   {$ENDIF}
   TTextZone = class(TAnimationZone)
   private
-     FText:TCaption;
-     FColor:TColor;
-     FTransparent:Boolean;
-     FFont:TFont;
-     FHorAlignment:TAlignment;
-     FVerAlignment:TTextLayout;
-     procedure FontChanges(Sender:TObject);
-     procedure SetText(t:TCaption);
-     procedure SetColor(c:TColor);
-     procedure SetTransparent(b:Boolean);
-     procedure SetFont(f:TFont);
-     procedure SetHorAlignment(x:TAlignment);
-     procedure SetVerAlignment(x:TTextLayout);
+    FText: TCaption;
+    FColor: TColor;
+    FTransparent: Boolean;
+    FFont: TFont;
+    FHorAlignment: TAlignment;
+    FVerAlignment: TTextLayout;
+    procedure FontChanges(Sender: TObject);
+    procedure SetText(t: TCaption);
+    procedure SetColor(c: TColor);
+    procedure SetTransparent(b: Boolean);
+    procedure SetFont(f: TFont);
+    procedure SetHorAlignment(x: TAlignment);
+    procedure SetVerAlignment(x: TTextLayout);
   public
     //: @exclude
     constructor Create(aCollection: TCollection); override;
@@ -382,7 +386,7 @@ type
     procedure AssignTo(Dest: TPersistent); override;
   published
 
-     {$IFDEF PORTUGUES}
+    {$IFDEF PORTUGUES}
      {:
      Alinhamento horizontal do texto da zona. Os valores possiveis são:
 
@@ -398,7 +402,7 @@ type
      @seealso(Transparent)
      @seealso(VerticalAlignment)
      }
-     {$ELSE}
+    {$ELSE}
      {:
      Horizontal alignment of the text. The possible values are:
 
@@ -414,10 +418,10 @@ type
      @seealso(Transparent)
      @seealso(VerticalAlignment)
      }
-     {$ENDIF}
-     property  HorizontalAlignment:TAlignment read FHorAlignment write SetHorAlignment default taLeftJustify;
+    {$ENDIF}
+    property HorizontalAlignment: TAlignment read FHorAlignment write SetHorAlignment default taLeftJustify;
 
-     {$IFDEF PORTUGUES}
+    {$IFDEF PORTUGUES}
      {:
      Vertical alignment of the text. The possible values are:
 
@@ -433,12 +437,12 @@ type
      @seealso(Transparent)
      @seealso(HorizontalAlignment)
      }
-     {$ELSE}
+    {$ELSE}
 
-     {$ENDIF}
-     property  VerticalAlignment:TTextLayout read FVerAlignment write SetVerAlignment default tlTop;
+    {$ENDIF}
+    property VerticalAlignment: TTextLayout read FVerAlignment write SetVerAlignment default tlTop;
 
-     {$IFDEF PORTUGUES}
+    {$IFDEF PORTUGUES}
      {:
      Texto a ser exibido na zona.
      @seealso(Color)
@@ -447,7 +451,7 @@ type
      @seealso(HorizontalAlignment)
      @seealso(VerticalAlignment)
      }
-     {$ELSE}
+    {$ELSE}
      {:
      Text to be shown.
      @seealso(Color)
@@ -456,10 +460,10 @@ type
      @seealso(HorizontalAlignment)
      @seealso(VerticalAlignment)
      }
-     {$ENDIF}
-     property  Text:TCaption read FText write SetText;
+    {$ENDIF}
+    property Text: TCaption read FText write SetText;
 
-     {$IFDEF PORTUGUES}
+    {$IFDEF PORTUGUES}
      {:
      Cor que será exibida no fundo da zona.
      @seealso(Font)
@@ -468,7 +472,7 @@ type
      @seealso(HorizontalAlignment)
      @seealso(VerticalAlignment)
      }
-     {$ELSE}
+    {$ELSE}
      {:
      Background color of the text animation zone.
      @seealso(Font)
@@ -477,10 +481,10 @@ type
      @seealso(HorizontalAlignment)
      @seealso(VerticalAlignment)
      }
-     {$ENDIF}
-     property  Color:TColor read FColor write SetColor;
+    {$ENDIF}
+    property Color: TColor read FColor write SetColor;
 
-     {$IFDEF PORTUGUES}
+    {$IFDEF PORTUGUES}
      {:
      Caso @false, usa a cor de fundo da zona informada em Color. Caso @true
      deixa o fundo da zona transparente.
@@ -490,7 +494,7 @@ type
      @seealso(HorizontalAlignment)
      @seealso(VerticalAlignment)
      }
-     {$ELSE}
+    {$ELSE}
      {:
      If @false, uses the background color specified in Color property. If @true
      makes the background transparent.
@@ -500,10 +504,10 @@ type
      @seealso(HorizontalAlignment)
      @seealso(VerticalAlignment)
      }
-     {$ENDIF}
-     property  Transparent:Boolean read FTransparent write SetTransparent;
+    {$ENDIF}
+    property Transparent: Boolean read FTransparent write SetTransparent;
 
-     {$IFDEF PORTUGUES}
+    {$IFDEF PORTUGUES}
      {:
      Fonte de formatação do texto (forma, tamanho e cor).
      @seealso(Color)
@@ -512,7 +516,7 @@ type
      @seealso(HorizontalAlignment)
      @seealso(VerticalAlignment)
      }
-     {$ELSE}
+    {$ELSE}
      {:
      Text font (form, size and color).
      @seealso(Color)
@@ -521,8 +525,8 @@ type
      @seealso(HorizontalAlignment)
      @seealso(VerticalAlignment)
      }
-     {$ENDIF}
-     property  Font:TFont read FFont write SetFont;
+    {$ENDIF}
+    property Font: TFont read FFont write SetFont;
   end;
 
   {$IFDEF PORTUGUES}
@@ -543,14 +547,14 @@ type
   TTextZones = class(TZones)
   public
     //: @exclude
-    constructor Create(aOwner:TPersistent);
+    constructor Create(aOwner: TPersistent);
 
     {$IFDEF PORTUGUES}
     //: Adiciona uma nova zona de texto na coleção.
     {$ELSE}
     //: Adds a animation text zone into the collection.
     {$ENDIF}
-    function Add:TTextZone;
+    function Add: TTextZone;
   end;
 
   {$IFDEF PORTUGUES}
@@ -573,25 +577,25 @@ type
 
   TGraphicZone = class(TAnimationZone)
   private
-     FILIsDefault:Boolean;
-     FFileName:AnsiString;
-     FImageList:TImageList;
-     FImageIndex:LongInt;
-     FColor:TColor;
-     FTransparent:Boolean;
-     procedure SetILAsDefault(b:Boolean);
-     procedure SetFileName(fn:AnsiString);
-     procedure SetImageList(il:TImageList);
-     procedure SetImageIndex(aIndex:LongInt);
-     procedure SetColor(c:TColor);
-     procedure SetTransparent(b:Boolean);
+    FILIsDefault: Boolean;
+    FFileName: Ansistring;
+    FImageList: TImageList;
+    FImageIndex: Longint;
+    FColor: TColor;
+    FTransparent: Boolean;
+    procedure SetILAsDefault(b: Boolean);
+    procedure SetFileName(fn: Ansistring);
+    procedure SetImageList(il: TImageList);
+    procedure SetImageIndex(aIndex: Longint);
+    procedure SetColor(c: TColor);
+    procedure SetTransparent(b: Boolean);
   public
-     //: @exclude
-     constructor Create(aCollection: TCollection); override;
-     procedure Assign(Source: TPersistent); override;
+    //: @exclude
+    constructor Create(aCollection: TCollection); override;
+    procedure Assign(Source: TPersistent); override;
   published
 
-     {$IFDEF PORTUGUES}
+    {$IFDEF PORTUGUES}
      {:
      Caso as propriedades FileName, ImageList e ImageIndex estejam configuradas
      corretamente, @name permite você escolher qual será o recurso primário.
@@ -601,7 +605,7 @@ type
      @seealso(ImageList)
      @seealso(ImageIndex)
      }
-     {$ELSE}
+    {$ELSE}
      {:
      If the properties FileName, ImageList and ImageIndex are configured
      correctly, @name let you choose what's the primary image resource. If @true,
@@ -611,82 +615,82 @@ type
      @seealso(ImageList)
      @seealso(ImageIndex)
      }
-     {$ENDIF}
-     property ImageListAsDefault:Boolean read FILIsDefault write SetILAsDefault default true;
+    {$ENDIF}
+    property ImageListAsDefault: Boolean read FILIsDefault write SetILAsDefault default True;
 
-     {$IFDEF PORTUGUES}
+    {$IFDEF PORTUGUES}
      {:
      Caso a zona seja escolhida, exibe a imagem apontada por esse caminho (caso exista).
      @seealso(ImageListAsDefault)
      }
-     {$ELSE}
+    {$ELSE}
      {:
      Shows the image pointed by @name (if the file exists) if the graphic
      animation zone is selected.
      @seealso(ImageListAsDefault)
      }
-     {$ENDIF}
-     property FileName:AnsiString read FFileName write SetFileName nodefault;
+    {$ENDIF}
+    property FileName: Ansistring read FFileName write SetFileName nodefault;
 
-     {$IFDEF PORTUGUES}
+    {$IFDEF PORTUGUES}
      {:
      Informa qual a lista de imagens que será usada pela zona gráfica.
      @seealso(ImageListAsDefault)
      @seealso(ImageIndex)
      }
-     {$ELSE}
+    {$ELSE}
      {:
      What's the ImageList that will be used graphic animation zone.
      @seealso(ImageListAsDefault)
      @seealso(ImageIndex)
      }
-     {$ENDIF}
-     property ImageList:TImageList read FImageList write SetImageList;
+    {$ENDIF}
+    property ImageList: TImageList read FImageList write SetImageList;
 
-     {$IFDEF PORTUGUES}
+    {$IFDEF PORTUGUES}
      {:
      Informa qual imagem do ImageList que será exibido pela zona gráfica.
      @seealso(ImageListAsDefault)
      @seealso(ImageList)
      }
-     {$ELSE}
+    {$ELSE}
      {:
      What's the Image Index of ImageList that will be shown if the graphic
      animation zone is selected.
      @seealso(ImageListAsDefault)
      @seealso(ImageList)
      }
-     {$ENDIF}
-     property ImageIndex:LongInt read FImageIndex write SetImageIndex stored true nodefault;
+    {$ENDIF}
+    property ImageIndex: Longint read FImageIndex write SetImageIndex stored True nodefault;
 
-     {$IFDEF PORTUGUES}
+    {$IFDEF PORTUGUES}
      {:
      Informa qual cor será interpretada como transparente pela zona gráfica caso
      a propriedade Transparent esteja habilitada.
      @seealso(Transparent)
      }
-     {$ELSE}
+    {$ELSE}
      {:
      What's the color that will be interpreted as Transparent if Transparent
      property is @true.
      @seealso(Transparent)
      }
-     {$ENDIF}
-     property TransparentColor:TColor read FColor write SetColor default clWhite;
+    {$ENDIF}
+    property TransparentColor: TColor read FColor write SetColor default clWhite;
 
-     {$IFDEF PORTUGUES}
+    {$IFDEF PORTUGUES}
      {:
      Habilita/desabilita o troca da cor TransparentColor pelo transparente.
      @seealso(TransparentColor)
      }
-     {$ELSE}
+    {$ELSE}
      {:
      Enables/disables the replacement of the color TransparentColor by the
      transparent.
      @seealso(TransparentColor)
      }
-     {$ENDIF}
-     property Transparent:Boolean read FTransparent write SetTransparent default true;
+    {$ENDIF}
+    property Transparent: Boolean read FTransparent write SetTransparent default True;
   end;
 
   {$IFDEF PORTUGUES}
@@ -710,14 +714,14 @@ type
   TGraphicZones = class(TZones)
   public
     //: @exclude
-    constructor Create(aOwner:TPersistent);
+    constructor Create(aOwner: TPersistent);
 
     {$IFDEF PORTUGUES}
     //: Adiciona uma nova zona gráfica a coleção.
     {$ELSE}
     //: Adds a new graphic animation zone into the collection.
     {$ENDIF}
-    function Add:TGraphicZone;
+    function Add: TGraphicZone;
   end;
 
   //: @exclude
@@ -741,14 +745,14 @@ type
   TColorZones = class(TZones)
   public
     //: @exclude
-    constructor Create(aOwner:TPersistent);
+    constructor Create(aOwner: TPersistent);
 
     {$IFDEF PORTUGUES}
     //: Adiciona uma nova zona de cor a coleção.
     {$ELSE}
     //: Adds a new color zone into the collection.
     {$ENDIF}
-    function Add:TColorZone;
+    function Add: TColorZone;
   end;
 
   {$IFDEF PORTUGUES}
@@ -771,103 +775,109 @@ type
     FColor: TColor;
     procedure SetColor(AValue: TColor);
   protected
-    function GetDisplayName: AnsiString; override;
+    function GetDisplayName: Ansistring; override;
   published
-    property Color:TColor read FColor write SetColor;
+    property Color: TColor read FColor write SetColor;
   end;
 
 implementation
 
 uses hsstrings;
 
-{ TColorZone }
+  { TColorZone }
 
 procedure TColorZone.SetColor(AValue: TColor);
 begin
-  if FColor=AValue then Exit;
-  FColor:=AValue;
+  if FColor = AValue then Exit;
+  FColor := AValue;
   NotifyChange;
 end;
 
-function TColorZone.GetDisplayName: AnsiString;
+function TColorZone.GetDisplayName: Ansistring;
 begin
-  Result:=inherited GetDisplayName+', Result='+ColorToString(FColor);
+  Result := inherited GetDisplayName + ', Result=' + ColorToString(FColor);
 end;
 
 { TAnimationZone }
 
-function  TAnimationZone.GetBlinkWithZoneNumber:LongInt;
+function TAnimationZone.GetBlinkWithZoneNumber: Longint;
 begin
-   if FBlinkWith<>nil then
-      Result := FBlinkWith.Index
-   else
-      Result := -1;
+  if FBlinkWith <> nil then
+    Result := FBlinkWith.Index
+  else
+    Result := -1;
 end;
 
-procedure TAnimationZone.SetBlinkWithZoneNumber(v:LongInt);
+procedure TAnimationZone.SetBlinkWithZoneNumber(v: Longint);
 begin
-   if [csReading]*THMIBasicColletion(Collection).CollectionState<>[] then begin
-      FBlinkWithIndex:=v;
-      exit;
-   end;
+  if [csReading] * THMIBasicColletion(Collection).CollectionState <> [] then
+  begin
+    FBlinkWithIndex := v;
+    Exit;
+  end;
 
-   if (v>=0) and (v<Collection.Count) then begin
-      if Collection.Items[v]=Self then
-         raise Exception.Create(ScannotBlinkWithItSelf);
-      FBlinkWith:=TAnimationZone(Collection.Items[v]);
-      FBlinkWith.AddReference(Self);
-   end else begin
-      if v<>-1 then
-         raise Exception.Create(SoutOfBounds);
-      if FBlinkWith<>nil then
-         FBlinkWith.RemReference(Self);
-      FBlinkWith:=nil;
-   end;
+  if (v >= 0) and (v < Collection.Count) then
+  begin
+    if Collection.Items[v] = Self then
+      raise Exception.Create(ScannotBlinkWithItSelf);
+    FBlinkWith := TAnimationZone(Collection.Items[v]);
+    FBlinkWith.AddReference(Self);
+  end
+  else
+  begin
+    if v <> -1 then
+      raise Exception.Create(SoutOfBounds);
+    if FBlinkWith <> nil then
+      FBlinkWith.RemReference(Self);
+    FBlinkWith := nil;
+  end;
 end;
 
-procedure TAnimationZone.SetBlinkTime(v:Cardinal);
+procedure TAnimationZone.SetBlinkTime(v: Cardinal);
 begin
-   if [csReading]*THMIBasicColletion(Collection).CollectionState<>[] then begin
-      FBlinkTime:=v;
-      exit;
-   end;
+  if [csReading] * THMIBasicColletion(Collection).CollectionState <> [] then
+  begin
+    FBlinkTime := v;
+    Exit;
+  end;
 
-   if v=FBlinkTime then exit;
-   FBlinkTime:=v;
-   NotifyChange;
+  if v = FBlinkTime then Exit;
+  FBlinkTime := v;
+  NotifyChange;
 end;
 
 procedure TAnimationZone.RemoveBlinkZone;
 begin
-   FBlinkWith:=nil;
+  FBlinkWith := nil;
 end;
 
 procedure TAnimationZone.AddReference(RefBy: TAnimationZone);
 var
-   h,i:LongInt;
+  h, i: Longint;
 begin
-   for i:=0 to High(FReferencedBy) do
-      if FReferencedBy[i]=RefBy then exit;
-   h:=Length(FReferencedBy);
-   SetLength(FReferencedBy, h+1);
-   FReferencedBy[h]:=RefBy;
+  for i := 0 to High(FReferencedBy) do
+    if FReferencedBy[i] = RefBy then Exit;
+  h := Length(FReferencedBy);
+  SetLength(FReferencedBy, h + 1);
+  FReferencedBy[h] := RefBy;
 end;
 
 procedure TAnimationZone.RemReference(RefBy: TAnimationZone);
 var
-   h,i,p:LongInt;
-   found:boolean;
+  h, i, p: Longint;
+  found: Boolean;
 begin
-   found := false;
-   for i:=0 to High(FReferencedBy) do
-      if FReferencedBy[i]=RefBy then begin
-         p:=i;
-         found:=true;
-      end;
-   if not found then exit;
-   h:=High(FReferencedBy);
-   FReferencedBy[p]:=FReferencedBy[h];
-   SetLength(FReferencedBy, h);
+  found := False;
+  for i := 0 to High(FReferencedBy) do
+    if FReferencedBy[i] = RefBy then
+    begin
+      p := i;
+      found := True;
+    end;
+  if not found then Exit;
+  h := High(FReferencedBy);
+  FReferencedBy[p] := FReferencedBy[h];
+  SetLength(FReferencedBy, h);
 end;
 
 procedure TAnimationZone.Loaded;
@@ -880,12 +890,15 @@ constructor TAnimationZone.Create(aCollection: TCollection);
 begin
   inherited Create(aCollection);
   FBlinkWithIndex := -1;
-  if (([csDesigning]*(Collection.Owner as TComponent).ComponentState)=[]) or (([csReading,csLoading]*(Collection.Owner as TComponent).ComponentState)<>[]) then begin
-    FValue1:=0;
-    FValue2:=0;
-  end else begin
-    FValue1:=Index;
-    FValue2:=FValue1;
+  if (([csDesigning] * (Collection.Owner as TComponent).ComponentState) = []) or (([csReading, csLoading] * (Collection.Owner as TComponent).ComponentState) <> []) then
+  begin
+    FValue1 := 0;
+    FValue2 := 0;
+  end
+  else
+  begin
+    FValue1 := Index;
+    FValue2 := FValue1;
   end;
 end;
 
@@ -894,9 +907,10 @@ var
   i: Integer;
 begin
   if Assigned(FBlinkWith) then
-     FBlinkWith.RemReference(Self);
+    FBlinkWith.RemReference(Self);
 
-  for i:=High(FReferencedBy) downto 0 do begin
+  for i := High(FReferencedBy) downto 0 do
+  begin
     FReferencedBy[i].RemoveBlinkZone;
     FReferencedBy[i].RemReference(Self);
   end;
@@ -908,22 +922,24 @@ procedure TAnimationZone.AssignTo(Dest: TPersistent);
 var
   aDest: TAnimationZone;
 begin
-   if Dest is TAnimationZone then begin
-      aDest:=Dest as TAnimationZone;
+  if Dest is TAnimationZone then
+  begin
+    aDest := Dest as TAnimationZone;
 
-      inherited AssignTo(Dest);
+    inherited AssignTo(Dest);
 
-      aDest.BlinkTime:=FBlinkTime;
-      aDest.BlinkWith:=FBlinkWithIndex;
-   end else
-     inherited AssignTo(Dest);
+    aDest.BlinkTime := FBlinkTime;
+    aDest.BlinkWith := FBlinkWithIndex;
+  end
+  else
+    inherited AssignTo(Dest);
 end;
 
 { TColorZones }
 
 constructor TColorZones.Create(aOwner: TPersistent);
 begin
-  inherited create(aOwner,TColorZone);
+  inherited Create(aOwner, TColorZone);
 end;
 
 function TColorZones.Add: TColorZone;
@@ -931,163 +947,178 @@ begin
   Result := TColorZone(inherited Add);
 end;
 
-procedure TZone.SetV1(v:Double);
+procedure TZone.SetV1(v: Double);
 begin
-   if [csReading]*THMIBasicColletion(Collection).CollectionState<>[] then begin
-      FValue1:=v;
-      exit;
-   end;
-   if v=FValue1 then exit;
-   if ZoneType=ztBit then begin
-      if (v>31) or (v<0) then
-         raise Exception.Create(SztBitcomparationValue1MustBeBetween0And31);
-      FValue1 := Int(v);
-   end else begin
-      if v>FValue2 then begin
-         FValue1:=FValue2;
-         FValue2:=v;
-      end else
-         FValue1:=v;
-   end;
-   NotifyChange;
-end;
-
-procedure TZone.SetV2(v:Double);
-begin
-   if [csReading]*THMIBasicColletion(Collection).CollectionState<>[] then begin
-      FValue2:=v;
-      exit;
-   end;
-
-   if v=FValue2 then exit;
-   if v<FValue1 then begin
-      FValue2:=FValue1;
-      FValue1:=v;
-   end else
-      FValue2:=v;
-   NotifyChange;
-end;
-
-procedure TZone.SetIncV1(v:Boolean);
-begin
-   if [csReading]*THMIBasicColletion(Collection).CollectionState<>[] then begin
-      FIncludeV1:=v;
-      exit;
-   end;
-   
-   if v=FIncludeV1 then exit;
-   FIncludeV1:=v;
-   NotifyChange;
-end;
-
-procedure TZone.SetIncV2(v:Boolean);
-begin
-   if [csReading]*THMIBasicColletion(Collection).CollectionState<>[] then begin
-      FIncludeV2:=v;
-      exit;
-   end;
-
-   if v=FIncludeV2 then exit;
-   FIncludeV2:=v;
-   NotifyChange;
-end;
-
-procedure TZone.SetAsDefaultZone(v:Boolean);
-var
-   c:LongInt;
-begin
-   if [csReading]*THMIBasicColletion(Collection).CollectionState<>[] then begin
-      FDefaultZone:=v;
-      exit;
-   end;
-
-   if v=FDefaultZone then exit;
-   
-   if v then
-      with Collection as TZones do begin
-         for c:=0 to Count-1 do
-            if (Items[c]<>Self) and (Items[c] is TZone) then
-               TZone(Items[c]).DefaultZone := false
-      end;
-   FDefaultZone:=v;
-   NotifyChange;
-end;
-
-procedure TZone.SetZoneType(zt:TZoneTypes);
-begin
-   if [csReading]*THMIBasicColletion(Collection).CollectionState<>[] then begin
-      FZoneType:=zt;
-      exit;
-   end;
-
-   if zt=FZoneType then exit;
-   
-   if (zt=ztBit) and ((FValue1>31) or (FValue1<0)) then
+  if [csReading] * THMIBasicColletion(Collection).CollectionState <> [] then
+  begin
+    FValue1 := v;
+    Exit;
+  end;
+  if v = FValue1 then Exit;
+  if ZoneType = ztBit then
+  begin
+    if (v > 31) or (v < 0) then
       raise Exception.Create(SztBitcomparationValue1MustBeBetween0And31);
-   FZoneType:=zt;
-   NotifyChange;
+    FValue1 := Int(v);
+  end
+  else
+  begin
+    if v > FValue2 then
+    begin
+      FValue1 := FValue2;
+      FValue2 := v;
+    end
+    else
+      FValue1 := v;
+  end;
+  NotifyChange;
 end;
 
-function  TZone.GetDisplayName: AnsiString;
+procedure TZone.SetV2(v: Double);
 begin
-   if FDefaultZone then begin
-     Result:='(Default)';
-     exit;
-   end;
+  if [csReading] * THMIBasicColletion(Collection).CollectionState <> [] then
+  begin
+    FValue2 := v;
+    Exit;
+  end;
 
-   case FZoneType of
+  if v = FValue2 then Exit;
+  if v < FValue1 then
+  begin
+    FValue2 := FValue1;
+    FValue1 := v;
+  end
+  else
+    FValue2 := v;
+  NotifyChange;
+end;
+
+procedure TZone.SetIncV1(v: Boolean);
+begin
+  if [csReading] * THMIBasicColletion(Collection).CollectionState <> [] then
+  begin
+    FIncludeV1 := v;
+    Exit;
+  end;
+
+  if v = FIncludeV1 then Exit;
+  FIncludeV1 := v;
+  NotifyChange;
+end;
+
+procedure TZone.SetIncV2(v: Boolean);
+begin
+  if [csReading] * THMIBasicColletion(Collection).CollectionState <> [] then
+  begin
+    FIncludeV2 := v;
+    Exit;
+  end;
+
+  if v = FIncludeV2 then Exit;
+  FIncludeV2 := v;
+  NotifyChange;
+end;
+
+procedure TZone.SetAsDefaultZone(v: Boolean);
+var
+  c: Longint;
+begin
+  if [csReading] * THMIBasicColletion(Collection).CollectionState <> [] then
+  begin
+    FDefaultZone := v;
+    Exit;
+  end;
+
+  if v = FDefaultZone then Exit;
+
+  if v then
+    with Collection as TZones do
+    begin
+      for c := 0 to Count - 1 do
+        if (Items[c] <> Self) and (Items[c] is TZone) then
+          TZone(Items[c]).DefaultZone := False;
+    end;
+  FDefaultZone := v;
+  NotifyChange;
+end;
+
+procedure TZone.SetZoneType(zt: TZoneTypes);
+begin
+  if [csReading] * THMIBasicColletion(Collection).CollectionState <> [] then
+  begin
+    FZoneType := zt;
+    Exit;
+  end;
+
+  if zt = FZoneType then Exit;
+
+  if (zt = ztBit) and ((FValue1 > 31) or (FValue1 < 0)) then
+    raise Exception.Create(SztBitcomparationValue1MustBeBetween0And31);
+  FZoneType := zt;
+  NotifyChange;
+end;
+
+function TZone.GetDisplayName: Ansistring;
+begin
+  if FDefaultZone then
+  begin
+    Result := '(Default)';
+    Exit;
+  end;
+
+  case FZoneType of
     ztEqual:
-       Result:='Value='+FloatToStr(Value1);
+      Result := 'Value=' + FloatToStr(Value1);
 
     ztRange:
     begin
-       if FIncludeV1 then
-          Result:='(Value>='+FloatToStr(Value1)
-       else
-          Result:='(Value>'+FloatToStr(Value1);
+      if FIncludeV1 then
+        Result := '(Value>=' + FloatToStr(Value1)
+      else
+        Result := '(Value>' + FloatToStr(Value1);
 
-       if FIncludeV2 then
-          Result:=Result + ') AND (Value<='+FloatToStr(Value2)+')'
-       else
-          Result:=Result + ') AND (Value<'+FloatToStr(Value2)+')';
+      if FIncludeV2 then
+        Result := Result + ') AND (Value<=' + FloatToStr(Value2) + ')'
+      else
+        Result := Result + ') AND (Value<' + FloatToStr(Value2) + ')';
     end;
 
     ztBit:
     begin
-       if FIncludeV1 then
-          Result := 'Value.Bit'+FormatFloat('00',FValue1)+'=ON'
-       else
-          Result := 'Value.Bit'+FormatFloat('00',FValue1)+'=OFF';
+      if FIncludeV1 then
+        Result := 'Value.Bit' + FormatFloat('00', FValue1) + '=ON'
+      else
+        Result := 'Value.Bit' + FormatFloat('00', FValue1) + '=OFF';
     end;
 
     ztNotEqual:
-       Result:='Value<>'+FloatToStr(Value1);
+      Result := 'Value<>' + FloatToStr(Value1);
 
     ztOutOfRange:
     begin
-       if FIncludeV1 then
-          Result:='(Value<='+FloatToStr(Value1)
-       else
-          Result:='(Value<'+FloatToStr(Value1);
+      if FIncludeV1 then
+        Result := '(Value<=' + FloatToStr(Value1)
+      else
+        Result := '(Value<' + FloatToStr(Value1);
 
-       if FIncludeV2 then
-          Result:=Result + ') OR (Value>='+FloatToStr(Value2)+')'
-       else
-          Result:=Result + ') OR (Value>'+FloatToStr(Value2)+')';
+      if FIncludeV2 then
+        Result := Result + ') OR (Value>=' + FloatToStr(Value2) + ')'
+      else
+        Result := Result + ') OR (Value>' + FloatToStr(Value2) + ')';
     end;
     ztGreaterThan:
     begin
-       if FIncludeV1 then
-          Result:='(Value>='+FloatToStr(Value1)+')'
-       else
-          Result:='(Value>'+FloatToStr(Value1)+')';
+      if FIncludeV1 then
+        Result := '(Value>=' + FloatToStr(Value1) + ')'
+      else
+        Result := '(Value>' + FloatToStr(Value1) + ')';
     end;
     ztLessThan:
     begin
-       if FIncludeV1 then
-          Result:='(Value<='+FloatToStr(Value1)+')'
-       else
-          Result:='(Value<'+FloatToStr(Value1)+')';
+      if FIncludeV1 then
+        Result := '(Value<=' + FloatToStr(Value1) + ')'
+      else
+        Result := '(Value<' + FloatToStr(Value1) + ')';
     end;
   end;
 end;
@@ -1096,24 +1127,26 @@ procedure TZone.AssignTo(Dest: TPersistent);
 var
   aDest: TZone;
 begin
-   if Dest is TZone then begin
-      aDest:=Dest as TZone;
+  if Dest is TZone then
+  begin
+    aDest := Dest as TZone;
 
-      aDest.FValue1      := FValue1;
-      aDest.FValue2      := FValue2;
-      aDest.FIncludeV1   := FIncludeV1;
-      aDest.FIncludeV2   := FIncludeV2;
-      aDest.FDefaultZone := FDefaultZone;
-      aDest.FZoneType    := FZoneType;
-   end else
-     inherited AssignTo(Dest);
+    aDest.FValue1 := FValue1;
+    aDest.FValue2 := FValue2;
+    aDest.FIncludeV1 := FIncludeV1;
+    aDest.FIncludeV2 := FIncludeV2;
+    aDest.FDefaultZone := FDefaultZone;
+    aDest.FZoneType := FZoneType;
+  end
+  else
+    inherited AssignTo(Dest);
 end;
 
 //############################################################
 // TZones implementation
 //############################################################
 
-constructor TZones.Create(aOwner:TPersistent; aItemClass: TCollectionItemClass);
+constructor TZones.Create(aOwner: TPersistent; aItemClass: TCollectionItemClass);
 begin
   inherited Create(aOwner, aItemClass);
 end;
@@ -1121,82 +1154,93 @@ end;
 //seleciona a zona de acordo com seu critério de seleção
 //se duas zonas responderem a um valor, ele irá retornar
 //a primeira zona encontrada
-//
+
 //Selects a animation zone depending of their select criteria.
-function TZones.GetZoneFromValue(v:Double):TZone;
+function TZones.GetZoneFromValue(v: Double): TZone;
 var
-   c, value, bit:LongInt;
-   found:Boolean;
+  c, Value, bit: Longint;
+  found: Boolean;
 begin
-   Result:=nil;
-   found := false;
-   for c := 0 to Count - 1 do begin
+  Result := nil;
+  found := False;
+  for c := 0 to Count - 1 do
+  begin
 
-      if (not found) and TZone(Items[c]).DefaultZone then begin
-         Result := TZone(Items[c]);
-         found := true;
-         continue;
-      end;
+    if (not found) and TZone(Items[c]).DefaultZone then
+    begin
+      Result := TZone(Items[c]);
+      found := True;
+      Continue;
+    end;
 
-      with Items[c] as TZone do
-         case ZoneType of
-            ztEqual:
-               if v=Value1 then begin
-                  Result := Self.items[c] as TZone;
-                  Break;
-               end;
-            ztRange:
-               if ((v>FValue1) OR (FIncludeV1 AND (v>=FValue1))) AND ((v<FValue2) OR (FIncludeV2 AND (v<=FValue2))) then begin
-                  Result := Self.items[c] as TZone;
-                  Break;
-               end;
-            ztBit:
-            begin
-               bit := Trunc(Value1);
-               value := Trunc(v);
-               bit := Power(2,bit);
-               if ((value and bit)=bit)=FIncludeV1 then begin
-                  Result := Self.items[c] as TZone;
-                  Break;
-               end;
-            end;
-            ztNotEqual:
-               if v<>Value1 then begin
-                  Result := Self.items[c] as TZone;
-                  Break;
-               end;
-            ztOutOfRange:
-               if ((v<FValue1) OR (FIncludeV1 AND (v<=FValue1))) OR ((v>FValue2) OR (FIncludeV2 AND (v>=FValue2))) then begin
-                  Result := Self.items[c] as TZone;
-                  Break;
-               end;
-            ztGreaterThan:
-               if ((v>FValue1) OR (FIncludeV1 AND (v>=FValue1))) then begin
-                  Result := Self.items[c] as TZone;
-                  Break;
-               end;
-            ztLessThan:
-               if ((v<FValue1) OR (FIncludeV1 AND (v<=FValue1))) then begin
-                  Result := Self.items[c] as TZone;
-                  Break;
-               end;
-         end; //end do case
-   end; //end do for
+    with Items[c] as TZone do
+      case ZoneType of
+        ztEqual:
+          if v = Value1 then
+          begin
+            Result := Self.Items[c] as TZone;
+            Break;
+          end;
+        ztRange:
+          if ((v > FValue1) or (FIncludeV1 and (v >= FValue1))) and ((v < FValue2) or (FIncludeV2 and (v <= FValue2))) then
+          begin
+            Result := Self.Items[c] as TZone;
+            Break;
+          end;
+        ztBit:
+        begin
+          bit := Trunc(Value1);
+          Value := Trunc(v);
+          bit := Power(2, bit);
+          if ((Value and bit) = bit) = FIncludeV1 then
+          begin
+            Result := Self.Items[c] as TZone;
+            Break;
+          end;
+        end;
+        ztNotEqual:
+          if v <> Value1 then
+          begin
+            Result := Self.Items[c] as TZone;
+            Break;
+          end;
+        ztOutOfRange:
+          if ((v < FValue1) or (FIncludeV1 and (v <= FValue1))) or ((v > FValue2) or (FIncludeV2 and (v >= FValue2))) then
+          begin
+            Result := Self.Items[c] as TZone;
+            Break;
+          end;
+        ztGreaterThan:
+          if ((v > FValue1) or (FIncludeV1 and (v >= FValue1))) then
+          begin
+            Result := Self.Items[c] as TZone;
+            Break;
+          end;
+        ztLessThan:
+          if ((v < FValue1) or (FIncludeV1 and (v <= FValue1))) then
+          begin
+            Result := Self.Items[c] as TZone;
+            Break;
+          end;
+      end; //end do case
+  end; //end do for
 end;
 
-function TZones.GetDefaultZone:TZone;
+function TZones.GetDefaultZone: TZone;
 var
-   c, value, bit:LongInt;
-   found:Boolean;
+  c, Value, bit: Longint;
+  found: Boolean;
 begin
-   Result:=nil;
-   found := false;
-   for c := 0 to Count - 1 do begin
-     if (not found) and TZone(Items[c]).DefaultZone then begin
-        Result := TZone(Items[c]);
-        exit;
-     end;
-   end;
+  Result := nil;
+  found := False;
+  for c := 0 to Count - 1 do
+  begin
+    if (not found) and TZone(Items[c]).DefaultZone then
+    begin
+      Result := TZone(Items[c]);
+      Exit;
+    end;
+  end;
 end;
 
 //############################################################
@@ -1205,11 +1249,11 @@ end;
 
 constructor TTextZone.Create(aCollection: TCollection);
 begin
-   inherited Create(aCollection);
-   FFont := TFont.Create;
-   FFont.OnChange := @FontChanges;
-   FVerAlignment:=tlTop;
-   FHorAlignment:=taLeftJustify;
+  inherited Create(aCollection);
+  FFont := TFont.Create;
+  FFont.OnChange := @FontChanges;
+  FVerAlignment := tlTop;
+  FHorAlignment := taLeftJustify;
 end;
 
 destructor TTextZone.Destroy;
@@ -1222,73 +1266,75 @@ procedure TTextZone.AssignTo(Dest: TPersistent);
 var
   aDest: TTextZone;
 begin
-  if Dest is TTextZone then begin
-     aDest:=Dest as TTextZone;
+  if Dest is TTextZone then
+  begin
+    aDest := Dest as TTextZone;
 
-     inherited AssignTo(Dest);
+    inherited AssignTo(Dest);
 
-     aDest.FText          := FText;
-     aDest.FColor         := FColor;
-     aDest.FTransparent   := FTransparent;
-     aDest.FHorAlignment  := FHorAlignment;
-     aDest.FVerAlignment  := FVerAlignment;
-     aDest.FFont.Assign(FFont);
-  end else
+    aDest.FText := FText;
+    aDest.FColor := FColor;
+    aDest.FTransparent := FTransparent;
+    aDest.FHorAlignment := FHorAlignment;
+    aDest.FVerAlignment := FVerAlignment;
+    aDest.FFont.Assign(FFont);
+  end
+  else
     inherited AssignTo(Dest);
 end;
 
-procedure TTextZone.SetText(t:TCaption);
+procedure TTextZone.SetText(t: TCaption);
 begin
-   FText:=t;
-   NotifyChange;
+  FText := t;
+  NotifyChange;
 end;
 
-procedure TTextZone.SetHorAlignment(x:TAlignment);
+procedure TTextZone.SetHorAlignment(x: TAlignment);
 begin
-   FHorAlignment:=x;
-   NotifyChange;
+  FHorAlignment := x;
+  NotifyChange;
 end;
 
-procedure TTextZone.SetVerAlignment(x:TTextLayout);
+procedure TTextZone.SetVerAlignment(x: TTextLayout);
 begin
-   FVerAlignment:=x;
-   NotifyChange;
+  FVerAlignment := x;
+  NotifyChange;
 end;
 
-procedure TTextZone.SetColor(c:TColor);
+procedure TTextZone.SetColor(c: TColor);
 begin
-   FColor:=c;
-   NotifyChange;
+  FColor := c;
+  NotifyChange;
 end;
 
-procedure TTextZone.SetTransparent(b:Boolean);
+procedure TTextZone.SetTransparent(b: Boolean);
 begin
-   FTransparent:=b;
-   NotifyChange;
+  FTransparent := b;
+  NotifyChange;
 end;
 
-procedure TTextZone.SetFont(f:TFont);
+procedure TTextZone.SetFont(f: TFont);
 begin
-   FFont.Assign(f);
+  FFont.Assign(f);
 end;
 
 
-procedure TTextZone.FontChanges(Sender:TObject);
+procedure TTextZone.FontChanges(Sender: TObject);
 begin
-   NotifyChange;
+  NotifyChange;
 end;
 
 //############################################################
 // TTextZones implementation
 //############################################################
-constructor TTextZones.Create(aOwner:TPersistent);
+constructor TTextZones.Create(aOwner: TPersistent);
 begin
-   inherited Create(aOwner, TTextZone);
+  inherited Create(aOwner, TTextZone);
 end;
 
-function TTextZones.Add:TTextZone;
+function TTextZones.Add: TTextZone;
 begin
-   Result := TTextZone(inherited Add);
+  Result := TTextZone(inherited Add);
 end;
 
 //############################################################
@@ -1297,138 +1343,148 @@ end;
 
 constructor TGraphicZone.Create(aCollection: TCollection);
 begin
-   inherited Create(aCollection);
-   FILIsDefault := true;
-   FTransparent := true;
-   FImageList := nil;
-   FImageIndex := -1;
-   FColor := clWhite;
+  inherited Create(aCollection);
+  FILIsDefault := True;
+  FTransparent := True;
+  FImageList := nil;
+  FImageIndex := -1;
+  FColor := clWhite;
 end;
 
 procedure TGraphicZone.Assign(Source: TPersistent);
 var
   Src: TGraphicZone;
 begin
-  if Source is TGraphicZone then begin
-     Src:=Source as TGraphicZone;
+  if Source is TGraphicZone then
+  begin
+    Src := Source as TGraphicZone;
 
-     FValue1      := Src.FValue1;
-     FValue2      := Src.FValue2;
-     FIncludeV1   := Src.FIncludeV1;
-     FIncludeV2   := Src.FIncludeV2;
-     FDefaultZone := Src.FDefaultZone;
-     FZoneType    := Src.FZoneType;
-     FImageList   := Src.FImageList;
-     FImageIndex  := Src.FImageIndex;
-     FBlinkTime   := Src.FBlinkTime;
-     BlinkWith    := Src.BlinkWith;
-  end else
+    FValue1 := Src.FValue1;
+    FValue2 := Src.FValue2;
+    FIncludeV1 := Src.FIncludeV1;
+    FIncludeV2 := Src.FIncludeV2;
+    FDefaultZone := Src.FDefaultZone;
+    FZoneType := Src.FZoneType;
+    FImageList := Src.FImageList;
+    FImageIndex := Src.FImageIndex;
+    FBlinkTime := Src.FBlinkTime;
+    BlinkWith := Src.BlinkWith;
+  end
+  else
     inherited Assign(Source);
 end;
 
-procedure TGraphicZone.SetILAsDefault(b:Boolean);
+procedure TGraphicZone.SetILAsDefault(b: Boolean);
 var
-   notify:Boolean;
+  notify: Boolean;
 begin
-   notify := (FILIsDefault<>b);
-   FILIsDefault:=b;
-   if notify then
-      NotifyChange;
+  notify := (FILIsDefault <> b);
+  FILIsDefault := b;
+  if notify then
+    NotifyChange;
 end;
 
-procedure TGraphicZone.SetFileName(fn: AnsiString);
+procedure TGraphicZone.SetFileName(fn: Ansistring);
 var
-   notify:Boolean;
+  notify: Boolean;
 begin
-   if (Trim(fn)<>'') AND (not FileExists(fn)) then
-      raise exception.Create(SfileNotFound);
-      
-   notify := (fn<>FFileName);
-   FFileName := fn;
-   if notify then
-      NotifyChange;
+  if (Trim(fn) <> '') and (not FileExists(fn)) then
+    raise Exception.Create(SfileNotFound);
+
+  notify := (fn <> FFileName);
+  FFileName := fn;
+  if notify then
+    NotifyChange;
 end;
 
-procedure TGraphicZone.SetImageList(il:TImageList);
+procedure TGraphicZone.SetImageList(il: TImageList);
 begin
-   if [csReading]*THMIBasicColletion(Collection).CollectionState<>[] then begin
-      FImageList:=il;
-      exit;
-   end;
-   
-   if il=FImageList then exit;
+  if [csReading] * THMIBasicColletion(Collection).CollectionState <> [] then
+  begin
+    FImageList := il;
+    Exit;
+  end;
 
-   if assigned(FImageList) then
-      FImageList.RemoveFreeNotification(TGraphicZones(Collection).Owner as TComponent);
+  if il = FImageList then Exit;
 
-   FImageList := il;
+  if Assigned(FImageList) then
+    FImageList.RemoveFreeNotification(TGraphicZones(Collection).Owner as TComponent);
 
-   if il=nil then
-      SetImageIndex(-1)
-   else
-      if FImageIndex>=il.Count then
-        SetImageIndex(-1);
+  FImageList := il;
 
-   NotifyChange;
+  if il = nil then
+    SetImageIndex(-1)
+  else
+  if FImageIndex >= il.Count then
+    SetImageIndex(-1);
+
+  NotifyChange;
 end;
 
-procedure TGraphicZone.SetImageIndex(aIndex:LongInt);
+procedure TGraphicZone.SetImageIndex(aIndex: Longint);
 var
-   notify:Boolean;
+  notify: Boolean;
 begin
-   if [csReading, csLoading]*THMIBasicColletion(Collection).CollectionState<>[] then begin
-      FImageIndex:=aIndex;
-      exit;
-   end;
+  if [csReading, csLoading] * THMIBasicColletion(Collection).CollectionState <> [] then
+  begin
+    FImageIndex := aIndex;
+    Exit;
+  end;
 
-   if FImageList<>nil then begin
-      if (aIndex>=0) and (aIndex<=(FImageList.Count-1)) then begin
-         notify := (FImageIndex<>aIndex);
-         FImageIndex:=aIndex;
-      end else begin
-         notify:= FImageIndex<>-1;
-         FImageIndex:=-1;
-      end;
-   end else begin
-      notify:= FImageIndex<>-1;
-      FImageIndex:=-1;
-   end;
+  if FImageList <> nil then
+  begin
+    if (aIndex >= 0) and (aIndex <= (FImageList.Count - 1)) then
+    begin
+      notify := (FImageIndex <> aIndex);
+      FImageIndex := aIndex;
+    end
+    else
+    begin
+      notify := FImageIndex <> -1;
+      FImageIndex := -1;
+    end;
+  end
+  else
+  begin
+    notify := FImageIndex <> -1;
+    FImageIndex := -1;
+  end;
 
-   if notify then
-      NotifyChange;
+  if notify then
+    NotifyChange;
 end;
 
-procedure TGraphicZone.SetColor(c:TColor);
+procedure TGraphicZone.SetColor(c: TColor);
 var
-   notify:Boolean;
+  notify: Boolean;
 begin
-   notify := (FColor<>c);
-   FColor:=c;
-   if notify then
-      NotifyChange;
+  notify := (FColor <> c);
+  FColor := c;
+  if notify then
+    NotifyChange;
 end;
 
-procedure TGraphicZone.SetTransparent(b:Boolean);
+procedure TGraphicZone.SetTransparent(b: Boolean);
 var
-   notify:Boolean;
+  notify: Boolean;
 begin
-   notify := (FTransparent<>b);
-   FTransparent := b;
-   if notify then
-      NotifyChange;
+  notify := (FTransparent <> b);
+  FTransparent := b;
+  if notify then
+    NotifyChange;
 end;
 
 //############################################################
 // TGraphicZones implementation
 //############################################################
-constructor TGraphicZones.Create(aOwner:TPersistent);
+constructor TGraphicZones.Create(aOwner: TPersistent);
 begin
-   inherited Create(aOwner, TGraphicZone);
+  inherited Create(aOwner, TGraphicZone);
 end;
 
-function TGraphicZones.Add:TGraphicZone;
+function TGraphicZones.Add: TGraphicZone;
 begin
-   Result := TGraphicZone(inherited Add);
+  Result := TGraphicZone(inherited Add);
 end;
 
 end.

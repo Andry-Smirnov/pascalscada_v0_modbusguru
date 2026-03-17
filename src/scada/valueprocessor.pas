@@ -415,7 +415,7 @@ begin
   if SP=Collection.Owner then
     raise Exception.Create(SInvalidQueueOperation);
 
-  if sp=SProcessor then exit;
+  if sp=SProcessor then Exit;
 
   if SProcessor<>nil then
      SProcessor.DelQueueItem(self);

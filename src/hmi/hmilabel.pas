@@ -37,54 +37,52 @@ type
   }
   {$ENDIF}
   THMILabel = class(TLabel, IHMIInterface)
-  private 
-    FRegInSecMan:Boolean;
+  private
+    FRegInSecMan: Boolean;
     FFormatDateTimeOptions: TFormatDateTimeOptions;
-    FNumberFormat:AnsiString;
-    FPrefix, FSufix:TCaption;
-    FIsEnabled,
-    FIsEnabledBySecurity:Boolean;
+    FNumberFormat: Ansistring;
+    FPrefix, FSufix: TCaption;
+    FIsEnabled, FIsEnabledBySecurity: Boolean;
 
-    FSecurityCode:UTF8String;
+    FSecurityCode: UTF8String;
     procedure SetFormatDateTimeOptions(AValue: TFormatDateTimeOptions);
-    procedure SetSecurityCode(sc:UTF8String);
+    procedure SetSecurityCode(sc: UTF8String);
 
-    procedure SetFormat(f:AnsiString);
-    procedure SetPrefix(s:TCaption);
-    procedure SetSufix(s:TCaption);
-    function  GetCaption:TCaption;
+    procedure SetFormat(f: Ansistring);
+    procedure SetPrefix(s: TCaption);
+    procedure SetSufix(s: TCaption);
+    function GetCaption: TCaption;
 
     //: @seealso(IHMIInterface.GetHMITag)
-    function  GetHMITag:TPLCTag;
+    function GetHMITag: TPLCTag;
 
     //: @seealso(IHMIInterface.GetControlSecurityCode)
-     function GetControlSecurityCode:UTF8String;
+    function GetControlSecurityCode: UTF8String;
     //: @seealso(IHMIInterface.CanBeAccessed)
-    procedure CanBeAccessed(a:Boolean);
+    procedure CanBeAccessed(a: Boolean);
     //: @seealso(IHMIInterface.MakeUnsecure)
     procedure MakeUnsecure;
 
   protected
     //: @exclude
-    FTag:TPLCTag;
+    FTag: TPLCTag;
     //: @exclude
-    procedure SetEnabled(e:Boolean); override;
+    procedure SetEnabled(e: Boolean); override;
     //: @exclude
-    procedure SetHMITag(t:TPLCTag); virtual;
+    procedure SetHMITag(t: TPLCTag); virtual;
     //: @exclude
     procedure RefreshTagValue; virtual;
 
-    procedure WriteFaultCallBack(Sender:TObject); virtual;
-    procedure RemoveTagCallBack(Sender:TObject); virtual;
-    procedure TagChangeCallBack(Sender:TObject); virtual;
+    procedure WriteFaultCallBack(Sender: TObject); virtual;
+    procedure RemoveTagCallBack(Sender: TObject); virtual;
+    procedure TagChangeCallBack(Sender: TObject); virtual;
 
     procedure Loaded; override;
-
   public
     //: @exclude
-    constructor Create(AOwner:TComponent); override;
+    constructor Create(AOwner: TComponent); override;
     //: @exclude
-    destructor  Destroy; override;
+    destructor Destroy; override;
     procedure RefreshLabel(Data: PtrInt);
   published
 
@@ -99,10 +97,10 @@ type
     prefix and the suffix.
     }
     {$ENDIF}
-    property Caption:TCaption read GetCaption stored false;
+    property Caption: TCaption read GetCaption stored False;
 
     //: @exclude
-    property Enabled:Boolean read FIsEnabled write SetEnabled;
+    property Enabled: Boolean read FIsEnabled write SetEnabled;
 
     {$IFDEF PORTUGUES}
     {:
@@ -120,7 +118,7 @@ type
     your development environment.
     }
     {$ENDIF}
-    property NumberFormat:AnsiString read FNumberFormat write SetFormat;
+    property NumberFormat: Ansistring read FNumberFormat write SetFormat;
 
     {$IFDEF PORTUGUES}
     {:
@@ -141,7 +139,7 @@ type
     @seealso(TPLCString)
     }
     {$ENDIF}
-    property PLCTag:TPLCTag read FTag write SetHMITag;
+    property PLCTag: TPLCTag read FTag write SetHMITag;
 
     {$IFDEF PORTUGUES}
     {:
@@ -152,7 +150,7 @@ type
     @name is the text that will be show at the left (before) of the tag value.
     }
     {$ENDIF}
-    property Prefix:TCaption read FPrefix write SetPrefix;
+    property Prefix: TCaption read FPrefix write SetPrefix;
 
     {$IFDEF PORTUGUES}
     {:
@@ -165,7 +163,7 @@ type
     Useful to show the engineering unit of the tag.
     }
     {$ENDIF}
-    property Sufix:TCaption read FSufix write SetSufix;
+    property Sufix: TCaption read FSufix write SetSufix;
     //: @exclude
     property AutoSize default False;
 
@@ -174,49 +172,51 @@ type
     {$ELSE}
     //: Security code that allows access to control.
     {$ENDIF}
-    property SecurityCode:UTF8String read FSecurityCode write SetSecurityCode;
+    property SecurityCode: UTF8String read FSecurityCode write SetSecurityCode;
 
     {$IFDEF PORTUGUES}
     //: Configuraçoes de formataçao data/hora.
     {$ELSE}
     //: Date/time format options.
     {$ENDIF}
-    property FormatDateTimeOptions:TFormatDateTimeOptions read FFormatDateTimeOptions write SetFormatDateTimeOptions;
+    property FormatDateTimeOptions: TFormatDateTimeOptions read FFormatDateTimeOptions write SetFormatDateTimeOptions;
   end;
 
 implementation
 
 uses hsstrings, ControlSecurityManager, Forms;
 
-constructor THMILabel.Create(AOwner:TComponent);
+constructor THMILabel.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FRegInSecMan:=GetControlSecurityManager.RegisterControl(Self as IHMIInterface);
-  if not FRegInSecMan then begin
+  FRegInSecMan := GetControlSecurityManager.RegisterControl(Self as IHMIInterface);
+  if not FRegInSecMan then
+  begin
     {$IFNDEF WINDOWS}
-    writeln('FIX-ME: Failed to register class ',ClassName,' instace with name="',Name,'" in the ControlSecurityManager?',{$i %FILE%},':',{$i %LINE%});
+    writeln('FIX-ME: Failed to register class ', ClassName, ' instace with name="', Name, '" in the ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
     {$ENDIF}
   end;
 
   if (csDesigning in ComponentState) then
     inherited Caption := SWithoutTag;
-  AutoSize:=False;
-  FIsEnabled:=true;
+  AutoSize := False;
+  FIsEnabled := True;
   FNumberFormat := '#0.0';
 end;
 
-destructor  THMILabel.Destroy;
+destructor THMILabel.Destroy;
 begin
   if FRegInSecMan then
     GetControlSecurityManager.UnRegisterControl(Self as IHMIInterface)
-  else begin
+  else
+  begin
     {$IFNDEF WINDOWS}
-    writeln('FIX-ME: Why class ',ClassName,', instace name="',Name,'" ins''t registered in ControlSecurityManager?',{$i %FILE%},':',{$i %LINE%});
+    writeln('FIX-ME: Why class ', ClassName, ', instace name="', Name, '" ins''t registered in ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
     {$ENDIF}
   end;
 
   Application.RemoveAsyncCalls(Self);
-  if FTag<>nil then
+  if FTag <> nil then
     FTag.RemoveAllHandlersFromObject(Self);
   inherited Destroy;
 end;
@@ -228,10 +228,11 @@ end;
 
 procedure THMILabel.SetSecurityCode(sc: UTF8String);
 begin
-  if Trim(sc)='' then
-    Self.CanBeAccessed(true)
+  if Trim(sc) = '' then
+    Self.CanBeAccessed(True)
   else
-    with GetControlSecurityManager do begin
+    with GetControlSecurityManager do
+    begin
       ValidateSecurityCode(sc);
       if not SecurityCodeExists(sc) then
         RegisterSecurityCode(sc);
@@ -239,45 +240,47 @@ begin
       Self.CanBeAccessed(CanAccess(sc));
     end;
 
-  FSecurityCode:=sc;
+  FSecurityCode := sc;
 end;
 
 procedure THMILabel.SetFormatDateTimeOptions(AValue: TFormatDateTimeOptions);
 begin
-  if FFormatDateTimeOptions=AValue then Exit;
-  FFormatDateTimeOptions:=AValue;
+  if FFormatDateTimeOptions = AValue then Exit;
+  FFormatDateTimeOptions := AValue;
   RefreshTagValue;
 end;
 
-procedure THMILabel.SetFormat(f: AnsiString);
+procedure THMILabel.SetFormat(f: Ansistring);
 begin
   FNumberFormat := f;
   RefreshTagValue;
 end;
 
-function  THMILabel.GetHMITag:TPLCTag;
+function THMILabel.GetHMITag: TPLCTag;
 begin
   Result := FTag;
 end;
 
-procedure THMILabel.SetHMITag(t:TPLCTag);
+procedure THMILabel.SetHMITag(t: TPLCTag);
 begin
   //se o tag esta entre um dos aceitos.
-  //
+
   //check if the tag is valid.
-  if (t<>nil) and (not Supports(t, ITagInterface)) then
-     raise Exception.Create(SinvalidTag);
+  if (t <> nil) and (not Supports(t, ITagInterface)) then
+    raise Exception.Create(SinvalidTag);
 
   //se ja estou associado a um tag, remove
-  //
+
   //if the control is linked with some tag, remove the old link.
-  if FTag<>nil then begin
+  if FTag <> nil then
+  begin
     FTag.RemoveAllHandlersFromObject(Self);
   end;
 
   //adiona o callback para o novo tag
   //link with the new tag.
-  if t<>nil then begin
+  if t <> nil then
+  begin
     t.AddTagChangeHandler(@TagChangeCallBack);
     t.AddWriteFaultHandler(@WriteFaultCallBack);
     t.AddRemoveTagHandler(@RemoveTagCallBack);
@@ -285,8 +288,8 @@ begin
     RefreshTagValue;
   end;
   FTag := t;
-  
-  if (FTag=nil) and (csDesigning in ComponentState) then
+
+  if (FTag = nil) and (csDesigning in ComponentState) then
     inherited Caption := SWithoutTag;
 end;
 
@@ -304,32 +307,38 @@ end;
 
 procedure THMILabel.RefreshTagValue;
 begin
-  if ([csReading, csLoading]*ComponentState<>[]) then begin
-    exit;
+  if ([csReading, csLoading] * ComponentState <> []) then
+  begin
+    Exit;
   end;
 
-  if (FTag<>nil) then begin
+  if (FTag <> nil) then
+  begin
     if Supports(FTag, ITagInterface) then
-       inherited Caption := (FTag as ITagInterface).GetValueAsText(FPrefix, FSufix, FNumberFormat, FFormatDateTimeOptions);
-  end else begin
-    if (csDesigning in ComponentState) then begin
-      inherited Caption := SWithoutTag
-    end else
+      inherited Caption := (FTag as ITagInterface).GetValueAsText(FPrefix, FSufix, FNumberFormat, FFormatDateTimeOptions);
+  end
+  else
+  begin
+    if (csDesigning in ComponentState) then
+    begin
+      inherited Caption := SWithoutTag;
+    end
+    else
       inherited Caption := '';
   end;
 end;
 
-function  THMILabel.GetCaption:TCaption;
+function THMILabel.GetCaption: TCaption;
 begin
   Result := inherited Caption;
 end;
 
 function THMILabel.GetControlSecurityCode: UTF8String;
 begin
-   Result:=FSecurityCode;
+  Result := FSecurityCode;
 end;
 
-procedure THMILabel.CanBeAccessed(a:Boolean);
+procedure THMILabel.CanBeAccessed(a: Boolean);
 begin
   FIsEnabledBySecurity := a;
   SetEnabled(FIsEnabled);
@@ -337,13 +346,13 @@ end;
 
 procedure THMILabel.MakeUnsecure;
 begin
-  FSecurityCode:='';
-  CanBeAccessed(true);
+  FSecurityCode := '';
+  CanBeAccessed(True);
 end;
 
-procedure THMILabel.SetEnabled(e:Boolean);
+procedure THMILabel.SetEnabled(e: Boolean);
 begin
-  FIsEnabled:=e;
+  FIsEnabled := e;
   inherited SetEnabled(FIsEnabled and FIsEnabledBySecurity);
 end;
 
@@ -354,8 +363,8 @@ end;
 
 procedure THMILabel.TagChangeCallBack(Sender: TObject);
 begin
-  if Application.Flags*[AppDoNotCallAsyncQueue]=[] then
-    Application.QueueAsyncCall(@RefreshLabel,0);
+  if Application.Flags * [AppDoNotCallAsyncQueue] = [] then
+    Application.QueueAsyncCall(@RefreshLabel, 0);
 end;
 
 procedure THMILabel.Loaded;
@@ -367,7 +376,7 @@ end;
 
 procedure THMILabel.RemoveTagCallBack(Sender: TObject);
 begin
-  if FTag=Sender then
+  if FTag = Sender then
     FTag := nil;
 end;
 

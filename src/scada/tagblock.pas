@@ -114,7 +114,7 @@ var
   tr:TTagRec;
 begin
   Result:=-1;
-  if Count=0 then exit;
+  if Count=0 then Exit;
   if (PProtocolDriver<>nil) then begin
     if PAutoWrite or IgnoreAutoWrite then begin
       BuildTagRec(tr,Count,Offset);
@@ -144,7 +144,7 @@ procedure TTagBlock.Write(Values:TArrayOfDouble; Count, Offset:Cardinal);
 var
   tr:TTagRec;
 begin
-  if Count=0 then exit;
+  if Count=0 then Exit;
   if PProtocolDriver<>nil then begin
     BuildTagRec(tr,Count,Offset);
     PProtocolDriver.Write(tr,Values);

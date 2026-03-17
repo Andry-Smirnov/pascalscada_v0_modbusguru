@@ -22,31 +22,30 @@ implementation
 
 uses hmifaceplatecontainer;
 
-{ TFaceplateFrame }
+  { TFaceplateFrame }
 
 constructor TFaceplateFrameFileDescriptor.Create;
 begin
   inherited Create;
-  Name:='FaceplateFrame'; // do not translate this
-  ResourceClass:=TFaceplateFrame;
-  RequiredPackages:='pascalscada_hmi';
-  UseCreateFormStatements:=True;
+  Name := 'FaceplateFrame'; // do not translate this
+  ResourceClass := TFaceplateFrame;
+  RequiredPackages := 'pascalscada_hmi';
+  UseCreateFormStatements := True;
 end;
 
 function TFaceplateFrameFileDescriptor.GetInterfaceUsesSection: string;
 begin
-  Result:='Classes, SysUtils, Forms, HMIFaceplateContainer';
+  Result := 'Classes, SysUtils, Forms, HMIFaceplateContainer';
 end;
 
 function TFaceplateFrameFileDescriptor.GetLocalizedName: string;
 begin
-  Result:='FaceplateFrame';
+  Result := 'FaceplateFrame';
 end;
 
 function TFaceplateFrameFileDescriptor.GetLocalizedDescription: string;
 begin
-  Result:='Create a new TFaceplate form for object customization';
+  Result := 'Create a new TFaceplate form for object customization';
 end;
 
 end.
-

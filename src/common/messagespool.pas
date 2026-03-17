@@ -266,7 +266,7 @@ var
 begin
   if FCs=nil then begin
      Result := false;
-     exit;
+     Exit;
   end;
   FCs.Acquire;
   Result := false;

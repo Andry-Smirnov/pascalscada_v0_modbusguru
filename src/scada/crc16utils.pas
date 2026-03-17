@@ -149,7 +149,7 @@ begin
         crc := byte(Word(crc) shl 1);
     end;
   end;
-  exit(crc);
+  Exit(crc);
 end;
 
 function Fast_CRC_Cal8Bits(data:BYTES):Byte;
@@ -198,7 +198,7 @@ begin
     crc := CrcTable[crc and $FF]; // One round of 8-bits
   end;
 
-  exit(crc);
+  Exit(crc);
 end;
 
 end.

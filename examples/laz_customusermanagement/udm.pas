@@ -96,7 +96,7 @@ var
 begin
   ValidUser:=false;
   {$IFDEF ReadOnly}
-  exit;
+  Exit;
   {$ENDIF}
 
   tblUsers.Close;
@@ -187,9 +187,9 @@ end;
 procedure Tdm.CustomizedUserManagement1RegisterSecurityCode(
   const securityCode: UTF8String);
 begin
-  if Trim(securityCode)='' then exit;
+  if Trim(securityCode)='' then Exit;
 
-  if tblObjects.Locate('ds_object',securityCode,[loCaseInsensitive]) then exit;
+  if tblObjects.Locate('ds_object',securityCode,[loCaseInsensitive]) then Exit;
 
   if tblObjects.State in dsEditModes then
     tblObjects.Cancel;
@@ -211,7 +211,7 @@ var
 begin
   if aUID=1 then begin
     CanAccess:=true;
-    exit;
+    Exit;
   end;
 
   oldValue:=tblListPermsOfUser.ParamByName('uid').Value;
@@ -232,7 +232,7 @@ end;
 procedure Tdm.CustomizedUserManagement1ValidadeSecurityCode(
   const securityCode: UTF8String);
 begin
-  if Trim(securityCode)='' then exit;
+  if Trim(securityCode)='' then Exit;
 
   CustomizedUserManagement1RegisterSecurityCode(securityCode);
 end;
@@ -252,7 +252,7 @@ procedure Tdm.CustomizedUserManagement1CheckUserChipCard(
 begin
   ValidChipCard:=false;
   {$IFDEF ReadOnly}
-  exit;
+  Exit;
   {$ENDIF}
 
   tblUsers.Close;

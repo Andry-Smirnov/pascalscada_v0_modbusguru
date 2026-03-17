@@ -1089,7 +1089,7 @@ begin
     for c:=0 to High(List) do begin
       if (TMethod(List[c]).Code=TMethod(aHandler).Code) and (TMethod(List[c]).Data=TMethod(aHandler).Data) then begin
         Result:=c;
-        exit;
+        Exit;
       end;
     end;
   Result:=-1;
@@ -1241,7 +1241,7 @@ procedure TTag.ASyncMethod();
 var
   FUserData: Pointer;
 begin
-  if assigned(FQueuedData) and (FQueuedData.Count>0) then begin
+  if Assigned(FQueuedData) and (FQueuedData.Count>0) then begin
     FUserData:=FQueuedData.First;
     try
       FQueuedData.Remove(FUserData);

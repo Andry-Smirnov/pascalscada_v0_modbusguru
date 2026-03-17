@@ -1371,7 +1371,7 @@ begin
     FDatasetReader := GetPacketReader(dfAny, FFileStream);
     FReadFromFile := True;
     end;
-  if assigned(FDatasetReader) then IntLoadFielddefsFromFile;
+  if Assigned(FDatasetReader) then IntLoadFielddefsFromFile;
 
   // This is to check if the dataset is actually created (By calling CreateDataset,
   // reading from a stream in some other way implemented by a descendent)
@@ -1392,7 +1392,7 @@ begin
     if fields[i].FieldNo=0 then
       DatabaseError(SErrNoDataset)
     else
-      if (FAutoIncValue>-1) and (fields[i] is TAutoIncField) and not assigned(FAutoIncField) then
+      if (FAutoIncValue>-1) and (fields[i] is TAutoIncField) and not Assigned(FAutoIncField) then
         FAutoIncField := TAutoIncField(fields[i]);
 
   InitDefaultIndexes;
@@ -1415,7 +1415,7 @@ begin
     on E: Exception do Filter := EmptyStr;
   end;
 
-  if assigned(FDatasetReader) then IntLoadRecordsFromFile;
+  if Assigned(FDatasetReader) then IntLoadRecordsFromFile;
 end;
 
 procedure TCustomBufDataset.InternalClose;
@@ -1448,9 +1448,9 @@ begin
     begin
     for r := 0 to length(FUpdateBuffer)-1 do with FUpdateBuffer[r] do
       begin
-      if assigned(OldValuesBuffer) then
+      if Assigned(OldValuesBuffer) then
         FreeRecordBuffer(OldValuesBuffer);
-      if (UpdateKind = ukDelete) and assigned(BookmarkData.BookmarkData) then
+      if (UpdateKind = ukDelete) and Assigned(BookmarkData.BookmarkData) then
         FreeRecordBuffer(TRecordBuffer(BookmarkData.BookmarkData));
       end;
     end;
@@ -1468,7 +1468,7 @@ begin
 
   FAutoIncValue:=-1;
 
-  if assigned(FParser) then FreeAndNil(FParser);
+  if Assigned(FParser) then FreeAndNil(FParser);
   FReadFromFile:=false;
 end;
 
@@ -1527,7 +1527,7 @@ end;
 
 function TBufIndex.BookmarkValid(const ABookmark: PBufBookmark): boolean;
 begin
-  Result := assigned(ABookmark) and assigned(ABookmark^.BookmarkData);
+  Result := Assigned(ABookmark) and Assigned(ABookmark^.BookmarkData);
 end;
 
 function TBufIndex.CompareBookmarks(const ABookmark1, ABookmark2: PBufBookmark): boolean;
@@ -1537,7 +1537,7 @@ end;
 
 function TDoubleLinkedBufIndex.ScrollBackward: TGetResult;
 begin
-  if not assigned(FCurrentRecBuf[IndNr].prior) then
+  if not Assigned(FCurrentRecBuf[IndNr].prior) then
     begin
     Result := grBOF;
     end
@@ -1890,7 +1890,7 @@ begin
       (FIndexes[i] as TDoubleLinkedBufIndex).FCurrentRecBuf:=(FCurrentIndex as TDoubleLinkedBufIndex).FCurrentRecBuf;
       FCurrentIndex:=FIndexes[i];
       if active then Resync([rmCenter]);
-      exit;
+      Exit;
       end;
 end;
 
@@ -1944,7 +1944,7 @@ begin
   if FAllPacketsFetched then
     begin
     result := 0;
-    exit;
+    Exit;
     end;
 
   FCurrentIndex.BeginUpdate;
@@ -2136,13 +2136,13 @@ begin
   else
     CurrBuff := GetCurrentBuffer;
 
-  if not assigned(CurrBuff) then Exit;
+  if not Assigned(CurrBuff) then Exit;
 
   If Field.Fieldno > 0 then // If = 0, then calculated field or something similar
     begin
     if GetFieldIsNull(pbyte(CurrBuff),Field.FieldNo-1) then
       Exit;
-    if assigned(buffer) then
+    if Assigned(buffer) then
       begin
       inc(CurrBuff,FFieldBufPositions[Field.FieldNo-1]);
       Move(CurrBuff^, Buffer^, GetFieldSize(FieldDefs[Field.FieldNo-1]));
@@ -2153,7 +2153,7 @@ begin
     begin
     Inc(CurrBuff, GetRecordSize + Field.Offset);
     Result := Boolean(CurrBuff^);
-    if result and assigned(Buffer) then
+    if result and Assigned(Buffer) then
       begin
       inc(CurrBuff);
       Move(CurrBuff^, Buffer^, Field.Datasize);
@@ -2185,7 +2185,7 @@ begin
     NullMask := CurrBuff;
 
     inc(pbyte(CurrBuff),FFieldBufPositions[Field.FieldNo-1]);
-    if assigned(buffer) then
+    if Assigned(buffer) then
       begin
       Move(Buffer^, CurrBuff^, GetFieldSize(FieldDefs[Field.FieldNo-1]));
       unSetFieldIsNull(NullMask,Field.FieldNo-1);
@@ -2198,7 +2198,7 @@ begin
     Inc(pbyte(CurrBuff), GetRecordSize + Field.Offset);
     Boolean(CurrBuff^) := Buffer <> nil;
     inc(pbyte(CurrBuff));
-    if assigned(Buffer) then
+    if Assigned(Buffer) then
       Move(Buffer^, CurrBuff^, Field.Datasize);
     end;
   if not (State in [dsCalcFields, dsFilter, dsNewValue]) then
@@ -2259,7 +2259,7 @@ var StoreRecBM     : TBufBookmark;
     StoreUpdBuf    : LongInt;
     Bm             : TBufBookmark;
   begin
-    with AUpdBuffer do if assigned(BookmarkData.BookmarkData) then // this is used to exclude buffers which are already handled
+    with AUpdBuffer do if Assigned(BookmarkData.BookmarkData) then // this is used to exclude buffers which are already handled
       begin
       if (UpdateKind = ukModify) then
         begin
@@ -2267,7 +2267,7 @@ var StoreRecBM     : TBufBookmark;
         move(TRecordBuffer(OldValuesBuffer)^,TRecordBuffer(FCurrentIndex.CurrentBuffer)^,FRecordSize);
         FreeRecordBuffer(OldValuesBuffer);
         end
-      else if (UpdateKind = ukDelete) and (assigned(OldValuesBuffer)) then
+      else if (UpdateKind = ukDelete) and (Assigned(OldValuesBuffer)) then
         begin
         FCurrentIndex.GotoBookmark(@NextBookmarkData);
         FCurrentIndex.InsertRecordBeforeCurrentRecord(TRecordBuffer(BookmarkData.BookmarkData));
@@ -2362,7 +2362,7 @@ begin
     while (r < Length(FUpdateBuffer)) and (Response <> rrAbort) do
       begin
       // If the record is first inserted and afterwards deleted, do nothing
-      if not ((FUpdateBuffer[r].UpdateKind=ukDelete) and not (assigned(FUpdateBuffer[r].OldValuesBuffer))) then
+      if not ((FUpdateBuffer[r].UpdateKind=ukDelete) and not (Assigned(FUpdateBuffer[r].OldValuesBuffer))) then
         begin
         FCurrentIndex.GotoBookmark(@FUpdateBuffer[r].BookmarkData);
         // Synchronise the Currentbuffer to the ActiveBuffer
@@ -2376,7 +2376,7 @@ begin
             Inc(FailedCount);
             if failedcount > word(MaxErrors) then Response := rrAbort
             else Response := rrSkip;
-            if assigned(FOnUpdateError) then
+            if Assigned(FOnUpdateError) then
               begin
               AUpdateErr := EUpdateError.Create(SOnUpdateError,E.Message,0,0,Exception(AcquireExceptionObject));
               FOnUpdateError(Self,Self,AUpdateErr,FUpdateBuffer[r].UpdateKind,Response);
@@ -2417,8 +2417,8 @@ var r            : LongInt;
 begin
   SetLength(FUpdateBuffer,0);
 
-  if assigned(FUpdateBlobBuffers) then for r:=0 to length(FUpdateBlobBuffers)-1 do
-   if assigned(FUpdateBlobBuffers[r]) then
+  if Assigned(FUpdateBlobBuffers) then for r:=0 to length(FUpdateBlobBuffers)-1 do
+   if Assigned(FUpdateBlobBuffers[r]) then
     begin
     if FUpdateBlobBuffers[r]^.OrgBufID >= 0 then
       begin
@@ -2443,8 +2443,8 @@ procedure TCustomBufDataset.InternalCancel;
 Var i            : LongInt;
 
 begin
-  if assigned(FUpdateBlobBuffers) then for i:=0 to length(FUpdateBlobBuffers)-1 do
-   if assigned(FUpdateBlobBuffers[i]) and (FUpdateBlobBuffers[i]^.FieldNo>0) then
+  if Assigned(FUpdateBlobBuffers) then for i:=0 to length(FUpdateBlobBuffers)-1 do
+   if Assigned(FUpdateBlobBuffers[i]) and (FUpdateBlobBuffers[i]^.FieldNo>0) then
     begin
     Reallocmem(FUpdateBlobBuffers[i]^.Buffer,0);
     Dispose(FUpdateBlobBuffers[i]);
@@ -2464,8 +2464,8 @@ Var ABuff        : TRecordBuffer;
 
 begin
   inherited InternalPost;
-  if assigned(FUpdateBlobBuffers) then for i:=0 to length(FUpdateBlobBuffers)-1 do
-   if assigned(FUpdateBlobBuffers[i]) and (FUpdateBlobBuffers[i]^.FieldNo>0) then
+  if Assigned(FUpdateBlobBuffers) then for i:=0 to length(FUpdateBlobBuffers)-1 do
+   if Assigned(FUpdateBlobBuffers[i]) and (FUpdateBlobBuffers[i]^.FieldNo>0) then
     begin
     blobbuf.BlobBuffer := FUpdateBlobBuffers[i];
     ABuff := ActiveBuffer;
@@ -2480,7 +2480,7 @@ begin
 
   if State = dsInsert then
     begin
-    if assigned(FAutoIncField) then
+    if Assigned(FAutoIncField) then
       begin
       li := FAutoIncValue;
       // In principle all TAutoIncfields are read-only, but in theory it is
@@ -2652,7 +2652,7 @@ begin
     if value > RecordCount then
       begin
       DatabaseError(SNoSuchRecord,self);
-      exit;
+      Exit;
       end;
     end;
   TmpRecBuffer := (FCurrentIndex as TDoubleLinkedBufIndex).FFirstRecBuf;
@@ -2667,8 +2667,8 @@ Var abuf            :  TRecordBuffer;
 
 begin
   abuf := GetCurrentBuffer;
-  // If abuf isn't assigned, the recordset probably isn't opened.
-  if assigned(abuf) and (FBRecordCount>0) and (state <> dsInsert) then
+  // If abuf isn't Assigned, the recordset probably isn't opened.
+  if Assigned(abuf) and (FBRecordCount>0) and (state <> dsInsert) then
     Result:=FCurrentIndex.GetRecNo(PBufBookmark(abuf+FRecordSize))
   else
     result := 0;
@@ -2780,7 +2780,7 @@ begin
     begin
     if not field.getData(@bufblob) then
       DatabaseError(SFieldIsNull);
-    if not assigned(bufblob.BlobBuffer) then with FDataSet do
+    if not Assigned(bufblob.BlobBuffer) then with FDataSet do
       begin
       FBlobBuffer := GetNewBlobBuffer;
       bufblob.BlobBuffer := FBlobBuffer;
@@ -2793,7 +2793,7 @@ begin
     begin
     FBlobBuffer := GetNewWriteBlobBuffer;
     FBlobBuffer^.FieldNo := Field.FieldNo;
-    if (field.getData(@bufblob)) and assigned(bufblob.BlobBuffer) then
+    if (field.getData(@bufblob)) and Assigned(bufblob.BlobBuffer) then
       FBlobBuffer^.OrgBufID := bufblob.BlobBuffer^.OrgBufID
     else
       FBlobBuffer^.OrgBufID := -1;
@@ -2809,7 +2809,7 @@ begin
   if mode=bmread then
     begin
     if not field.getData(@bufblob) then
-      exit;
+      Exit;
 
     result := TBufBlobStream.Create(Field as tblobfield,bmread);
     end
@@ -2818,7 +2818,7 @@ begin
     if not (state in [dsEdit, dsInsert, dsFilter, dsCalcFields]) then
       begin
       DatabaseErrorFmt(SNotEditing,[Name],self);
-      exit;
+      Exit;
       end;
 
     result := TBufBlobStream.Create(Field as tblobfield,bmWrite);
@@ -2900,7 +2900,7 @@ procedure TCustomBufDataset.GetDatasetPacket(AWriter: TDataPacketReader);
 
     FFilterBuffer:=AUpdBuffer.OldValuesBuffer;
     // If the record is inserted or inserted and afterwards deleted then OldValuesBuffer is nil
-    if assigned(FFilterBuffer) then
+    if Assigned(FFilterBuffer) then
       FDatasetReader.StoreRecord(Self,AThisRowState,FCurrentUpdateBuffer);
   end;
 
@@ -3047,7 +3047,7 @@ end;
 
 function TCustomBufDataset.BookmarkValid(ABookmark: TBookmark): Boolean;
 begin
-  Result:=assigned(FCurrentIndex) and  FCurrentIndex.BookmarkValid(pointer(ABookmark));
+  Result:=Assigned(FCurrentIndex) and  FCurrentIndex.BookmarkValid(pointer(ABookmark));
 end;
 
 function TCustomBufDataset.CompareBookmarks(Bookmark1, Bookmark2: TBookmark
@@ -3171,7 +3171,7 @@ begin
   RestoreState(StoreState);
   FIndexes[0].SetToFirstRecord;
   FAllPacketsFetched:=True;
-  if assigned(FFileStream) then
+  if Assigned(FFileStream) then
     begin
     FreeAndNil(FFileStream);
     FreeAndNil(FDatasetReader);
@@ -3235,7 +3235,7 @@ end;
 procedure TCustomBufDataset.SetFilterText(const Value: String);
 begin
   if Value = Filter then
-    exit;
+    Exit;
 
   // parse
   ParseFilter(Value);
@@ -3250,7 +3250,7 @@ end;
 procedure TCustomBufDataset.SetFiltered(Value: Boolean); {override;}
 begin
   if Value = Filtered then
-    exit;
+    Exit;
 
   // pass on to ancestor
   inherited;
@@ -3345,14 +3345,14 @@ begin
 
     while (Result<FLastRecInd) do
       begin
-      if (FRecordArray[Result] = ABookmark.BookmarkData) then exit;
+      if (FRecordArray[Result] = ABookmark.BookmarkData) then Exit;
       inc(Result);
       end;
 
     Result:=0;
     while (Result<ABookmark.BookmarkInt) do
       begin
-      if (FRecordArray[Result] = ABookmark.BookmarkData) then exit;
+      if (FRecordArray[Result] = ABookmark.BookmarkData) then Exit;
       inc(Result);
       end;
 
@@ -3378,14 +3378,14 @@ begin
   // Call inherited to make sure the dataset is bi-directional
   Result := inherited;
   CheckActive;
-  if IsEmpty then exit;
+  if IsEmpty then Exit;
 
   // Build the DBCompare structure
   SearchFields := TList.Create;
   try
     GetFieldList(SearchFields,KeyFields);
     FieldsAmount:=SearchFields.Count;
-    if FieldsAmount=0 then exit;
+    if FieldsAmount=0 then Exit;
 
     SetLength(DBCompareStruct,FieldsAmount);
     for FieldNr:=0 to FieldsAmount-1 do

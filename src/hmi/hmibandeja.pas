@@ -9,7 +9,7 @@ uses
   PLCNumber, plcstructstring;
 
 type
-  TOnConvertDintToColor = function(Sender:TObject; const aColorDint:LongInt; out Lum:LongInt):TColor of object;
+  TOnConvertDintToColor = function(Sender: TObject; const aColorDint: Longint; out Lum: Longint): TColor of object;
 
   { THMIBandeja }
 
@@ -23,7 +23,7 @@ type
     FBackgroundColorPLCTag: TPLCNumber;
     FBandejaTextPLCTag: TPLCStructString;
     FBorderColorPLCTag: TPLCNumber;
-    function DIntToColor(aDInt: LongInt; out Lumin: LongInt): TColor;
+    function DIntToColor(aDInt: Longint; out Lumin: Longint): TColor;
     procedure SetBackgroundColorPLCTag(AValue: TPLCNumber); virtual;
     procedure SetBandejaTextPLCTag(AValue: TPLCStructString); virtual;
     procedure SetBorderColorPLCTag(AValue: TPLCNumber); virtual;
@@ -31,10 +31,10 @@ type
   public
     destructor Destroy; override;
   published
-    property BorderColorPLCTag:TPLCNumber read FBorderColorPLCTag Write SetBorderColorPLCTag;
-    property BackgroundColorPLCTag:TPLCNumber read FBackgroundColorPLCTag Write SetBackgroundColorPLCTag;
-    property BandejaTextPLCTag:TPLCStructString read FBandejaTextPLCTag write SetBandejaTextPLCTag;
-    property OnConvertDintToColor:TOnConvertDintToColor read fOnConvertDintToColor write FOnConvertDintToColor;
+    property BorderColorPLCTag: TPLCNumber read FBorderColorPLCTag write SetBorderColorPLCTag;
+    property BackgroundColorPLCTag: TPLCNumber read FBackgroundColorPLCTag write SetBackgroundColorPLCTag;
+    property BandejaTextPLCTag: TPLCStructString read FBandejaTextPLCTag write SetBandejaTextPLCTag;
+    property OnConvertDintToColor: TOnConvertDintToColor read fOnConvertDintToColor write fOnConvertDintToColor;
   published
     property Align;
     property Alignment;
@@ -115,35 +115,41 @@ implementation
 
 procedure THMIBandeja.SetBorderColorPLCTag(AValue: TPLCNumber);
 begin
-  if FBorderColorPLCTag=AValue then Exit;
+  if FBorderColorPLCTag = AValue then Exit;
 
-  if Assigned(FBorderColorPLCTag) then begin
+  if Assigned(FBorderColorPLCTag) then
+  begin
     FBorderColorPLCTag.RemoveAllHandlersFromObject(Self);
     FBorderColorPLCTag.RemoveFreeNotification(Self);
   end;
 
-  if Assigned(AValue) then begin
+  if Assigned(AValue) then
+  begin
     AValue.AddTagChangeHandler(@TagBorderColorChanged);
     AValue.FreeNotification(Self);
   end;
 
-  FBorderColorPLCTag:=AValue;
+  FBorderColorPLCTag := AValue;
 end;
 
 procedure THMIBandeja.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
-  if Operation=opRemove then begin
-    if AComponent=FBorderColorPLCTag then begin
-      FBorderColorPLCTag:=nil;
+  if Operation = opRemove then
+  begin
+    if AComponent = FBorderColorPLCTag then
+    begin
+      FBorderColorPLCTag := nil;
     end;
 
-    if AComponent=FBackgroundColorPLCTag then begin
-      FBackgroundColorPLCTag:=nil;
+    if AComponent = FBackgroundColorPLCTag then
+    begin
+      FBackgroundColorPLCTag := nil;
     end;
 
-    if AComponent=FBandejaTextPLCTag then begin
-      FBandejaTextPLCTag:=nil;
+    if AComponent = FBandejaTextPLCTag then
+    begin
+      FBandejaTextPLCTag := nil;
     end;
   end;
 end;
@@ -158,84 +164,90 @@ end;
 
 procedure THMIBandeja.TagBackgroundColorChanged(Sender: TObject);
 var
-  lum: LongInt;
+  Lum: Longint;
 begin
-  if Assigned(FBackgroundColorPLCTag) then begin
+  if Assigned(FBackgroundColorPLCTag) then
+  begin
     if Assigned(fOnConvertDintToColor) then
-      Color:=fOnConvertDintToColor(Self, Trunc(FBackgroundColorPLCTag.Value), lum)
+      Color := fOnConvertDintToColor(Self, Trunc(FBackgroundColorPLCTag.Value), Lum)
     else
-      Color:=DIntToColor(Trunc(FBackgroundColorPLCTag.Value), lum);
+      Color := DIntToColor(Trunc(FBackgroundColorPLCTag.Value), Lum);
 
-    Visible:= not (Color = 0);
+    Visible := not (Color = 0);
 
-    if lum>127 then
-      Font.Color:=clBlack
+    if Lum > 127 then
+      Font.Color := clBlack
     else
-      Font.Color:=clWhite;
+      Font.Color := clWhite;
   end;
 end;
 
 procedure THMIBandeja.TagBandejaTextChanged(Sender: TObject);
 begin
   if Assigned(FBandejaTextPLCTag) then
-    Caption:=FBandejaTextPLCTag.Value;
+    Caption := FBandejaTextPLCTag.Value;
 end;
 
 procedure THMIBandeja.TagBorderColorChanged(Sender: TObject);
 var
-  aux: LongInt;
+  aux: Longint;
 begin
-  if Assigned(FBorderColorPLCTag) then begin
+  if Assigned(FBorderColorPLCTag) then
+  begin
     if Assigned(fOnConvertDintToColor) then
-      Color:=fOnConvertDintToColor(Self, Trunc(FBorderColorPLCTag.Value), aux)
+      Color := fOnConvertDintToColor(Self, Trunc(FBorderColorPLCTag.Value), aux)
     else
-      BevelColor:=DIntToColor(Trunc(FBorderColorPLCTag.Value), aux);
+      BevelColor := DIntToColor(Trunc(FBorderColorPLCTag.Value), aux);
   end;
 end;
 
-function THMIBandeja.DIntToColor(aDInt: LongInt; out Lumin:LongInt): TColor;
+function THMIBandeja.DIntToColor(aDInt: Longint; out Lumin: Longint): TColor;
 var
-  R, G, B: LongInt;
+  R, G, B: Longint;
 begin
-  R:=(aDint and $00ff0000) div $10000;
-  G:=(aDint and $0000ff00) div $100;
-  B:=(aDint and $000000ff);
-  Lumin:=trunc((R*0.3) + (G*0.59) + (B*0.11));
-  Result:=RGBToColor(R,G,B);
+  R := (aDInt and $00ff0000) Div $10000;
+  G := (aDInt and $0000ff00) Div $100;
+  B := (aDInt and $000000ff);
+  Lumin := Trunc((R * 0.3) + (G * 0.59) + (B * 0.11));
+  Result := RGBToColor(R, G, B);
 end;
 
 procedure THMIBandeja.SetBackgroundColorPLCTag(AValue: TPLCNumber);
 begin
-  if FBackgroundColorPLCTag=AValue then Exit;
+  if FBackgroundColorPLCTag = AValue then Exit;
 
-  if Assigned(FBackgroundColorPLCTag) then begin
+  if Assigned(FBackgroundColorPLCTag) then
+  begin
     FBackgroundColorPLCTag.RemoveAllHandlersFromObject(Self);
     FBackgroundColorPLCTag.RemoveFreeNotification(Self);
   end;
 
-  if Assigned(AValue) then begin
+  if Assigned(AValue) then
+  begin
     AValue.AddTagChangeHandler(@TagBackgroundColorChanged);
     AValue.FreeNotification(Self);
   end;
 
-  FBackgroundColorPLCTag:=AValue;
+  FBackgroundColorPLCTag := AValue;
 end;
 
 procedure THMIBandeja.SetBandejaTextPLCTag(AValue: TPLCStructString);
 begin
-  if FBandejaTextPLCTag=AValue then Exit;
+  if FBandejaTextPLCTag = AValue then Exit;
 
-  if Assigned(FBandejaTextPLCTag) then begin
+  if Assigned(FBandejaTextPLCTag) then
+  begin
     FBandejaTextPLCTag.RemoveAllHandlersFromObject(Self);
     FBandejaTextPLCTag.RemoveFreeNotification(Self);
   end;
 
-  if Assigned(AValue) then begin
+  if Assigned(AValue) then
+  begin
     AValue.AddTagChangeHandler(@TagBandejaTextChanged);
     AValue.FreeNotification(Self);
   end;
 
-  FBandejaTextPLCTag:=AValue;
+  FBandejaTextPLCTag := AValue;
 end;
 
 end.

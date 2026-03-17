@@ -251,7 +251,7 @@ begin
   p:=TTagNamesItemEditor(Self.Prior);
   n:=TTagNamesItemEditor(Self.Next);
   if p=nil then begin
-    exit;
+    Exit;
   end else begin
     Self.Top := p.Top - 1;
     p1 := TTagNamesItemEditor(p.Prior);
@@ -275,7 +275,7 @@ begin
   p:=TTagNamesItemEditor(Self.Prior);
   n:=TTagNamesItemEditor(Self.Next);
   if n=nil then begin
-    exit;
+    Exit;
   end else begin
     Self.Top := n.Top + 1;
     n1 := TTagNamesItemEditor(n.Next);
@@ -336,7 +336,7 @@ var
   item, n, p:TTagNamesItemEditor;
 begin
   //se so ha um item.
-  if (CurItem.Prior=nil) and (CurItem.Next=nil) then exit;
+  if (CurItem.Prior=nil) and (CurItem.Next=nil) then Exit;
 
   If MessageDlg(SDoYouWantDeleteThisItem, mtConfirmation, [mbYes, mbNo],0)=mrYes then begin
     item := CurItem;
@@ -421,19 +421,19 @@ begin
   while item<>nil do begin
     if (Trim(item.Nome.Text)<>'') AND (not (item.Nome.Text[1] in ['a'..'z','A'..'Z','_'])) then begin
       MessageDlg(SInvalidTagNameInTagBuilder,mtError,[mbOk],0);
-      exit;
+      Exit;
     end;
     item := TTagNamesItemEditor(item.Prior);
   end;
 
   if optPLCBlock.Checked AND ((Trim(NameOfEachBlock.Text)='') OR (not (NameOfEachBlock.Text[1] in ['a'..'z','A'..'Z','_']))) then begin
     MessageDlg(SInvalidBlockName,mtError,[mbOk],0);
-    exit;
+    Exit;
   end;
 
   if CurItem=nil then begin
     MessageDlg(SWithoutAtLeastOneValidName,mtError,[mbOk],0);
-    exit;
+    Exit;
   end;
   ModalResult:=mrOK;
 end;

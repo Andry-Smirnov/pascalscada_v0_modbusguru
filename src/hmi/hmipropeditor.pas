@@ -30,14 +30,14 @@ uses
     PropEdits, ComponentEditors, GraphPropEdits, ImgList,
     hmibooleanpropertyconnector, hmicolorpropertyconnector, hmi_polyline;
   {$ELSE}
-    Types,
-    //if is a delphi 6+
-    {$IF defined(DELPHI6_UP)}
-      DesignIntf, DesignEditors;
-    {$ELSE}
+  Types,
+  //if is a delphi 6+
+  {$IF defined(DELPHI6_UP)}
+  DesignIntf, DesignEditors;
+  {$ELSE}
       //delphi 5-
       DsgnIntf;
-    {$IFEND}
+  {$IFEND}
   {$ENDIF}
 
 type
@@ -54,10 +54,10 @@ type
   {$ENDIF}
   TZoneFileNamePropertyEditor = class(TStringProperty)
   public
-    function  GetAttributes: TPropertyAttributes; override;
-    function  GetValue: AnsiString; override;
+    function GetAttributes: TPropertyAttributes; override;
+    function GetValue: Ansistring; override;
     procedure Edit; override;
-    procedure SetValue(const Value: AnsiString); override;
+    procedure SetValue(const Value: Ansistring); override;
   end;
 
   {$IFDEF FPC}
@@ -147,8 +147,8 @@ type
   {$ENDIF}
   TPositionPropertyEditor = class(TStringProperty)
   public
-    function  GetAttributes: TPropertyAttributes; override;
-    function  GetValue: AnsiString; override;
+    function GetAttributes: TPropertyAttributes; override;
+    function GetValue: Ansistring; override;
     procedure Edit; override;
   end;
 
@@ -165,7 +165,7 @@ type
   {$ENDIF}
   TZoneBlinkWithPropertyEditor = class(TIntegerProperty)
   public
-    function  GetAttributes: TPropertyAttributes; override;
+    function GetAttributes: TPropertyAttributes; override;
     procedure GetValues(Proc: TGetStrProc); override;
   end;
 
@@ -182,7 +182,7 @@ type
   {$ENDIF}
   TSecurityCodePropertyEditor = class(TStringProperty)
   public
-    function  GetAttributes: TPropertyAttributes; override;
+    function GetAttributes: TPropertyAttributes; override;
     procedure GetValues(Proc: TGetStrProc); override;
   end;
 
@@ -196,52 +196,52 @@ type
     procedure DrawEmptyPolyline;
     procedure OptimizePolyline;
   public
-    procedure ExecuteVerb(Index: LongInt); override;
-    function  GetVerb(Index: LongInt): AnsiString; override;
-    function  GetVerbCount: LongInt; override;
-    function  Polyline: THMIPolyline; virtual;
+    procedure ExecuteVerb(Index: Longint); override;
+    function GetVerb(Index: Longint): Ansistring; override;
+    function GetVerbCount: Longint; override;
+    function Polyline: THMIPolyline; virtual;
   end;
 
   TControlPosSizePropertyEditor = class(TIntegerExpressionPropertyEditor)
   protected
-    procedure RegisterExpressionVariables(const i: Integer;
-                 var parser: TFPExpressionParser); override;
+    procedure RegisterExpressionVariables(const i: Integer; var parser: TFPExpressionParser); override;
   end;
 
 implementation
 
 uses HMITypes;
 
-{ TControlPosSizePropertyEditor }
+  { TControlPosSizePropertyEditor }
 
-procedure TControlPosSizePropertyEditor.RegisterExpressionVariables(
-  const i: Integer; var parser: TFPExpressionParser);
+procedure TControlPosSizePropertyEditor.RegisterExpressionVariables(const i: Integer; var parser: TFPExpressionParser);
 var
-  propertyName: AnsiString;
+  propertyName: Ansistring;
 begin
-  if assigned(parser) then begin
+  if Assigned(parser) then
+  begin
     //unregister all possible registered variables.
     parser.Identifiers.Clear;
 
-    propertyName:=lowercase(GetPropInfo^.Name);
+    propertyName := LowerCase(GetPropInfo^.Name);
 
-    if (GetComponent(i) is TControl) then begin
+    if (GetComponent(i) is TControl) then
+    begin
       //register only if the property is not being edited,
       //to avoid circular references.
 
-      if (propertyName<>'left') then
+      if (propertyName <> 'left') then
         parser.Identifiers.AddIntegerVariable('left', (GetComponent(i) as TControl).Left);
 
-      if (propertyName<>'top') then
+      if (propertyName <> 'top') then
         parser.Identifiers.AddIntegerVariable('top', (GetComponent(i) as TControl).top);
 
-      if (propertyName<>'width') then
+      if (propertyName <> 'width') then
         parser.Identifiers.AddIntegerVariable('width', (GetComponent(i) as TControl).Width);
 
-      if (propertyName<>'height') then
+      if (propertyName <> 'height') then
         parser.Identifiers.AddIntegerVariable('height', (GetComponent(i) as TControl).Height);
 
-      if (propertyName<>'tag') then
+      if (propertyName <> 'tag') then
         parser.Identifiers.AddIntegerVariable('tag', (GetComponent(i) as TControl).Tag);
     end;
   end;
@@ -264,7 +264,7 @@ begin
   THMIPolylineAccess(Polyline).OptimizeDraw;
 end;
 
-procedure THMIPolylineComponentEditor.ExecuteVerb(Index: LongInt);
+procedure THMIPolylineComponentEditor.ExecuteVerb(Index: Longint);
 begin
   case Index of
     0: DrawPolyline;
@@ -273,68 +273,66 @@ begin
   end;
 end;
 
-function THMIPolylineComponentEditor.GetVerb(Index: LongInt): AnsiString;
+function THMIPolylineComponentEditor.GetVerb(Index: Longint): Ansistring;
 begin
   case Index of
-   0: Result:='Continue draw';
-   1: Result:='Clear draw';
-   2: Result:='Optimize';
-   else
-     Result:=inherited GetVerb(Index);
+    0: Result := 'Continue draw';
+    1: Result := 'Clear draw';
+    2: Result := 'Optimize';
+    else
+      Result := inherited GetVerb(Index);
   end;
 end;
 
-function THMIPolylineComponentEditor.GetVerbCount: LongInt;
+function THMIPolylineComponentEditor.GetVerbCount: Longint;
 begin
-  Result:=3;
+  Result := 3;
 end;
 
 function THMIPolylineComponentEditor.Polyline: THMIPolyline;
 begin
-  Result:=THMIPolyline(GetComponent);
+  Result := THMIPolyline(GetComponent);
 end;
 
 { TSelectOnlyTColorPropPropertyEditor }
 
-constructor TSelectOnlyTColorPropPropertyEditor.Create(
-  Hook: TPropertyEditorHook; APropCount: Integer);
+constructor TSelectOnlyTColorPropPropertyEditor.Create(Hook: TPropertyEditorHook; APropCount: Integer);
 begin
   inherited Create(Hook, APropCount);
-  FOnlyPropertiesOfType:=PTypeInfo(TypeInfo(TColor))^.Name;
-  FExpectedClass:=TObjectWithColorPropetiesColletionItem;
+  FOnlyPropertiesOfType := PTypeInfo(TypeInfo(TColor))^.Name;
+  FExpectedClass := TObjectWithColorPropetiesColletionItem;
 end;
 
 { TSelectOnlyBooleanPropPropertyEditor }
 
-constructor TSelectOnlyBooleanPropPropertyEditor.Create(
-  Hook: TPropertyEditorHook; APropCount: Integer);
+constructor TSelectOnlyBooleanPropPropertyEditor.Create(Hook: TPropertyEditorHook; APropCount: Integer);
 begin
   inherited Create(Hook, APropCount);
-  FOnlyPropertiesOfType:=PTypeInfo(TypeInfo(Boolean))^.Name;
-  FExpectedClass:=TObjectWithBooleanPropetiesColletionItem;
+  FOnlyPropertiesOfType := PTypeInfo(TypeInfo(Boolean))^.Name;
+  FExpectedClass := TObjectWithBooleanPropetiesColletionItem;
 end;
 
 { TTargetObjectPropPropertyEditor }
 
-constructor TSelectObjectPropPropertyEditor.Create(Hook: TPropertyEditorHook;
-  APropCount: Integer);
+constructor TSelectObjectPropPropertyEditor.Create(Hook: TPropertyEditorHook; APropCount: Integer);
 begin
   inherited Create(Hook, APropCount);
-  FOnlyPropertiesOfType:='';
-  FExpectedClass:=TObjectColletionItem;
+  FOnlyPropertiesOfType := '';
+  FExpectedClass := TObjectColletionItem;
 end;
 
 function TSelectObjectPropPropertyEditor.GetAttributes: TPropertyAttributes;
 begin
   if GetComponent(0) is FExpectedClass then
-     Result := [paValueList
-                {$IFDEF FPC}
+    Result := [paValueList
+      {$IFDEF FPC}
                 ,paPickList
-                {$ELSE}
-                  {$IFDEF DELPHI2005_UP}
+      {$ELSE}
+      {$IFDEF DELPHI2005_UP}
                   , paReadOnly, paValueEditable
-                  {$ENDIF}
-                {$ENDIF}];
+      {$ENDIF}
+      {$ENDIF}
+      ];
 end;
 
 procedure TSelectObjectPropPropertyEditor.GetValues(Proc: TGetStrProc);
@@ -346,71 +344,81 @@ var
   obj: TComponent;
 begin
   Proc('(none)');
-   if GetComponent(0) is FExpectedClass then
-     if assigned((GetComponent(0) as FExpectedClass).TargetObject) then begin
-       obj := (GetComponent(0) as FExpectedClass).TargetObject;
+  if GetComponent(0) is FExpectedClass then
+    if Assigned((GetComponent(0) as FExpectedClass).TargetObject) then
+    begin
+      obj := (GetComponent(0) as FExpectedClass).TargetObject;
 
-       tdata:=GetTypeData(obj.ClassInfo);
+      tdata := GetTypeData(obj.ClassInfo);
 
-       GetMem(PL,tdata^.PropCount*SizeOf(Pointer));
-       try
-         nprops:=GetPropList(obj,PL);
-         for p:=0 to nprops-1 do begin
-           if (lowercase(PL^[p]^.PropType^.Name)=lowercase(FOnlyPropertiesOfType)) or (FOnlyPropertiesOfType='') then begin
-             Proc(PL^[p]^.Name);
-           end;
-         end;
-       finally
-         Freemem(PL);
-       end;
-     end;
+      GetMem(PL, tdata^.PropCount * SizeOf(Pointer));
+      try
+        nprops := GetPropList(obj, PL);
+        for p := 0 to nprops - 1 do
+        begin
+          if (LowerCase(PL^[p]^.PropType^.Name) = LowerCase(FOnlyPropertiesOfType)) or (FOnlyPropertiesOfType = '') then
+          begin
+            Proc(PL^[p]^.Name);
+          end;
+        end;
+      finally
+        Freemem(PL);
+      end;
+    end;
 end;
 
-procedure TSelectObjectPropPropertyEditor.SetValue(const NewValue: AnsiString);
+procedure TSelectObjectPropPropertyEditor.SetValue(const NewValue: Ansistring);
 begin
-  if NewValue='(none)' then
+  if NewValue = '(none)' then
     inherited SetValue('')
   else
     inherited SetValue(NewValue);
 end;
 
-function  TZoneFileNamePropertyEditor.GetAttributes: TPropertyAttributes;
+function TZoneFileNamePropertyEditor.GetAttributes: TPropertyAttributes;
 begin
-   if GetComponent(0) is TGraphicZone then
-      Result := [paDialog{$IFNDEF FPC}{$IFDEF DELPHI2005_UP}, paReadOnly,
-                 paValueEditable{$ENDIF}{$ENDIF}];
+  if GetComponent(0) is TGraphicZone then
+    Result := [paDialog
+      {$IFNDEF FPC}
+      {$IFDEF DELPHI2005_UP}
+, paReadOnly,
+                 paValueEditable
+      {$ENDIF}
+      {$ENDIF}
+      ];
 end;
 
-function  TZoneFileNamePropertyEditor.GetValue: AnsiString;
+function TZoneFileNamePropertyEditor.GetValue: Ansistring;
 begin
-   Result := GetStrValue;
+  Result := GetStrValue;
 end;
 
 procedure TZoneFileNamePropertyEditor.Edit;
 var
   od: TOpenDialog;
 begin
-  if GetComponent(0) is TGraphicZone then begin
-    od:=TOpenDialog.Create(nil);
+  if GetComponent(0) is TGraphicZone then
+  begin
+    od := TOpenDialog.Create(nil);
     {$IFDEF FPC}
     od.Filter:='Imagens *.ico *.ppm *.pgm *.pbm *.png *.xpm *.bpm|*.ico;*.ppm;*.pgm;*.pbm;*.png;*.xpm;*.bpm';
     {$ELSE}
-    od.Filter:='Imagens *.jpg *.jpeg *.bmp *.ico *.emf *.wmf|*.jpg;*.jpeg;*.bmp;*.ico;*.emf;*.wmf';
+    od.Filter := 'Imagens *.jpg *.jpeg *.bmp *.ico *.emf *.wmf|*.jpg;*.jpeg;*.bmp;*.ico;*.emf;*.wmf';
     {$ENDIF}
     try
-       if od.Execute then
-          TGraphicZone(GetComponent(0)).FileName := od.FileName;
+      if od.Execute then
+        TGraphicZone(GetComponent(0)).FileName := od.FileName;
     finally
-       od.Destroy;
+      od.Destroy;
     end;
   end;
 end;
 
-procedure TZoneFileNamePropertyEditor.SetValue(const Value: AnsiString);
+procedure TZoneFileNamePropertyEditor.SetValue(const Value: Ansistring);
 begin
-   SetStrValue(Value);
-   if GetComponent(0) is TGraphicZone then
-      TGraphicZone(GetComponent(0)).ImageListAsDefault := false;
+  SetStrValue(Value);
+  if GetComponent(0) is TGraphicZone then
+    TGraphicZone(GetComponent(0)).ImageListAsDefault := False;
 end;
 
 {$IFDEF FPC}
@@ -465,7 +473,7 @@ var
 begin
   if Index=0 then  begin
     DrawText;
-    exit;
+    Exit;
   end;
   dec(Index);
   Images := GetImageList;
@@ -534,86 +542,110 @@ begin
 end;
 {$ENDIF}
 
-function  TZoneBlinkWithPropertyEditor.GetAttributes: TPropertyAttributes;
+function TZoneBlinkWithPropertyEditor.GetAttributes: TPropertyAttributes;
 begin
-   if GetComponent(0) is TZone then
-      Result := [paValueList{$IFNDEF FPC}{$IFDEF DELPHI2005_UP}, paReadOnly,
-                 paValueEditable{$ENDIF}{$ENDIF}];
+  if GetComponent(0) is TZone then
+    Result := [paValueList
+      {$IFNDEF FPC}
+      {$IFDEF DELPHI2005_UP}
+, paReadOnly,
+                 paValueEditable
+      {$ENDIF}
+      {$ENDIF}
+      ];
 end;
 
 procedure TZoneBlinkWithPropertyEditor.GetValues(Proc: TGetStrProc);
 var
-   i:LongInt;
+  i: Longint;
 begin
-   Proc('-1');
-   if (GetComponent(0) is TZone) and (TZone(GetComponent(0)).Collection is TZones) then
-      for i := 0 to TZone(GetComponent(0)).Collection.Count-1 do begin
-         if TZone(GetComponent(0)).Collection.Items[i]<>GetComponent(0) then
-            Proc(IntToStr(i));
-      end;
+  Proc('-1');
+  if (GetComponent(0) is TZone) and (TZone(GetComponent(0)).Collection is TZones) then
+    for i := 0 to TZone(GetComponent(0)).Collection.Count - 1 do
+    begin
+      if TZone(GetComponent(0)).Collection.Items[i] <> GetComponent(0) then
+        Proc(IntToStr(i));
+    end;
 end;
 
-function  TSecurityCodePropertyEditor.GetAttributes: TPropertyAttributes;
+function TSecurityCodePropertyEditor.GetAttributes: TPropertyAttributes;
 begin
-   if Supports(GetComponent(0), IHMIInterface) or (GetComponent(0) is TPascalSCADACheckSpecialTokenAction) then
-      Result := [paValueList{$IFNDEF FPC}{$IFDEF DELPHI2005_UP}, paReadOnly,
-                 paValueEditable{$ENDIF}{$ENDIF}];
+  if Supports(GetComponent(0), IHMIInterface) or (GetComponent(0) is TPascalSCADACheckSpecialTokenAction) then
+    Result := [paValueList
+      {$IFNDEF FPC}
+      {$IFDEF DELPHI2005_UP}
+, paReadOnly,
+                 paValueEditable
+      {$ENDIF}
+      {$ENDIF}
+      ];
 end;
 
 procedure TSecurityCodePropertyEditor.GetValues(Proc: TGetStrProc);
 var
-   i:LongInt;
-   x:TStringList;
+  i: Longint;
+  x: TStringList;
 begin
-   Proc('');
-   x:=GetControlSecurityManager.GetRegisteredAccessCodes;
-   for i:=0 to x.Count-1 do begin
-     proc(x.Strings[i]);
-   end;
-   x.Destroy;
+  Proc('');
+  x := GetControlSecurityManager.GetRegisteredAccessCodes;
+  for i := 0 to x.Count - 1 do
+  begin
+    Proc(x.Strings[i]);
+  end;
+  x.Destroy;
 end;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-function  TPositionPropertyEditor.GetAttributes: TPropertyAttributes;
+function TPositionPropertyEditor.GetAttributes: TPropertyAttributes;
 begin
-   if GetComponent(0) is THMIControlDislocatorAnimation then
-      Result := [paDialog{$IFNDEF FPC}{$IFDEF DELPHI2005_UP}, paReadOnly,
-                 paValueEditable{$ENDIF}{$ENDIF}];
+  if GetComponent(0) is THMIControlDislocatorAnimation then
+    Result := [paDialog
+      {$IFNDEF FPC}
+      {$IFDEF DELPHI2005_UP}
+, paReadOnly,
+                 paValueEditable
+      {$ENDIF}
+      {$ENDIF}
+      ];
 end;
 
-function  TPositionPropertyEditor.GetValue: AnsiString;
+function TPositionPropertyEditor.GetValue: Ansistring;
 begin
-   Result := GetStrValue;
+  Result := GetStrValue;
 end;
 
 procedure TPositionPropertyEditor.Edit;
 var
-  pname:AnsiString;
+  pname: Ansistring;
 begin
-  if GetComponent(0) is THMIControlDislocatorAnimation then begin
-    with GetComponent(0) as THMIControlDislocatorAnimation do begin
-      if Control=nil then exit;
+  if GetComponent(0) is THMIControlDislocatorAnimation then
+  begin
+    with GetComponent(0) as THMIControlDislocatorAnimation do
+    begin
+      if Control = nil then Exit;
       pname := LowerCase(GetName);
-      if pname='gets_p0_position' then begin
-        P0_X:=Control.Left;
-        P0_Y:=Control.Top;
-        exit;
+      if pname = 'gets_p0_position' then
+      begin
+        P0_X := Control.Left;
+        P0_Y := Control.top;
+        Exit;
       end;
 
-      if pname='gets_p1_position' then begin
-        P1_X:=Control.Left;
-        P1_Y:=Control.Top;
-        exit;
+      if pname = 'gets_p1_position' then
+      begin
+        P1_X := Control.Left;
+        P1_Y := Control.top;
+        Exit;
       end;
-      if pname='goto_p0_position' then begin
-        Control.Left:=P0_X;
-        Control.Top:=P0_Y;
-        exit;
+      if pname = 'goto_p0_position' then
+      begin
+        Control.Left := P0_X;
+        Control.top := P0_Y;
+        Exit;
       end;
     end;
   end;
 end;
 
 end.
-

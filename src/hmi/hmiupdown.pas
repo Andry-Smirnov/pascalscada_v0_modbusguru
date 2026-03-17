@@ -16,7 +16,11 @@ unit HMIUpDown;
 interface
 
 uses
-  Classes, SysUtils, {$IFDEF FPC}LResources, {$ENDIF} Controls, Graphics,
+  Classes, SysUtils,
+  {$IFDEF FPC}
+LResources,
+  {$ENDIF}
+  Controls, Graphics,
   Dialogs, ExtCtrls, HMITypes, PLCTag, ProtocolTypes, ComCtrls, Tag;
 
 type
@@ -35,57 +39,56 @@ type
   {$ENDIF}
   THMIUpDown = class(TUpDown, IHMIInterface)
   private
-    FRegInSecMan:Boolean;
+    FRegInSecMan: Boolean;
     FAfterSendValueToTag: TAfterSendNumericValueToTagEvent;
     FBeforeSendValueToTag: TBeforeSendNumericValueToTagEvent;
-    FTag:TPLCTag;
-    FIsEnabled,
-    FIsEnabledBySecurity:Boolean;
-    FPosition, FIncrement:Double;
-    FMax,FMin:Double;
-    FEnableMax, FEnableMin:Boolean;
+    FTag: TPLCTag;
+    FIsEnabled, FIsEnabledBySecurity: Boolean;
+    FPosition, FIncrement: Double;
+    FMax, FMin: Double;
+    FEnableMax, FEnableMin: Boolean;
 
-    FSecurityCode:UTF8String;
-    procedure SetSecurityCode(sc:UTF8String);
+    FSecurityCode: UTF8String;
+    procedure SetSecurityCode(sc: UTF8String);
 
     //implements the IHMIInterface interface
     //: @seealso(IHMIInterface.SetHMITag)
-    procedure SetHMITag(t:TPLCTag);                    //seta um tag
+    procedure SetHMITag(t: TPLCTag);                    //seta um tag
     //: @seealso(IHMIInterface.GetHMITag)
-    function  GetHMITag:TPLCTag;
+    function GetHMITag: TPLCTag;
 
     //: @seealso(IHMIInterface.GetControlSecurityCode)
-     function GetControlSecurityCode:UTF8String;
+    function GetControlSecurityCode: UTF8String;
     //: @seealso(IHMIInterface.CanBeAccessed)
-    procedure CanBeAccessed(a:Boolean);
+    procedure CanBeAccessed(a: Boolean);
     //: @seealso(IHMIInterface.MakeUnsecure)
     procedure MakeUnsecure;
 
-    procedure SetPosition(v:Double);
-    procedure SetIncrement(v:Double);
-    procedure SetMax(v:Double);
-    procedure SetMin(v:Double);
+    procedure SetPosition(v: Double);
+    procedure SetIncrement(v: Double);
+    procedure SetMax(v: Double);
+    procedure SetMin(v: Double);
 
-    procedure WriteFaultCallBack(Sender:TObject);
-    procedure TagChangeCallBack(Sender:TObject);
-    procedure RemoveTagCallBack(Sender:TObject);
+    procedure WriteFaultCallBack(Sender: TObject);
+    procedure TagChangeCallBack(Sender: TObject);
+    procedure RemoveTagCallBack(Sender: TObject);
   protected
     //: @exclude
-    procedure SetEnabled(e:Boolean); override;
+    procedure SetEnabled(e: Boolean); override;
     //: @exclude
     procedure Loaded; override;
     //: @exclude
     procedure Click(Button: TUDBtnType); override;
   public
     //: @exclude
-    constructor Create(AOwner:TComponent); override;
+    constructor Create(AOwner: TComponent); override;
     //: @exclude
-    destructor  Destroy; override;
+    destructor Destroy; override;
     procedure RefreshUpDown(Data: PtrInt);
   published
     property Align;
     //: @exclude
-    property Enabled:Boolean read FIsEnabled write SetEnabled;
+    property Enabled: Boolean read FIsEnabled write SetEnabled;
 
     {$IFDEF PORTUGUES}
     {:
@@ -104,99 +107,103 @@ type
     @seealso(TPLCStructItem)
     }
     {$ENDIF}
-    property PLCTag:TPLCTag read FTag write SetHMITag;
+    property PLCTag: TPLCTag read FTag write SetHMITag;
 
     {$IFDEF PORTUGUES}
     //: Valor máximo que o controle pode atingir caso EnableMax for igual a @true.
     {$ELSE}
     //: Maximum value which control can write on tag if EnableMax is @true.
     {$ENDIF}
-    property Max:Double read FMax write SetMax;
+    property Max: Double read FMax write SetMax;
 
     {$IFDEF PORTUGUES}
     //: Valor minimo que o controle pode atingir caso EnableMin for igual a @true.
     {$ELSE}
     //: Minimum value which control can write on tag if EnableMin is @true.
     {$ENDIF}
-    property Min:Double read FMin write SetMin;
+    property Min: Double read FMin write SetMin;
 
     {$IFDEF PORTUGUES}
     //: Valor que será incrementado/decrementado a cada clique no controle.
     {$ELSE}
     //: Value that will be incremented/decremented on each click on control.
     {$ENDIF}
-    property Increment:Double read FIncrement write SetIncrement;
+    property Increment: Double read FIncrement write SetIncrement;
 
     {$IFDEF PORTUGUES}
     //: Valor atual do controle.
     {$ELSE}
     //: Actual value of the control.
     {$ENDIF}
-    property Position:Double read FPosition write SetPosition;
+    property Position: Double read FPosition write SetPosition;
 
     {$IFDEF PORTUGUES}
     //: Habilita/desabilita o limite máximo para o cotrole.
     {$ELSE}
     //: Enables/disables the maximum value of the control.
     {$ENDIF}
-    property EnableMax:Boolean read FEnableMax write FEnableMax default false;
+    property EnableMax: Boolean read FEnableMax write FEnableMax default False;
 
     {$IFDEF PORTUGUES}
     //: Habilita/desabilita o limite minimo para o cotrole.
     {$ELSE}
     //: Enables/disables the minimum value of the control.
     {$ENDIF}
-    property EnableMin:Boolean read FEnableMin write FEnableMin default false;
+    property EnableMin: Boolean read FEnableMin write FEnableMin default False;
 
     {$IFDEF PORTUGUES}
     //: Codigo de segurança que libera acesso ao controle
     {$ELSE}
     //: Security code that allows access to control.
     {$ENDIF}
-    property SecurityCode:UTF8String read FSecurityCode write SetSecurityCode;
+    property SecurityCode: UTF8String read FSecurityCode write SetSecurityCode;
 
     {$IFDEF PORTUGUES}
     //: Evento disparado antes do HMIEdit enviar um valor ao tag associado
     {$ELSE}
     //: Event triggered before HMIEdit send a value to linked tag.
     {$ENDIF}
-    property BeforeSendAValueToTag:TBeforeSendNumericValueToTagEvent read FBeforeSendValueToTag write FBeforeSendValueToTag;
+    property BeforeSendAValueToTag: TBeforeSendNumericValueToTagEvent read FBeforeSendValueToTag write FBeforeSendValueToTag;
 
     {$IFDEF PORTUGUES}
     //: Evento disparado quando o HMIEdit enviou um valor ao tag associado
     {$ELSE}
     //: Event triggered when the HMIEdit sent a value to linked tag.
     {$ENDIF}
-    property AfterSendValueToTag:TAfterSendNumericValueToTagEvent read FAfterSendValueToTag write FAfterSendValueToTag;
+    property AfterSendValueToTag: TAfterSendNumericValueToTagEvent read FAfterSendValueToTag write FAfterSendValueToTag;
   end;
 
 implementation
 
 uses hsstrings, ControlSecurityManager, Forms;
 
-constructor THMIUpDown.Create(AOwner:TComponent);
+constructor THMIUpDown.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FRegInSecMan:=GetControlSecurityManager.RegisterControl(Self as IHMIInterface);
-  if not FRegInSecMan then begin
+  FRegInSecMan := GetControlSecurityManager.RegisterControl(Self as IHMIInterface);
+  if not FRegInSecMan then
+  begin
     {$IFNDEF WINDOWS}
-    writeln('FIX-ME: Failed to register class ',ClassName,' instace with name="',Name,'" in the ControlSecurityManager?',{$i %FILE%},':',{$i %LINE%});
+    writeln('FIX-ME: Failed to register class ', ClassName, ' instace with name="', Name, '" in the ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
     {$ENDIF}
   end;
-  if csDesigning in ComponentState then begin
+  if csDesigning in ComponentState then
+  begin
     FIncrement := 1;
     FPosition := 0;
     FMax := 100;
     FMin := 0;
-  end else begin
+  end
+  else
+  begin
     FIncrement := 0;
-    FPosition  := 0;
-    FMax       := 0;
-    FMin       := 0;
+    FPosition := 0;
+    FMax := 0;
+    FMin := 0;
   end;
-  inherited Position:=50;
-  FEnableMin := false;
-  FEnableMax := false;
+  inherited Position := 50;
+  FEnableMin := False;
+  FEnableMax := False;
 
 end;
 
@@ -204,33 +211,35 @@ destructor THMIUpDown.Destroy;
 begin
   if FRegInSecMan then
     GetControlSecurityManager.UnRegisterControl(Self as IHMIInterface)
-  else begin
+  else
+  begin
     {$IFNDEF WINDOWS}
-    writeln('FIX-ME: Why class ',ClassName,', instace name="',Name,'" ins''t registered in ControlSecurityManager?',{$i %FILE%},':',{$i %LINE%});
+    writeln('FIX-ME: Why class ', ClassName, ', instace name="', Name, '" ins''t registered in ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
     {$ENDIF}
   end;
 
   Application.RemoveAsyncCalls(Self);
-  if FTag<>nil then
+  if FTag <> nil then
     FTag.RemoveAllHandlersFromObject(Self);
   inherited Destroy;
 end;
 
 procedure THMIUpDown.RefreshUpDown(Data: PtrInt);
 begin
-  if [csReading,csLoading,csDestroying]*ComponentState<>[] then exit;
-  if (FTag<>nil) AND Supports(FTag, ITagNumeric) then
+  if [csReading, csLoading, csDestroying] * ComponentState <> [] then Exit;
+  if (FTag <> nil) and Supports(FTag, ITagNumeric) then
     FPosition := (FTag as ITagNumeric).Value;
 
-  inherited Position:=50;
+  inherited Position := 50;
 end;
 
 procedure THMIUpDown.SetSecurityCode(sc: UTF8String);
 begin
-  if Trim(sc)='' then
-    Self.CanBeAccessed(true)
+  if Trim(sc) = '' then
+    Self.CanBeAccessed(True)
   else
-    with GetControlSecurityManager do begin
+    with GetControlSecurityManager do
+    begin
       ValidateSecurityCode(sc);
       if not SecurityCodeExists(sc) then
         RegisterSecurityCode(sc);
@@ -238,48 +247,50 @@ begin
       Self.CanBeAccessed(CanAccess(sc));
     end;
 
-  FSecurityCode:=sc;
+  FSecurityCode := sc;
 end;
 
-procedure THMIUpDown.SetHMITag(t:TPLCTag);
+procedure THMIUpDown.SetHMITag(t: TPLCTag);
 begin
-   //se o tag esta entre um dos aceitos.
-   //
-   //check if the tag is valid (only numeric tags)
-   if (t<>nil) and (not Supports(t, ITagNumeric)) then
-      raise Exception.Create(SonlyNumericTags);
+  //se o tag esta entre um dos aceitos.
 
-   //se ja estou associado a um tag, remove
-   //
-   //Remove the old link
-   if FTag<>nil then begin
-      FTag.RemoveAllHandlersFromObject(Self);
-   end;
+  //check if the tag is valid (only numeric tags)
+  if (t <> nil) and (not Supports(t, ITagNumeric)) then
+    raise Exception.Create(SonlyNumericTags);
 
-   //adiona o callback para o novo tag
-   //
-   //link with the new tag.
-   if t<>nil then begin
-      t.AddWriteFaultHandler(@WriteFaultCallBack);
-      t.AddTagChangeHandler(@TagChangeCallBack);
-      t.AddRemoveTagHandler(@RemoveTagCallBack);
-      FTag := t;
-      RefreshUpDown(0);
-   end;
-   FTag := t;
+  //se ja estou associado a um tag, remove
+
+  //Remove the old link
+  if FTag <> nil then
+  begin
+    FTag.RemoveAllHandlersFromObject(Self);
+  end;
+
+  //adiona o callback para o novo tag
+
+  //link with the new tag.
+  if t <> nil then
+  begin
+    t.AddWriteFaultHandler(@WriteFaultCallBack);
+    t.AddTagChangeHandler(@TagChangeCallBack);
+    t.AddRemoveTagHandler(@RemoveTagCallBack);
+    FTag := t;
+    RefreshUpDown(0);
+  end;
+  FTag := t;
 end;
 
-function  THMIUpDown.GetHMITag:TPLCTag;
+function THMIUpDown.GetHMITag: TPLCTag;
 begin
-   Result:=FTag;
+  Result := FTag;
 end;
 
-function THMIUpDown.GetControlSecurityCode:UTF8String;
+function THMIUpDown.GetControlSecurityCode: UTF8String;
 begin
-   Result:=FSecurityCode;
+  Result := FSecurityCode;
 end;
 
-procedure THMIUpDown.CanBeAccessed(a:Boolean);
+procedure THMIUpDown.CanBeAccessed(a: Boolean);
 begin
   FIsEnabledBySecurity := a;
   SetEnabled(FIsEnabled);
@@ -287,13 +298,13 @@ end;
 
 procedure THMIUpDown.MakeUnsecure;
 begin
-  FSecurityCode:='';
-  CanBeAccessed(true);
+  FSecurityCode := '';
+  CanBeAccessed(True);
 end;
 
-procedure THMIUpDown.SetEnabled(e:Boolean);
+procedure THMIUpDown.SetEnabled(e: Boolean);
 begin
-  FIsEnabled:=e;
+  FIsEnabled := e;
   inherited SetEnabled(FIsEnabled and FIsEnabledBySecurity);
 end;
 
@@ -306,72 +317,74 @@ end;
 
 procedure THMIUpDown.Click(Button: TUDBtnType);
 var
-  aValue:Double;
+  aValue: Double;
 
-  procedure DoAfterSendValue(ivalue:Double);
+  procedure DoAfterSendValue(ivalue: Double);
   begin
     if Assigned(FAfterSendValueToTag) then
-      FAfterSendValueToTag(Self,ivalue);
+      FAfterSendValueToTag(Self, ivalue);
   end;
 
-  function SendIt(ivalue:Double):Boolean;
+  function SendIt(ivalue: Double): Boolean;
   begin
     if Assigned(FBeforeSendValueToTag) then
-      FBeforeSendValueToTag(Self,ivalue,Result)
+      FBeforeSendValueToTag(Self, ivalue, Result)
     else
-      Result:=true;
+      Result := True;
   end;
+
 begin
-   if FTag=nil then exit;
-   
-   inherited Position:=50;
-     
-   case Button of
-     btNext:
-        aValue := Position+FIncrement;
-     else
-        aValue := Position-FIncrement;
-   end;
+  if FTag = nil then Exit;
 
-   if (FEnableMax And (aValue>FMax)) then
-      aValue := FMax;
-      
-   if (FEnableMin And (aValue<FMin)) then
-      aValue := FMin;
+  inherited Position := 50;
 
-   if Supports(FTag, ITagNumeric) and SendIt(aValue) then begin
-      (FTag as ITagNumeric).Value := aValue;
-      DoAfterSendValue(aValue);
-   end;
+  case Button of
+    btNext:
+      aValue := Position + FIncrement;
+    else
+      aValue := Position - FIncrement;
+  end;
 
-   inherited Click(Button);
+  if (FEnableMax and (aValue > FMax)) then
+    aValue := FMax;
+
+  if (FEnableMin and (aValue < FMin)) then
+    aValue := FMin;
+
+  if Supports(FTag, ITagNumeric) and SendIt(aValue) then
+  begin
+    (FTag as ITagNumeric).Value := aValue;
+    DoAfterSendValue(aValue);
+  end;
+
+  inherited Click(Button);
 end;
 
-procedure THMIUpDown.SetPosition(v:Double);
+procedure THMIUpDown.SetPosition(v: Double);
 begin
 
 end;
 
-procedure THMIUpDown.SetIncrement(v:Double);
+procedure THMIUpDown.SetIncrement(v: Double);
 begin
-   if (Increment<=0) and ([csReading, csLoading]*ComponentState=[]) then
-      raise Exception.Create(SincrementMustBeGreaterThanZero);
+  if (Increment <= 0) and ([csReading, csLoading] * ComponentState = []) then
+    raise Exception.Create(SincrementMustBeGreaterThanZero);
 
-   FIncrement := v;
+  FIncrement := v;
 end;
 
-procedure THMIUpDown.SetMax(v:Double);
+procedure THMIUpDown.SetMax(v: Double);
 begin
-  if ([csLoading]*ComponentState=[]) and (v<=FMin) then
-     raise Exception.Create(SmaxMustBeGreaterThanMin);
+  if ([csLoading] * ComponentState = []) and (v <= FMin) then
+    raise Exception.Create(SmaxMustBeGreaterThanMin);
 
   FMax := v;
 end;
 
-procedure THMIUpDown.SetMin(v:Double);
+procedure THMIUpDown.SetMin(v: Double);
 begin
-  if ([csLoading]*ComponentState=[]) and (v>=FMax) then
-     raise Exception.Create(SminMustBeLessThanMax);
+  if ([csLoading] * ComponentState = []) and (v >= FMax) then
+    raise Exception.Create(SminMustBeLessThanMax);
 
   FMin := v;
 end;
@@ -383,14 +396,14 @@ end;
 
 procedure THMIUpDown.TagChangeCallBack(Sender: TObject);
 begin
-  if Application.Flags*[AppDoNotCallAsyncQueue]=[] then
+  if Application.Flags * [AppDoNotCallAsyncQueue] = [] then
     Application.QueueAsyncCall(@RefreshUpDown, 0);
 end;
 
 procedure THMIUpDown.RemoveTagCallBack(Sender: TObject);
 begin
-  if Ftag=Sender then
-    FTag:=nil;
+  if FTag = Sender then
+    FTag := nil;
 end;
 
 end.

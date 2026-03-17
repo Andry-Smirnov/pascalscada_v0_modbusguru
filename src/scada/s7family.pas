@@ -969,7 +969,7 @@ begin
             Result:='Unknown area';
         end;
       end;
-      exit;
+      Exit;
     end;
 
     if aTag is TPLCString then begin
@@ -995,7 +995,7 @@ begin
             Result:='Unknown area';
         end;
       end;
-      exit;
+      Exit;
     end;
 
     if aTag is TPLCStruct then begin
@@ -1019,7 +1019,7 @@ begin
         end;
         Result:=Result+LineEnding+'with '+IntToStr(TagSizeOnProtocol);
       end;
-      exit;
+      Exit;
     end;
 
     if aTag is TPLCBlock then begin //block and plcstruct
@@ -1045,7 +1045,7 @@ begin
         end;
         Result:=Result+LineEnding+'with '+IntToStr(Size)+' elements'+PascalDescOfType(TagType);
       end;
-      exit;
+      Exit;
     end;
   end else begin
 
@@ -1085,7 +1085,7 @@ begin
 
   if SetupPDU(msgOut, true, pduo, err)=false then  begin
     Result:=False;
-    exit;
+    Exit;
   end;
 
   if CPU.PDUId=$FFFF then
@@ -1188,7 +1188,7 @@ begin
   else
     position:=PDUIncoming;
 
-  if length(msg)<position then exit;
+  if length(msg)<position then Exit;
 
   PDU.header:=@msg[position];
   PDU.header_len:=10;
@@ -1205,7 +1205,7 @@ begin
       PDU.data:=@msg[position + PDU.header_len + PDU.param_len];
       PDU.data_len:=SwapBytesInWord(PPDUHeader(PDU.header)^.data_len);
 
-      if length(msg)<(position+PDU.header_len+PDU.param_len+PDU.data_len) then exit;
+      if length(msg)<(position+PDU.header_len+PDU.param_len+PDU.data_len) then Exit;
     end else begin
       PDU.data:=nil;
       PDU.data_len:=0;
@@ -1604,11 +1604,11 @@ var
   ProtocolErrorCode:TProtocolIOResult;
 begin
   if writepkg then begin
-    if not SetupPDU(pkgout, true, PDU, err) then exit;
-    if (PDU.param=nil) or (PDU.param[0]<>S7FuncWrite) then exit;
+    if not SetupPDU(pkgout, true, PDU, err) then Exit;
+    if (PDU.param=nil) or (PDU.param[0]<>S7FuncWrite) then Exit;
   end else begin
-    if not SetupPDU(pkgin, false, PDU, err) then exit;
-    if (PDU.param=nil) or (PDU.param[0]<>S7FuncRead) then exit;
+    if not SetupPDU(pkgin, false, PDU, err) then Exit;
+    if (PDU.param=nil) or (PDU.param[0]<>S7FuncRead) then Exit;
   end;
   NumResults:=Min(PDU.param[1], Length(ReqList));
   CurResult:=0;
@@ -1634,7 +1634,7 @@ begin
         //if 3, the result already is in bytes
         //if 9, the result is in bits, but each byte stores one bit
         if not (PDU.data[DataIdx+1] in [3,9]) then
-          exit;
+          Exit;
       end;
     end else begin
       if ResultCode=$FF then
@@ -1832,7 +1832,7 @@ begin
         break;
       end;
 
-    if not foundplc then exit;
+    if not foundplc then Exit;
 
     case tr.ReadFunction of
       1: begin
@@ -1853,7 +1853,7 @@ begin
             break;
           end;
 
-        if not founddb then exit;
+        if not founddb then Exit;
 
         FPLCs[plc].DBs[db].DBArea.RemoveAddress(tr.Address,tr.Size,1);
 
@@ -2055,7 +2055,7 @@ begin
 
   if retries>=3 then begin
     NeedSleep:=500;
-    exit;
+    Exit;
   end;
 
   NeedSleep:=ifthen(Length(FPLCs)<=0,500,-10);
@@ -2067,7 +2067,7 @@ begin
       if not FPLCs[plc].Connected then
         if not connectPLC(FPLCs[plc]) then begin
           NeedSleep:=500;
-          exit;
+          Exit;
         end;
       Reset;
       OutOffScanOutgoingPDUSize:=0;
@@ -2262,7 +2262,7 @@ begin
           Reset;
           FNextReadIn:=0; //IO acts as a sleep
           Break;
-          if ReqItem.NeedUpdate=false then exit;
+          if ReqItem.NeedUpdate=false then Exit;
         end;
         pkg_initialized;
 
@@ -2307,7 +2307,7 @@ begin
       break;
     end;
 
-  if not foundplc then exit;
+  if not foundplc then Exit;
 
   SetLength(values.Values, TagRec.Size);
 
@@ -2329,7 +2329,7 @@ begin
           break;
         end;
 
-      if not founddb then exit;
+      if not founddb then Exit;
 
       FPLCs[plc].DBs[db].DBArea.GetValues(TagRec.Address,TagRec.Size,1, values.Values, values.LastQueryResult, values.ValuesTimestamp);
     end;
@@ -2396,13 +2396,13 @@ begin
 
   if retries>=3 then begin
     Result:=ioAdapterInitFail;
-    exit;
+    Exit;
   end;
 
   if not PLCPtr^.Connected then
     if not connectPLC(PLCPtr^) then begin
       Result:=ioConnectPLCFailed;
-      exit;
+      Exit;
     end;
 
   case tagrec.ReadFunction of
@@ -2495,7 +2495,7 @@ begin
             Result:=S7ErrorCodeToProtocolErrorCode(incomingPDU.data[0])
           end else
             Result := ioCommError;
-        exit;
+        Exit;
       end;
     end else begin
       if hasAtLeastOneSuccess then begin
@@ -2503,7 +2503,7 @@ begin
       end else
         Result:=ioCommError;
 
-      exit;
+      Exit;
     end;
 
     inc(BytesSent,BytesToSend);
@@ -2557,13 +2557,13 @@ begin
 
   if retries>=3 then begin
     Result:=ioDriverError;
-    exit;
+    Exit;
   end;
 
   if not PLCPtr^.Connected then
     if not connectPLC(PLCPtr^) then begin
       Result:=ioDriverError;
-      exit;
+      Exit;
     end;
 
   case tagrec.ReadFunction of
@@ -2601,7 +2601,7 @@ begin
       ReqType := vtS7_Peripheral;
     else begin
       Result:=ioTagError;
-      exit;
+      Exit;
     end;
   end;
 
@@ -2657,7 +2657,7 @@ begin
             Result:=S7ErrorCodeToProtocolErrorCode(incomingPDU.data[0])
           end else
             Result := ioCommError;
-        exit;
+        Exit;
       end;
     end else begin
       if hasAtLeastOneSuccess then begin
@@ -2665,7 +2665,7 @@ begin
       end else
         Result:=ioCommError;
 
-      exit;
+      Exit;
     end;
 
     inc(BytesReceived,BytesToRecv);
@@ -2765,7 +2765,7 @@ begin
       UpdateTime:=TPLCTagNumber(TagObj).UpdateTime;
       CallBack:=nil;
     end;
-    exit;
+    Exit;
   end;
 
   if tagobj is TPLCBlock then begin
@@ -2783,7 +2783,7 @@ begin
       UpdateTime:=TPLCBlock(TagObj).UpdateTime;
       CallBack:=nil;
     end;
-    exit;
+    Exit;
   end;
 
   if tagobj is TPLCString then begin
@@ -2801,7 +2801,7 @@ begin
       UpdateTime:=TPLCString(TagObj).UpdateTime;
       CallBack:=nil;
     end;
-    exit;
+    Exit;
   end;
   raise Exception.Create(SinvalidTag);
 end;
@@ -3029,8 +3029,8 @@ end;
 
 procedure SetTagBuilderToolForSiemensS7ProtocolFamily(TagBuilderTool:TOpenTagEditor);
 begin
-  if assigned(TagBuilderEditor) then
-    raise Exception.Create('A Tag Builder editor for Siemens S7 protocol family was already assigned.')
+  if Assigned(TagBuilderEditor) then
+    raise Exception.Create('A Tag Builder editor for Siemens S7 protocol family was already Assigned.')
   else
     TagBuilderEditor:=TagBuilderTool;
 end;

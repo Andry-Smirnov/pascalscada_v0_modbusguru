@@ -280,7 +280,7 @@ var
 begin
   CPU.Connected:=false;
   Result:=false;
-  if (PCommPort=nil) or (PCommPort.ReallyActive=false) then exit;
+  if (PCommPort=nil) or (PCommPort.ReallyActive=false) then Exit;
 
   //incializa conexao
   //
@@ -308,26 +308,26 @@ begin
 
   try
     res := PCommPort.IOCommandSync(iocWriteRead,22,msg,4,DriverID,ifthen(FConnectionWay=ISOTCP_VIA_CP243,1000,0),@IOResult);
-    if (res=0) then exit;
-    if (IOResult.ReadIOResult<>iorOK) or (IOResult.Received<>4) then exit;
+    if (res=0) then Exit;
+    if (IOResult.ReadIOResult<>iorOK) or (IOResult.Received<>4) then Exit;
 
     len:= IOResult.BufferToRead[2]*$100 + IOResult.BufferToRead[3];
 
     res := PCommPort.IOCommandSync(iocRead,0,nil,len-4,DriverID,0,@IOResult);
-    if (res=0) then exit;
-    if (IOResult.ReadIOResult<>iorOK) or (IOResult.Received<>(len-4)) then exit;
+    if (res=0) then Exit;
+    if (IOResult.ReadIOResult<>iorOK) or (IOResult.Received<>(len-4)) then Exit;
 
     retries := 1;
     while (len<>22) and (retries<3) do begin
       res := PCommPort.IOCommandSync(iocRead,0,nil,4,DriverID,0,@IOResult);
-      if (res=0) then exit;
-      if (IOResult.ReadIOResult<>iorOK) or (IOResult.Received<>4) then exit;
+      if (res=0) then Exit;
+      if (IOResult.ReadIOResult<>iorOK) or (IOResult.Received<>4) then Exit;
 
       len:= IOResult.BufferToRead[2]*$100 + IOResult.BufferToRead[3];
 
       res := PCommPort.IOCommandSync(iocRead,0,nil,len-4,DriverID,0,@IOResult);
-      if (res=0) then exit;
-      if (IOResult.ReadIOResult<>iorOK) or (IOResult.Received<>(len-4)) then exit;
+      if (res=0) then Exit;
+      if (IOResult.ReadIOResult<>iorOK) or (IOResult.Received<>(len-4)) then Exit;
     end;
 
     //negocia o tamanho da pdu
@@ -349,7 +349,7 @@ var
   retries, BytesRead:LongInt;
   resget:TIOResult;
 begin
-  if (PCommPort=nil) or (PCommPort.ReallyActive=false) then exit;
+  if (PCommPort=nil) or (PCommPort.ReallyActive=false) then Exit;
 
   Result := Inherited exchange(CPU, msgOut, msgIn, IsWrite);
   Result := false;
@@ -369,7 +369,7 @@ begin
       SetLength(msgIn,0);
       SetLength(msgOut,0);
       Result:=false;
-      exit;
+      Exit;
     end;
     retries:=0;
 
@@ -403,13 +403,13 @@ begin
     if (res=0) then begin
       BytesRead:=0;
       Result:=iorNotReady;
-      exit;
+      Exit;
     end;
 
     if (IOResult1.ReadIOResult<>iorOK) or (IOResult1.Received<>7) then begin
       BytesRead:=IOResult1.Received;
       Result:=IOResult1.ReadIOResult;
-      exit;
+      Exit;
     end;
 
     len := IOResult1.BufferToRead[2]*$100 + IOResult1.BufferToRead[3];
@@ -426,13 +426,13 @@ begin
       if (res=0) then begin
         BytesRead:=0;
         Result:=iorNotReady;
-        exit;
+        Exit;
       end;
 
       if (IOResult1.ReadIOResult<>iorOK) or (IOResult1.Received<>7) then begin
         BytesRead:=IOResult1.Received;
         Result:= IOResult1.ReadIOResult;
-        exit;
+        Exit;
       end;
       //calcula o tamanho do pacote recebido.
       //
@@ -444,18 +444,18 @@ begin
     if (res=0) then begin
       BytesRead:=0;
       Result:=iorNotReady;
-      exit;
+      Exit;
     end;
     //se resultado nao der ok,
     //ou não fechar com o numero de bytes a ler
     //e não ter o comprimento minimo do ISOTCP sai.
     //
     //if the IO result aren't ok or the packet has less bytes than minimum size.
-    //exit...
+    //Exit...
     if (IOResult2.ReadIOResult<>iorOK) or (IOResult2.Received<>(len-7)) then begin
       BytesRead:=IOResult2.Received;
       Result:= IOResult2.ReadIOResult;
-      exit;
+      Exit;
     end;
 
     SetLength(msgIn,IOResult1.ToRead + IOResult2.ToRead);
@@ -618,7 +618,7 @@ end;
 
 procedure TISOTCPDriver.SetISOConnectionWay(NewISOConWay:TISOTCPConnectionWay);
 begin
-  if NewISOConWay = FConnectionWay then exit;
+  if NewISOConWay = FConnectionWay then Exit;
   FConnectionWay:=NewISOConWay;
   //TODO: reset the conection and stabilish it again using the new way.
 end;

@@ -1,7 +1,7 @@
 {$i ../common/language.inc}
 {$IFDEF PORTUGUES}
 {:
-  @abstract(Unit do formulário TagBuilder para a familia de drivers da Siemens.)
+  @abstract(Unit do formulï¿½rio TagBuilder para a familia de drivers da Siemens.)
   @author(Fabio Luis Girardi <fabio@pascalscada.com>)
 }
 {$ELSE}
@@ -457,7 +457,7 @@ procedure TTagBitItemEditor.edtItemNameExit(Sender:TObject);
 var
   accept:Boolean;
 begin
-  if not fedtItemName.Modified then exit;
+  if not fedtItemName.Modified then Exit;
   accept:=true;
   if Assigned(FCheckNames) then
     FCheckNames(Self,fedtItemName.Text,accept);
@@ -473,7 +473,7 @@ end;
 
 procedure TTagBitItemEditor.btnDelClick(Sender:TObject);
 begin
-  if assigned(fondelclick) then
+  if Assigned(fondelclick) then
     fondelclick(Self);
 end;
 
@@ -531,8 +531,8 @@ begin
     OnExit:=@edtItemNameExit;
   end;
 
-  //correção
-  //desenha um botão que não faz nada
+  //correï¿½ï¿½o
+  //desenha um botï¿½o que nï¿½o faz nada
   //para forcar a perda de foco por tab do
   //edit anterior
   //
@@ -851,7 +851,7 @@ var
   b:LongInt;
   oldname:AnsiString;
 begin
-  if not edtItemName.Modified then exit;
+  if not edtItemName.Modified then Exit;
 
   accept1:=true;
   accept2:=true;
@@ -885,9 +885,9 @@ end;
 
 procedure TS7TagItemEditor.DelBitItem(Sender:TObject);
 begin
-  if not (Sender is TTagBitItemEditor) then exit;
+  if not (Sender is TTagBitItemEditor) then Exit;
 
-  if MessageDlg(SDeleteTheItem+(Sender as TTagBitItemEditor).TagName+'"?',mtConfirmation,[mbyes,mbNo],0)=mrno then exit;
+  if MessageDlg(SDeleteTheItem+(Sender as TTagBitItemEditor).TagName+'"?',mtConfirmation,[mbyes,mbNo],0)=mrno then Exit;
 
   DelList.Add(Sender);
   DelTimer.Enabled:=true;
@@ -965,7 +965,7 @@ begin
     for b:=0 to GetBitCount-1 do
       if (Sender<>Bit[b]) and (Bit[b].TagName=NewName) then begin
         AcceptNewName:=false ;
-        exit;
+        Exit;
       end;
 
     if Assigned(FCheckNames) then
@@ -1188,7 +1188,7 @@ var
   priortop, actualTop:LongInt;
   prior:TS7TagItemEditor;
 begin
-  if not (Sender is TS7TagItemEditor) then exit;
+  if not (Sender is TS7TagItemEditor) then Exit;
 
   idx := TagList.IndexOf(Sender);
   if idx>0 then begin
@@ -1213,7 +1213,7 @@ var
   nexttop, actualTop:LongInt;
   aNext:TS7TagItemEditor;
 begin
-  if not (Sender is TS7TagItemEditor) then exit;
+  if not (Sender is TS7TagItemEditor) then Exit;
 
   idx := TagList.IndexOf(Sender);
   if (idx<>-1) and (idx<(TagList.Count-1)) then begin
@@ -1284,7 +1284,7 @@ var
     Result := StringReplace(Result,'%t',n,[rfReplaceAll]);
   end;
 begin
-  if not (Sender is TS7TagItemEditor) then exit;
+  if not (Sender is TS7TagItemEditor) then Exit;
 
   s7tageditor := (Sender as TS7TagItemEditor);
 
@@ -1395,13 +1395,13 @@ begin
     if TObject(TagList.Items[t])=Sender then continue;
     if TS7TagItemEditor(TagList.Items[t]).TagName=NewName then begin
       AcceptNewName:=false;
-      exit;
+      Exit;
     end;
     for b:=0 to TS7TagItemEditor(TagList.Items[t]).BitCount-1 do begin
       if TS7TagItemEditor(TagList.Items[t]).Bit[b]=Sender then continue;
       if TTagBitItemEditor(TS7TagItemEditor(TagList.Items[t]).Bit[b]).TagName=NewName then begin
         AcceptNewName:=false;
-        exit;
+        Exit;
       end;
     end;
   end;
@@ -1610,7 +1610,7 @@ var
   nome, nome2:AnsiString;
   curtype:TTagType;
 begin
-  if TagList.Count<=0 then exit;
+  if TagList.Count<=0 then Exit;
    
   if MemoryArea.ItemIndex=2 then
     nome:='M%s'
@@ -1832,7 +1832,7 @@ var
   strblockname, starttype, endtype:AnsiString;
   curitem:LongInt;
 begin
-  if BlockName.Modified then exit;
+  if BlockName.Modified then Exit;
   case MemoryArea.ItemIndex of
     0: begin
      strblockname:='InputBytes_From_IB%d_to_IB%d';

@@ -430,7 +430,7 @@ begin
       //if don't found the PLC, has nothing to do,
       //because if the PLC don't exists, the memory don't exists too.
       if not foundplc then
-        exit;
+        Exit;
 
       with FWestDevices[plc].Registers[plctagobj.MemAddress] do begin
         h:=High(ScanTimes);
@@ -453,7 +453,7 @@ begin
         end;
 
       if not foundScanRate then
-        exit;
+        Exit;
 
       //procura por registros ativos no scan.
       //
@@ -495,7 +495,7 @@ var
 begin
   if ([csDestroying]*ComponentState<>[]) then begin
     CrossThreadSwitch;
-    exit;
+    Exit;
   end;
   plcneedy:=0;
   regneedy:=0;
@@ -574,10 +574,10 @@ var
   plc:LongInt;
 begin
   if (tagrec.Station<1) or (tagrec.Station>99) then
-    exit;
+    Exit;
 
   if (tagrec.Address<$00) or (tagrec.Address>$1b) then
-    exit;
+    Exit;
 
   for plc:=0 to High(FWestDevices) do
     if FWestDevices[plc].Address=TagRec.Station then begin
@@ -597,12 +597,12 @@ var
 begin
   if (tagrec.Station<1) or (tagrec.Station>99) then begin
     Result := ioIllegalStationAddress;
-    exit;
+    Exit;
   end;
 
   if (tagrec.Address<$00) or (tagrec.Address>$1b) then begin
     Result := ioIllegalRegAddress;
-    exit;
+    Exit;
   end;
 
   if ParameterList[tagrec.Address].Decimal=255 then begin
@@ -642,12 +642,12 @@ var
 begin
   if (tagrec.Station<1) or (tagrec.Station>99) then begin
     Result := ioIllegalStationAddress;
-    exit;
+    Exit;
   end;
 
   if (tagrec.Address<$00) or (tagrec.Address>$1b) then begin
     Result := ioIllegalRegAddress;
-    exit;
+    Exit;
   end;
 
   foundplc := false;
@@ -695,30 +695,30 @@ begin
 
     if PCommPort=nil then begin
       Result := ioNullDriver;
-      exit;
+      Exit;
     end;
 
     if PCommPort.IOCommandSync(iocWriteRead, 6, buffer, 6, DriverID, 5, @pkg)=0 then begin
       Result:=ioDriverError;
-      exit;
+      Exit;
     end;
 
     Result := IOResultToProtocolResult(pkg.WriteIOResult);
-    if Result <> ioOk then exit;
+    if Result <> ioOk then Exit;
     Result := IOResultToProtocolResult(pkg.ReadIOResult);
-    if Result <> ioOk then exit;
+    if Result <> ioOk then Exit;
 
     SetLength(buffer,0);
     buffer := pkg.BufferToRead;
 
     if (buffer[0]=$4C) and (buffer[1]=No[0]) and (buffer[2]=No[1]) and (buffer[3]=$3F) and (buffer[4]=$41) and (buffer[5]=$2A) then begin
       result := ioOk;
-      exit;
+      Exit;
     end;
 
     if (buffer[0]=$4C) and (buffer[1]=No[1]) and (buffer[2]=$3F) and (buffer[3]=$41) and (buffer[4]=$2A) then begin
       result := ioOk;
-      exit;
+      Exit;
     end;
 
     Result := ioCommError;
@@ -734,7 +734,7 @@ procedure TWestASCIIDriver.AddressToChar(Addr:TWestAddressRange; var ret:BYTES);
 var
    Dezenas, Unidades:BYTE;
 begin
-  if not Assigned(ret) then exit;
+  if not Assigned(ret) then Exit;
 
   //testa as condições q fariam esse procedimento falhar
   if ((Addr<1) or (Addr>98)) then
@@ -754,14 +754,14 @@ var
 begin
   if ((buffer[0]=$3C) and (buffer[1]=$3F) and (buffer[2]=$3F) and (buffer[3]=$3E)) then begin
     Result := ioIllegalValue;
-    exit;
+    Exit;
   end;
 
   for i:=0 to 4 do begin
     aux := (buffer[i]-48);
     if ((aux<0) or (aux>9)) then begin
       Result := ioCommError;
-      exit;
+      Exit;
     end;
   end;
 
@@ -835,7 +835,7 @@ begin
 
   if (Value>=10000) or (Value<=-10000) then begin
     Result := ioIllegalValue;
-    exit;
+    Exit;
   end;
 
   caso:=IfThen((Value>=1000) and (Value<10000),$30,caso);
@@ -867,7 +867,7 @@ begin
       numaux := Value*(-1000);
     else begin
       Result := ioIllegalValue;
-      exit;
+      Exit;
     end;
   end;
 
@@ -891,7 +891,7 @@ begin
 
    if (Value>=10000) or (Value<=-10000) then begin
        Result := ioIllegalValue;
-       exit;
+       Exit;
    end;
 
    caso:=IfThen(((caso=255) and (dec<=0) and (Value<10000) and (Value>=0)), $30, caso);
@@ -906,7 +906,7 @@ begin
 
    if (caso = 255) then begin
       Result := ioIllegalValue;
-      exit;
+      Exit;
    end;
 
    case caso of
@@ -928,7 +928,7 @@ begin
          numaux := Value*(-1000);
       else begin
          Result := ioIllegalValue;
-         exit;
+         Exit;
       end;
    end;
 
@@ -966,19 +966,19 @@ begin
 
     if PCommPort=nil then begin
       Result := ioNullDriver;
-      exit;
+      Exit;
     end;
 
 
     if PCommPort.IOCommandSync(iocWriteRead, 6, buffer, 11, DriverID, 5, @pkg)=0 then begin
       Result:=ioDriverError;
-      exit;
+      Exit;
     end;
 
     Result := IOResultToProtocolResult(pkg.WriteIOResult);
-    if Result <> ioOk then exit;
+    if Result <> ioOk then Exit;
     Result := IOResultToProtocolResult(pkg.ReadIOResult);
-    if Result <> ioOk then exit;
+    if Result <> ioOk then Exit;
 
     SetLength(buffer,0);
     buffer := pkg.BufferToRead;
@@ -1036,7 +1036,7 @@ begin
     else
       Result := DoubleToWestManual(buffer[5],Value,dec);
 
-    if Result<>ioOk then exit;
+    if Result<>ioOk then Exit;
 
     buffer[10] := $2A;
 
@@ -1049,29 +1049,29 @@ begin
     else
       Result := DoubleToWestManual(respprog[4],Value,dec);
 
-    if Result<>ioOk then exit;
+    if Result<>ioOk then Exit;
 
     respprog[9] := $49;
     respprog[10] := $2A;
 
     if PCommPort=nil then begin
       Result := ioNullDriver;
-      exit;
+      Exit;
     end;
 
     PCommPort.IOCommandSync(iocWriteRead, 11, buffer, 11, DriverID, 10, @pkg);
 
     Result := IOResultToProtocolResult(pkg.WriteIOResult);
-    if Result <> ioOk then exit;
+    if Result <> ioOk then Exit;
     Result := IOResultToProtocolResult(pkg.ReadIOResult);
-    if Result <> ioOk then exit;
+    if Result <> ioOk then Exit;
 
     for i:=0 to 10 do
       flag := flag and (respprog[i]=pkg.BufferToRead[i]);
 
     if (not flag) then begin
       Result := ioCommError;
-      exit;
+      Exit;
     end;
 
     SetLength(buffer,0);
@@ -1090,13 +1090,13 @@ begin
     PCommPort.IOCommandSync(iocWriteRead, 6, buffer, 11, DriverID, 10, @pkg);
 
     Result := IOResultToProtocolResult(pkg.WriteIOResult);
-    if Result <> ioOk then exit;
+    if Result <> ioOk then Exit;
     Result := IOResultToProtocolResult(pkg.ReadIOResult);
-    if Result <> ioOk then exit;
+    if Result <> ioOk then Exit;
 
     if ((pkg.BufferToRead[8]=$4E) or (pkg.BufferToRead[9]=$4E)) then begin
       Result := ioIllegalFunction;
-      exit;
+      Exit;
     end;
     Result := ioOk;
   finally
@@ -1130,25 +1130,25 @@ begin
 
     if PCommPort=nil then begin
       Result := ioNullDriver;
-      exit;
+      Exit;
     end;
 
     PCommPort.Lock(DriverID);
 
     if PCommPort.IOCommandSync(iocWriteRead, 6, buffer, 6, DriverID, 10, @pkg)=0 then begin
       Result:=ioDriverError;
-      exit;
+      Exit;
     end;
 
     if [csDestroying]*ComponentState<>[] then begin
       Result := ioDriverError;
-      exit;
+      Exit;
     end;
 
     Result := IOResultToProtocolResult(pkg.WriteIOResult);
-    if Result <> ioOk then exit;
+    if Result <> ioOk then Exit;
     Result := IOResultToProtocolResult(pkg.ReadIOResult);
-    if Result <> ioOk then exit;
+    if Result <> ioOk then Exit;
 
     buffer := pkg.BufferToRead;
 
@@ -1157,7 +1157,7 @@ begin
 
     if (b1=false) and (b2=false) then begin
       Result := ioCommError;
-      exit;
+      Exit;
     end;
 
     //se respondeu o endereco com dois byte, incrementa offset da array.
@@ -1178,24 +1178,24 @@ begin
       end;
       else begin
         Result := ioCommError;
-        exit;
+        Exit;
       end;
     end;
 
     if res=0 then begin
       Result := ioDriverError;
-      exit;
+      Exit;
     end;
 
     if [csDestroying]*ComponentState<>[] then begin
       Result := ioDriverError;
-      exit;
+      Exit;
     end;
 
     PCommPort.Unlock(DriverID);
 
     Result := IOResultToProtocolResult(pkg.ReadIOResult);
-    if Result <> ioOk then exit;
+    if Result <> ioOk then Exit;
 
     if b2 and (pkg.BufferToRead[0]=$20) then
       OffsetSpace := 1
@@ -1206,43 +1206,43 @@ begin
 
     if ((buffer[20+OffsetSize+OffsetSpace]<>$41) or (buffer[21+OffsetSize+OffsetSpace]<>$2A)) then begin
       Result := ioCommError;
-      exit;
+      Exit;
     end;
 
     Result := WestToDouble(buffer[0+OffsetSpace], ScanTableValues.SP.Value, ScanTableValues.SP.Decimal);
     if (Result=ioCommError) then
-      exit;
+      Exit;
     ScanTableValues.SP.TimeStamp:=CrossNow;
     ScanTableValues.SP.IOResult:=Result;
 
     Result := WestToDouble(buffer[5+OffsetSpace], ScanTableValues.PV.Value, ScanTableValues.PV.Decimal);
     if (Result=ioCommError) then
-      exit;
+      Exit;
     ScanTableValues.PV.TimeStamp:=CrossNow;
     ScanTableValues.PV.IOResult:=Result;
 
     Result := WestToDouble(buffer[10+OffsetSpace], ScanTableValues.Out1.Value, ScanTableValues.Out1.Decimal);
     if (Result=ioCommError) then
-      exit;
+      Exit;
     ScanTableValues.Out1.TimeStamp:=CrossNow;
     ScanTableValues.Out1.IOResult:=Result;
 
     if OffsetSize=0 then begin
       Result := WestToDouble(buffer[15+OffsetSpace], ScanTableValues.Status.Value, ScanTableValues.Status.Decimal);
       if (Result=ioCommError) then
-        exit;
+        Exit;
       ScanTableValues.Status.TimeStamp:=CrossNow;
       ScanTableValues.Status.IOResult:=Result;
     end else begin
       Result := WestToDouble(buffer[15+OffsetSpace], ScanTableValues.Out2.Value, ScanTableValues.Out2.Decimal);
       if (Result=ioCommError) then
-        exit;
+        Exit;
       ScanTableValues.Out2.TimeStamp:=CrossNow;
       ScanTableValues.Out2.IOResult:=Result;
 
       Result := WestToDouble(buffer[20+OffsetNo+OffsetSpace], ScanTableValues.Status.Value, ScanTableValues.Status.Decimal);
       if (Result=ioCommError) then
-        exit;
+        Exit;
       ScanTableValues.Status.TimeStamp:=CrossNow;
       ScanTableValues.Status.IOResult:=Result;
     end;
@@ -1314,8 +1314,8 @@ end;
 
 procedure SetTagBuilderToolForWest6100Protocol(TagBuilderTool:TOpenTagEditor);
 begin
-  if assigned(WestTagBuilderEditor) then
-    raise Exception.Create('A Tag Builder editor for West 6100 protocol was already assigned.')
+  if Assigned(WestTagBuilderEditor) then
+    raise Exception.Create('A Tag Builder editor for West 6100 protocol was already Assigned.')
   else
     WestTagBuilderEditor:=TagBuilderTool;
 end;

@@ -5,7 +5,7 @@ unit hmi_draw_fita;
 interface
 
 uses
-  Controls, sysutils, Graphics, Classes, hmi_draw_basic_horizontal_control,
+  Controls, SysUtils, Graphics, Classes, hmi_draw_basic_horizontal_control,
   BGRABitmap;
 
 type
@@ -31,31 +31,30 @@ implementation
 
 procedure THMIFitaBasica.DrawControl;
 var
-  emptyArea: TBGRABitmap;
+  EmptyArea: TBGRABitmap;
 begin
-  emptyArea := TBGRABitmap.Create(Width,Height);
+  EmptyArea := TBGRABitmap.Create(Width, Height);
   try
-    FControlArea.Assign(emptyArea);
+    FControlArea.Assign(EmptyArea);
   finally
-    FreeAndNil(emptyArea);
+    FreeAndNil(EmptyArea);
   end;
 
   //###############################################################################
   //preenchimento da cabeça do elevador, cor e diametro da linha.
   //###############################################################################
-  FControlArea.CanvasBGRA.Brush.Color:=FBodyColor;
-  FControlArea.CanvasBGRA.Pen.Color  :=FBorderColor;
-  FControlArea.CanvasBGRA.Pen.Width  :=FBorderWidth;
+  FControlArea.CanvasBGRA.Brush.Color := FBodyColor;
+  FControlArea.CanvasBGRA.Pen.Color := FBorderColor;
+  FControlArea.CanvasBGRA.Pen.Width := FBorderWidth;
 
   //desenha o quadrado da fita.
-  FControlArea.CanvasBGRA.Rectangle(FBodyHeight div 2,0,Width-(FBodyHeight div 2), FBodyHeight);
+  FControlArea.CanvasBGRA.Rectangle(FBodyHeight Div 2, 0, Width - (FBodyHeight Div 2), FBodyHeight);
 
   //desenha o circulo da esquerda
   FControlArea.CanvasBGRA.Ellipse(0, 0, FBodyHeight, FBodyHeight);
 
   //desenha o circulo da esquerda
-  FControlArea.CanvasBGRA.Ellipse(Width-FBodyHeight, 0, Width, FBodyHeight);
+  FControlArea.CanvasBGRA.Ellipse(Width - FBodyHeight, 0, Width, FBodyHeight);
 end;
 
 end.
-

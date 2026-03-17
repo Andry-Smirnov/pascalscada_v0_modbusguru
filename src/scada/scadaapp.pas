@@ -50,7 +50,7 @@ procedure TScadaApp.SetDBConnection(db:TZConnection);
 var
   match:boolean;
 begin
-  if db=PZConnection then exit;
+  if db=PZConnection then Exit;
 
   //se não está em desing e esta tentando remover a conexao...
   if (db=nil) then
@@ -105,24 +105,24 @@ begin
   if (not found) and (LowerCase(LeftStr(PZConnection.Protocol,10))='postgresql') then begin
     sql := 'select tablename from pg_tables WHERE tablename='''+tname+'''';
     found:=true;
-    exit;
+    Exit;
   end;
 
   //SQLITE.
   if (not found) and (LowerCase(LeftStr(PZConnection.Protocol,5))='mysql') then begin
     sql := 'SELECT name FROM sqlite_master WHERE type=''table'' AND name='''+tname+'''';
     found:=true;
-    exit;
+    Exit;
   end;
 
   //mysql.
   if (not found) and (LowerCase(LeftStr(PZConnection.Protocol,5))='mysql') then begin
     sql := 'SHOW TABLES WHERE Tables_in_'+PZConnection.Database+'='''+tname+'''';
     found:=true;
-    exit;
+    Exit;
   end;
 
-  if (not found) or (not PZConnection.ExecuteDirect(sql,affected)) then exit;
+  if (not found) or (not PZConnection.ExecuteDirect(sql,affected)) then Exit;
 
   Result := (affected>0);
 

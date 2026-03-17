@@ -795,7 +795,7 @@ begin
     Exit;
   end;
 
-  if p=PProtocolDriver then exit;
+  if p=PProtocolDriver then Exit;
 
   //remove o driver antigo.
   //removes the link with the old driver.
@@ -862,7 +862,7 @@ end;
 
 procedure TPLCTag.SetAutoRead(v:Boolean);
 begin
-  if PAutoRead=v then exit;
+  if PAutoRead=v then Exit;
 
   PAutoRead := v;
 
@@ -882,7 +882,7 @@ end;
 
 procedure TPLCTag.SetPLCHack(v:Cardinal);
 begin
-  if PRack=v then exit;
+  if PRack=v then Exit;
 
   if (PProtocolDriver<>nil) and PAutoRead then
     PProtocolDriver.RemoveTag(self);
@@ -898,7 +898,7 @@ end;
 
 procedure TPLCTag.SetPLCSlot(v:Cardinal);
 begin
-  if PSlot=v then exit;
+  if PSlot=v then Exit;
 
   if (PProtocolDriver<>nil) AND PAutoRead then
     PProtocolDriver.RemoveTag(Self);
@@ -914,7 +914,7 @@ end;
 
 procedure TPLCTag.SetPLCStation(v:Cardinal);
 begin
-  if PStation=v then exit;
+  if PStation=v then Exit;
 
   if (PProtocolDriver<>nil) AND PAutoRead then
     PProtocolDriver.RemoveTag(self);
@@ -930,7 +930,7 @@ end;
 
 procedure TPLCTag.SetMemFileDB(v:Cardinal);
 begin
-  if PFile_DB=v then exit;
+  if PFile_DB=v then Exit;
 
   if (PProtocolDriver<>nil) AND PAutoRead then
     PProtocolDriver.RemoveTag(Self);
@@ -946,7 +946,7 @@ end;
 
 procedure TPLCTag.SetMemAddress(v:Cardinal);
 begin
-  if PAddress=v then exit;
+  if PAddress=v then Exit;
 
   if (PProtocolDriver<>nil) AND PAutoRead then
     PProtocolDriver.RemoveTag(Self);
@@ -962,7 +962,7 @@ end;
 
 procedure TPLCTag.SetMemSubElement(v:Cardinal);
 begin
-  if PSubElement=v then exit;
+  if PSubElement=v then Exit;
 
   if (PProtocolDriver<>nil) AND PAutoRead then
     PProtocolDriver.RemoveTag(Self);
@@ -978,7 +978,7 @@ end;
 
 procedure TPLCTag.SetMemReadFunction(v:Cardinal);
 begin
-  if PReadFunction=v then exit;
+  if PReadFunction=v then Exit;
 
   if (PProtocolDriver<>nil) AND PAutoRead then
     PProtocolDriver.RemoveTag(Self);
@@ -994,7 +994,7 @@ end;
 
 procedure TPLCTag.SetMemWriteFunction(v:Cardinal);
 begin
-  if PWriteFunction=v then exit;
+  if PWriteFunction=v then Exit;
 
   if (PProtocolDriver<>nil) AND PAutoRead then
     PProtocolDriver.RemoveTag(Self);
@@ -1010,7 +1010,7 @@ end;
 
 procedure TPLCTag.SetPath(v:AnsiString);
 begin
-  if PPath=v then exit;
+  if PPath=v then Exit;
 
   if (PProtocolDriver<>nil) AND PAutoRead and (PPath.Trim<>'')then
     PProtocolDriver.RemoveTag(Self);
@@ -1026,7 +1026,7 @@ end;
 
 procedure TPLCTag.SetRefreshTime(v:TRefreshTime);
 begin
-  if PUpdateTime=v then exit;
+  if PUpdateTime=v then Exit;
 
   if (PProtocolDriver<>nil) AND PAutoRead then
     PProtocolDriver.RemoveTag(Self);
@@ -1101,7 +1101,7 @@ procedure TPLCTag.GetNewProtocolTagSize;
 begin
   if PProtocolDriver=nil then begin
     FProtocolWordSize:=1;
-    exit;
+    Exit;
   end;
 
   FProtocolWordSize:=PProtocolDriver.SizeOfTag(Self,False,FProtocolTagType);
@@ -1170,13 +1170,13 @@ end;
 
 procedure TPLCTag.SetGUID(v:AnsiString);
 begin
-  if ComponentState*[csReading]=[] then exit;
+  if ComponentState*[csReading]=[] then Exit;
   PGUID:=UpperCase(v);
 end;
 
 procedure TPLCTag.SetTagType(newType:TTagType);
 begin
-  if newType=FTagType then exit;
+  if newType=FTagType then Exit;
 
   if (PProtocolDriver<>nil) AND PAutoRead then
     PProtocolDriver.RemoveTag(Self);
@@ -1197,7 +1197,7 @@ var
   Tamanho:LongInt;
 begin
   if PProtocolDriver=nil then begin
-    exit;
+    Exit;
   end;
 
   case FTagType of
@@ -1228,33 +1228,33 @@ end;
 
 procedure TPLCTag.SetSwapDWords(v:Boolean);
 begin
-  if v=FSwapDWords then exit;
+  if v=FSwapDWords then Exit;
 
   FSwapDWords:=v;
 
-  if [csReading, csLoading]*ComponentState<>[] then exit;
+  if [csReading, csLoading]*ComponentState<>[] then Exit;
 
   RebuildValues;
 end;
 
 procedure TPLCTag.SetSwapWords(v:Boolean);
 begin
-  if v=FSwapWords then exit;
+  if v=FSwapWords then Exit;
 
   FSwapWords:=v;
 
-  if [csReading, csLoading]*ComponentState<>[] then exit;
+  if [csReading, csLoading]*ComponentState<>[] then Exit;
 
   RebuildValues;
 end;
 
 procedure TPLCTag.SetSwapBytes(v:Boolean);
 begin
-  if v=FSwapBytes then exit;
+  if v=FSwapBytes then Exit;
 
   FSwapBytes:=v;
 
-  if [csReading, csLoading]*ComponentState<>[] then exit;
+  if [csReading, csLoading]*ComponentState<>[] then Exit;
 
   RebuildValues;
 end;
@@ -1319,7 +1319,7 @@ begin
   //   ((FProtocolTagType=ptDouble) AND (FTagType=pttDouble))
   if (pttSize=ttSize) or (FProtocolTagType=ptUnknown) then begin
     Result:=Values;
-    exit;
+    Exit;
   end;
 
   resIdx  := 0;
@@ -1647,7 +1647,7 @@ var
 begin
   if (FProtocolTagType=ptUnknown) then begin
     Result:=Values;
-    exit
+    Exit
   end;
 
   if (FTagType=pttDefault) OR
@@ -1661,7 +1661,7 @@ begin
      ((FProtocolTagType=ptDouble) AND (FTagType=pttDouble))
   then begin
     Result:=Values;
-    exit;
+    Exit;
   end;
 
   //calcula quantos bytes precisam ser alocados.
@@ -2062,7 +2062,7 @@ var
   c,h:LongInt;
 begin
   for c:=0 to High(ftags) do begin
-    if ftags[c]=Tag then exit;
+    if ftags[c]=Tag then Exit;
     if (ftags[c]<>Tag) and (ftags[c].TagGUID=tag.TagGUID) then begin
       if Supports(Tag, IManagedTagInterface) then
         (Tag as IManagedTagInterface).RebuildTagGUID

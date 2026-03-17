@@ -18,7 +18,10 @@ interface
 
 uses
   SysUtils, Classes, Controls, ComCtrls, PLCTag, ProtocolTypes, HMITypes, Tag
-  {$IFDEF FPC}, LMessages{$ENDIF};
+  {$IFDEF FPC}
+, LMessages
+  {$ENDIF}
+  ;
 
 type
   {$IFDEF PORTUGUES}
@@ -35,40 +38,39 @@ type
   {$ENDIF}
   THMITrackBar = class(TTrackBar, IHMIInterface)
   private
-    FRegInSecMan:Boolean;
+    FRegInSecMan: Boolean;
     FAfterSendValueToTag: TAfterSendNumericValueToTagEvent;
     FBeforeSendValueToTag: TBeforeSendNumericValueToTagEvent;
-    Ftag:TPLCTag;
-    FIsEnabled,
-    FIsEnabledBySecurity:Boolean;
-    FModified:Boolean;
+    Ftag: TPLCTag;
+    FIsEnabled, FIsEnabledBySecurity: Boolean;
+    FModified: Boolean;
 
-    FSecurityCode:UTF8String;
-    procedure SetSecurityCode(sc:UTF8String);
+    FSecurityCode: UTF8String;
+    procedure SetSecurityCode(sc: UTF8String);
 
-    function  GetPosition:LongInt;
-    procedure RefreshTagValue(DataPtr:PtrInt);
+    function GetPosition: Longint;
+    procedure RefreshTagValue(DataPtr: PtrInt);
 
     //: @seealso(IHMIInterface.SetHMITag)
-    procedure SetHMITag(t:TPLCTag);                    //seta um tag
+    procedure SetHMITag(t: TPLCTag);                    //seta um tag
     //: @seealso(IHMIInterface.GetHMITag)
-    function  GetHMITag:TPLCTag;
+    function GetHMITag: TPLCTag;
 
     //: @seealso(IHMIInterface.GetControlSecurityCode)
-     function GetControlSecurityCode:UTF8String;
+    function GetControlSecurityCode: UTF8String;
     //: @seealso(IHMIInterface.CanBeAccessed)
-    procedure CanBeAccessed(a:Boolean);
+    procedure CanBeAccessed(a: Boolean);
     //: @seealso(IHMIInterface.MakeUnsecure)
     procedure MakeUnsecure;
 
-    procedure WriteFaultCallBack(Sender:TObject);
-    procedure TagChangeCallBack(Sender:TObject);
-    procedure RemoveTagCallBack(Sender:TObject);
+    procedure WriteFaultCallBack(Sender: TObject);
+    procedure TagChangeCallBack(Sender: TObject);
+    procedure RemoveTagCallBack(Sender: TObject);
   protected
     //: @exclude
-    procedure SetEnabled(e:Boolean); override;
+    procedure SetEnabled(e: Boolean); override;
     procedure KeyUp(var Key: Word; Shift: TShiftState); override;
-    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: LongInt); override;
+    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Longint); override;
     {$IFDEF FPC}
     procedure DoChange(var msg); message LM_CHANGED;
     {$ELSE}
@@ -83,10 +85,10 @@ type
     //: @exclude
     constructor Create(AOwner: TComponent); override;
     //: @exclude
-    destructor  Destroy; override;
+    destructor Destroy; override;
   published
     //: @exclude
-    property Enabled:Boolean read FIsEnabled write SetEnabled;
+    property Enabled: Boolean read FIsEnabled write SetEnabled;
 
     {$IFDEF PORTUGUES}
     {:
@@ -105,42 +107,42 @@ type
     @seealso(TPLCStructItem)
     }
     {$ENDIF}
-    property PLCTag:TPLCTag read FTag write SetHMITag;
+    property PLCTag: TPLCTag read Ftag write SetHMITag;
 
     {$IFDEF PORTUGUES}
     //: Informa a posição atual da barra.
     {$ELSE}
     //: Tells the current position.
     {$ENDIF}
-    Property Position:LongInt read GetPosition;
+    property Position: Longint read GetPosition;
 
     {$IFDEF PORTUGUES}
     //: Diz se o valor do controle sofreu alguma alteração.
     {$ELSE}
     //: Tells if the control has been modified.
     {$ENDIF}
-    property Modified:Boolean read FModified;
+    property Modified: Boolean read FModified;
 
     {$IFDEF PORTUGUES}
     //: Codigo de segurança que libera acesso ao controle
     {$ELSE}
     //: Security code that allows access to control.
     {$ENDIF}
-    property SecurityCode:UTF8String read FSecurityCode write SetSecurityCode;
+    property SecurityCode: UTF8String read FSecurityCode write SetSecurityCode;
 
     {$IFDEF PORTUGUES}
     //: Evento disparado quando o HMIEdit enviou um valor ao tag associado
     {$ELSE}
     //: Event triggered when the HMIEdit sent a value to linked tag.
     {$ENDIF}
-    property AfterSendValueToTag:TAfterSendNumericValueToTagEvent read FAfterSendValueToTag write FAfterSendValueToTag;
+    property AfterSendValueToTag: TAfterSendNumericValueToTagEvent read FAfterSendValueToTag write FAfterSendValueToTag;
 
     {$IFDEF PORTUGUES}
     //: Evento disparado antes do HMIEdit enviar um valor ao tag associado
     {$ELSE}
     //: Event triggered before HMIEdit send a value to linked tag.
     {$ENDIF}
-    property BeforeSendAValueToTag:TBeforeSendNumericValueToTagEvent read FBeforeSendValueToTag write FBeforeSendValueToTag;
+    property BeforeSendAValueToTag: TBeforeSendNumericValueToTagEvent read FBeforeSendValueToTag write FBeforeSendValueToTag;
   end;
 
 implementation
@@ -150,27 +152,29 @@ uses hsstrings, ControlSecurityManager, Forms;
 constructor THMITrackBar.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FRegInSecMan:=GetControlSecurityManager.RegisterControl(Self as IHMIInterface);
-  if not FRegInSecMan then begin
+  FRegInSecMan := GetControlSecurityManager.RegisterControl(Self as IHMIInterface);
+  if not FRegInSecMan then
+  begin
     {$IFNDEF WINDOWS}
-    writeln('FIX-ME: Failed to register class ',ClassName,' instace with name="',Name,'" in the ControlSecurityManager?',{$i %FILE%},':',{$i %LINE%});
+    writeln('FIX-ME: Failed to register class ', ClassName, ' instace with name="', Name, '" in the ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
     {$ENDIF}
   end;
-  FIsEnabled:=true;
+  FIsEnabled := True;
 end;
 
 destructor THMITrackBar.Destroy;
 begin
   if FRegInSecMan then
     GetControlSecurityManager.UnRegisterControl(Self as IHMIInterface)
-  else begin
+  else
+  begin
     {$IFNDEF WINDOWS}
-    writeln('FIX-ME: Why class ',ClassName,', instace name="',Name,'" ins''t registered in ControlSecurityManager?',{$i %FILE%},':',{$i %LINE%});
+    writeln('FIX-ME: Why class ', ClassName, ', instace name="', Name, '" ins''t registered in ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
     {$ENDIF}
   end;
 
   Application.RemoveAsyncCalls(Self);
-  if Assigned(FTag) then
+  if Assigned(Ftag) then
     Ftag.RemoveAllHandlersFromObject(Self);
   inherited Destroy;
 end;
@@ -184,49 +188,51 @@ end;
 
 procedure THMITrackBar.RefreshTagValue(DataPtr: PtrInt);
 begin
-  if [csReading,csLoading,csDestroying]*ComponentState<>[] then exit;
-  if (FTag<>nil) AND Supports(Ftag, ITagNumeric) then
+  if [csReading, csLoading, csDestroying] * ComponentState <> [] then Exit;
+  if (Ftag <> nil) and Supports(Ftag, ITagNumeric) then
     inherited Position := Trunc((Ftag as ITagNumeric).Value);
-  FModified:=false;
+  FModified := False;
 end;
 
-procedure THMITrackBar.SetHMITag(t:TPLCTag);
+procedure THMITrackBar.SetHMITag(t: TPLCTag);
 begin
   //se o tag esta entre um dos aceitos.
-  //
+
   //check if the tag is valid (only numeric tags);
-  if (t<>nil) and (not Supports(t, ITagNumeric)) then
-     raise Exception.Create(SonlyNumericTags);
+  if (t <> nil) and (not Supports(t, ITagNumeric)) then
+    raise Exception.Create(SonlyNumericTags);
 
   //se ja estou associado a um tag, remove
   //removes the old link.
-  if FTag<>nil then begin
-    FTag.RemoveAllHandlersFromObject(Self);
+  if Ftag <> nil then
+  begin
+    Ftag.RemoveAllHandlersFromObject(Self);
   end;
 
   //adiona o callback para o novo tag
   //link with the new tag.
-  if t<>nil then begin
+  if t <> nil then
+  begin
     t.AddWriteFaultHandler(@WriteFaultCallBack);
     t.AddTagChangeHandler(@TagChangeCallBack);
     t.AddRemoveTagHandler(@RemoveTagCallBack);
-    FTag := t;
+    Ftag := t;
     RefreshTagValue(0);
   end;
-  FTag := t;
+  Ftag := t;
 end;
 
 function THMITrackBar.GetHMITag: TPLCTag;
 begin
-  Result:=Ftag;
+  Result := Ftag;
 end;
 
 function THMITrackBar.GetControlSecurityCode: UTF8String;
 begin
-   Result:=FSecurityCode;
+  Result := FSecurityCode;
 end;
 
-procedure THMITrackBar.CanBeAccessed(a:Boolean);
+procedure THMITrackBar.CanBeAccessed(a: Boolean);
 begin
   FIsEnabledBySecurity := a;
   SetEnabled(FIsEnabled);
@@ -234,22 +240,23 @@ end;
 
 procedure THMITrackBar.MakeUnsecure;
 begin
-  FSecurityCode:='';
-  CanBeAccessed(true);
+  FSecurityCode := '';
+  CanBeAccessed(True);
 end;
 
-procedure THMITrackBar.SetEnabled(e:Boolean);
+procedure THMITrackBar.SetEnabled(e: Boolean);
 begin
-  FIsEnabled:=e;
+  FIsEnabled := e;
   inherited SetEnabled(FIsEnabled and FIsEnabledBySecurity);
 end;
 
 procedure THMITrackBar.SetSecurityCode(sc: UTF8String);
 begin
-  if Trim(sc)='' then
-    Self.CanBeAccessed(true)
+  if Trim(sc) = '' then
+    Self.CanBeAccessed(True)
   else
-    with GetControlSecurityManager do begin
+    with GetControlSecurityManager do
+    begin
       ValidateSecurityCode(sc);
       if not SecurityCodeExists(sc) then
         RegisterSecurityCode(sc);
@@ -257,32 +264,35 @@ begin
       Self.CanBeAccessed(CanAccess(sc));
     end;
 
-  FSecurityCode:=sc;
+  FSecurityCode := sc;
 end;
 
-function THMITrackBar.GetPosition:LongInt;
+function THMITrackBar.GetPosition: Longint;
 begin
   Result := inherited Position;
 end;
 
 procedure THMITrackBar.WriteValue;
+
   procedure DoAfterSendValue;
   begin
     if Assigned(FAfterSendValueToTag) then
-      FAfterSendValueToTag(Self,Position);
+      FAfterSendValueToTag(Self, Position);
   end;
 
-  function SendIt(ivalue:Double):Boolean;
+  function SendIt(ivalue: Double): Boolean;
   begin
     if Assigned(FBeforeSendValueToTag) then
-      FBeforeSendValueToTag(Self,ivalue,Result)
+      FBeforeSendValueToTag(Self, ivalue, Result)
     else
-      Result:=true;
+      Result := True;
   end;
-begin
-  if [csLoading,csReading]*ComponentState<>[] then exit;
 
-  if (FTag<>nil) AND Supports(Ftag, ITagNumeric) and SendIt(Position) then begin
+begin
+  if [csLoading, csReading] * ComponentState <> [] then Exit;
+
+  if (Ftag <> nil) and Supports(Ftag, ITagNumeric) and SendIt(Position) then
+  begin
     (Ftag as ITagNumeric).Value := Position;
     DoAfterSendValue;
   end;
@@ -290,23 +300,23 @@ end;
 
 //------------------------------------------------------------------------------
 // PROCESSAMENTO DE EVENTOS
-//
+
 // PROCESS EVENTS
 //------------------------------------------------------------------------------
 procedure THMITrackBar.KeyUp(var Key: Word; Shift: TShiftState);
 begin
-   if Modified then
-      WriteValue;
-      
-   inherited KeyUp(Key, Shift);
+  if Modified then
+    WriteValue;
+
+  inherited KeyUp(Key, Shift);
 end;
 
-procedure THMITrackBar.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: LongInt);
+procedure THMITrackBar.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Longint);
 begin
-   if Modified then
-      WriteValue;
-      
-   inherited MouseUp(Button, Shift, X, Y);
+  if Modified then
+    WriteValue;
+
+  inherited MouseUp(Button, Shift, X, Y);
 end;
 
 {$IFDEF FPC}
@@ -316,16 +326,17 @@ begin
   inherited DoChange(msg);
 end;
 {$ELSE}
+
 procedure THMITrackBar.Changed;
 begin
-  FModified:=true;
+  FModified := True;
   inherited Changed;
 end;
 {$ENDIF}
 
 //------------------------------------------------------------------------------
 // FIM DO PROCESSAMENTO DE EVENTOS
-//
+
 // END OF PROCESSING OF EVENTS
 //------------------------------------------------------------------------------
 
@@ -336,14 +347,14 @@ end;
 
 procedure THMITrackBar.TagChangeCallBack(Sender: TObject);
 begin
-  if Application.Flags*[AppDoNotCallAsyncQueue]=[] then
-    Application.QueueAsyncCall(@RefreshTagValue,0);
+  if Application.Flags * [AppDoNotCallAsyncQueue] = [] then
+    Application.QueueAsyncCall(@RefreshTagValue, 0);
 end;
 
 procedure THMITrackBar.RemoveTagCallBack(Sender: TObject);
 begin
-  if Ftag=Sender then
-    FTag:=nil;
+  if Ftag = Sender then
+    Ftag := nil;
 end;
 
 end.

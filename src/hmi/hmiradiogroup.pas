@@ -16,7 +16,11 @@ unit HMIRadioGroup;
 interface
 
 uses
-  Classes, SysUtils, {$IFDEF FPC}LResources, {$ENDIF} Controls, Graphics,
+  Classes, SysUtils,
+  {$IFDEF FPC}
+LResources,
+  {$ENDIF}
+  Controls, Graphics,
   Dialogs, ExtCtrls, HMITypes, PLCTag, ProtocolTypes, Tag;
 
 type
@@ -34,51 +38,50 @@ type
   }
   {$ENDIF}
   THMIRadioGroup = class(TRadioGroup, IHMIInterface)
-  private  
-    FRegInSecMan:Boolean;
-    FTag:TPLCTag;
-    FIsEnabled,
-    FIsEnabledBySecurity:Boolean;
-    FDefaultIndex:LongInt;
-    FIgnore, FLoaded:Boolean;
+  private
+    FRegInSecMan: Boolean;
+    FTag: TPLCTag;
+    FIsEnabled, FIsEnabledBySecurity: Boolean;
+    FDefaultIndex: Longint;
+    FIgnore, FLoaded: Boolean;
 
-    FSecurityCode:UTF8String;
-    procedure SetSecurityCode(sc:UTF8String);
+    FSecurityCode: UTF8String;
+    procedure SetSecurityCode(sc: UTF8String);
 
     //: @seealso(IHMIInterface.SetHMITag)
-    procedure SetHMITag(t:TPLCTag);                    //seta um tag
+    procedure SetHMITag(t: TPLCTag);                    //seta um tag
     //: @seealso(IHMIInterface.GetHMITag)
-    function  GetHMITag:TPLCTag;
+    function GetHMITag: TPLCTag;
 
     //: @seealso(IHMIInterface.GetControlSecurityCode)
-    function GetControlSecurityCode:UTF8String;
+    function GetControlSecurityCode: UTF8String;
     //: @seealso(IHMIInterface.CanBeAccessed)
-    procedure CanBeAccessed(a:Boolean);
+    procedure CanBeAccessed(a: Boolean);
     //: @seealso(IHMIInterface.MakeUnsecure)
     procedure MakeUnsecure;
 
-    procedure SetDefaultIndex(v:LongInt);
-    function  GetIndex:LongInt;
-    procedure SetIndex(v:LongInt);
+    procedure SetDefaultIndex(v: Longint);
+    function GetIndex: Longint;
+    procedure SetIndex(v: Longint);
 
-    procedure WriteFaultCallBack(Sender:TObject);
-    procedure TagChangeCallBack(Sender:TObject);
-    procedure RemoveTagCallBack(Sender:TObject);
+    procedure WriteFaultCallBack(Sender: TObject);
+    procedure TagChangeCallBack(Sender: TObject);
+    procedure RemoveTagCallBack(Sender: TObject);
   protected
     {$IFNDEF FPC}
     procedure Click; override;
     {$ENDIF}
     //: @exclude
-    procedure SetEnabled(e:Boolean); override;
+    procedure SetEnabled(e: Boolean); override;
     //: @exclude
     procedure CheckItemIndexChanged; {$IFDEF FPC} override; {$ENDIF}
     //: @exclude
     procedure Loaded; override;
   public
     //: @exclude
-    constructor Create(AOwner:TComponent); override;
+    constructor Create(AOwner: TComponent); override;
     //: @exclude
-    destructor  Destroy; override;
+    destructor Destroy; override;
     procedure RefreshRadioGroup(Data: PtrInt);
   published
     {$IFDEF PORTUGUES}
@@ -86,10 +89,10 @@ type
     {$ELSE}
     //: @name tells what's the index of selected option.
     {$ENDIF}
-    property  ItemIndex:LongInt read GetIndex Write SetIndex;
+    property ItemIndex: Longint read GetIndex write SetIndex;
 
     //: @exclude
-    property Enabled:Boolean read FIsEnabled write SetEnabled;
+    property Enabled: Boolean read FIsEnabled write SetEnabled;
 
     {$IFDEF PORTUGUES}
     {:
@@ -108,7 +111,7 @@ type
     @seealso(TPLCStructItem)
     }
     {$ENDIF}
-    property  PLCTag:TPLCTag read GetHMITag write SetHMITag;
+    property PLCTag: TPLCTag read GetHMITag write SetHMITag;
 
     {$IFDEF PORTUGUES}
     {:
@@ -121,77 +124,80 @@ type
     the value of @name.
     }
     {$ENDIF}
-    property  DefaultIndex:LongInt read FDefaultIndex write SetDefaultIndex default -1;
+    property DefaultIndex: Longint read FDefaultIndex write SetDefaultIndex default -1;
 
     {$IFDEF PORTUGUES}
     //: Codigo de segurança que libera acesso ao controle
     {$ELSE}
     //: Security code that allows access to control.
     {$ENDIF}
-    property SecurityCode:UTF8String read FSecurityCode write SetSecurityCode;
+    property SecurityCode: UTF8String read FSecurityCode write SetSecurityCode;
   end;
 
 implementation
 
 uses hsstrings, ControlSecurityManager, Forms;
 
-constructor THMIRadioGroup.Create(AOwner:TComponent);
+constructor THMIRadioGroup.Create(AOwner: TComponent);
 begin
-   inherited Create(AOwner);
-   FRegInSecMan:=GetControlSecurityManager.RegisterControl(Self as IHMIInterface);
-   if not FRegInSecMan then begin
+  inherited Create(AOwner);
+  FRegInSecMan := GetControlSecurityManager.RegisterControl(Self as IHMIInterface);
+  if not FRegInSecMan then
+  begin
     {$IFNDEF WINDOWS}
-    writeln('FIX-ME: Failed to register class ',ClassName,' instace with name="',Name,'" in the ControlSecurityManager?',{$i %FILE%},':',{$i %LINE%});
+    writeln('FIX-ME: Failed to register class ', ClassName, ' instace with name="', Name, '" in the ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
     {$ENDIF}
   end;
-   FIgnore:=false;
-   FLoaded:=false;
-   FIsEnabled:=true;
-   FDefaultIndex:=-1;
+  FIgnore := False;
+  FLoaded := False;
+  FIsEnabled := True;
+  FDefaultIndex := -1;
 
 end;
 
-destructor  THMIRadioGroup.Destroy;
+destructor THMIRadioGroup.Destroy;
 begin
   if FRegInSecMan then
     GetControlSecurityManager.UnRegisterControl(Self as IHMIInterface)
-  else begin
+  else
+  begin
     {$IFNDEF WINDOWS}
-    writeln('FIX-ME: Why class ',ClassName,', instace name="',Name,'" ins''t registered in ControlSecurityManager?',{$i %FILE%},':',{$i %LINE%});
+    writeln('FIX-ME: Why class ', ClassName, ', instace name="', Name, '" ins''t registered in ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
     {$ENDIF}
   end;
 
   Application.RemoveAsyncCalls(Self);
-  if FTag<>nil then
+  if FTag <> nil then
     FTag.RemoveAllHandlersFromObject(Self);
   inherited Destroy;
 end;
 
 procedure THMIRadioGroup.RefreshRadioGroup(Data: PtrInt);
 var
-   Value:Double;
+  Value: Double;
 begin
-  if [csReading,csLoading,csDestroying]*ComponentState<>[] then exit;
+  if [csReading, csLoading, csDestroying] * ComponentState <> [] then Exit;
 
   Value := 0;
 
-  if (FTag<>nil) AND Supports(FTag, ITagNumeric) then
+  if (FTag <> nil) and Supports(FTag, ITagNumeric) then
     Value := (FTag as ITagNumeric).Value;
 
-  FIgnore:=true;
-  if (Value>=0) and (Value<Items.Count) then
-    inherited ItemIndex:= Trunc(Value)
+  FIgnore := True;
+  if (Value >= 0) and (Value < Items.Count) then
+    inherited ItemIndex := Trunc(Value)
   else
     inherited ItemIndex := FDefaultIndex;
-  FIgnore:=false;
+  FIgnore := False;
 end;
 
 procedure THMIRadioGroup.SetSecurityCode(sc: UTF8String);
 begin
-  if Trim(sc)='' then
-    Self.CanBeAccessed(true)
+  if Trim(sc) = '' then
+    Self.CanBeAccessed(True)
   else
-    with GetControlSecurityManager do begin
+    with GetControlSecurityManager do
+    begin
       ValidateSecurityCode(sc);
       if not SecurityCodeExists(sc) then
         RegisterSecurityCode(sc);
@@ -199,47 +205,49 @@ begin
       Self.CanBeAccessed(CanAccess(sc));
     end;
 
-  FSecurityCode:=sc;
+  FSecurityCode := sc;
 end;
 
 //link with tags
-procedure THMIRadioGroup.SetHMITag(t:TPLCTag);
+procedure THMIRadioGroup.SetHMITag(t: TPLCTag);
 begin
-   //se o tag esta entre um dos aceitos.
-   //
-   //Check if the tag is valid (only numeric tags).
-   if (t<>nil) and (not Supports(t, ITagNumeric)) then
-      raise Exception.Create(SonlyNumericTags);
+  //se o tag esta entre um dos aceitos.
 
-   //se ja estou associado a um tag, remove
-   //remove the old link.
-   if FTag<>nil then begin
-      FTag.RemoveAllHandlersFromObject(Self);
-   end;
+  //Check if the tag is valid (only numeric tags).
+  if (t <> nil) and (not Supports(t, ITagNumeric)) then
+    raise Exception.Create(SonlyNumericTags);
 
-   //adiona o callback para o novo tag
-   //link with the new tag.
-   if t<>nil then begin
-      t.AddWriteFaultHandler(@WriteFaultCallBack);
-      t.AddTagChangeHandler(@TagChangeCallBack);
-      t.AddRemoveTagHandler(@RemoveTagCallBack);
-      FTag := t;
-      RefreshRadioGroup(0);
-   end;
-   FTag := t;
+  //se ja estou associado a um tag, remove
+  //remove the old link.
+  if FTag <> nil then
+  begin
+    FTag.RemoveAllHandlersFromObject(Self);
+  end;
+
+  //adiona o callback para o novo tag
+  //link with the new tag.
+  if t <> nil then
+  begin
+    t.AddWriteFaultHandler(@WriteFaultCallBack);
+    t.AddTagChangeHandler(@TagChangeCallBack);
+    t.AddRemoveTagHandler(@RemoveTagCallBack);
+    FTag := t;
+    RefreshRadioGroup(0);
+  end;
+  FTag := t;
 end;
 
-function  THMIRadioGroup.GetHMITag:TPLCTag;
+function THMIRadioGroup.GetHMITag: TPLCTag;
 begin
-   Result:=FTag;
+  Result := FTag;
 end;
 
 function THMIRadioGroup.GetControlSecurityCode: UTF8String;
 begin
-   Result:=FSecurityCode;
+  Result := FSecurityCode;
 end;
 
-procedure THMIRadioGroup.CanBeAccessed(a:Boolean);
+procedure THMIRadioGroup.CanBeAccessed(a: Boolean);
 begin
   FIsEnabledBySecurity := a;
   SetEnabled(FIsEnabled);
@@ -247,53 +255,53 @@ end;
 
 procedure THMIRadioGroup.MakeUnsecure;
 begin
-  FSecurityCode:='';
-  CanBeAccessed(true);
+  FSecurityCode := '';
+  CanBeAccessed(True);
 end;
 
-procedure THMIRadioGroup.SetEnabled(e:Boolean);
+procedure THMIRadioGroup.SetEnabled(e: Boolean);
 begin
-  FIsEnabled:=e;
+  FIsEnabled := e;
   inherited SetEnabled(FIsEnabled and FIsEnabledBySecurity);
 end;
 
 procedure THMIRadioGroup.CheckItemIndexChanged;
 begin
-   {$IFDEF FPC}
+  {$IFDEF FPC}
    inherited CheckItemIndexChanged;
-   {$ENDIF}
+  {$ENDIF}
 
-   if [csLoading, csReading, csDestroying]*ComponentState<>[] then
-      exit;
+  if [csLoading, csReading, csDestroying] * ComponentState <> [] then
+    Exit;
 
-   if (FLoaded) and (not FIgnore) then
-     if (FTag<>nil) AND Supports(FTag, ITagNumeric) then
-        (FTag as ITagNumeric).Value := ItemIndex;
+  if (FLoaded) and (not FIgnore) then
+    if (FTag <> nil) and Supports(FTag, ITagNumeric) then
+      (FTag as ITagNumeric).Value := ItemIndex;
 end;
 
 procedure THMIRadioGroup.Loaded;
 begin
-   inherited Loaded;
-   CanBeAccessed(GetControlSecurityManager.CanAccess(GetControlSecurityCode));
-   FLoaded:=true;
-   TagChangeCallBack(Self);
+  inherited Loaded;
+  CanBeAccessed(GetControlSecurityManager.CanAccess(GetControlSecurityCode));
+  FLoaded := True;
+  TagChangeCallBack(Self);
 end;
 
-procedure THMIRadioGroup.SetDefaultIndex(v:LongInt);
+procedure THMIRadioGroup.SetDefaultIndex(v: Longint);
 begin
-  if v<(-1) then
-     FDefaultIndex:=-1
+  if v < (-1) then
+    FDefaultIndex := -1
   else
-     FDefaultIndex:=v;
+    FDefaultIndex := v;
   RefreshRadioGroup(0);
 end;
 
-function  THMIRadioGroup.GetIndex:LongInt;
+function THMIRadioGroup.GetIndex: Longint;
 begin
-   Result := inherited ItemIndex;
+  Result := inherited ItemIndex;
 end;
 
-procedure THMIRadioGroup.SetIndex(v:LongInt);
+procedure THMIRadioGroup.SetIndex(v: Longint);
 begin
   inherited ItemIndex := v;
 end;
@@ -301,8 +309,8 @@ end;
 {$IFNDEF FPC}
 procedure THMIRadioGroup.Click;
 begin
-   CheckItemIndexChanged;
-   inherited Click;
+  CheckItemIndexChanged;
+  inherited Click;
 end;
 {$ENDIF}
 
@@ -313,13 +321,13 @@ end;
 
 procedure THMIRadioGroup.TagChangeCallBack(Sender: TObject);
 begin
-  if Application.Flags*[AppDoNotCallAsyncQueue]=[] then
-    Application.QueueAsyncCall(@RefreshRadioGroup,0);
+  if Application.Flags * [AppDoNotCallAsyncQueue] = [] then
+    Application.QueueAsyncCall(@RefreshRadioGroup, 0);
 end;
 
 procedure THMIRadioGroup.RemoveTagCallBack(Sender: TObject);
 begin
-  if FTag=Sender then
+  if FTag = Sender then
     FTag := nil;
 end;
 

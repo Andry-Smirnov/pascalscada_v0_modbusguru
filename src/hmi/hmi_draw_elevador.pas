@@ -5,7 +5,7 @@ unit hmi_draw_elevador;
 interface
 
 uses
-  Controls, sysutils, Graphics, Classes, hmi_draw_basiccontrol, BGRABitmap,
+  Controls, SysUtils, Graphics, Classes, hmi_draw_basiccontrol, BGRABitmap,
   BGRABitmapTypes, hmi_polyline, hmi_flow_zones, ExtCtrls, PLCTag, HMIZones;
 
 type
@@ -17,7 +17,7 @@ type
     FBodyWidth: Byte;
     FFooterColor: TColor;
     FHeadColor: TColor;
-    FExitPoint:TPoint;
+    FExitPoint: TPoint;
     procedure SetHeadAtLeft(AValue: Boolean);
     procedure SetBodyWidth(AValue: Byte);
     procedure SetFooterColor(AValue: TColor);
@@ -26,13 +26,13 @@ type
   public
     constructor Create(AOwner: TComponent); override;
   protected
-    property HeadAtLeft:Boolean read FHeadAtLeft write SetHeadAtLeft default false;
-    property HeadColor:TColor read FHeadColor write SetHeadColor default clSilver;
+    property HeadAtLeft: Boolean read FHeadAtLeft write SetHeadAtLeft default False;
+    property HeadColor: TColor read FHeadColor write SetHeadColor default clSilver;
     property BodyColor default clSilver;
-    property FooterColor:TColor read FFooterColor write SetFooterColor default clSilver;
+    property FooterColor: TColor read FFooterColor write SetFooterColor default clSilver;
     property BorderColor;
 
-    property BodyWidth:Byte read FBodyWidth write SetBodyWidth default 12;
+    property BodyWidth: Byte read FBodyWidth write SetBodyWidth default 12;
     property BorderWidth default 1;
   end;
 
@@ -68,24 +68,24 @@ type
   public
     constructor Create(aCollection: TCollection); override;
   published
-    property EmptyColor:TColor read FEmptyColor write SetEmptyColor;
-    property PaintHeaderWithFlowColor:Boolean read FPaintHeaderWithFlowColor write SetPaintHeaderWithFlowColor;
-    property PaintBodyWithFlowColor:Boolean read FPaintBodyWithFlowColor write SetPaintBodyWithFlowColor;
-    property PaintFooterWithFlowColor:Boolean read FPaintFooterWithFlowColor write SetPaintFooterWithFlowColor;
+    property EmptyColor: TColor read FEmptyColor write SetEmptyColor;
+    property PaintHeaderWithFlowColor: Boolean read FPaintHeaderWithFlowColor write SetPaintHeaderWithFlowColor;
+    property PaintBodyWithFlowColor: Boolean read FPaintBodyWithFlowColor write SetPaintBodyWithFlowColor;
+    property PaintFooterWithFlowColor: Boolean read FPaintFooterWithFlowColor write SetPaintFooterWithFlowColor;
   end;
 
   { THMIElevatorFlowZones }
 
   THMIElevatorFlowZones = class(TZones)
     //: @exclude
-    constructor Create(aOwner:TPersistent);
+    constructor Create(AOwner: TPersistent);
 
     {$IFDEF PORTUGUES}
     //: Adiciona uma nova zona de cor.
     {$ELSE}
     //: Adds a new color and flow zone into the collection.
     {$ENDIF}
-    function Add:THMIElevatorFlowZone;
+    function Add: THMIElevatorFlowZone;
   end;
 
 
@@ -101,30 +101,28 @@ type
     procedure SetUseStaticHeaderColor(AValue: Boolean);
   protected
     procedure UpdateInOutLines; virtual;
-    procedure AddNotifyCallback(WhoNotify:IColorChangeNotification);
-    procedure RemoveNotifyCallback(WhoRemove:IColorChangeNotification);
-    procedure NotifyFree(const WhoWasDestroyed:THMIFlowPolyline);
-    procedure NotifyChange(const WhoChanged:THMIFlowPolyline);
+    procedure AddNotifyCallback(WhoNotify: IColorChangeNotification);
+    procedure RemoveNotifyCallback(WhoRemove: IColorChangeNotification);
+    procedure NotifyFree(const WhoWasDestroyed: THMIFlowPolyline);
+    procedure NotifyChange(const WhoChanged: THMIFlowPolyline);
   protected
     FInputPolyline: THMIFlowPolyline;
     FOutputPolyline: THMIFlowPolyline;
     FElevatorStates: THMIElevatorFlowZones;
-    FCurrentZone,
-    FOwnerZone: THMIElevatorFlowZone;
-    FZoneTimer:TTimer;
-    procedure ChangeBounds(ALeft, ATop, AWidth, AHeight: Integer;
-      KeepBase: Boolean); override;
+    FCurrentZone, FOwnerZone: THMIElevatorFlowZone;
+    FZoneTimer: TTimer;
+    procedure ChangeBounds(ALeft, ATop, AWidth, AHeight: Integer; KeepBase: Boolean); override;
     procedure SetInputPolyline(AValue: THMIFlowPolyline);
     procedure SetOutputPolyline(AValue: THMIFlowPolyline);
     procedure SetElevatorStates(AValue: THMIElevatorFlowZones);
-    procedure ShowZone(aZone:THMIElevatorFlowZone);
+    procedure ShowZone(aZone: THMIElevatorFlowZone);
     procedure UpdateFlow; virtual;
-    property  InputPolyline:THMIFlowPolyline read FInputPolyline write SetInputPolyline;
-    property  OutputPolyline:THMIFlowPolyline read FOutputPolyline write SetOutputPolyline;
-    property  ColorAndFlowStates:THMIElevatorFlowZones read FElevatorStates write SetElevatorStates;
-    property  UseStaticHeaderColor:Boolean read FUseStaticHeaderColor write SetUseStaticHeaderColor default false;
-    property  UseStaticBodyColor:Boolean   read FUseStaticBodyColor   write SetUseStaticBodyColor   default false;
-    property  UseStaticFooterColor:Boolean read FUseStaticFooterColor write SetUseStaticFooterColor default false;
+    property InputPolyline: THMIFlowPolyline read FInputPolyline write SetInputPolyline;
+    property OutputPolyline: THMIFlowPolyline read FOutputPolyline write SetOutputPolyline;
+    property ColorAndFlowStates: THMIElevatorFlowZones read FElevatorStates write SetElevatorStates;
+    property UseStaticHeaderColor: Boolean read FUseStaticHeaderColor write SetUseStaticHeaderColor default False;
+    property UseStaticBodyColor: Boolean read FUseStaticBodyColor write SetUseStaticBodyColor default False;
+    property UseStaticFooterColor: Boolean read FUseStaticFooterColor write SetUseStaticFooterColor default False;
     procedure StateChanged(Sender: TObject);
     procedure StatesNeedsComponentState(var CurState: TComponentState);
     procedure NextZone(Sender: TObject);
@@ -134,8 +132,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Notification(AComponent: TComponent; Operation: TOperation);
-      override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   end;
 
   { THMICustomLinkedFlowElevator }
@@ -145,14 +142,14 @@ type
     FOnStateChange: TNotifyEvent;
     FPLCTag: TPLCTag;
     procedure SetHMITag(AValue: TPLCTag);
-    procedure WriteFaultCallBack(Sender:TObject);
-    procedure TagChangeCallBack(Sender:TObject);
-    procedure RemoveTagCallBack(Sender:TObject);
+    procedure WriteFaultCallBack(Sender: TObject);
+    procedure TagChangeCallBack(Sender: TObject);
+    procedure RemoveTagCallBack(Sender: TObject);
     procedure UpdateControlDelayed(Data: PtrInt);
   protected
     procedure UpdateControl; override;
-    property PLCTag:TPLCTag read FPLCTag write SetHMITag;
-    property OnStateChange:TNotifyEvent read FOnStateChange write FOnStateChange;
+    property PLCTag: TPLCTag read FPLCTag write SetHMITag;
+    property OnStateChange: TNotifyEvent read FOnStateChange write FOnStateChange;
     procedure Loaded; override;
   public
     destructor Destroy; override;
@@ -166,7 +163,7 @@ type
     property OutputPolyline;
     property PLCTag;
     property ColorAndFlowStates;
-    property CurrentBodyColor:TColor read FBodyColor;
+    property CurrentBodyColor: TColor read FBodyColor;
     property BodyColor;
     property FooterColor;
     property HeadAtLeft;
@@ -195,54 +192,54 @@ type
 
 implementation
 
-uses ProtocolTypes, hsstrings, forms;
+uses ProtocolTypes, hsstrings, Forms;
 
-{ THMIElevatorFlowZones }
+  { THMIElevatorFlowZones }
 
-constructor THMIElevatorFlowZones.Create(aOwner: TPersistent);
+constructor THMIElevatorFlowZones.Create(AOwner: TPersistent);
 begin
-  inherited Create(aOwner, THMIElevatorFlowZone);
+  inherited Create(AOwner, THMIElevatorFlowZone);
 end;
 
 function THMIElevatorFlowZones.Add: THMIElevatorFlowZone;
 begin
-  Result:=THMIElevatorFlowZone(inherited Add);
+  Result := THMIElevatorFlowZone(inherited Add);
 end;
 
 { THMIElevatorFlowZone }
 
 procedure THMIElevatorFlowZone.SetPaintBodyWithFlowColor(AValue: Boolean);
 begin
-  if FPaintBodyWithFlowColor=AValue then Exit;
-  FPaintBodyWithFlowColor:=AValue;
+  if FPaintBodyWithFlowColor = AValue then Exit;
+  FPaintBodyWithFlowColor := AValue;
   NotifyChange;
 end;
 
 procedure THMIElevatorFlowZone.SetEmptyColor(AValue: TColor);
 begin
-  if FEmptyColor=AValue then Exit;
-  FEmptyColor:=AValue;
+  if FEmptyColor = AValue then Exit;
+  FEmptyColor := AValue;
   NotifyChange;
 end;
 
 procedure THMIElevatorFlowZone.SetPaintFooterWithFlowColor(AValue: Boolean);
 begin
-  if FPaintFooterWithFlowColor=AValue then Exit;
-  FPaintFooterWithFlowColor:=AValue;
+  if FPaintFooterWithFlowColor = AValue then Exit;
+  FPaintFooterWithFlowColor := AValue;
   NotifyChange;
 end;
 
 procedure THMIElevatorFlowZone.SetPaintHeaderWithFlowColor(AValue: Boolean);
 begin
-  if FPaintHeaderWithFlowColor=AValue then Exit;
-  FPaintHeaderWithFlowColor:=AValue;
+  if FPaintHeaderWithFlowColor = AValue then Exit;
+  FPaintHeaderWithFlowColor := AValue;
   NotifyChange;
 end;
 
 constructor THMIElevatorFlowZone.Create(aCollection: TCollection);
 begin
   inherited Create(aCollection);
-  FEmptyColor:=clSilver;
+  FEmptyColor := clSilver;
 end;
 
 { THMICustomLinkedFlowElevator }
@@ -250,20 +247,22 @@ end;
 procedure THMICustomLinkedFlowElevator.SetHMITag(AValue: TPLCTag);
 begin
   //se o tag esta entre um dos aceitos.
-  //
+
   //check if the tag is valid (only numeric tags);
-  if (AValue<>nil) and (not Supports(AValue, ITagNumeric)) then
-     raise Exception.Create(SonlyNumericTags);
+  if (AValue <> nil) and (not Supports(AValue, ITagNumeric)) then
+    raise Exception.Create(SonlyNumericTags);
 
   //se ja estou associado a um tag, remove
   //removes the old link.
-  if FPLCTag<>nil then begin
+  if FPLCTag <> nil then
+  begin
     FPLCTag.RemoveAllHandlersFromObject(Self);
   end;
 
   //adiona o callback para o novo tag
   //link with the new tag.
-  if AValue<>nil then begin
+  if AValue <> nil then
+  begin
     AValue.AddWriteFaultHandler(@WriteFaultCallBack);
     AValue.AddTagChangeHandler(@TagChangeCallBack);
     AValue.AddRemoveTagHandler(@RemoveTagCallBack);
@@ -285,40 +284,42 @@ end;
 
 procedure THMICustomLinkedFlowElevator.RemoveTagCallBack(Sender: TObject);
 begin
-  if FPLCTag=Sender then
-    FPLCTag:=nil;
+  if FPLCTag = Sender then
+    FPLCTag := nil;
 end;
 
 procedure THMICustomLinkedFlowElevator.UpdateControlDelayed(Data: PtrInt);
 var
-  value: Double;
+  Value: Double;
   zone: THMIElevatorFlowZone;
 begin
-  if [csReading,csLoading,csDestroying]*ComponentState<>[] then exit;
+  if [csReading, csLoading, csDestroying] * ComponentState <> [] then Exit;
   if Assigned(FPLCTag) then
-    value:=(FPLCTag as ITagNumeric).GetValue;
+    Value := (FPLCTag as ITagNumeric).GetValue;
 
-  zone:=THMIElevatorFlowZone(FElevatorStates.GetZoneFromValue(value));
-  if FOwnerZone<>zone then begin
-    FOwnerZone:=zone;
+  zone := THMIElevatorFlowZone(FElevatorStates.GetZoneFromValue(Value));
+  if FOwnerZone <> zone then
+  begin
+    FOwnerZone := zone;
     ShowZone(FOwnerZone);
-    if FCurrentZone<>nil then begin
-       FZoneTimer.Interval := FCurrentZone.BlinkTime;
-       FZoneTimer.Enabled :=  FCurrentZone.BlinkWith<>(-1);
+    if FCurrentZone <> nil then
+    begin
+      FZoneTimer.Interval := FCurrentZone.BlinkTime;
+      FZoneTimer.Enabled := FCurrentZone.BlinkWith <> (-1);
     end;
   end;
 
   if Assigned(FOnStateChange) then
-    try
-      FOnStateChange(Self);
-    except
-    end;
+  try
+    FOnStateChange(Self);
+  except
+  end;
 end;
 
 procedure THMICustomLinkedFlowElevator.UpdateControl;
 begin
-  if (Application.Flags*[AppDoNotCallAsyncQueue]=[]) and (ComponentState*[csDesigning]=[]) then
-    Application.QueueAsyncCall(@UpdateControlDelayed,0);
+  if (Application.Flags * [AppDoNotCallAsyncQueue] = []) and (ComponentState * [csDesigning] = []) then
+    Application.QueueAsyncCall(@UpdateControlDelayed, 0);
 end;
 
 procedure THMICustomLinkedFlowElevator.Loaded;
@@ -339,64 +340,67 @@ end;
 
 procedure THMICustomElevadorBasico.SetHeadColor(AValue: TColor);
 begin
-  if FHeadColor=AValue then Exit;
-  FHeadColor:=AValue;
+  if FHeadColor = AValue then Exit;
+  FHeadColor := AValue;
   InvalidateDraw;
 end;
 
 procedure THMICustomElevadorBasico.DrawControl;
 var
-  x:array of TPointF;
+  x: array of TPointF;
 begin
   inherited DrawControl;
 
 
-  FControlArea.CanvasBGRA.AntialiasingMode:=amOff;
+  FControlArea.CanvasBGRA.AntialiasingMode := amOff;
 
   //###############################################################################
   //coordenadas de que desenham a cabeca do elevador
   //###############################################################################
-  SetLength(x,4);
+  SetLength(x, 4);
 
-  if FHeadAtLeft then begin
-    x[0].X:=0;
-    x[0].Y:=BodyWidth + (BorderWidth/2);
+  if FHeadAtLeft then
+  begin
+    x[0].x := 0;
+    x[0].Y := BodyWidth + (BorderWidth / 2);
 
-    FExitPoint:=x[0].Truncate;
-    FExitPoint.X:=FExitPoint.X+8;
+    FExitPoint := x[0].Truncate;
+    FExitPoint.x := FExitPoint.x + 8;
 
-    x[1].X:=BodyWidth;
-    x[1].Y:=(BorderWidth/2);
+    x[1].x := BodyWidth;
+    x[1].Y := (BorderWidth / 2);
 
-    x[2].X:=2*BodyWidth-1;
-    x[2].Y:=(BorderWidth/2);
+    x[2].x := 2 * BodyWidth - 1;
+    x[2].Y := (BorderWidth / 2);
 
-    x[3].X:=2*BodyWidth-1;
-    x[3].Y:=BodyWidth + (BorderWidth/2);
-  end else begin
-    x[0].X:=BodyWidth;
-    x[0].Y:=(BorderWidth/2);
+    x[3].x := 2 * BodyWidth - 1;
+    x[3].Y := BodyWidth + (BorderWidth / 2);
+  end
+  else
+  begin
+    x[0].x := BodyWidth;
+    x[0].Y := (BorderWidth / 2);
 
-    x[1].X:=2*BodyWidth-1;
-    x[1].Y:=(BorderWidth/2);
+    x[1].x := 2 * BodyWidth - 1;
+    x[1].Y := (BorderWidth / 2);
 
-    x[2].X:=3*BodyWidth-1;
-    x[2].Y:=BodyWidth + (BorderWidth/2);
+    x[2].x := 3 * BodyWidth - 1;
+    x[2].Y := BodyWidth + (BorderWidth / 2);
 
-    FExitPoint:=x[2].Truncate;
-    FExitPoint.X:=FExitPoint.X-8;
+    FExitPoint := x[2].Truncate;
+    FExitPoint.x := FExitPoint.x - 8;
 
-    x[3].X:=BodyWidth;
-    x[3].Y:=BodyWidth + (BorderWidth/2);
+    x[3].x := BodyWidth;
+    x[3].Y := BodyWidth + (BorderWidth / 2);
   end;
 
   //###############################################################################
   //preenchimento da cabeça do elevador, cor e diametro da linha.
   //###############################################################################
 
-  FControlArea.CanvasBGRA.Brush.Color:= FHeadColor;
-  FControlArea.CanvasBGRA.Pen.Color  := FBorderColor;
-  FControlArea.CanvasBGRA.Pen.Width  := FBorderWidth;
+  FControlArea.CanvasBGRA.Brush.Color := FHeadColor;
+  FControlArea.CanvasBGRA.Pen.Color := FBorderColor;
+  FControlArea.CanvasBGRA.Pen.Width := FBorderWidth;
 
   //###############################################################################
   //desenha a cabeca do elevador.
@@ -406,22 +410,22 @@ begin
   //###############################################################################
   //coordenadas que desenham o pé do elevador.
   //###############################################################################
-  x[0].X:=0;
-  x[0].Y:=Height-BodyWidth-(BorderWidth/2);
+  x[0].x := 0;
+  x[0].Y := Height - BodyWidth - (BorderWidth / 2);
 
-  x[1].X:=3*BodyWidth-1;
-  x[1].Y:=Height-BodyWidth-(BorderWidth/2);
+  x[1].x := 3 * BodyWidth - 1;
+  x[1].Y := Height - BodyWidth - (BorderWidth / 2);
 
-  x[2].X:=2*BodyWidth-1;
-  x[2].Y:=Height-(BorderWidth/2);
+  x[2].x := 2 * BodyWidth - 1;
+  x[2].Y := Height - (BorderWidth / 2);
 
-  x[3].X:=BodyWidth;
-  x[3].Y:=Height-(BorderWidth/2);
+  x[3].x := BodyWidth;
+  x[3].Y := Height - (BorderWidth / 2);
 
   //###############################################################################
   //preenchimento do pé do elevador.
   //###############################################################################
-  FControlArea.CanvasBGRA.Brush.Color:=FFooterColor;
+  FControlArea.CanvasBGRA.Brush.Color := FFooterColor;
 
   //###############################################################################
   //desenha o pé do elevador.
@@ -431,19 +435,19 @@ begin
   //###############################################################################
   //preenchimento do corpo do elevador.
   //###############################################################################
-  FControlArea.CanvasBGRA.Brush.Color:=FBodyColor;
+  FControlArea.CanvasBGRA.Brush.Color := FBodyColor;
 
-  x[0].X:=FBodyWidth;
-  x[0].Y:=(BorderWidth/2);
+  x[0].x := FBodyWidth;
+  x[0].Y := (BorderWidth / 2);
 
-  x[1].X:=2*BodyWidth-1;
-  x[1].Y:=(BorderWidth/2);
+  x[1].x := 2 * BodyWidth - 1;
+  x[1].Y := (BorderWidth / 2);
 
-  x[2].X:=2*BodyWidth-1;
-  x[2].Y:=Height-(BorderWidth/2);
+  x[2].x := 2 * BodyWidth - 1;
+  x[2].Y := Height - (BorderWidth / 2);
 
-  x[3].X:=BodyWidth;
-  x[3].Y:=Height-(BorderWidth/2);
+  x[3].x := BodyWidth;
+  x[3].Y := Height - (BorderWidth / 2);
 
   FControlArea.CanvasBGRA.PolygonF(x);
 
@@ -451,67 +455,67 @@ begin
   //Risquinhos, acabamento.
   //###############################################################################
   FControlArea.CanvasBGRA.PolylineF([PointF(FBodyWidth,
-                                            FBodyWidth+(BorderWidth/2)),
-                                     PointF(2*FBodyWidth-1,
-                                            FBodyWidth+(BorderWidth/2))]);
-  FControlArea.CanvasBGRA.PolylineF([PointF(FBodyWidth,   Height-BodyWidth-(BorderWidth/2)),
-                                     PointF(2*FBodyWidth, Height-BodyWidth-(BorderWidth/2))]);
+    FBodyWidth + (BorderWidth / 2)),
+    PointF(2 * FBodyWidth - 1,
+    FBodyWidth + (BorderWidth / 2))]);
+  FControlArea.CanvasBGRA.PolylineF([PointF(FBodyWidth, Height - BodyWidth - (BorderWidth / 2)),
+    PointF(2 * FBodyWidth, Height - BodyWidth - (BorderWidth / 2))]);
 end;
 
 constructor THMICustomElevadorBasico.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FHeadColor:=clSilver;
-  FBodyColor:=clSilver;
-  FFooterColor:=clSilver;
-  FBorderColor:=clBlack;
-  FBorderWidth:=1;
-  FHeadAtLeft:=false;
-  FBodyWidth:=12; //inicializa o desenho com 12px de largura do
+  FHeadColor := clSilver;
+  FBodyColor := clSilver;
+  FFooterColor := clSilver;
+  FBorderColor := clBlack;
+  FBorderWidth := 1;
+  FHeadAtLeft := False;
+  FBodyWidth := 12; //inicializa o desenho com 12px de largura do
 end;
 
 procedure THMICustomElevadorBasico.SetHeadAtLeft(AValue: Boolean);
 begin
-  if FHeadAtLeft=AValue then Exit;
-  FHeadAtLeft:=AValue;
+  if FHeadAtLeft = AValue then Exit;
+  FHeadAtLeft := AValue;
   InvalidateShape;
 end;
 
 procedure THMICustomElevadorBasico.SetBodyWidth(AValue: Byte);
 begin
-  if FBodyWidth=AValue then Exit;
-  FBodyWidth:=AValue;
-  Constraints.MinWidth:=FBodyWidth*3;
-  Constraints.MaxWidth:=FBodyWidth*3;
-  Constraints.MinHeight:=FBodyWidth*2+3;
-  if Height<Constraints.MinHeight then
-    Height:=Constraints.MinHeight;
-  Width:=FBodyWidth*3;
+  if FBodyWidth = AValue then Exit;
+  FBodyWidth := AValue;
+  Constraints.MinWidth := FBodyWidth * 3;
+  Constraints.MaxWidth := FBodyWidth * 3;
+  Constraints.MinHeight := FBodyWidth * 2 + 3;
+  if Height < Constraints.MinHeight then
+    Height := Constraints.MinHeight;
+  Width := FBodyWidth * 3;
   InvalidateShape;
 end;
 
 procedure THMICustomElevadorBasico.SetFooterColor(AValue: TColor);
 begin
-  if FFooterColor=AValue then Exit;
-  FFooterColor:=AValue;
+  if FFooterColor = AValue then Exit;
+  FFooterColor := AValue;
   InvalidateDraw;
 end;
 
 { TCustomFlowElevator }
 
-procedure THMICustomFlowElevator.SetElevatorStates(AValue: THMIElevatorFlowZones
-  );
+procedure THMICustomFlowElevator.SetElevatorStates(AValue: THMIElevatorFlowZones);
 begin
   FElevatorStates.Assign(AValue);
 end;
 
 procedure THMICustomFlowElevator.ShowZone(aZone: THMIElevatorFlowZone);
 begin
-  FCurrentZone:=aZone;
-  if aZone<>nil then begin
-    if (FUseStaticBodyColor=false)   and (aZone.PaintBodyWithFlowColor=false)   then SetBodyColor(aZone.Color);
-    if (FUseStaticHeaderColor=false) and (aZone.PaintHeaderWithFlowColor=false) then SetHeadColor(aZone.Color);
-    if (FUseStaticFooterColor=false) and (aZone.PaintFooterWithFlowColor=false) then SetFooterColor(aZone.Color);
+  FCurrentZone := aZone;
+  if aZone <> nil then
+  begin
+    if (FUseStaticBodyColor = False) and (aZone.PaintBodyWithFlowColor = False) then SetBodyColor(aZone.Color);
+    if (FUseStaticHeaderColor = False) and (aZone.PaintHeaderWithFlowColor = False) then SetHeadColor(aZone.Color);
+    if (FUseStaticFooterColor = False) and (aZone.PaintFooterWithFlowColor = False) then SetFooterColor(aZone.Color);
     SetBorderColor(aZone.BorderColor);
     UpdateFlow;
     InvalidateDraw;
@@ -520,33 +524,39 @@ end;
 
 procedure THMICustomFlowElevator.UpdateFlow;
 begin
-  if assigned(FCurrentZone) and Assigned(FInputPolyline) and assigned(FOutputPolyline) then begin
-    if FCurrentZone.Flow then begin
+  if Assigned(FCurrentZone) and Assigned(FInputPolyline) and Assigned(FOutputPolyline) then
+  begin
+    if FCurrentZone.Flow then
+    begin
 
-      if (FUseStaticBodyColor=false) and FCurrentZone.FPaintBodyWithFlowColor   then begin
-        if FInputPolyline.LineColor=FInputPolyline.EmptyColor then
+      if (FUseStaticBodyColor = False) and FCurrentZone.FPaintBodyWithFlowColor then
+      begin
+        if FInputPolyline.LineColor = FInputPolyline.EmptyColor then
           SetBodyColor(FCurrentZone.EmptyColor)
         else
           SetBodyColor(FInputPolyline.LineColor);
       end;
 
-      if (FUseStaticHeaderColor=false) and FCurrentZone.FPaintHeaderWithFlowColor then begin
-        if FInputPolyline.LineColor=FInputPolyline.EmptyColor then
+      if (FUseStaticHeaderColor = False) and FCurrentZone.FPaintHeaderWithFlowColor then
+      begin
+        if FInputPolyline.LineColor = FInputPolyline.EmptyColor then
           SetHeadColor(FCurrentZone.EmptyColor)
         else
           SetHeadColor(FInputPolyline.LineColor);
       end;
 
-      if (FUseStaticFooterColor=false) and FCurrentZone.FPaintFooterWithFlowColor then  begin
-        if FInputPolyline.LineColor=FInputPolyline.EmptyColor then
+      if (FUseStaticFooterColor = False) and FCurrentZone.FPaintFooterWithFlowColor then
+      begin
+        if FInputPolyline.LineColor = FInputPolyline.EmptyColor then
           SetFooterColor(FCurrentZone.EmptyColor)
         else
           SetFooterColor(FInputPolyline.LineColor);
       end;
 
-      FOutputPolyline.LineColor:=FInputPolyline.LineColor
-    end else
-      FOutputPolyline.LineColor:=FOutputPolyline.EmptyColor;
+      FOutputPolyline.LineColor := FInputPolyline.LineColor;
+    end
+    else
+      FOutputPolyline.LineColor := FOutputPolyline.EmptyColor;
   end;
 end;
 
@@ -555,10 +565,9 @@ begin
   UpdateControl;
 end;
 
-procedure THMICustomFlowElevator.StatesNeedsComponentState(
-  var CurState: TComponentState);
+procedure THMICustomFlowElevator.StatesNeedsComponentState(var CurState: TComponentState);
 begin
-  CurState:=ComponentState;
+  CurState := ComponentState;
 end;
 
 procedure THMICustomFlowElevator.NextZone(Sender: TObject);
@@ -585,13 +594,13 @@ end;
 constructor THMICustomFlowElevator.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FElevatorStates:=THMIElevatorFlowZones.Create(Self);
-  FElevatorStates.OnCollectionItemChange:=@StateChanged;
-  FElevatorStates.OnNeedCompState:=@StatesNeedsComponentState;
+  FElevatorStates := THMIElevatorFlowZones.Create(Self);
+  FElevatorStates.OnCollectionItemChange := @StateChanged;
+  FElevatorStates.OnNeedCompState := @StatesNeedsComponentState;
 
-  FZoneTimer:=TTimer.Create(self);
-  FZoneTimer.Enabled:=false;
-  FZoneTimer.OnTimer:=@NextZone;
+  FZoneTimer := TTimer.Create(Self);
+  FZoneTimer.Enabled := False;
+  FZoneTimer.OnTimer := @NextZone;
 end;
 
 destructor THMICustomFlowElevator.Destroy;
@@ -604,62 +613,59 @@ begin
   inherited Destroy;
 end;
 
-procedure THMICustomFlowElevator.Notification(AComponent: TComponent;
-  Operation: TOperation);
+procedure THMICustomFlowElevator.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
-  if (Operation=opRemove) and (AComponent<>Self) then begin
-    if AComponent=FInputPolyline then
-      FInputPolyline:=nil;
-    if AComponent=FOutputPolyline then
-      FOutputPolyline:=nil;
+  if (Operation = opRemove) and (AComponent <> Self) then
+  begin
+    if AComponent = FInputPolyline then
+      FInputPolyline := nil;
+    if AComponent = FOutputPolyline then
+      FOutputPolyline := nil;
   end;
 end;
 
 procedure THMICustomFlowElevator.SetUseStaticBodyColor(AValue: Boolean);
 begin
-  if FUseStaticBodyColor=AValue then Exit;
-  FUseStaticBodyColor:=AValue;
+  if FUseStaticBodyColor = AValue then Exit;
+  FUseStaticBodyColor := AValue;
   ShowZone(FCurrentZone);
 end;
 
 procedure THMICustomFlowElevator.SetUseStaticFooterColor(AValue: Boolean);
 begin
-  if FUseStaticFooterColor=AValue then Exit;
-  FUseStaticFooterColor:=AValue;
+  if FUseStaticFooterColor = AValue then Exit;
+  FUseStaticFooterColor := AValue;
   ShowZone(FCurrentZone);
 end;
 
 procedure THMICustomFlowElevator.SetUseStaticHeaderColor(AValue: Boolean);
 begin
-  if FUseStaticHeaderColor=AValue then Exit;
-  FUseStaticHeaderColor:=AValue;
+  if FUseStaticHeaderColor = AValue then Exit;
+  FUseStaticHeaderColor := AValue;
   ShowZone(FCurrentZone);
 end;
 
 procedure THMICustomFlowElevator.UpdateInOutLines;
 begin
   if Assigned(FOutputPolyline) then
-    FOutputPolyline.UpdateEndPoints(false,ControlToScreen(FExitPoint));
+    FOutputPolyline.UpdateEndPoints(False, ControlToScreen(FExitPoint));
 end;
 
-procedure THMICustomFlowElevator.AddNotifyCallback(
-  WhoNotify: IColorChangeNotification);
+procedure THMICustomFlowElevator.AddNotifyCallback(WhoNotify: IColorChangeNotification);
 begin
 
 end;
 
-procedure THMICustomFlowElevator.RemoveNotifyCallback(
-  WhoRemove: IColorChangeNotification);
+procedure THMICustomFlowElevator.RemoveNotifyCallback(WhoRemove: IColorChangeNotification);
 begin
 
 end;
 
-procedure THMICustomFlowElevator.NotifyFree(const WhoWasDestroyed: THMIFlowPolyline
-  );
+procedure THMICustomFlowElevator.NotifyFree(const WhoWasDestroyed: THMIFlowPolyline);
 begin
-  if WhoWasDestroyed=FInputPolyline then FInputPolyline:=nil;
-  if WhoWasDestroyed=FOutputPolyline then FOutputPolyline:=nil;
+  if WhoWasDestroyed = FInputPolyline then FInputPolyline := nil;
+  if WhoWasDestroyed = FOutputPolyline then FOutputPolyline := nil;
 end;
 
 procedure THMICustomFlowElevator.NotifyChange(const WhoChanged: THMIFlowPolyline);
@@ -667,8 +673,7 @@ begin
   UpdateFlow;
 end;
 
-procedure THMICustomFlowElevator.ChangeBounds(ALeft, ATop, AWidth,
-  AHeight: Integer; KeepBase: Boolean);
+procedure THMICustomFlowElevator.ChangeBounds(ALeft, ATop, AWidth, AHeight: Integer; KeepBase: Boolean);
 begin
   inherited ChangeBounds(ALeft, ATop, AWidth, AHeight, KeepBase);
   UpdateInOutLines;
@@ -676,41 +681,42 @@ end;
 
 procedure THMICustomFlowElevator.SetInputPolyline(AValue: THMIFlowPolyline);
 begin
-  if FInputPolyline=AValue then
+  if FInputPolyline = AValue then
     Exit;
 
-  if Assigned(aValue) and (not Supports(AValue, IColorChangeNotification)) then
-    exit;
+  if Assigned(AValue) and (not Supports(AValue, IColorChangeNotification)) then
+    Exit;
 
-  if Assigned(FInputPolyline) then begin
+  if Assigned(FInputPolyline) then
+  begin
     (FInputPolyline as IColorChangeNotification).RemoveNotifyCallback(Self as IColorChangeNotification);
     FInputPolyline.RemoveFreeNotification(Self);
   end;
 
-  if Assigned(aValue) then begin
-    (AValue as IColorChangeNotification).AddNotifyCallback(self as IColorChangeNotification);
+  if Assigned(AValue) then
+  begin
+    (AValue as IColorChangeNotification).AddNotifyCallback(Self as IColorChangeNotification);
     AValue.FreeNotification(Self);
   end;
 
-  FInputPolyline:=AValue;
+  FInputPolyline := AValue;
   UpdateFlow;
   UpdateInOutLines;
 end;
 
 procedure THMICustomFlowElevator.SetOutputPolyline(AValue: THMIFlowPolyline);
 begin
-  if FOutputPolyline=AValue then exit;
+  if FOutputPolyline = AValue then Exit;
 
-  if assigned(FOutputPolyline) then
+  if Assigned(FOutputPolyline) then
     FOutputPolyline.RemoveFreeNotification(Self);
 
   if Assigned(AValue) then
     AValue.FreeNotification(Self);
 
-  FOutputPolyline:=AValue;
+  FOutputPolyline := AValue;
   UpdateFlow;
   UpdateInOutLines;
 end;
 
 end.
-

@@ -33,80 +33,80 @@ type
   protected
     {$IFDEF PORTUGUES}
     //: Controle alvo dos eventos de teclado.
-    {$ELSE}
+  {$ELSE}
     //: Target control of keyboard events.
-    {$ENDIF}
-    FTarget:TWinControl;
+  {$ENDIF}
+    FTarget: TWinControl;
 
-    FShitfState:TShiftState;
+    FShitfState: TShiftState;
 
     {$IFDEF PORTUGUES}
     //: Emula o pressionamento de uma tecla.
-    {$ELSE}
+  {$ELSE}
     //: Emulates the key press event.
-    {$ENDIF}
-    procedure DoDown(Key: LongWord); dynamic; abstract;
+  {$ENDIF}
+    procedure DoDown(Key: Longword); dynamic; abstract;
 
     {$IFDEF PORTUGUES}
     //: Emula o liberar de uma tecla.
-    {$ELSE}
+  {$ELSE}
     //: Emulates a key release event.
-    {$ENDIF}
-    procedure DoUp(Key: LongWord); dynamic; abstract;
+  {$ENDIF}
+    procedure DoUp(Key: Longword); dynamic; abstract;
 
     {$IFDEF PORTUGUES}
     //: Traduz o codigo da tecla para o codigo da tecla no widgetset.
-    {$ELSE}
+  {$ELSE}
     //: Translate the key code to the widgetset key code.
-    {$ENDIF}
-    function  TranlateVirtualKey(Key:Word):LongWord; dynamic; abstract;
+  {$ENDIF}
+    function TranlateVirtualKey(Key: Word): Longword; dynamic; abstract;
   public
     {$IFDEF PORTUGUES}
      //: Cria o emulador de eventos de tecla.
-    {$ELSE}
+  {$ELSE}
     //: Creates the key event emulator.
-    {$ENDIF}
-    constructor Create(Target:TWinControl); virtual;
+  {$ENDIF}
+    constructor Create(Target: TWinControl); virtual;
 
     {$IFDEF PORTUGUES}
     //: Configura o controle alvo dos eventos de tecla.
-    {$ELSE}
+  {$ELSE}
     //: Sets the target control of key events.
-    {$ENDIF}
-    procedure SetTarget(Target:TWinControl);
+  {$ENDIF}
+    procedure SetTarget(Target: TWinControl);
 
     {$IFDEF PORTUGUES}
     //: Traduz e emula o pressionamento de uma tecla.
-    {$ELSE}
+  {$ELSE}
     //: Translate and send the key press event.
-    {$ENDIF}
+  {$ENDIF}
     procedure Down(Key: Word);
 
     {$IFDEF PORTUGUES}
     //: Traduz e emula o liberar de uma tecla.
-    {$ELSE}
+  {$ELSE}
     //: Translate and send a key release event.
-    {$ENDIF}
+  {$ENDIF}
     procedure Up(Key: Word);
 
     {$IFDEF PORTUGUES}
     //: Traduz e emula o presionar e o liberar de uma tecla.
-    {$ELSE}
+  {$ELSE}
     //: Translate and send a key press and a key release events.
-    {$ENDIF}
+  {$ENDIF}
     procedure Press(Key: Word);
 
     {$IFDEF PORTUGUES}
     //: Aplica modificadores de evento de tecla (Ctrl, Shift e Alt).
-    {$ELSE}
+  {$ELSE}
     //: Apply key modification events (Ctrl, Shift and Alt).
-    {$ENDIF}
+  {$ENDIF}
     procedure Apply(Shift: TShiftState); virtual;
     {$IFDEF PORTUGUES}
     //: Remove modificadores de evento de tecla (Ctrl, Shift e Alt).
-    {$ELSE}
+  {$ELSE}
     //: Removes key modification events (Ctrl, Shift and Alt).
-    {$ENDIF}
+  {$ENDIF}
     procedure Unapply(Shift: TShiftState); virtual;
   end;
 
@@ -130,7 +130,7 @@ type
   end;
   {$IFEND}
 
-   {$IF defined(LCLgtk3)}
+  {$IF defined(LCLgtk3)}
   { TGTK3KeyEvents }
   TGTK3KeyEvents = class(TCrossKeyEvents)
     protected
@@ -190,31 +190,33 @@ type
 
   TWindowsKeyEvents = class(TCrossKeyEvents)
   protected
-      FCurrentShiftState: TShiftState;
-      //: @seealso(TCrossKeyEvents.DoDown)
-      procedure DoDown(Key: LongWord); override;
-      //: @seealso(TCrossKeyEvents.DoUp)
-      procedure DoUp(Key: LongWord); override;
-      //: @seealso(TCrossKeyEvents.TranlateVirtualKey)
-      function TranlateVirtualKey(Key: Word): LongWord; override;
-      procedure Apply(Shift: TShiftState); override;
-      procedure Unapply(Shift: TShiftState); override;
+    FCurrentShiftState: TShiftState;
+    //: @seealso(TCrossKeyEvents.DoDown)
+    procedure DoDown(Key: Longword); override;
+    //: @seealso(TCrossKeyEvents.DoUp)
+    procedure DoUp(Key: Longword); override;
+    //: @seealso(TCrossKeyEvents.TranlateVirtualKey)
+    function TranlateVirtualKey(Key: Word): Longword; override;
+    procedure Apply(Shift: TShiftState); override;
+    procedure Unapply(Shift: TShiftState); override;
   public
-      constructor Create(Target: TWinControl); override;
+    constructor Create(Target: TWinControl); override;
   end;
   {$IFEND}
 
-  {$IFDEF PORTUGUES}
+{$IFDEF PORTUGUES}
   //: Cria o emulador de eventos de tecla de acordo com o widgetset em uso.
-  {$ELSE}
+{$ELSE}
   //: Creates the key event emulator of the currently widgetset.
-  {$ENDIF}
-  function CreateCrossKeyEvents(Target:TWinControl):TCrossKeyEvents;
+{$ENDIF}
+function CreateCrossKeyEvents(Target: TWinControl): TCrossKeyEvents;
 
 var
-  PSVK_BACK, PSVK_DECIMAL, PSVK_SUBTRACT:Byte;
+  PSVK_BACK: Byte;
+  PSVK_DECIMAL: Byte;
+  PSVK_SUBTRACT: Byte;
 
-{$IF (not defined(FPC)) and (defined(WIN32) or defined(WIN64) or defined(WINDOWS))}
+  {$IF (not defined(FPC)) and (defined(WIN32) or defined(WIN64) or defined(WINDOWS))}
 const
   //Constantes e teclas ausentes.
   //missing key constants
@@ -350,7 +352,7 @@ const
   VK_DELETE = $2E;
   VK_RETURN = $0D;
 
-{$IFEND}
+  {$IFEND}
 
 
 implementation
@@ -391,31 +393,38 @@ uses {$IFDEF FPC}LCLType{$ENDIF};
 
 //se não esta definido FPC (consequentemente não estará definida LCLwin32),
 //estou usando Delphi, consequentemente, Windows...
-//
+
 //if isn't set FPC (consequently will not defined LCLwin32),
 //so, I'm using Delphi, consequently Windows.
 {$IF defined(LCLwin32) OR defined(LCLwin64) OR defined(LCLwince) OR (not defined(FPC))}
-uses windows{$IFDEF FPC}, LCLType {$ELSE}, Messages {$ENDIF};
-{$IFEND}
+uses
+  Windows
+  {$IFDEF FPC}
+, LCLType
+  {$ELSE}
+  , Messages
+  {$ENDIF}
+  ;
+  {$IFEND}
 
-constructor TCrossKeyEvents.Create(Target:TWinControl);
+constructor TCrossKeyEvents.Create(Target: TWinControl);
 begin
-  FTarget:=Target;
+  FTarget := Target;
 end;
 
-procedure TCrossKeyEvents.SetTarget(Target:TWinControl);
+procedure TCrossKeyEvents.SetTarget(Target: TWinControl);
 begin
-  FTarget:=Target;
+  FTarget := Target;
 end;
 
 procedure TCrossKeyEvents.Down(Key: Word);
 begin
-  DoDown(TranlateVirtualKey(key));
+  DoDown(TranlateVirtualKey(Key));
 end;
 
 procedure TCrossKeyEvents.Up(Key: Word);
 begin
-  DoUp(TranlateVirtualKey(key));
+  DoUp(TranlateVirtualKey(Key));
 end;
 
 procedure TCrossKeyEvents.Press(Key: Word);
@@ -426,16 +435,22 @@ end;
 
 procedure TCrossKeyEvents.Apply(Shift: TShiftState);
 begin
-  if ssCtrl in Shift then Down(VK_CONTROL);
-  if ssAlt in Shift then Down(VK_MENU);
-  if ssShift in Shift then Down(VK_SHIFT);
+  if ssCtrl in Shift then
+    Down(VK_CONTROL);
+  if ssAlt in Shift then
+    Down(VK_MENU);
+  if ssShift in Shift then
+    Down(VK_SHIFT);
 end;
 
 procedure TCrossKeyEvents.Unapply(Shift: TShiftState);
 begin
-  if ssCtrl in Shift then Up(VK_CONTROL);
-  if ssAlt in Shift then Up(VK_MENU);
-  if ssShift in Shift then Up(VK_SHIFT);
+  if ssCtrl in Shift then
+    Up(VK_CONTROL);
+  if ssAlt in Shift then
+    Up(VK_MENU);
+  if ssShift in Shift then
+    Up(VK_SHIFT);
 end;
 
 {$IF defined(LCLgtk2)}
@@ -447,7 +462,7 @@ var
   effectivegroup, level:Integer;
   consumedkeys:TGdkModifierType;
 begin
-  if FTarget=nil then exit;
+  if FTarget=nil then Exit;
   gev.key.window:={%H-}PGtkWidget(Ftarget.Handle)^.window;
   gev.key._type:=GDK_KEY_PRESS;
   gev.key.send_event:=0;
@@ -470,7 +485,7 @@ begin
   gdk_keymap_get_entries_for_keyval(nil,key,{%H-}keys,@nkeys);
 
   if keys=nil then begin
-    exit;
+    Exit;
   end else begin
     gev.key.hardware_keycode:=keys^.keycode;
     gev.key.group:=keys^.group;
@@ -488,7 +503,7 @@ var
   keys:PGdkKeymapKey;
   nkeys:cint;
 begin
-  if FTarget=nil then exit;
+  if FTarget=nil then Exit;
   gev.key.window:={%H-}PGtkWidget(Ftarget.Handle)^.window;
   gev.key._type:=GDK_KEY_RELEASE;
   gev.key.send_event:=0;
@@ -501,7 +516,7 @@ begin
   gdk_keymap_get_entries_for_keyval(nil,gev.key.keyval,{%H-}keys,@nkeys);
 
   if keys=nil then begin
-    exit;
+    Exit;
   end else begin
     gev.key.hardware_keycode:=keys^.keycode;
     gev.key.group:=keys^.group;
@@ -628,16 +643,22 @@ end;
 
 procedure TGTK2KeyEvents.Apply(Shift: TShiftState);
 begin
-  if ssCtrl in Shift then  FShitfState:=FShitfState+[ssCtrl];
-  if ssAlt in Shift then   FShitfState:=FShitfState+[ssAlt];
-  if ssShift in Shift then FShitfState:=FShitfState+[ssShift];
+  if ssCtrl in Shift then
+    FShitfState := FShitfState + [ssCtrl];
+  if ssAlt in Shift then
+    FShitfState := FShitfState + [ssAlt];
+  if ssShift in Shift then
+    FShitfState := FShitfState + [ssShift];
 end;
 
 procedure TGTK2KeyEvents.Unapply(Shift: TShiftState);
 begin
-  if ssCtrl in Shift then  FShitfState:=FShitfState-[ssCtrl];
-  if ssAlt in Shift then   FShitfState:=FShitfState-[ssAlt];
-  if ssShift in Shift then FShitfState:=FShitfState-[ssShift];
+  if ssCtrl in Shift then
+    FShitfState := FShitfState - [ssCtrl];
+  if ssAlt in Shift then
+    FShitfState := FShitfState - [ssAlt];
+  if ssShift in Shift then
+    FShitfState := FShitfState - [ssShift];
 end;
 {$IFEND}
 
@@ -650,32 +671,35 @@ var
   effectivegroup, level:Integer;
   consumedkeys:TGdkModifierType;
 begin
-  if FTarget=nil then exit;
-  gev.key.window:=PGtkWidget(Ftarget.Handle)^.window;
-  gev.key.type_:=GDK_KEY_PRESS;
-  gev.key.send_event:=1;
+  if FTarget=nil then Exit;
+  gev.key.window := PGtkWidget(Ftarget.Handle)^.window;
+  gev.key.type_ := GDK_KEY_PRESS;
+  gev.key.send_event := 1;
 
-  gev.key.time:=10;
-  gev.key.state:=[];
-  gev.key.length:=1;
+  gev.key.time := 10;
+  gev.key.state := [];
+  gev.key.length := 1;
 
   if ssShift in FShitfState then
-    gev.key.state:=gev.key.state + [GDK_SHIFT_MASK];
+    gev.key.state := gev.key.state + [GDK_SHIFT_MASK];
 
   if ssCtrl in FShitfState  then
-    gev.key.state:=gev.key.state + [GDK_CONTROL_MASK];
+    gev.key.state := gev.key.state + [GDK_CONTROL_MASK];
 
   if ssAlt in FShitfState   then
-    gev.key.state:=gev.key.state + [GDK_MOD1_MASK];
+    gev.key.state := gev.key.state + [GDK_MOD1_MASK];
 
-  gev.key.string_:=gdk_keyval_name(key);
+  gev.key.string_ := gdk_keyval_name(key);
 
   gdk_keymap_get_entries_for_keyval(nil,key,keys,@nkeys);
 
-  if keys=nil then begin
+  if keys=nil then
+  begin
     gev.key.hardware_keycode:=GDK_KEY_a;
     gev.key.group:=1;
-  end else begin
+  end
+  else
+  begin
     gev.key.hardware_keycode:=keys^^.keycode;
     gev.key.group:=keys^^.group;
     g_free(keys);
@@ -688,11 +712,11 @@ end;
 
 procedure TGTK3KeyEvents.DoUp(Key: LongWord);
 var
-  gev:TGdkEvent;
-  keys:PPGdkKeymapKey;
-  nkeys:gint;
+  gev: TGdkEvent;
+  keys: PPGdkKeymapKey;
+  nkeys: gint;
 begin
-  if FTarget=nil then exit;
+  if FTarget=nil then Exit;
   gev.key.window:=PGtkWidget(Ftarget.Handle)^.window;
   gev.key.type_:=GDK_KEY_RELEASE;
   gev.key.send_event:=1;
@@ -832,47 +856,55 @@ end;
 
 procedure TGTK3KeyEvents.Apply(Shift: TShiftState);
 begin
-  if ssCtrl in Shift then  FShitfState:=FShitfState+[ssCtrl];
-  if ssAlt in Shift then   FShitfState:=FShitfState+[ssAlt];
-  if ssShift in Shift then FShitfState:=FShitfState+[ssShift];
+  if ssCtrl in Shift then
+    FShitfState := FShitfState + [ssCtrl];
+  if ssAlt in Shift then
+    FShitfState := FShitfState + [ssAlt];
+  if ssShift in Shift then
+    FShitfState := FShitfState + [ssShift];
 end;
 
 procedure TGTK3KeyEvents.Unapply(Shift: TShiftState);
 begin
-  if ssCtrl in Shift then  FShitfState:=FShitfState-[ssCtrl];
-  if ssAlt in Shift then   FShitfState:=FShitfState-[ssAlt];
-  if ssShift in Shift then FShitfState:=FShitfState-[ssShift];
+  if ssCtrl in Shift then
+    FShitfState := FShitfState - [ssCtrl];
+  if ssAlt in Shift then
+    FShitfState := FShitfState - [ssAlt];
+  if ssShift in Shift then
+    FShitfState := FShitfState - [ssShift];
 end;
 {$IFEND}
 
 {$IF defined(LCLqt)}
 procedure TQT4KeyEvents.DoDown(Key: LongWord);
 var
-  qevt:QKeyEventH;
-  ktxt:WideString;
+  Qevt:QKeyEventH;
+  KTxt:WideString;
 begin
-  if (Key in [QtKey_A..QtKey_Z]) then begin
-    if (FShitfState=[ssShift])  then
-      ktxt:=chr(key)
+  if (Key in [QtKey_A..QtKey_Z]) then
+  begin
+    if (FShitfState = [ssShift])  then
+      KTxt := Chr(Key)
     else
-      ktxt:=chr(key+32)
-  end else
-    ktxt:=chr(key);
+      KTxt := Chr(Key+32)
+  end
+  else
+    KTxt := Chr(Key);
 
-  qevt:=QKeyEvent_create(QEventKeyPress, key, QtNoModifier, @ktxt, false, 1);
+  qevt := QKeyEvent_create(QEventKeyPress, Key, QtNoModifier, @KTxt, False, 1);
 
-  QCoreApplication_sendEvent(TQtWidget(FTarget.Handle).Widget,qevt);
-  QKeyEvent_destroy(qevt);
+  QCoreApplication_sendEvent(TQtWidget(FTarget.Handle).Widget, Qevt);
+  QKeyEvent_destroy(Qevt);
 end;
 
 procedure TQT4KeyEvents.DoUp(Key: LongWord);
 var
-  qevt:QKeyEventH;
+  Qevt:QKeyEventH;
 begin
-  qevt:=QKeyEvent_create(QEventKeyRelease, key, QtNoModifier, nil, false, 1);
+  Qevt := QKeyEvent_create(QEventKeyRelease, Key, QtNoModifier, nil, False, 1);
 
-  QCoreApplication_sendEvent(TQtWidget(FTarget.Handle).Widget,qevt);
-  QKeyEvent_destroy(qevt);
+  QCoreApplication_sendEvent(TQtWidget(FTarget.Handle).Widget, Qevt);
+  QKeyEvent_destroy(Qevt);
 end;
 
 function TQT4KeyEvents.TranlateVirtualKey(Key: Word): LongWord;
@@ -994,31 +1026,33 @@ end;
 {$IF defined(LCLqt5)}
 procedure TQT5KeyEvents.DoDown(Key: LongWord);
 var
-  qevt:QKeyEventH;
-  ktxt:WideString;
+  Qevt: QKeyEventH;
+  KTxt: WideString;
 begin
-  if (Key in [QtKey_A..QtKey_Z]) then begin
-    if (FShitfState=[ssShift])  then
-      ktxt:=chr(key)
+  if (Key in [QtKey_A..QtKey_Z]) then
+  begin
+    if (FShitfState = [ssShift])  then
+      KTxt := Chr(Key)
     else
-      ktxt:=chr(key+32)
-  end else
-    ktxt:=chr(key);
+      KTxt := Chr(Key+32)
+  end
+  else
+    KTxt := Chr(Key);
 
-  qevt:=QKeyEvent_create(QEventKeyPress, key, QtNoModifier, @ktxt, false, 1);
+  Qevt := QKeyEvent_create(QEventKeyPress, Key, QtNoModifier, @KTxt, false, 1);
 
-  QCoreApplication_sendEvent(TQtWidget(FTarget.Handle).Widget,qevt);
-  QKeyEvent_destroy(qevt);
+  QCoreApplication_sendEvent(TQtWidget(FTarget.Handle).Widget, Qevt);
+  QKeyEvent_destroy(Qevt);
 end;
 
 procedure TQT5KeyEvents.DoUp(Key: LongWord);
 var
-  qevt:QKeyEventH;
+  Qevt:QKeyEventH;
 begin
-  qevt:=QKeyEvent_create(QEventKeyRelease, key, QtNoModifier, nil, false, 1);
+  Qevt:=QKeyEvent_create(QEventKeyRelease, Key, QtNoModifier, nil, False, 1);
 
-  QCoreApplication_sendEvent(TQtWidget(FTarget.Handle).Widget,qevt);
-  QKeyEvent_destroy(qevt);
+  QCoreApplication_sendEvent(TQtWidget(FTarget.Handle).Widget, Qevt);
+  QKeyEvent_destroy(Qevt);
 end;
 
 function TQT5KeyEvents.TranlateVirtualKey(Key: Word): LongWord;
@@ -1140,31 +1174,33 @@ end;
 {$IF defined(LCLqt6)}
 procedure TQT6KeyEvents.DoDown(Key: LongWord);
 var
-  qevt:QKeyEventH;
-  ktxt:WideString;
+  Qevt: QKeyEventH;
+  KTxt: WideString;
 begin
-  if (Key in [QtKey_A..QtKey_Z]) then begin
-    if (FShitfState=[ssShift])  then
-      ktxt:=chr(key)
+  if (Key in [QtKey_A..QtKey_Z]) then
+  begin
+    if (FShitfState = [ssShift])  then
+      KTxt := Chr(Key)
     else
-      ktxt:=chr(key+32)
-  end else
-    ktxt:=chr(key);
+      KTxt := Chr(Key+32)
+  end
+  else
+    KTxt := Chr(Key);
 
-  qevt:=QKeyEvent_create(QEventKeyPress, key, QtNoModifier, @ktxt, false, 1);
+  Qevt:=QKeyEvent_create(QEventKeyPress, Key, QtNoModifier, @KTxt, False, 1);
 
-  QCoreApplication_sendEvent(TQtWidget(FTarget.Handle).Widget,qevt);
-  QKeyEvent_destroy(qevt);
+  QCoreApplication_sendEvent(TQtWidget(FTarget.Handle).Widget, Qevt);
+  QKeyEvent_destroy(Qevt);
 end;
 
 procedure TQT6KeyEvents.DoUp(Key: LongWord);
 var
-  qevt:QKeyEventH;
+  Qevt: QKeyEventH;
 begin
-  qevt:=QKeyEvent_create(QEventKeyRelease, key, QtNoModifier, nil, false, 1);
+  Qevt := QKeyEvent_create(QEventKeyRelease, Key, QtNoModifier, nil, False, 1);
 
-  QCoreApplication_sendEvent(TQtWidget(FTarget.Handle).Widget,qevt);
-  QKeyEvent_destroy(qevt);
+  QCoreApplication_sendEvent(TQtWidget(FTarget.Handle).Widget, Qevt);
+  QKeyEvent_destroy(Qevt);
 end;
 
 function TQT6KeyEvents.TranlateVirtualKey(Key: Word): LongWord;
@@ -1284,26 +1320,26 @@ end;
 {$IFEND}
 
 {$IF defined(LCLwin32) OR (not defined(FPC))}
-procedure TWindowsKeyEvents.DoDown(Key: LongWord);
+procedure TWindowsKeyEvents.DoDown(Key: Longword);
 begin
   if (Key in [VK_A..VK_Z]) and (FShitfState = []) then
-    Key := Key+32;
+    Key := Key + 32;
 
-  SendMessage(FTarget.Handle,WM_KEYDOWN,Key,0);
-  if (Key<>VK_DELETE) then
-    SendMessage(FTarget.Handle,WM_CHAR,Key,0);
+  SendMessage(FTarget.Handle, WM_KEYDOWN, Key, 0);
+  if (Key <> VK_DELETE) then
+    SendMessage(FTarget.Handle, WM_CHAR, Key, 0);
   //if (Key<>VK_DELETE) AND (Key in [VK_0..VK_9,PSVK_DECIMAL,PSVK_BACK,PSVK_SUBTRACT]) then
   //  SendMessage(FTarget.Handle,WM_CHAR,Key,0);
 end;
 
-procedure TWindowsKeyEvents.DoUp(Key: LongWord);
+procedure TWindowsKeyEvents.DoUp(Key: Longword);
 begin
-  SendMessage(FTarget.Handle,WM_KEYUP,Key,0);
+  SendMessage(FTarget.Handle, WM_KEYUP, Key, 0);
 end;
 
-function TWindowsKeyEvents.TranlateVirtualKey(Key: Word): LongWord;
+function TWindowsKeyEvents.TranlateVirtualKey(Key: Word): Longword;
 begin
-  Result := key;
+  Result := Key;
 end;
 
 procedure TWindowsKeyEvents.Apply(Shift: TShiftState);
@@ -1321,50 +1357,50 @@ end;
 constructor TWindowsKeyEvents.Create(Target: TWinControl);
 begin
   inherited Create(Target);
-  FShitfState:=[];
+  FShitfState := [];
 end;
 
 {$IFEND}
 
-function CreateCrossKeyEvents(Target:TWinControl):TCrossKeyEvents;
+function CreateCrossKeyEvents(Target: TWinControl): TCrossKeyEvents;
 begin
   {$IF defined(LCLgtk2)}
-  exit(TGtk2KeyEvents.Create(Target));
+  Exit(TGtk2KeyEvents.Create(Target));
   {$IFEND}
 
   {$IF defined(LCLgtk3)}
-  exit(TGtk3KeyEvents.Create(Target));
+  Exit(TGtk3KeyEvents.Create(Target));
   {$IFEND}
 
   {$IF defined(LCLqt)}
-  exit(TQt4KeyEvents.Create(Target));
+  Exit(TQt4KeyEvents.Create(Target));
   {$IFEND}
 
   {$IF defined(LCLqt5)}
-  exit(TQt5KeyEvents.Create(Target));
+  Exit(TQt5KeyEvents.Create(Target));
   {$IFEND}
 
   {$IF defined(LCLqt6)}
-  exit(TQT6KeyEvents.Create(Target));
+  Exit(TQT6KeyEvents.Create(Target));
   {$IFEND}
 
   {$IF defined(LCLwin32) OR (not defined(FPC))}
-  exit(TWindowsKeyEvents.Create(Target));
+  Exit(TWindowsKeyEvents.Create(Target));
   {$IFEND}
 
-  raise exception.Create('No screen keyboard defined to this widgetset.');
+  raise Exception.Create('No screen keyboard defined to this widgetset.');
 end;
 
-initialization
 
-{$IFDEF WINDOWS}
-PSVK_BACK     := 8;
-PSVK_DECIMAL  := Ord(DecimalSeparator);
-PSVK_SUBTRACT := Ord('-');
-{$ELSE}
-PSVK_BACK     := VK_BACK;
-PSVK_DECIMAL  := VK_DECIMAL;
-PSVK_SUBTRACT := VK_SUBTRACT;
-{$ENDIF}
+initialization
+  {$IFDEF WINDOWS}
+  PSVK_BACK     := 8;
+  PSVK_DECIMAL  := Ord(DecimalSeparator);
+  PSVK_SUBTRACT := Ord('-');
+  {$ELSE}
+  PSVK_BACK := VK_BACK;
+  PSVK_DECIMAL := VK_DECIMAL;
+  PSVK_SUBTRACT := VK_SUBTRACT;
+  {$ENDIF}
 
 end.

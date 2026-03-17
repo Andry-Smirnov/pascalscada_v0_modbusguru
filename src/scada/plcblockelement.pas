@@ -170,7 +170,7 @@ end;
 
 procedure TPLCBlockElement.SetBlock(blk:TPLCBlock);
 begin
-  if blk=PLCBlock then exit;
+  if blk=PLCBlock then Exit;
   //esta removendo do bloco.
   //removing the link with the block
   if Assigned(PBlock) then begin
@@ -193,7 +193,7 @@ procedure TPLCBlockElement.SetIndex(i:Cardinal);
 begin
   if PBlock=nil then begin
     PIndex := i;
-    exit;
+    Exit;
   end;
 
   if i>=PBlock.Size then

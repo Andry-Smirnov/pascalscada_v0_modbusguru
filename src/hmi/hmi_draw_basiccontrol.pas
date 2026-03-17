@@ -8,18 +8,16 @@ uses
   Classes, sysutils, Controls, Graphics, BGRABitmap, BGRABitmapTypes, LCLIntf,
   LMessages, ControlSecurityManager, HMITypes, PLCTag;
 
-{$IF defined(CM_DESIGNERHITTEST)}
-
-{$ELSE}
+{$IF not defined(CM_DESIGNERHITTEST)}
 const
   CM_DESIGNERHITTEST = CM_BASE + 100;
 {$ENDIF}
 
+{$DEFINE ONE_BIT_BMP_CONTINUOUS_ROW_AS_RECTANGLE}
+
 type
 
   TDragManagerAccess = Class(TDragManager);
-
-  {$DEFINE ONE_BIT_BMP_CONTINUOUS_ROW_AS_RECTANGLE}
 
   { THMIBasicControl }
 
@@ -126,7 +124,8 @@ type
 
 implementation
 
-uses math, LCLType, Forms;
+uses
+  math, LCLType, Forms;
 
 { TBasicSCADAControl }
 
@@ -140,7 +139,7 @@ procedure THMIBasicControl.InvalidateShape;
 var
   emptyArea: TBGRABitmap;
 begin
-  if [csDestroying]*ComponentState<>[] then exit;
+  if [csDestroying]*ComponentState<>[] then Exit;
   FUpdateShape:=true;
   emptyArea := TBGRABitmap.Create();
   try
@@ -166,7 +165,7 @@ end;
 procedure THMIBasicControl.SetBorderWidth(AValue: Integer);
 begin
   if FBorderWidth=AValue then Exit;
-  if AValue<0 then exit;
+  if AValue<0 then Exit;
   FBorderWidth:=AValue;
   if ComponentState*[csReading, csLoading]=[] then
     InvalidateShape;
@@ -715,9 +714,9 @@ var
 begin
   {$IF defined(LCLqt) or defined(LCLQt5)}
   Color:=clBackground;
-  exit;
+  Exit;
   {$IFEND}
-  if Parent=nil then exit;
+  if Parent=nil then Exit;
 
   {$IFDEF RGN_PIXEL_BY_PIXEL}
   frgn:=TRegion.Create;
@@ -899,7 +898,7 @@ end;
 
 procedure THMIBasicControl.Paint;
 begin
-  if assigned(FControlArea) then begin
+  if Assigned(FControlArea) then begin
     if FControlArea.Empty Or FUpdateShape then begin
       DrawControl;
       {$IF defined(LCLqt) or defined(LCLQt5)}
@@ -990,7 +989,7 @@ end;
 
 procedure THMIBasicControl.SetBorderColor(AValue: TColor);
 begin
-  if AValue=FBorderColor then exit;
+  if AValue=FBorderColor then Exit;
   FBorderColor:=AValue;
   if ComponentState*[csReading, csLoading]=[] then
     InvalidateDraw;

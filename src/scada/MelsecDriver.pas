@@ -11,9 +11,9 @@
 }
 
 (*
-As variáveis possíveis de serem utilizadas no CLP mitsubishi com protocolo "MC Protocol" para series Q/L são as seguintes:
-Memórias outputs: M, SM, L, F, V, X, Y, B
-Memórias registros: D, SD
+As variï¿½veis possï¿½veis de serem utilizadas no CLP mitsubishi com protocolo "MC Protocol" para series Q/L sï¿½o as seguintes:
+Memï¿½rias outputs: M, SM, L, F, V, X, Y, B
+Memï¿½rias registros: D, SD
 Tabela para setar as propriedades MemReadFunction, MemWriteFunction e MemAddress
 
 The possible variables to be used in the PLC protocol by Mitsubishi " MC Protocol" for series Q/L are the following
@@ -233,7 +233,7 @@ var
   found, valido:boolean;
   plc:LongInt;
 begin
-  //Recupera as informações do tag;
+  //Recupera as informaï¿½ï¿½es do tag;
   //retrieve informations of the tag.
   station:=0;
   mem:=0;
@@ -245,7 +245,7 @@ begin
   found := GetTagProperts(TagObj,station,mem,size,memtype,scantime);
 
   if found then
-    //se o endereco do plc esta numa faixa válida procura nos blocos de memória.
+    //se o endereco do plc esta numa faixa vï¿½lida procura nos blocos de memï¿½ria.
     //check if the address of the slave is valid.
     if station in [1..255] then
     begin
@@ -339,7 +339,7 @@ var
   found:boolean;
   plc:LongInt;
 begin
-  //Recupera as informações do tag;
+  //Recupera as informaï¿½ï¿½es do tag;
   //retrieve informations about the tag.
   station:=0;
   mem:=0;
@@ -349,7 +349,7 @@ begin
   found := GetTagProperts(TagObj,station,mem,size,memtype,scantime);
 
   if found then
-    //se o endereco do plc esta numa faixa válida procura nos blocos de memória.
+    //se o endereco do plc esta numa faixa vï¿½lida procura nos blocos de memï¿½ria.
     //check if the slave address is valid.
     if station in [1..255] then begin
       found := false;
@@ -413,7 +413,7 @@ begin
     values.ReadFaults := 1;
     values.LastQueryResult := ioDriverError;
     SetLength(values.Values,0);
-    exit;
+    Exit;
   end;
 
   case TagObj.ReadFunction of
@@ -479,7 +479,7 @@ begin
       if (res<>0) and (IOResult1.ReadIOResult=iorOK) then
       begin
 
-        //retorna o numero de bytes que está aguardando ser lido no buffer da porta de comunicação.
+        //retorna o numero de bytes que estï¿½ aguardando ser lido no buffer da porta de comunicaï¿½ï¿½o.
         //calculates the remaining package length at the communication buffer.
         FRemainingBytes := RemainingBytesRead(IOResult1.BufferToRead, tagrec);
 
@@ -533,7 +533,7 @@ begin
     if ([csDestroying]*ComponentState<>[]) then
     begin
       CrossThreadSwitch;
-      exit;
+      Exit;
     end;
 
     for plc:= 0 to High(PMelsecPLC) do
@@ -862,7 +862,7 @@ begin
       //if the IO result is OK, reads the remaing packet...
       if (res<>0) and (IOResult1.ReadIOResult=iorOK) then begin
 
-        //retorna o numero de bytes que está aguardando ser lido no buffer da porta de comunicação.
+        //retorna o numero de bytes que estï¿½ aguardando ser lido no buffer da porta de comunicaï¿½ï¿½o.
         //calculates the remaining package length at the communication buffer.
         FRemainingBytes:=RemainingBytesWrite(IOResult1.BufferToRead);
 
@@ -978,7 +978,7 @@ procedure TMelsecDriver.SetOutput_M_MaxHole(v: Cardinal);
 var
   plc:LongInt;
 begin
-  if v = POutput_M_MaxHole then exit;
+  if v = POutput_M_MaxHole then Exit;
 
   POutput_M_MaxHole:=v;
 
@@ -990,7 +990,7 @@ procedure TMelsecDriver.SetOutput_SM_MaxHole(v: Cardinal);
 var
   plc:LongInt;
 begin
-  if v = POutput_SM_MaxHole then exit;
+  if v = POutput_SM_MaxHole then Exit;
 
   POutput_SM_MaxHole:=v;
 
@@ -1002,7 +1002,7 @@ procedure TMelsecDriver.SetOutput_L_MaxHole(v: Cardinal);
 var
   plc:LongInt;
 begin
-  if v = POutput_L_MaxHole then exit;
+  if v = POutput_L_MaxHole then Exit;
 
   POutput_L_MaxHole:=v;
 
@@ -1014,7 +1014,7 @@ procedure TMelsecDriver.SetOutput_F_MaxHole(v: Cardinal);
 var
   plc:LongInt;
 begin
-  if v = POutput_F_MaxHole then exit;
+  if v = POutput_F_MaxHole then Exit;
 
   POutput_F_MaxHole:=v;
 
@@ -1026,7 +1026,7 @@ procedure TMelsecDriver.SetOutput_V_MaxHole(v: Cardinal);
 var
   plc:LongInt;
 begin
-  if v = POutput_V_MaxHole then exit;
+  if v = POutput_V_MaxHole then Exit;
 
   POutput_V_MaxHole:=v;
 
@@ -1038,7 +1038,7 @@ procedure TMelsecDriver.SetOutput_X_MaxHole(v: Cardinal);
 var
   plc:LongInt;
 begin
-  if v = POutput_X_MaxHole then exit;
+  if v = POutput_X_MaxHole then Exit;
 
   POutput_X_MaxHole:=v;
 
@@ -1050,7 +1050,7 @@ procedure TMelsecDriver.SetOutput_Y_MaxHole(v: Cardinal);
 var
   plc:LongInt;
 begin
-  if v = POutput_Y_MaxHole then exit;
+  if v = POutput_Y_MaxHole then Exit;
 
   POutput_Y_MaxHole:=v;
 
@@ -1062,7 +1062,7 @@ procedure TMelsecDriver.SetOutput_B_MaxHole(v: Cardinal);
 var
   plc:LongInt;
 begin
-  if v = POutput_B_MaxHole then exit;
+  if v = POutput_B_MaxHole then Exit;
 
   POutput_B_MaxHole:=v;
 
@@ -1074,7 +1074,7 @@ procedure TMelsecDriver.SetRegister_D_MaxHole(v: Cardinal);
 var
   plc:LongInt;
 begin
-  if v = PRegisters_D_MaxHole then exit;
+  if v = PRegisters_D_MaxHole then Exit;
 
   PRegisters_D_MaxHole:=v;
 
@@ -1086,7 +1086,7 @@ procedure TMelsecDriver.SetRegister_SD_MaxHole(v: Cardinal);
 var
   plc:LongInt;
 begin
-  if v = PRegisters_SD_MaxHole then exit;
+  if v = PRegisters_SD_MaxHole then Exit;
 
   PRegisters_SD_MaxHole:=v;
 
@@ -1130,7 +1130,7 @@ begin
 
 
   //retorna o tamanho em bits dos registradores lidos/escritos por
-  //cada tipo de função de leitura/escrita
+  //cada tipo de funï¿½ï¿½o de leitura/escrita
   //
   //return the size in bits of the tag
   case FunctionCode of
@@ -1149,8 +1149,8 @@ end;
 
 procedure SetTagBuilderToolForMelsecProtocolFamily(TagBuilderTool:TOpenTagEditor);
 begin
-  if assigned(MelsecTagBuilderEditor) then
-    raise Exception.Create('A Tag Builder editor for MC protocol family was already assigned.')
+  if Assigned(MelsecTagBuilderEditor) then
+    raise Exception.Create('A Tag Builder editor for MC protocol family was already Assigned.')
   else
     MelsecTagBuilderEditor:=TagBuilderTool;
 end;

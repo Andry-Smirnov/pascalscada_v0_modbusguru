@@ -5,7 +5,7 @@ unit hmi_tachart_tag_source_list;
 interface
 
 uses
-  Classes, SysUtils, math, TACustomSource;
+  Classes, SysUtils, Math, TACustomSource;
 
 type
 
@@ -52,7 +52,7 @@ end;
 //var
 //  i: Integer;
 //begin
-//  if AValue = FXCount then exit;
+//  if AValue = FXCount then Exit;
 //  FXCount := AValue;
 //  for i := 0 to Count - 1 do
 //    SetLength(Item[i]^.XList, Max(FXCount - 1, 0));
@@ -62,7 +62,7 @@ procedure THMITaChartTagValuesSource.SetYCount(AValue: Cardinal);
 var
   i: Integer;
 begin
-  if AValue = FYCount then exit;
+  if AValue = FYCount then Exit;
   FYCount := AValue;
   for i := 0 to Count - 1 do
     SetLength(Item[i]^.YList, Max(FYCount - 1, 0));
@@ -84,13 +84,13 @@ begin
   //FExtent := EmptyExtent;
   //FExtentIsValid := true;
   FValuesTotal := 0;
-  FValuesTotalIsValid := true;
+  FValuesTotalIsValid := True;
 end;
 
 constructor THMITaChartTagValuesSource.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FData:=TFPList.Create;
+  FData := TFPList.Create;
 end;
 
 destructor THMITaChartTagValuesSource.Destroy;
@@ -101,4 +101,3 @@ begin
 end;
 
 end.
-

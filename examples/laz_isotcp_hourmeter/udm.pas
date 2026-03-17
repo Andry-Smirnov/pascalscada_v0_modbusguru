@@ -138,7 +138,7 @@ begin
       state:=Value;
     end
   else
-    exit;
+    Exit;
 
   agora:=FormatDateTime('yyyy-mm-dd hh:nn:ss',Now);
   with dmdb.SQLiteConnection do begin
@@ -160,7 +160,7 @@ begin
       state:=Value;
     end
   else
-    exit;
+    Exit;
 
   agora:=FormatDateTime('yyyy-mm-dd hh:nn:ss',Now);
   with dmdb.SQLiteConnection do begin

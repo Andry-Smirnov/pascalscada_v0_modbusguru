@@ -62,7 +62,7 @@ begin
   begin
     setlength(result,1);
     result[0] := str;
-    exit;
+    Exit;
   end;
   while cc+1 < limit do
   begin

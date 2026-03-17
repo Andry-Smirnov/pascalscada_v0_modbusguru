@@ -17,7 +17,11 @@ unit HMIScrollBar;
 interface
 
 uses
-  Classes, SysUtils, {$IFDEF FPC}LResources, {$ENDIF} Controls, Graphics,
+  Classes, SysUtils,
+  {$IFDEF FPC}
+LResources,
+  {$ENDIF}
+  Controls, Graphics,
   Dialogs, StdCtrls, HMITypes, PLCTag, ProtocolTypes, Tag;
 
 type
@@ -34,43 +38,42 @@ type
   }
   {$ENDIF}
   THMIScrollBar = class(TScrollBar, IHMIInterface)
-  private 
-    FRegInSecMan:Boolean;
-    FTag:TPLCTag;
-    FIsEnabled,
-    FIsEnabledBySecurity:Boolean;
-    FUpdateOnMove:Boolean;
-    FBusy:Boolean;
-    FCmdCount:LongInt;
-    FLastPosition:LongInt;
+  private
+    FRegInSecMan: Boolean;
+    FTag: TPLCTag;
+    FIsEnabled, FIsEnabledBySecurity: Boolean;
+    FUpdateOnMove: Boolean;
+    FBusy: Boolean;
+    FCmdCount: Longint;
+    FLastPosition: Longint;
 
-    FSecurityCode:UTF8String;
-    procedure SetSecurityCode(sc:UTF8String);
+    FSecurityCode: UTF8String;
+    procedure SetSecurityCode(sc: UTF8String);
 
     //: @seealso(IHMIInterface.SetHMITag)
-    procedure SetHMITag(t:TPLCTag);                    //seta um tag
+    procedure SetHMITag(t: TPLCTag);                    //seta um tag
     //: @seealso(IHMIInterface.GetHMITag)
-    function  GetHMITag:TPLCTag;
+    function GetHMITag: TPLCTag;
 
     //: @seealso(IHMIInterface.GetControlSecurityCode)
-     function GetControlSecurityCode:UTF8String;
+    function GetControlSecurityCode: UTF8String;
     //: @seealso(IHMIInterface.CanBeAccessed)
-    procedure CanBeAccessed(a:Boolean);
+    procedure CanBeAccessed(a: Boolean);
     //: @seealso(IHMIInterface.MakeUnsecure)
     procedure MakeUnsecure;
 
-    procedure WriteValue(Value:LongInt);
+    procedure WriteValue(Value: Longint);
 
-    procedure WriteFaultCallBack(Sender:TObject);
-    procedure TagChangeCallBack(Sender:TObject);
-    procedure RemoveTagCallBack(Sender:TObject);
+    procedure WriteFaultCallBack(Sender: TObject);
+    procedure TagChangeCallBack(Sender: TObject);
+    procedure RemoveTagCallBack(Sender: TObject);
   protected
     //: @exclude
-     procedure SetEnabled(e:Boolean); override;
+    procedure SetEnabled(e: Boolean); override;
     //: @exclude
-    procedure Scroll(ScrollCode: TScrollCode; var ScrollPos: LongInt); override;
+    procedure Scroll(ScrollCode: TScrollCode; var ScrollPos: Longint); override;
     {$IF (not defined(WIN32)) and (not defined(WIN64))}
-    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: LongInt); override;
+    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Longint); override;
     {$IFEND}
     procedure Loaded; override;
   public
@@ -81,7 +84,7 @@ type
     procedure RefreshScrollBar(Data: PtrInt);
   published
     //: @exclude
-    property Enabled:Boolean read FIsEnabled write SetEnabled;
+    property Enabled: Boolean read FIsEnabled write SetEnabled;
 
     {$IFDEF PORTUGUES}
     {:
@@ -100,7 +103,7 @@ type
     @seealso(TPLCStructItem)
     }
     {$ENDIF}
-    property PLCTag:TPLCTag read GetHMITag write SetHMITag;
+    property PLCTag: TPLCTag read GetHMITag write SetHMITag;
 
     {$IFDEF PORTUGUES}
     {:
@@ -113,14 +116,14 @@ type
     If @false write its value only when the scroll is released.
     }
     {$ENDIF}
-    property UpdateOnMove:Boolean read FUpdateOnMove write FUpdateOnMove default false;
+    property UpdateOnMove: Boolean read FUpdateOnMove write FUpdateOnMove default False;
 
     {$IFDEF PORTUGUES}
     //: Codigo de segurança que libera acesso ao controle
     {$ELSE}
     //: Security code that allows access to control.
     {$ENDIF}
-    property SecurityCode:UTF8String read FSecurityCode write SetSecurityCode;
+    property SecurityCode: UTF8String read FSecurityCode write SetSecurityCode;
   end;
 
 implementation
@@ -130,36 +133,39 @@ uses hsstrings, ControlSecurityManager, Forms;
 constructor THMIScrollBar.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FRegInSecMan:=GetControlSecurityManager.RegisterControl(Self as IHMIInterface);
-  if not FRegInSecMan then begin
+  FRegInSecMan := GetControlSecurityManager.RegisterControl(Self as IHMIInterface);
+  if not FRegInSecMan then
+  begin
     {$IFNDEF WINDOWS}
-    writeln('FIX-ME: Failed to register class ',ClassName,' instace with name="',Name,'" in the ControlSecurityManager?',{$i %FILE%},':',{$i %LINE%});
+    writeln('FIX-ME: Failed to register class ', ClassName, ' instace with name="', Name, '" in the ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
     {$ENDIF}
   end;
-  FIsEnabled:=true;
+  FIsEnabled := True;
 end;
 
 destructor THMIScrollBar.Destroy;
 begin
   if FRegInSecMan then
     GetControlSecurityManager.UnRegisterControl(Self as IHMIInterface)
-  else begin
+  else
+  begin
     {$IFNDEF WINDOWS}
-    writeln('FIX-ME: Why class ',ClassName,', instace name="',Name,'" ins''t registered in ControlSecurityManager?',{$i %FILE%},':',{$i %LINE%});
+    writeln('FIX-ME: Why class ', ClassName, ', instace name="', Name, '" ins''t registered in ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
     {$ENDIF}
   end;
 
   Application.RemoveAsyncCalls(Self);
-  if FTag<>nil then
+  if FTag <> nil then
     FTag.RemoveAllHandlersFromObject(Self);
   inherited Destroy;
 end;
 
 procedure THMIScrollBar.RefreshScrollBar(Data: PtrInt);
 begin
-  if [csReading,csLoading,csDestroying]*ComponentState<>[] then exit;
-  if not FBusy then begin
-    if (FTag=nil) then exit;
+  if [csReading, csLoading, csDestroying] * ComponentState <> [] then Exit;
+  if not FBusy then
+  begin
+    if (FTag = nil) then Exit;
 
     if Supports(FTag, ITagNumeric) then
       Position := Trunc((FTag as ITagNumeric).Value);
@@ -168,10 +174,11 @@ end;
 
 procedure THMIScrollBar.SetSecurityCode(sc: UTF8String);
 begin
-  if Trim(sc)='' then
-    Self.CanBeAccessed(true)
+  if Trim(sc) = '' then
+    Self.CanBeAccessed(True)
   else
-    with GetControlSecurityManager do begin
+    with GetControlSecurityManager do
+    begin
       ValidateSecurityCode(sc);
       if not SecurityCodeExists(sc) then
         RegisterSecurityCode(sc);
@@ -179,46 +186,48 @@ begin
       Self.CanBeAccessed(CanAccess(sc));
     end;
 
-  FSecurityCode:=sc;
+  FSecurityCode := sc;
 end;
 
-procedure THMIScrollBar.SetHMITag(t:TPLCTag);
+procedure THMIScrollBar.SetHMITag(t: TPLCTag);
 begin
-   //se o tag esta entre um dos aceitos.
-   //
-   //check if the tag is valid (only numeric tags);
-   if (t<>nil) and (not Supports(t, ITagNumeric)) then
-      raise Exception.Create(SonlyNumericTags);
+  //se o tag esta entre um dos aceitos.
 
-   //se ja estou associado a um tag, remove
-   //removes the old link.
-   if FTag<>nil then begin
-      FTag.RemoveAllHandlersFromObject(Self);
-   end;
+  //check if the tag is valid (only numeric tags);
+  if (t <> nil) and (not Supports(t, ITagNumeric)) then
+    raise Exception.Create(SonlyNumericTags);
 
-   //adiona o callback para o novo tag
-   //link with the new tag.
-   if t<>nil then begin
-      t.AddWriteFaultHandler(@WriteFaultCallBack);
-      t.AddTagChangeHandler(@TagChangeCallBack);
-      t.AddRemoveTagHandler(@RemoveTagCallBack);
-      FTag := t;
-      RefreshScrollBar(0);
-   end;
-   FTag := t;
+  //se ja estou associado a um tag, remove
+  //removes the old link.
+  if FTag <> nil then
+  begin
+    FTag.RemoveAllHandlersFromObject(Self);
+  end;
+
+  //adiona o callback para o novo tag
+  //link with the new tag.
+  if t <> nil then
+  begin
+    t.AddWriteFaultHandler(@WriteFaultCallBack);
+    t.AddTagChangeHandler(@TagChangeCallBack);
+    t.AddRemoveTagHandler(@RemoveTagCallBack);
+    FTag := t;
+    RefreshScrollBar(0);
+  end;
+  FTag := t;
 end;
 
-function  THMIScrollBar.GetHMITag:TPLCTag;
+function THMIScrollBar.GetHMITag: TPLCTag;
 begin
-   Result:=FTag;
+  Result := FTag;
 end;
 
 function THMIScrollBar.GetControlSecurityCode: UTF8String;
 begin
-   Result:=FSecurityCode;
+  Result := FSecurityCode;
 end;
 
-procedure THMIScrollBar.CanBeAccessed(a:Boolean);
+procedure THMIScrollBar.CanBeAccessed(a: Boolean);
 begin
   FIsEnabledBySecurity := a;
   SetEnabled(FIsEnabled);
@@ -226,48 +235,52 @@ end;
 
 procedure THMIScrollBar.MakeUnsecure;
 begin
-  FSecurityCode:='';
-  CanBeAccessed(true);
+  FSecurityCode := '';
+  CanBeAccessed(True);
 end;
 
-procedure THMIScrollBar.SetEnabled(e:Boolean);
+procedure THMIScrollBar.SetEnabled(e: Boolean);
 begin
-  FIsEnabled:=e;
+  FIsEnabled := e;
   inherited SetEnabled(FIsEnabled and FIsEnabledBySecurity);
 end;
 
-procedure THMIScrollBar.Scroll(ScrollCode: TScrollCode; var ScrollPos: LongInt);
+procedure THMIScrollBar.Scroll(ScrollCode: TScrollCode; var ScrollPos: Longint);
 var
-   WriteFlag:Boolean;
+  WriteFlag: Boolean;
 begin
-   WriteFlag:=false;
-   Try
-      FLastPosition:=ScrollPos;
+  WriteFlag := False;
+  try
+    FLastPosition := ScrollPos;
 
-      if (ScrollCode=scEndScroll) then begin
-         {$IF defined(WIN32) or defined(WIN64)}
+    if (ScrollCode = scEndScroll) then
+    begin
+      {$IF defined(WIN32) or defined(WIN64)}
          FBusy:=false;
          FCmdCount:=0;
          WriteFlag:=true;
-         {$IFEND}
-      end else begin
-         inc(FCmdCount);
-         if FCmdCount>5 then begin
-            if FUpdateOnMove then
-               WriteFlag:=true;
-            FCmdCount:=0;
-         end;
+      {$IFEND}
+    end
+    else
+    begin
+      Inc(FCmdCount);
+      if FCmdCount > 5 then
+      begin
+        if FUpdateOnMove then
+          WriteFlag := True;
+        FCmdCount := 0;
       end;
-      if WriteFlag then
-         WriteValue(ScrollPos);
-      
-   finally
-      inherited Scroll(ScrollCode, ScrollPos);
-   end;
+    end;
+    if WriteFlag then
+      WriteValue(ScrollPos);
+
+  finally
+    inherited Scroll(ScrollCode, ScrollPos);
+  end;
 end;
 
 {$IF (not defined(WIN32)) and (not defined(WIN64))}
-procedure THMIScrollBar.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: LongInt);
+procedure THMIScrollBar.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Longint);
 begin
   try
     WriteValue(FLastPosition);
@@ -284,12 +297,12 @@ begin
   TagChangeCallBack(Self);
 end;
 
-procedure THMIScrollBar.WriteValue(Value:LongInt);
+procedure THMIScrollBar.WriteValue(Value: Longint);
 begin
-   if (FTag=nil)  then exit;
+  if (FTag = nil) then Exit;
 
-   if Supports(FTag, ITagNumeric) then
-      (FTag as ITagNumeric).Value:=Value;
+  if Supports(FTag, ITagNumeric) then
+    (FTag as ITagNumeric).Value := Value;
 end;
 
 procedure THMIScrollBar.WriteFaultCallBack(Sender: TObject);
@@ -299,13 +312,13 @@ end;
 
 procedure THMIScrollBar.TagChangeCallBack(Sender: TObject);
 begin
-  if Application.Flags*[AppDoNotCallAsyncQueue]=[] then
-    application.QueueAsyncCall(@RefreshScrollBar,0);
+  if Application.Flags * [AppDoNotCallAsyncQueue] = [] then
+    Application.QueueAsyncCall(@RefreshScrollBar, 0);
 end;
 
 procedure THMIScrollBar.RemoveTagCallBack(Sender: TObject);
 begin
-  if FTag=Sender then
+  if FTag = Sender then
     FTag := nil;
 end;
 

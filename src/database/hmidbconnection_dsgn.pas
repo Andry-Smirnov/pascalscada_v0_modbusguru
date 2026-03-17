@@ -41,43 +41,46 @@ type
 
 implementation
 
-uses HMIDBConnection;
+uses
+  HMIDBConnection;
 
-//##############################################################################
-//EDITORES DE PROPRIEDADES DA CLASSE THMIDBCONNECTION
-//PROPERTY EDITORS OF THE CLASS THMIDBCONNECTION
-//##############################################################################
+  //##############################################################################
+  //EDITORES DE PROPRIEDADES DA CLASSE THMIDBCONNECTION
+  //PROPERTY EDITORS OF THE CLASS THMIDBCONNECTION
+  //##############################################################################
 
-function THMIDBDatabasePropertyEditor.GetZComponent:TPersistent;
+function THMIDBDatabasePropertyEditor.GetZComponent: TPersistent;
 begin
-  Result:=GetComponent(0);
+  Result := GetComponent(0);
   if (Result is THMIDBConnection) and Supports(Result, IHMIDBConnection) then
-    Result:=(THMIDBConnection(Result) as IHMIDBConnection).GetSyncConnection;
+    Result := (THMIDBConnection(Result) as IHMIDBConnection).GetSyncConnection;
 end;
 
-function THMIDBCatalogPropertyEditor.GetZComponent:TPersistent;
+function THMIDBCatalogPropertyEditor.GetZComponent: TPersistent;
 begin
-  Result:=GetComponent(0);
+  Result := GetComponent(0);
   if (Result is THMIDBConnection) and Supports(Result, IHMIDBConnection) then
-    Result:=(THMIDBConnection(Result) as IHMIDBConnection).GetSyncConnection;
+    Result := (THMIDBConnection(Result) as IHMIDBConnection).GetSyncConnection;
 end;
 
 var
-  SupportedDBDrivers:array[0..3] of string = ('postgresql','sqlite','mysql','firebird');
+  SupportedDBDrivers: array[0..3] of string = ('postgresql', 'sqlite', 'mysql', 'firebird');
 
 //only accepted drivers are show.
 procedure THMIDBProtocolPropertyEditor.GetValueList(List: TStrings);
 var
-  i, s:LongInt;
-  found:Boolean;
+  i, s: Longint;
+  found: Boolean;
 begin
   inherited GetValueList(List);
-  for i:=List.Count-1 downto 0 do begin
-    found:=false;
-    for s:=0 to High(SupportedDBDrivers) do
-      if pos(SupportedDBDrivers[s], List.Strings[i])<>0 then begin
-        found:=true;
-        break;
+  for i := List.Count - 1 downto 0 do
+  begin
+    found := False;
+    for s := 0 to High(SupportedDBDrivers) do
+      if pos(SupportedDBDrivers[s], List.Strings[i]) <> 0 then
+      begin
+        found := True;
+        Break;
       end;
     if not found then
       List.Delete(i);
@@ -85,4 +88,3 @@ begin
 end;
 
 end.
-

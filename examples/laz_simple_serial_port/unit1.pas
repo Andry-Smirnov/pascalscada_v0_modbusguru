@@ -41,7 +41,7 @@ begin
     SerialPortDriver1.COMPort:='ttyUSB0'; //troque conforme necessário
   except
     showmessage('Porta não existe, abortando!');
-    exit;
+    Exit;
   end;
 
   SerialPortDriver1.BaudRate:=br19200;  //troque conforme necessário
@@ -56,7 +56,7 @@ begin
     SerialPortDriver1.Active:=true;  //ative
   except
     showmessage('Falha abrindo a porta serial! Provavelmente ela está em uso por outro processo');
-    exit;
+    Exit;
   end;
 
   if (Application.Flags*[AppDoNotCallAsyncQueue])=[] then begin

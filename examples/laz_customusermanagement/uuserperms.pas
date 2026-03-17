@@ -111,10 +111,10 @@ var
   i, sChecked, sUnchecked: Integer;
 begin
   //verificações...
-  if (Key<>VK_SPACE) or (Shift<>[]) then exit;
-  if CheckListBox1.Selected=nil then exit;
-  if CheckListBox1.Selected.Data=nil then exit;
-  if not (TObject(CheckListBox1.Selected.Data) is TNamedIntegerList) then exit;
+  if (Key<>VK_SPACE) or (Shift<>[]) then Exit;
+  if CheckListBox1.Selected=nil then Exit;
+  if CheckListBox1.Selected.Data=nil then Exit;
+  if not (TObject(CheckListBox1.Selected.Data) is TNamedIntegerList) then Exit;
   if GetControlSecurityManager.CanAccess(TNamedIntegerList(CheckListBox1.Selected.Data).Listname)=False
   then raise Exception.Create('Você não pode conceder esta permissão.');
 
@@ -152,7 +152,7 @@ begin
         end;
       end;
       3: ChangeAuth(CheckListBox1.Selected, CheckListBox1.Selected.StateIndex=0, true);
-      else exit;
+      else Exit;
     end;
   end else begin
     ChangeAuth(CheckListBox1.Selected,
@@ -210,7 +210,7 @@ end;
 
 procedure TfrmUserPerms.PopupMenu1CloseDoNothing(Sender: TObject);
 begin
-  exit;
+  Exit;
 end;
 
 procedure TfrmUserPerms.ChangeAuth(auth: TTreeNode; Check, IncludeChildItems: Boolean);
@@ -227,7 +227,7 @@ procedure TfrmUserPerms.UpdateParents(auth: TTreeNode);
 var
   CheckCount, GrayCount, UnCheckCount, i: Integer;
 begin
-  if auth.Parent=nil then exit;
+  if auth.Parent=nil then Exit;
   CheckCount := 0;
   GrayCount := 0;
   UnCheckCount := 0;

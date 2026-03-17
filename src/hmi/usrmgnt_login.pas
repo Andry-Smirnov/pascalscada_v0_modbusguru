@@ -6,7 +6,10 @@ unit usrmgnt_login;
 interface
 
 uses
-  {$IFDEF FPC}LCLIntf, LResources,{$ENDIF} Forms, StdCtrls, Buttons, ExtCtrls, Classes;
+  {$IFDEF FPC}
+LCLIntf, LResources,
+  {$ENDIF}
+  Forms, StdCtrls, Buttons, ExtCtrls, Classes;
 
 type
 
@@ -28,13 +31,13 @@ type
     Panel3: TPanel;
     procedure FormShow(Sender: TObject);
   private
-    FFocusControl:TFocusedControl;
+    FFocusControl: TFocusedControl;
   public
-    ChipCardCode:UTF8String;
+    ChipCardCode: UTF8String;
     procedure EnableEntry;
     procedure DisableEntry;
   published
-    property FocusControl:TFocusedControl read FFocusControl write FFocusControl;
+    property FocusControl: TFocusedControl read FFocusControl write FFocusControl;
   end;
 
 var
@@ -47,7 +50,8 @@ implementation
     {$R usrmgnt_login.lfm}
   {$IFEND}
 {$ELSE}
-  {$R *.dfm}
+{$R *.dfm}
+
 {$ENDIF}
 
 { TpsHMIfrmUserAuthentication }
@@ -62,19 +66,19 @@ end;
 
 procedure TpsHMIfrmUserAuthentication.EnableEntry;
 begin
-  edtPassword.Enabled:=true;
-  edtusername.Enabled:=true;
-  btnCancel.Enabled:=true;
-  btnOk.Enabled:=true;
+  edtPassword.Enabled := True;
+  edtusername.Enabled := True;
+  btnCancel.Enabled := True;
+  btnOk.Enabled := True;
   FormShow(Self);
 end;
 
 procedure TpsHMIfrmUserAuthentication.DisableEntry;
 begin
-  edtPassword.Enabled:=false;
-  edtusername.Enabled:=false;
-  btnCancel.Enabled:=false;
-  btnOk.Enabled:=false;
+  edtPassword.Enabled := False;
+  edtusername.Enabled := False;
+  btnCancel.Enabled := False;
+  btnOk.Enabled := False;
 end;
 
 {$IFDEF FPC}

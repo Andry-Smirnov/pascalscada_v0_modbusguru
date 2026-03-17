@@ -248,7 +248,7 @@ var
 begin
   //try
     Result := false;
-    if Length(pkg)<2 then exit;
+    if Length(pkg)<2 then Exit;
     sum :=0;
     h:=High(pkg);
     for c:=0 to h-1 do
@@ -265,7 +265,7 @@ var
   c,h:LongInt;
   sum:cardinal;
 begin
-  if Length(pkg)<2 then exit;
+  if Length(pkg)<2 then Exit;
   sum :=0;
   h:=High(pkg);
   for c:=0 to h-1 do
@@ -285,8 +285,8 @@ begin
   valido := false;
 
   with TPLCTagNumber(TagObj) do begin
-    if not (PLCStation in [0..255]) then exit;
-    if not (MemAddress in [0,96,168,200..205,247]) then exit;
+    if not (PLCStation in [0..255]) then Exit;
+    if not (MemAddress in [0,96,168,200..205,247]) then Exit;
 
     valido:=true;
 
@@ -411,8 +411,8 @@ begin
     Raise Exception.Create(SinvalidTag);
 
   with TagObj as TPLCTagNumber do begin
-    if not (PLCStation in [0..255]) then exit;
-    if not (MemAddress in [0,96,168,200..205,247]) then exit;
+    if not (PLCStation in [0..255]) then Exit;
+    if not (MemAddress in [0,96,168,200..205,247]) then Exit;
 
     h:=High(PStations);
     for plc := 0 to h do
@@ -421,7 +421,7 @@ begin
         break;
       end;
 
-    if not found then exit;
+    if not found then Exit;
 
     case MemAddress of
       0:
@@ -548,19 +548,19 @@ begin
   if not (tagrec.Station in [0..255]) then begin
     values.LastQueryResult := ioIllegalStationAddress;
     values.ValuesTimestamp :=CrossNow;
-    exit;
+    Exit;
   end;
 
   if not (tagrec.Address in [0,96,168,200..205,247]) then begin
     values.LastQueryResult := ioIllegalRegAddress;
     values.ValuesTimestamp :=CrossNow;
-    exit;
+    Exit;
   end;
 
   if (Tagrec.Address in [200..202]) and (not (Tagrec.SubElement in [0..16])) then begin
     values.LastQueryResult := ioIllegalRegAddress;
     values.ValuesTimestamp :=CrossNow;
-    exit;
+    Exit;
   end;
 
   found := false;
@@ -573,7 +573,7 @@ begin
   if not found then begin
     values.LastQueryResult:=ioDriverError;
     values.ValuesTimestamp :=CrossNow;
-    exit;
+    Exit;
   end;
 
   SetLength(values.Values,1);
@@ -678,17 +678,17 @@ var
 begin
   if not (tagrec.Station in [0..255]) then begin
     Result := ioIllegalStationAddress;
-    exit;
+    Exit;
   end;
 
   if not (tagrec.Address in [0,96,168,200..205,247]) then begin
     Result := ioIllegalRegAddress;
-    exit;
+    Exit;
   end;
 
   if (Tagrec.Address in [200..202]) and (not (Tagrec.SubElement in [0..16])) then begin
     Result := ioIllegalRegAddress;
-    exit;
+    Exit;
   end;
 
   found := false;
@@ -702,7 +702,7 @@ begin
   try
     if PCommPort=nil then begin
       Result := ioNullDriver;
-      exit;
+      Exit;
     end;
 
     SetLength(pkg,4);
@@ -716,24 +716,24 @@ begin
       96: begin
         if PCommPort.IOCommandSync(iocWriteRead,4,pkg,4,PDriverID,5,@cmdpkg)=0 then begin
           Result:=ioDriverError;
-          exit;
+          Exit;
         end;
 
         if not CheckSumOk(cmdpkg.BufferToRead) then begin
           Result := ioCommError;
-          exit;
+          Exit;
         end;
 
         if (cmdpkg.BufferToRead[0]<>cmdpkg.BufferToWrite[0]) or
            (cmdpkg.BufferToRead[0]<>tagrec.Station) then begin
           Result := ioCommError;
-          exit;
+          Exit;
         end;
 
         if (cmdpkg.BufferToRead[1]<>cmdpkg.BufferToWrite[2]) or
            (cmdpkg.BufferToRead[1]<>tagrec.Address) then begin
           Result := ioCommError;
-          exit;
+          Exit;
         end;
 
         values[0]:= cmdpkg.BufferToRead[2]/2;
@@ -748,24 +748,24 @@ begin
       168: begin
         if PCommPort.IOCommandSync(iocWriteRead,4,pkg,5,PDriverID,5,@cmdpkg)=0 then begin
           Result:=ioDriverError;
-          exit;
+          Exit;
         end;
 
         if not CheckSumOk(cmdpkg.BufferToRead) then begin
           Result := ioCommError;
-          exit;
+          Exit;
         end;
 
         if (cmdpkg.BufferToRead[0]<>cmdpkg.BufferToWrite[0]) or
            (cmdpkg.BufferToRead[0]<>tagrec.Station) then begin
           Result := ioCommError;
-          exit;
+          Exit;
         end;
 
         if (cmdpkg.BufferToRead[1]<>cmdpkg.BufferToWrite[2]) or
            (cmdpkg.BufferToRead[1]<>tagrec.Address) then begin
           Result := ioCommError;
-          exit;
+          Exit;
         end;
 
         Values[0] := (cmdpkg.BufferToRead[2]*256 + cmdpkg.BufferToRead[3])/20;
@@ -797,19 +797,19 @@ begin
         PCommPort.Lock(PDriverID);
         if PCommPort.IOCommandSync(iocWriteRead,4,pkg,5,PDriverID,5,@cmdpkg)=0 then begin
           Result:=ioDriverError;
-          exit;
+          Exit;
         end;
 
         if (cmdpkg.BufferToRead[0]<>cmdpkg.BufferToWrite[0]) or
            (cmdpkg.BufferToRead[0]<>tagrec.Station) then begin
           Result := ioCommError;
-          exit;
+          Exit;
         end;
 
         if (cmdpkg.BufferToRead[1]<>cmdpkg.BufferToWrite[2]) or
            (cmdpkg.BufferToRead[1]<>tagrec.Address) then begin
           Result := ioCommError;
-          exit;
+          Exit;
         end;
 
         //se chegou até aqui, a requisição aparentemente está ok
@@ -827,7 +827,7 @@ begin
         //de comunicação.
         if (cmdpkg.BufferToRead[3+offset] and 1)=1 then begin
           Result := ioCommError;
-          exit;
+          Exit;
         end;
 
         //offset tbm diz se é necessario
@@ -864,14 +864,14 @@ begin
 
           if PCommPort.IOCommandSync(iocRead,0,nil,bytesRemaim,PDriverID,5,@cmdpkg)=0 then begin
             Result:=ioDriverError;
-            exit;
+            Exit;
           end;
 
           pkgtotal:=ConcatenateBYTES(pkg,cmdpkg.BufferToRead);
 
           if not CheckSumOk(pkgtotal) then begin
             Result := ioCommError;
-            exit;
+            Exit;
           end;
 
           //o trem comeca da pos 4 + offset...
@@ -968,24 +968,24 @@ begin
       204, 205: begin
         if PCommPort.IOCommandSync(iocWriteRead,4,pkg,4,PDriverID,5,@cmdpkg)=0 then begin
           Result:=ioDriverError;
-          exit;
+          Exit;
         end;
 
         if not CheckSumOk(cmdpkg.BufferToRead) then begin
           Result := ioCommError;
-          exit;
+          Exit;
         end;
 
         if (cmdpkg.BufferToRead[0]<>cmdpkg.BufferToWrite[0]) or
            (cmdpkg.BufferToRead[0]<>tagrec.Station) then begin
           Result := ioCommError;
-          exit;
+          Exit;
         end;
 
         if (cmdpkg.BufferToRead[1]<>cmdpkg.BufferToWrite[2]) or
            (cmdpkg.BufferToRead[1]<>tagrec.Address) then begin
           Result := ioCommError;
-          exit;
+          Exit;
         end;
 
         Values[0]:= cmdpkg.BufferToRead[2];
@@ -1007,24 +1007,24 @@ begin
       247: begin
         if PCommPort.IOCommandSync(iocWriteRead,4,pkg,7,PDriverID,5,@cmdpkg)=0 then begin
           Result:=ioDriverError;
-          exit;
+          Exit;
         end;
 
         if not CheckSumOk(cmdpkg.BufferToRead) then begin
           Result := ioCommError;
-          exit;
+          Exit;
         end;
 
         if (cmdpkg.BufferToRead[0]<>cmdpkg.BufferToWrite[0]) or
            (cmdpkg.BufferToRead[0]<>tagrec.Station) then begin
           Result := ioCommError;
-          exit;
+          Exit;
         end;
 
         if (cmdpkg.BufferToRead[1]<>cmdpkg.BufferToWrite[2]) or
            (cmdpkg.BufferToRead[1]<>tagrec.Address) then begin
           Result := ioCommError;
-          exit;
+          Exit;
         end;
 
         Values[0]:= ((cmdpkg.BufferToRead[2]*16777216) + (cmdpkg.BufferToRead[3]*65536) + (cmdpkg.BufferToRead[4]*256) + cmdpkg.BufferToRead[5])/20;

@@ -26,25 +26,23 @@ type
   Object colletion class item.
   }
   {$ENDIF}
-  TObjectColletionItem = Class(THMIBasicColletionItem)
+  TObjectColletionItem = class(THMIBasicColletionItem)
   private
     FTag: PtrUInt;
   protected
-    FTargetObject,
-    FTargetObjectLoaded: TComponent;
-    FTargetObjectProperty,
-    FTargetObjectPropertyLoaded: AnsiString;
+    FTargetObject, FTargetObjectLoaded: TComponent;
+    FTargetObjectProperty, FTargetObjectPropertyLoaded: Ansistring;
     procedure SetTargetObject(AValue: TComponent);
-    procedure SetTargetObjectProperty(AValue: AnsiString);
+    procedure SetTargetObjectProperty(AValue: Ansistring);
   protected
-    fRequiredTypeName:AnsiString;
-    fRequiredTypeKind:TTypeKind;
-    function AcceptObject(obj:TComponent):Boolean; virtual;
-    function AcceptObjectProperty(PropertyName:AnsiString):Boolean; virtual;
+    fRequiredTypeName: Ansistring;
+    fRequiredTypeKind: TTypeKind;
+    function AcceptObject(obj: TComponent): Boolean; virtual;
+    function AcceptObjectProperty(PropertyName: Ansistring): Boolean; virtual;
   published
-    property Tag:PtrUInt read FTag write FTag;
-    property TargetObject:TComponent read FTargetObject write SetTargetObject;
-    property TargetObjectProperty:AnsiString read FTargetObjectProperty write SetTargetObjectProperty;
+    property Tag: PtrUInt read FTag write FTag;
+    property TargetObject: TComponent read FTargetObject write SetTargetObject;
+    property TargetObjectProperty: Ansistring read FTargetObjectProperty write SetTargetObjectProperty;
   public
     procedure Loaded; override;
     constructor Create(ACollection: TCollection); override;
@@ -58,60 +56,66 @@ implementation
 
 procedure TObjectColletionItem.SetTargetObject(AValue: TComponent);
 begin
-  if [csReading,csLoading]*THMIBasicColletion(Collection).CollectionState<>[] then begin
-    FTargetObjectLoaded:=AValue;
-    exit;
+  if [csReading, csLoading] * THMIBasicColletion(Collection).CollectionState <> [] then
+  begin
+    FTargetObjectLoaded := AValue;
+    Exit;
   end;
 
-  if FTargetObject=AValue    then Exit;
-  if AValue=Collection.Owner then exit;
+  if FTargetObject = AValue then Exit;
+  if AValue = Collection.Owner then Exit;
 
-  if AValue=nil then begin
-    if assigned(FTargetObject) then
+  if AValue = nil then
+  begin
+    if Assigned(FTargetObject) then
       FTargetObject.RemoveFreeNotification(TComponent(Collection.Owner));
-    FTargetObject:=nil;
-    FTargetObjectProperty:='';
-    exit;
+    FTargetObject := nil;
+    FTargetObjectProperty := '';
+    Exit;
   end;
 
-  if not AcceptObject(AValue) then exit;
-  FTargetObject:=AValue;
+  if not AcceptObject(AValue) then Exit;
+  FTargetObject := AValue;
   if Collection.Owner is TComponent then
     FTargetObject.FreeNotification(TComponent(Collection.Owner));
 end;
 
-procedure TObjectColletionItem.SetTargetObjectProperty(AValue: AnsiString);
+procedure TObjectColletionItem.SetTargetObjectProperty(AValue: Ansistring);
 begin
-  if [csReading,csLoading]*THMIBasicColletion(Collection).CollectionState<>[] then begin
-    FTargetObjectPropertyLoaded:=AValue;
-    exit;
+  if [csReading, csLoading] * THMIBasicColletion(Collection).CollectionState <> [] then
+  begin
+    FTargetObjectPropertyLoaded := AValue;
+    Exit;
   end;
 
-  if FTargetObjectProperty=AValue     then Exit;
+  if FTargetObjectProperty = AValue then Exit;
 
-  if AValue='' then begin
-    FTargetObjectProperty:='';
-    exit;
+  if AValue = '' then
+  begin
+    FTargetObjectProperty := '';
+    Exit;
   end;
 
-  if not Assigned(FTargetObject)      then exit;
-  if not AcceptObject(FTargetObject)  then exit;
-  if not AcceptObjectProperty(AValue) then exit;
+  if not Assigned(FTargetObject) then Exit;
+  if not AcceptObject(FTargetObject) then Exit;
+  if not AcceptObjectProperty(AValue) then Exit;
 
-  FTargetObjectProperty:=AValue;
+  FTargetObjectProperty := AValue;
 end;
 
 function TObjectColletionItem.AcceptObject(obj: TComponent): Boolean;
 var
-  helper:TPropInfoList;
+  helper: TPropInfoList;
   pidx: Integer;
 begin
-  Result:=false;
-  helper := TPropInfoList.Create(obj,[fRequiredTypeKind]);
+  Result := False;
+  helper := TPropInfoList.Create(obj, [fRequiredTypeKind]);
   try
-    for pidx:=0 to helper.Count-1 do begin
-      if helper.Items[pidx]^.PropType^.Name=fRequiredTypeName then begin
-        Result:=true;
+    for pidx := 0 to helper.Count - 1 do
+    begin
+      if helper.Items[pidx]^.PropType^.Name = fRequiredTypeName then
+      begin
+        Result := True;
         Exit;
       end;
     end;
@@ -120,20 +124,21 @@ begin
   end;
 end;
 
-function TObjectColletionItem.AcceptObjectProperty(PropertyName: AnsiString
-  ): Boolean;
+function TObjectColletionItem.AcceptObjectProperty(PropertyName: Ansistring): Boolean;
 var
-  helper:TPropInfoList;
+  helper: TPropInfoList;
   pidx: Integer;
 begin
-  Result:=false;
-  if FTargetObject=nil then exit;
-  helper := TPropInfoList.Create(FTargetObject,[fRequiredTypeKind]);
+  Result := False;
+  if FTargetObject = nil then Exit;
+  helper := TPropInfoList.Create(FTargetObject, [fRequiredTypeKind]);
   try
-    for pidx:=0 to helper.Count-1 do begin
-      if (lowercase(helper.Items[pidx]^.Name)=LowerCase(PropertyName)) and
-         (helper.Items[pidx]^.PropType^.Name=fRequiredTypeName)  then begin
-        Result:=true;
+    for pidx := 0 to helper.Count - 1 do
+    begin
+      if (LowerCase(helper.Items[pidx]^.Name) = LowerCase(PropertyName)) and
+        (helper.Items[pidx]^.PropType^.Name = fRequiredTypeName) then
+      begin
+        Result := True;
         Exit;
       end;
     end;
@@ -152,8 +157,7 @@ end;
 constructor TObjectColletionItem.Create(ACollection: TCollection);
 begin
   inherited Create(ACollection);
-  fRequiredTypeName:='';
+  fRequiredTypeName := '';
 end;
 
 end.
-

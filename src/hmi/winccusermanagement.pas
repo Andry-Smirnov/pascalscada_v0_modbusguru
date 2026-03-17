@@ -162,7 +162,7 @@ begin
   newAuthorizationCache:=TStringList.Create;
   try
     ValidFormat:=true;
-    if AValue=nil then exit;
+    if AValue=nil then Exit;
     for l:=0 to AValue.Count-1 do begin
       p:=Pos(':',AValue[l]);
       if p>0 then begin
@@ -260,7 +260,7 @@ end;
 
 function  TWinCCUserManagement.Login: Boolean;
 begin
-  if FInLoginProcess then exit;
+  if FInLoginProcess then Exit;
   FInLoginProcess:=true;
   try
     Result := inherited Login;
@@ -300,7 +300,7 @@ begin
 
   p:=PWRTGetLoginPriority(); //forces a initialization... I don´t know why...
 
-  if not SecurityCodeExists(sc) then exit;
+  if not SecurityCodeExists(sc) then Exit;
 
   auth:=GetRegisteredAccessCodes;
 

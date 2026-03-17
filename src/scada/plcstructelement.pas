@@ -141,7 +141,7 @@ end;
 
 procedure TPLCStructItem.SetBlock(blk:TPLCStruct);
 begin
-  if blk=PLCBlock then exit;
+  if blk=PLCBlock then Exit;
   //se esta setando o bloco
   //if the block is being set
   if (blk<>nil) then begin
@@ -196,7 +196,7 @@ begin
 
     converted_value := PLCValuesToTagValues(data,0);
 
-    if Length(converted_value)<=0 then exit;
+    if Length(converted_value)<=0 then Exit;
 
     notify := (IsNan(converted_value[0]) and (not IsNan(PValueRaw))) or
               ((not IsNan(converted_value[0])) and IsNan(PValueRaw)) or (PValueRaw<>converted_value[0]) ;
@@ -251,7 +251,7 @@ end;
 function TPLCStructItem.GetBlock: TPLCStruct;
 begin
   Result:=nil;
-  if assigned(PBlock) then
+  if Assigned(PBlock) then
     Result:=PBlock as TPLCStruct;
 end;
 

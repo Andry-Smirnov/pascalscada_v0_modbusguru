@@ -329,7 +329,7 @@ procedure TPLCNumber.AsyncNotifyChange(data:Pointer);
 var
   x:PArrayOfDouble;
 begin
-  if not Assigned(POnAsyncValueChange) then exit;
+  if not Assigned(POnAsyncValueChange) then Exit;
   x:=data;
   POnAsyncValueChange(self,x^);
 end;
@@ -390,7 +390,7 @@ procedure TPLCNumber.SetScaleProcessor(sp:TScaleProcessor);
 var
   oldValue: Double;
 begin
-  if sp=PScaleProcessor then exit;
+  if sp=PScaleProcessor then Exit;
   oldValue:=Value;
   if PScaleProcessor<>nil then
     PScaleProcessor.RemoveFreeNotification(self);
@@ -465,13 +465,13 @@ begin
   if Assigned(BitMapperEditor) then
     BitMapperEditor(Self, Self.Owner,InsertHook,CreateProc)
   else
-    raise exception.Create('None bit mapper tool has been assigned!');
+    raise exception.Create('None bit mapper tool has been Assigned!');
 end;
 
 procedure SetTagBitMapper(BitMapperTool:TOpenTagEditor);
 begin
-  if assigned(BitMapperEditor) then
-    raise Exception.Create('A Bit Mapper editor was already assigned.')
+  if Assigned(BitMapperEditor) then
+    raise Exception.Create('A Bit Mapper editor was already Assigned.')
   else
     BitMapperEditor:=BitMapperTool;
 end;

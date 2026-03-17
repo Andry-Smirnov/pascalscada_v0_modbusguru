@@ -124,7 +124,7 @@ begin
   VarDesc[$18]:= 'Proportional band 2 value';
   VarDesc[$19]:= 'PV Offset';
   VarDesc[$1A]:= 'Arithmetic deviation';
-  VarDesc[$1B]:= 'Arithmetic deviation'; // checar estas descrições.
+  VarDesc[$1B]:= 'Arithmetic deviation'; // checar estas descriï¿½ï¿½es.
 
   TagNames[$00]:='WEST%a_SP';
   TagNames[$01]:='WEST%a_PV';
@@ -153,7 +153,7 @@ begin
   TagNames[$18]:='WEST%a_Proportional_band_2_value';
   TagNames[$19]:='WEST%a_PV_Offset';
   TagNames[$1A]:='WEST%a_Arithmetic_deviation1';
-  TagNames[$1B]:='WEST%a_Arithmetic_deviation2'; //_checar_estas_descrições.
+  TagNames[$1B]:='WEST%a_Arithmetic_deviation2'; //_checar_estas_descriï¿½ï¿½es.
 
   ScrollBox1.Visible:=false;
 
@@ -181,7 +181,7 @@ begin
     Variaveis[c].Scan.Height   := 22;
     Variaveis[c].Scan.Width    := 84;
     Variaveis[c].Scan.MinValue := 1; //1 milisegundo
-    Variaveis[c].Scan.MaxValue := 7200000; //2 horas máximo
+    Variaveis[c].Scan.MaxValue := 7200000; //2 horas mï¿½ximo
     Variaveis[c].Scan.Value    := 1000; //1 segundo
   end;
 
@@ -204,14 +204,14 @@ begin
    with Sender as TEdit do begin
      if (trim(Text)='') or (not (Text[1] in ['A'..'Z','a'..'z','_'])) then begin
        Text := OldTagName[Tag];
-       exit;
+       Exit;
      end;
      
      for c := 0 to $1b do
        if Tag<>c then
          if Text=Variaveis[c].TagName.Text then begin
            Text := OldTagName[Tag];
-           exit;
+           Exit;
          end;
    end;
 end;

@@ -62,7 +62,7 @@ begin
   EventIntID:=0;
 
   CreateGUID(EventGUID);
-  exit(true);
+  Exit(true);
 end;
 
 procedure TForm1.THMIEventLogger1NewTagEvent(Sender: TObject;

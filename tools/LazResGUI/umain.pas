@@ -198,7 +198,7 @@ begin
       mrYes:
         MenuItem4Click(Sender);
       mrCancel:
-        exit;
+        Exit;
     end;
 
   FActiveFile:='';
@@ -215,7 +215,7 @@ begin
       mrYes:
         MenuItem4Click(Sender);
       mrCancel:
-        exit;
+        Exit;
     end;
 
   if DlgOpen.Execute then begin
@@ -227,7 +227,7 @@ end;
 procedure TForm1.MenuItem4Click(Sender: TObject);
 begin
    if FActiveFile='' then begin
-     if not DlgSave.Execute then exit;
+     if not DlgSave.Execute then Exit;
      FActiveFile:=DlgSave.FileName;
    end;
    Save(FActiveFile);
@@ -426,7 +426,7 @@ begin
    for r:=1 to StringGrid1.RowCount-1 do
       if FileName=StringGrid1.Rows[r].Strings[4] then begin
          Result := true;
-         exit;
+         Exit;
       end;
 end;
 
@@ -559,7 +559,7 @@ begin
   for c:=0 to High(alist) do
      if aList[c].ResourceName=ResourceName then begin
         Result := true;
-        exit;
+        Exit;
      end;
 end;
 

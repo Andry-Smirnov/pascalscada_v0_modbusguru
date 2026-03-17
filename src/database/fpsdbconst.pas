@@ -28,7 +28,7 @@ Resourcestring
   SDuplicateFieldName      = 'Duplicate fieldname : "%s"';
   SErrAssTransaction       = 'Cannot assign transaction while old transaction active!';
   SErrColumnNotFound       = 'Column "%s" not found.';
-  SErrDatabasenAssigned    = 'Database not assigned!';
+  SErrDatabasenAssigned    = 'Database not Assigned!';
   SErrNoDatabaseAvailable  = 'Invalid operation: Not attached to database';
   SErrNoDatabaseName       = 'Database connect string (DatabaseName) not filled in!';
   SErrNoSelectStatement    = 'Cannot open a non-select statement';

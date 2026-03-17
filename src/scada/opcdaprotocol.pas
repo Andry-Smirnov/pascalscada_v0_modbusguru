@@ -28,13 +28,13 @@ implementation
 
 procedure TOPCDAProtocol.SetHost(const AValue: AnsiString);
 begin
-  if FHost=AValue then exit;
+  if FHost=AValue then Exit;
   FHost:=AValue;
 end;
 
 procedure TOPCDAProtocol.SetServer(const AValue: AnsiString);
 begin
-  if FServer=AValue then exit;
+  if FServer=AValue then Exit;
   FServer:=AValue;
 end;
 

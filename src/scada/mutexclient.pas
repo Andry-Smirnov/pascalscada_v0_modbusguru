@@ -176,11 +176,11 @@ begin
           case serverrequest of
             21: begin
               SetIntoServerMutexBehavior;
-              exit;
+              Exit;
             end;
             20, 30, 31, 32: begin
               SetOutServerMutexBehavior;
-              exit;
+              Exit;
             end;
             253: begin
               ServerHasBeenFinished;
@@ -367,7 +367,7 @@ var
   socketOpen:boolean;
 begin
 
-  if FConnected<>0 then exit;
+  if FConnected<>0 then Exit;
 
   socketOpen:=false;
 
@@ -382,7 +382,7 @@ begin
         if ServerAddr.Addr.s_addr=0 then begin
           //PActive:=false;
           //RefreshLastOSError;
-          exit;
+          Exit;
         end;
       end;
     {$IFEND}
@@ -399,7 +399,7 @@ begin
     if FSocket<0 then begin
       //PActive:=false;
       //RefreshLastOSError;
-      exit;
+      Exit;
     end;
     {$ELSE}
     //WINDOWS
@@ -408,7 +408,7 @@ begin
     if FSocket=INVALID_SOCKET then begin
       //PActive:=false;
       //RefreshLastOSError;
-      exit;
+      Exit;
     end;
     {$IFEND}
 
@@ -459,7 +459,7 @@ begin
     {$IFEND}
 
     if connect_with_timeout(FSocket,@channel,sizeof(channel),2000)<>0 then begin
-      exit;
+      Exit;
     end;
     FConnected:=1;
     FConnectionStatusThread:=TMutexClientThread.Create(true, FSocket);
@@ -501,12 +501,12 @@ procedure TMutexClient.setActive(AValue: Boolean);
 begin
   if [csLoading,csReading]*ComponentState<>[] then begin
     FActiveLoaded:=AValue;
-    exit;
+    Exit;
   end;
 
   if [csDesigning]*ComponentState<>[] then begin
     FActive:=AValue;
-    exit;
+    Exit;
   end;
 
   if AValue then
@@ -539,11 +539,11 @@ begin
   if FActive then
     raise exception.Create(SimpossibleToChangeWhenActive);
 
-  if (FServerHost=trim(AValue)) then exit;
+  if (FServerHost=trim(AValue)) then Exit;
 
   if (trim(AValue)='') then begin
     FServerHost:=trim(AValue);
-    exit;
+    Exit;
   end;
 
   if FServerHost<>AValue then begin
@@ -564,7 +564,7 @@ begin
     if FFCount=4   then goto err;
 
     FServerHost:=AValue;
-    exit;
+    Exit;
   end;
 
 err:
@@ -633,10 +633,10 @@ begin
     if FConnected=0 then
       Connect;
 
-    //if still disconnected, exit.
-    if FConnected=0 then exit;
+    //if still disconnected, Exit.
+    if FConnected=0 then Exit;
 
-    if FConnectionStatusThread=nil then exit;
+    if FConnectionStatusThread=nil then Exit;
 
     PickedTheDefaultBehavior:=false;
     Result:=FConnectionStatusThread.TryEnter;
@@ -652,10 +652,10 @@ begin
     if FConnected=0 then
       Connect;
 
-    //if still disconnected, exit.
-    if FConnected=0 then exit;
+    //if still disconnected, Exit.
+    if FConnected=0 then Exit;
 
-    if FConnectionStatusThread=nil then exit;
+    if FConnectionStatusThread=nil then Exit;
 
     Result:=FConnectionStatusThread.Leave;
   end;

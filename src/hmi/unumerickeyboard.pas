@@ -10,7 +10,10 @@ interface
 
 uses
   SysUtils, Forms, Classes, types, Controls, Buttons, crosskeyevents
-  {$IFDEF FPC}, LResources, LCLIntf, LCLType, ExtCtrls{$ENDIF};
+  {$IFDEF FPC}
+, LResources, LCLIntf, LCLType, ExtCtrls
+  {$ENDIF}
+  ;
 
 type
 
@@ -40,23 +43,22 @@ type
     procedure BtnPress(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
   protected
-    FShowMinus,
-    FShowDecimal:Boolean;
-    FTarget:TWinControl;
-    FFormOwner:TCustomForm;
-    keyboard:TCrossKeyEvents;
-    fStartedAt:TDateTime;
+    FShowMinus, FShowDecimal: Boolean;
+    FTarget: TWinControl;
+    FFormOwner: TCustomForm;
+    Keyboard: TCrossKeyEvents;
+    FStartedAt: TDateTime;
     procedure GotoBetterPosition;
     procedure ReturnFocusToTarget;
     procedure DoClose(var CloseAction: TCloseAction); override;
   public
-    class function CreateOrGetLast(TheOwner: TComponent; Target:TWinControl; ShowMinus, ShowDecimal:Boolean):TpsHMIfrmNumericKeyBoard;
-    constructor Create(TheOwner: TComponent; Target:TWinControl; ShowMinus, ShowDecimal:Boolean); overload;
+    class function CreateOrGetLast(TheOwner: TComponent; Target: TWinControl; ShowMinus, ShowDecimal: Boolean): TpsHMIfrmNumericKeyBoard;
+    constructor Create(TheOwner: TComponent; Target: TWinControl; ShowMinus, ShowDecimal: Boolean); overload;
     destructor Destroy; override;
     procedure ShowAlongsideOfTheTarget;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   published
-    property Target:TWinControl read FTarget;
+    property Target: TWinControl read FTarget;
   end;
 
 var
@@ -64,72 +66,76 @@ var
 
 implementation
 
-uses dateutils, InterfaceBase;
+uses
+  dateutils, InterfaceBase;
 
-{$IFNDEF FPC}
+  {$IFNDEF FPC}
   {$R *.dfm}
-{$ELSE}
+
+  {$ELSE}
   {$IF defined(FPC) AND (FPC_FULLVERSION >= 20400) }
     {$R unumerickeyboard.lfm}
   {$IFEND}
-{$ENDIF}
+  {$ENDIF}
 
 var
   LastNumericKeyBoard: TpsHMIfrmNumericKeyBoard;
 
-constructor TpsHMIfrmNumericKeyBoard.Create(TheOwner: TComponent; Target:TWinControl; ShowMinus, ShowDecimal:Boolean);
+constructor TpsHMIfrmNumericKeyBoard.Create(TheOwner: TComponent; Target: TWinControl; ShowMinus, ShowDecimal: Boolean);
 begin
   inherited Create(TheOwner);
 
   if not Assigned(Target) then
     raise Exception.Create('Nil target!');
 
-  if Assigned(LastNumericKeyBoard) then begin
+  if Assigned(LastNumericKeyBoard) then
+  begin
     FreeAndNil(LastNumericKeyBoard);
   end;
 
-  FShowDecimal:=ShowDecimal;
-  FShowMinus:=ShowMinus;
-  FTarget:=Target;
-  keyboard:=CreateCrossKeyEvents(Target);
-  FormStyle:=fsSystemStayOnTop;
-  Btn_Minus.Visible:=ShowMinus;
-  Btn_DecSeparator.Visible:=ShowDecimal;
+  FShowDecimal := ShowDecimal;
+  FShowMinus := ShowMinus;
+  FTarget := Target;
+  Keyboard := CreateCrossKeyEvents(Target);
+  FormStyle := fsSystemStayOnTop;
+  Btn_Minus.Visible := ShowMinus;
+  Btn_DecSeparator.Visible := ShowDecimal;
 
-  ControlStyle:=ControlStyle+[csNoFocus];
-  FFormOwner:=GetParentForm(Target);
+  ControlStyle := ControlStyle + [csNoFocus];
+  FFormOwner := GetParentForm(Target);
 
-  LastNumericKeyBoard:=Self;
+  LastNumericKeyBoard := Self;
 
   FTarget.FreeNotification(Self);
 end;
 
-class function TpsHMIfrmNumericKeyBoard.CreateOrGetLast(TheOwner: TComponent;
-  Target: TWinControl; ShowMinus, ShowDecimal: Boolean
-  ): TpsHMIfrmNumericKeyBoard;
+class function TpsHMIfrmNumericKeyBoard.CreateOrGetLast(TheOwner: TComponent; Target: TWinControl; ShowMinus, ShowDecimal: Boolean): TpsHMIfrmNumericKeyBoard;
 begin
-  if Assigned(LastNumericKeyBoard) and (LastNumericKeyBoard.FTarget=Target) then begin
-    LastNumericKeyBoard.FShowDecimal:=ShowDecimal;
-    LastNumericKeyBoard.FShowMinus:=ShowMinus;
-    LastNumericKeyBoard.FormStyle:=fsSystemStayOnTop;
-    LastNumericKeyBoard.Btn_Minus.Visible:=ShowMinus;
-    LastNumericKeyBoard.Btn_DecSeparator.Visible:=ShowDecimal;
+  if Assigned(LastNumericKeyBoard) and (LastNumericKeyBoard.FTarget = Target) then
+  begin
+    LastNumericKeyBoard.FShowDecimal := ShowDecimal;
+    LastNumericKeyBoard.FShowMinus := ShowMinus;
+    LastNumericKeyBoard.FormStyle := fsSystemStayOnTop;
+    LastNumericKeyBoard.Btn_Minus.Visible := ShowMinus;
+    LastNumericKeyBoard.Btn_DecSeparator.Visible := ShowDecimal;
 
-    LastNumericKeyBoard.ControlStyle:=LastNumericKeyBoard.ControlStyle+[csNoFocus];
-    LastNumericKeyBoard.FFormOwner:=GetParentForm(Target);
+    LastNumericKeyBoard.ControlStyle := LastNumericKeyBoard.ControlStyle + [csNoFocus];
+    LastNumericKeyBoard.FFormOwner := GetParentForm(Target);
 
-    exit(LastNumericKeyBoard)
-  end else begin
+    Exit(LastNumericKeyBoard);
+  end
+  else
+  begin
     FreeAndNil(LastNumericKeyBoard);
-    exit(TpsHMIfrmNumericKeyBoard.Create(TheOwner, Target, ShowMinus, ShowDecimal));
+    Exit(TpsHMIfrmNumericKeyBoard.Create(TheOwner, Target, ShowMinus, ShowDecimal));
   end;
 end;
 
 destructor TpsHMIfrmNumericKeyBoard.Destroy;
 begin
-  if LastNumericKeyBoard=Self then
-    LastNumericKeyBoard:=nil;
-  keyboard.Destroy;
+  if LastNumericKeyBoard = Self then
+    LastNumericKeyBoard := nil;
+  Keyboard.Destroy;
 
   if Assigned(FTarget) then
     FTarget.RemoveFreeNotification(Self);
@@ -139,39 +145,43 @@ end;
 
 procedure TpsHMIfrmNumericKeyBoard.GotoBetterPosition;
 var
-  sw, sh:Integer;
-  numkeyboard_rect, target_rect: TRect;
+  sw: Integer;
+  sh: Integer;
+  NumKeyRect: TRect;
+  TargetRect: TRect;
 begin
   //auto posicionamento do popup.
   //t_point:=FTarget.ClientOrigin;
-  WidgetSet.GetWindowRect(Target.Handle,target_rect);
-  WidgetSet.GetWindowRect(Self.Handle,numkeyboard_rect);
-  sw:=Screen.Width;
-  sh:=Screen.Height;
+  WidgetSet.GetWindowRect(Target.Handle, TargetRect);
+  WidgetSet.GetWindowRect(Self.Handle, NumKeyRect);
+  sw := Screen.Width;
+  sh := Screen.Height;
 
-  if (target_rect.Top+(numkeyboard_rect.Bottom-numkeyboard_rect.Top)+FTarget.Height)<=sh then
-    Top:=target_rect.Top+FTarget.Height   //borda superior do form com borda inferior do target
-  else begin
-    if (target_rect.Top - (numkeyboard_rect.Bottom - numkeyboard_rect.Top) - 30)>=0 then
-      Top:=target_rect.Top - (numkeyboard_rect.Bottom - numkeyboard_rect.Top) - 30  //borda inferior do form com borda superior do target
-    else begin
-      Top:= (target_rect.Top+((target_rect.Bottom-target_rect.Top) div 2) - ((numkeyboard_rect.Bottom-numkeyboard_rect.Top) div 2)); //meio
-      if Top<0 then Top:=0;
-      if (Top+(numkeyboard_rect.Bottom - numkeyboard_rect.Top))>Screen.Height then Top:=Screen.Height - (numkeyboard_rect.Bottom - numkeyboard_rect.Top);
-    end;
+  if (TargetRect.Top + (NumKeyRect.Bottom - NumKeyRect.Top) + FTarget.Height) <= sh then
+    Top := TargetRect.Top + FTarget.Height   //borda superior do form com borda inferior do target
+  else if (TargetRect.Top - (NumKeyRect.Bottom - NumKeyRect.Top) - 30) >= 0 then
+    Top := TargetRect.Top - (NumKeyRect.Bottom - NumKeyRect.Top) - 30  //borda inferior do form com borda superior do target
+  else
+  begin
+    Top := (TargetRect.Top + ((TargetRect.Bottom - TargetRect.Top) Div 2) - ((NumKeyRect.Bottom - NumKeyRect.Top) Div 2)); //meio
+    if Top < 0 then
+      Top := 0;
+    if (Top + (NumKeyRect.Bottom - NumKeyRect.Top)) > Screen.Height then
+      Top := Screen.Height - (NumKeyRect.Bottom - NumKeyRect.Top);
   end;
 
-  if ((target_rect.Left+FTarget.Width)-(numkeyboard_rect.Right-numkeyboard_rect.Left))>=0 then
-    Left:=((target_rect.Left+FTarget.Width)-(numkeyboard_rect.Right-numkeyboard_rect.Left))  //borda direita do form com
-                                                                //borda direita do target
-  else begin
-    if (target_rect.Left+(numkeyboard_rect.Right-numkeyboard_rect.Left))<=sw then
-      Left:=target_rect.Left   //borda esquerda do form com borda esquerda do target
-    else begin
-      Left:= (target_rect.Left+((target_rect.Right-target_rect.Left) div 2) - ((numkeyboard_rect.Right-numkeyboard_rect.Left) div 2)); //meio
-      if Left<0 then Left:=0;
-      if (Left+(numkeyboard_rect.Right - numkeyboard_rect.Left))>Screen.Width then Left:=Screen.Width - (numkeyboard_rect.Right - numkeyboard_rect.Left);
-    end;
+  if ((TargetRect.Left + FTarget.Width) - (NumKeyRect.Right - NumKeyRect.Left)) >= 0 then
+    Left := ((TargetRect.Left + FTarget.Width) - (NumKeyRect.Right - NumKeyRect.Left))  //borda direita do form com
+  //borda direita do target
+  else if (TargetRect.Left + (NumKeyRect.Right - NumKeyRect.Left)) <= sw then
+    Left := TargetRect.Left   //borda esquerda do form com borda esquerda do target
+  else
+  begin
+    Left := (TargetRect.Left + ((TargetRect.Right - TargetRect.Left) Div 2) - ((NumKeyRect.Right - NumKeyRect.Left) Div 2)); //meio
+    if Left < 0 then
+      Left := 0;
+    if (Left + (NumKeyRect.Right - NumKeyRect.Left)) > Screen.Width then
+      Left := Screen.Width - (NumKeyRect.Right - NumKeyRect.Left);
   end;
 end;
 
@@ -181,53 +191,54 @@ begin
   ShowOnTop;
 end;
 
-procedure TpsHMIfrmNumericKeyBoard.Notification(AComponent: TComponent;
-  Operation: TOperation);
+procedure TpsHMIfrmNumericKeyBoard.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
-  if (Operation=opRemove) and (AComponent = FTarget) then begin
-    FTarget:=nil;
-    FFormOwner:=nil;
-    Timer1.Enabled:=false;
+  if (Operation = opRemove) and (AComponent = FTarget) then
+  begin
+    FTarget := nil;
+    FFormOwner := nil;
+    Timer1.Enabled := False;
     Close;
   end;
 end;
 
 procedure TpsHMIfrmNumericKeyBoard.FormCreate(Sender: TObject);
 begin
-  Btn_0.Tag:=VK_0;
-  Btn_1.Tag:=VK_1;
-  Btn_2.Tag:=VK_2;
-  Btn_3.Tag:=VK_3;
-  Btn_4.Tag:=VK_4;
-  Btn_5.Tag:=VK_5;
-  Btn_6.Tag:=VK_6;
-  Btn_7.Tag:=VK_7;
-  Btn_8.Tag:=VK_8;
-  Btn_9.Tag:=VK_9;
+  Btn_0.Tag := VK_0;
+  Btn_1.Tag := VK_1;
+  Btn_2.Tag := VK_2;
+  Btn_3.Tag := VK_3;
+  Btn_4.Tag := VK_4;
+  Btn_5.Tag := VK_5;
+  Btn_6.Tag := VK_6;
+  Btn_7.Tag := VK_7;
+  Btn_8.Tag := VK_8;
+  Btn_9.Tag := VK_9;
 
-  Btn_Left.tag:=VK_LEFT;
-  Btn_Rigth.Tag:=VK_RIGHT;
-  Btn_Esc.Tag:=VK_ESCAPE;
-  Btn_Del.Tag:=VK_DELETE;
-  Btn_Ok.Tag:=VK_RETURN;
+  Btn_Left.Tag := VK_LEFT;
+  Btn_Rigth.Tag := VK_RIGHT;
+  Btn_Esc.Tag := VK_ESCAPE;
+  Btn_Del.Tag := VK_DELETE;
+  Btn_Ok.Tag := VK_RETURN;
 
-  Btn_Back.Tag:=VK_BACK;
-  Btn_DecSeparator.Tag:=VK_OEM_PERIOD;
+  Btn_Back.Tag := VK_BACK;
+  Btn_DecSeparator.Tag := VK_OEM_PERIOD;
 
-  Btn_Minus.Tag:=VK_SUBTRACT;
+  Btn_Minus.Tag := VK_SUBTRACT;
 
-  Btn_Minus.Visible:=FShowMinus;
-  Btn_DecSeparator.Visible:=FShowDecimal;
+  Btn_Minus.Visible := FShowMinus;
+  Btn_DecSeparator.Visible := FShowDecimal;
 end;
 
 procedure TpsHMIfrmNumericKeyBoard.BtnPress(Sender: TObject);
 begin
-  if FTarget=nil then exit;
+  if FTarget = nil then Exit;
 
-  with Sender as TSpeedButton do begin
-    keyboard.Press(Tag);
-    if (tag=VK_ESCAPE) or (tag=VK_RETURN) then
+  with Sender as TSpeedButton do
+  begin
+    Keyboard.Press(Tag);
+    if (Tag = VK_ESCAPE) or (Tag = VK_RETURN) then
       Close
     else
       ReturnFocusToTarget;
@@ -241,16 +252,17 @@ end;
 
 procedure TpsHMIfrmNumericKeyBoard.DoClose(var CloseAction: TCloseAction);
 begin
-  CloseAction:=caFree;
+  CloseAction := caFree;
   inherited DoClose(CloseAction);
-  if LastNumericKeyBoard=Self then
-    LastNumericKeyBoard:=nil;
-  CloseAction:=caFree;
+  if LastNumericKeyBoard = Self then
+    LastNumericKeyBoard := nil;
+  CloseAction := caFree;
 end;
 
 procedure TpsHMIfrmNumericKeyBoard.ReturnFocusToTarget;
 begin
-  if Assigned(FFormOwner) then begin
+  if Assigned(FFormOwner) then
+  begin
     FFormOwner.Show;
     FFormOwner.BringToFront;
     Application.ProcessMessages;

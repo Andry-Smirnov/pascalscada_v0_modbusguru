@@ -403,12 +403,12 @@ begin
       if (L < Cardinal(MinValue)) or (L > Cardinal(MaxValue)) then begin
         // bump up to Int64 to get past the %d in the format string
         Error([Int64(Cardinal(MinValue)), Int64(Cardinal(MaxValue))]);
-        exit;
+        Exit;
       end
     end else
       if (L < MinValue) or (L > MaxValue) then begin
         Error([MinValue, MaxValue]);
-        exit;
+        Exit;
       end;
   with GetInstProp[index] do SetOrdProp(Instance, PropInfo, NewValue);
   Modified;
@@ -426,21 +426,21 @@ end;
 procedure TElementIndexPropertyEditor.RegisterExpressionVariables(
   const i: Integer; var parser: TFPExpressionParser);
 begin
-  if assigned(parser) then begin
+  if Assigned(parser) then begin
     //unregister all possible registered variables.
     parser.Identifiers.Clear;
 
     if (GetComponent(i) is TPLCBlockElement) then begin
       //register only if the property is not being edited,
       //to avoid circular references.
-      if (lowercase(GetPropInfo^.Name)<>'tag') then
+      if (LowerCase(GetPropInfo^.Name)<>'tag') then
         parser.Identifiers.AddIntegerVariable('Tag', (GetComponent(i) as TPLCBlockElement).Tag);
     end;
 
     if (GetComponent(i) is TPLCStructString) then begin
       //register only if the property is not being edited,
       //to avoid circular references.
-      if (lowercase(GetPropInfo^.Name)<>'tag') then
+      if (LowerCase(GetPropInfo^.Name)<>'tag') then
         parser.Identifiers.AddIntegerVariable('Tag', (GetComponent(i) as TPLCStructString).Tag);
     end;
   end;
@@ -464,11 +464,11 @@ procedure TTagAddressPropertyEditor.RegisterExpressionVariables(
 var
   propertyName: String;
 begin
-  if assigned(parser) then begin
+  if Assigned(parser) then begin
     //unregister all possible registered variables.
     parser.Identifiers.Clear;
 
-    propertyName:=lowercase(GetPropInfo^.Name);
+    propertyName:=LowerCase(GetPropInfo^.Name);
 
     if (GetComponent(i) is TPLCTagNumber) then begin
       //register only if the property is not being edited,
@@ -572,11 +572,11 @@ procedure TWinControlBoundsEditor.RegisterExpressionVariables(const i: Integer;
 var
   propertyName: String;
 begin
-  if assigned(parser) then begin
+  if Assigned(parser) then begin
     //unregister all possible registered variables.
     parser.Identifiers.Clear;
 
-    propertyName:=lowercase(GetPropInfo^.Name);
+    propertyName:=LowerCase(GetPropInfo^.Name);
 
     if (GetComponent(i) is TWinControl) then begin
       //register only if the property is not being edited,
@@ -610,7 +610,7 @@ var
 begin
 {$IFDEF FPC}
   Hook:=nil;
-  if not GetHook(Hook) then exit;
+  if not GetHook(Hook) then Exit;
   Hook.PersistentAdded(Tag,false);
   Modified;
 {$ELSE}
@@ -741,12 +741,12 @@ function TBlockElementMapperComponentEditor.GetCustomHint: AnsiString;
 begin
   if GetComponent is TPLCStruct then begin
     Result:=Result+'Structure size in bytes:'+IntToStr(TPLCStruct(GetComponent).Size);
-    exit;
+    Exit;
   end;
 
   if GetComponent is TPLCBlock then begin
     Result:=Result+'Number of elements: '+IntToStr(TPLCBlock(GetComponent).Size);
-    exit;
+    Exit;
   end;
 end;
 {$ifend}
@@ -757,11 +757,11 @@ begin
   if Index=0 then begin
     if GetComponent is TPLCStruct then begin
       Result:='Map structure items...';
-      exit;
+      Exit;
     end;
     if GetComponent is TPLCBlock then begin
       Result:='Map block elements...';
-      exit;
+      Exit;
     end;
   end;
 end;

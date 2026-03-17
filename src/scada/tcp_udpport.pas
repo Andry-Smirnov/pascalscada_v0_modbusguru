@@ -334,7 +334,7 @@ begin
 
     if FActive and not Terminated then begin
       OK:=true;
-      if assigned(FCheckSocket) then
+      if Assigned(FCheckSocket) then
         FCheckSocket(Ok);
       if not ok then begin
         if ReconnectTimerRunning=false then
@@ -490,19 +490,19 @@ var
 begin
   ip:=ExplodeString('.',aIPv4);
   if Length(ip)<>4 then
-    exit(false);
+    Exit(false);
 
   ZeroCount:=0;
   FFCount:=0;
   for i:=0 to 3 do begin
-    if TryStrToInt(ip[i],octeto)=false then exit(false);
-    if not (octeto in [0..255]) then exit(false);
-    if ((i=0) or (i=3)) and ((octeto=0) or (octeto=255)) then exit(false);
+    if TryStrToInt(ip[i],octeto)=false then Exit(false);
+    if not (octeto in [0..255]) then Exit(false);
+    if ((i=0) or (i=3)) and ((octeto=0) or (octeto=255)) then Exit(false);
     if octeto=0   then ZeroCount:=ZeroCount + 1;
     if octeto=255 then FFCount  :=FFCount   + 1;
   end;
-  if ZeroCount=4 then exit(false);
-  if FFCount=4   then exit(false);
+  if ZeroCount=4 then Exit(false);
+  if FFCount=4   then Exit(false);
   Result:=true;
 end;
 
@@ -522,19 +522,19 @@ procedure TTCP_UDPPort.SetHostname(target:Ansistring);
 begin
   DoExceptionInActive;
 
-  if (FHostName=trim(target)) then exit;
+  if (FHostName=trim(target)) then Exit;
 
   if (trim(target)='') then begin
     FHostName:=trim(target);
     RecalcPortId;
-    exit;
+    Exit;
   end;
 
   if (FHostName<>target) then begin
     if ValidIPv4(target) then begin
       FHostName:=target;
       RecalcPortId;
-      exit;
+      Exit;
     end else
       raise Exception.Create(Format('The address "%s" is not a valid IPv4 address',[target]));
   end;
@@ -570,7 +570,7 @@ var
 begin
   if csReading in ComponentState then begin
     FExclusiveReaded:=b;
-    exit;
+    Exit;
   end;
 
   //only at design-time
@@ -846,7 +846,7 @@ begin
         ServerAddr.Addr:=StrToHostAddr(FHostName);
         if ServerAddr.Addr.s_addr=0 then begin
           RefreshLastOSError;
-          exit;
+          Exit;
         end;
       end;
     {$IFEND}
@@ -867,7 +867,7 @@ begin
           sockType  := SOCK_DGRAM;
         end
       else begin
-        exit;
+        Exit;
       end;
     end;
 
@@ -877,7 +877,7 @@ begin
 
     if ASocket<0 then begin
       RefreshLastOSError;
-      exit;
+      Exit;
     end;
     {$ELSE}
     //WINDOWS
@@ -885,7 +885,7 @@ begin
 
     if ASocket=INVALID_SOCKET then begin
       RefreshLastOSError;
-      exit;
+      Exit;
     end;
     {$IFEND}
     MustCloseSocket:=true;
@@ -941,7 +941,7 @@ begin
 
     if connect_with_timeout(ASocket,@channel,sizeof(channel),FTimeout)<>0 then begin
       RefreshLastOSError;
-      exit;
+      Exit;
     end;
 
     Ok:=true;

@@ -200,7 +200,7 @@ procedure TPLCStructString.SetBlock(AValue: TPLCStruct);
 begin
   if [csLoading,csReading]*ComponentState<>[] then begin
     PLoadedBlock:=AValue;
-    exit;
+    Exit;
   end;
 
   if PBlock=AValue then Exit;
@@ -210,7 +210,7 @@ begin
 
   if Assigned(AValue) then begin
     if not ValidSettings(AValue.Size,PIndex,PStringSize,PStringType) then
-      exit;
+      Exit;
 
     AValue.AddTagChangeHandler(@BlockTagChange);
     AValue.AddRemoveTagHandler(@BlockRemoveTag);
@@ -229,7 +229,7 @@ begin
   if PIndex=AValue then Exit;
 
   if Assigned(PBlock) and (not ValidSettings(PBlock.Size,AValue,PStringSize,PStringType)) then
-      exit;
+      Exit;
 
   PIndex:=AValue;
 end;
@@ -246,7 +246,7 @@ begin
   if PStringSize=AValue then Exit;
 
   if Assigned(PBlock) and (not ValidSettings(PBlock.Size,PIndex,AValue,PStringType)) then
-    exit;
+    Exit;
 
   PStringSize:=AValue;
 end;
@@ -256,7 +256,7 @@ begin
   if PStringType=AValue then Exit;
 
   if Assigned(PBlock) and (not ValidSettings(PBlock.Size,PIndex,PStringSize,AValue)) then
-    exit;
+    Exit;
 
   PStringType:=AValue;
 end;
@@ -369,7 +369,7 @@ begin
         end;
         aux[high(aux)]:=0;
       end
-      else exit;
+      else Exit;
     end;
     PBlock.ScanWrite(aux, Length(aux), PIndex);
   end;
@@ -393,10 +393,10 @@ begin
     stC:        RealSize:=aStrSize+1; //+1 = Null terminator at string end.
     stSIEMENS:  RealSize:=aStrSize+2; //+2 string size and string capacity at begining of string.
     stROCKWELL: RealSize:=aStrSize+4; //+4 string size (dword) at begining of string;
-    else exit(false);
+    else Exit(false);
   end;
 
-  if (aindex+RealSize)>aBlockSize then exit(false);
+  if (aindex+RealSize)>aBlockSize then Exit(false);
 
   Result:=true;
 end;

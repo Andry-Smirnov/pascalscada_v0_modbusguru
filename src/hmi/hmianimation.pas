@@ -15,11 +15,15 @@ unit HMIAnimation;
 interface
 
 uses
-  Classes, SysUtils, {$IFDEF FPC}LResources,{$ENDIF} Controls, Graphics,
+  Classes, SysUtils,
+{$IFDEF FPC}
+  LResources,
+{$ENDIF}
+  Controls, Graphics,
   Dialogs, ExtCtrls, HMIZones, HMITypes, PLCTag, ProtocolTypes, Tag;
 
 type
-  TZoneChanged = procedure(Sender:TObject; ZoneIndex:Integer) of object;
+  TZoneChanged = procedure(Sender: TObject; ZoneIndex: Integer) of object;
 
   {$IFDEF PORTUGUES}
   {:
@@ -42,50 +46,51 @@ type
   {$ENDIF}
   THMIAnimation = class(TCustomImage, IHMIInterface)
   private
-    FRegInSecMan:Boolean;
+    FRegInSecMan: Boolean;
   protected
-    FAnimationZones:TGraphicZones;
-    FTag:TPLCTag;
-    FIsEnabled,
-    FIsEnabledBySecurity:Boolean;
-    FTestValue:Double;
-    FCurrentZone,
-    FOwnerZone:TGraphicZone;
+    FAnimationZones: TGraphicZones;
+    FTag: TPLCTag;
+    FIsEnabled: Boolean;
+    FIsEnabledBySecurity: Boolean;
+    FTestValue: Double;
+    FCurrentZone: TGraphicZone;
+    FOwnerZone: TGraphicZone;
 
-    FSecurityCode:UTF8String;
+    FSecurityCode: UTF8String;
     FZoneChanged: TZoneChanged;
+
     function GetAnimationZone: TAnimationZone;
-    procedure SetSecurityCode(sc:UTF8String);
+    procedure SetSecurityCode(ASecurityCode: UTF8String);
 
-    procedure ZoneChange(Sender:TObject);
-    function  GetAnimationZones:TGraphicZones;
-    procedure SetAnimationZones(v:TGraphicZones);
-    procedure NeedComState(var CurState:TComponentState);
-    procedure BlinkTimer(Sender:TObject);
+    procedure ZoneChange(Sender: TObject);
+    function GetAnimationZones: TGraphicZones;
+    procedure SetAnimationZones(V: TGraphicZones);
+    procedure NeedComState(var CurState: TComponentState);
+    procedure BlinkTimer(Sender: TObject);
 
-    procedure WriteFaultCallBack(Sender:TObject);
-    procedure TagChangeCallBack(Sender:TObject);
-    procedure RemoveTagCallBack(Sender:TObject);
+    procedure WriteFaultCallBack(Sender: TObject);
+    procedure TagChangeCallBack(Sender: TObject);
+    procedure RemoveTagCallBack(Sender: TObject);
   protected
     //: @exclude
-    procedure ShowZone(zone:TGraphicZone);
+    procedure ShowZone(Zone: TGraphicZone);
     //: @exclude
-    procedure SetTestValue(v:Double);
+    procedure SetTestValue(Val: Double);
 
     //: @seealso(IHMIInterface.SetHMITag)
-    procedure SetHMITag(t:TPLCTag);                    //seta um tag
+    procedure SetHMITag(APLCTag: TPLCTag);                    //seta um tag
     //: @seealso(IHMIInterface.GetHMITag)
-    function  GetHMITag:TPLCTag;
+    function GetHMITag: TPLCTag;
 
     //: @seealso(IHMIInterface.GetControlSecurityCode)
-     function GetControlSecurityCode:UTF8String;
+    function GetControlSecurityCode: UTF8String;
     //: @seealso(IHMIInterface.CanBeAccessed)
-    procedure CanBeAccessed(a:Boolean);
+    procedure CanBeAccessed(A: Boolean);
     //: @seealso(IHMIInterface.MakeUnsecure)
     procedure MakeUnsecure;
 
     //: @exclude
-    procedure SetEnabled(e:Boolean); override;
+    procedure SetEnabled(E: Boolean); override;
 
     //: @exclude
     procedure Loaded; override;
@@ -93,14 +98,14 @@ type
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
     //: @exclude
-    constructor Create(AOwner:TComponent); override;
+    constructor Create(AOwner: TComponent); override;
     //: @exclude
-    destructor  Destroy; override;
+    destructor Destroy; override;
     procedure RefreshAnimation(Data: PtrInt);
     //: @exclude
-    procedure SetValue(v:Double);
+    procedure SetValue(AValue: Double);
     procedure ShowDefaultZone;
-    property CurrentAnimationZone:TAnimationZone read GetAnimationZone;
+    property CurrentAnimationZone: TAnimationZone read GetAnimationZone;
   published
 
     {$IFDEF PORTUGUES}
@@ -114,7 +119,7 @@ type
     @bold(Can only be used in design-time.)
     }
     {$ENDIF}
-    property TestValue:Double read FTestValue write SetTestValue stored false;
+    property TestValue: Double read FTestValue write SetTestValue stored False;
 
     {$IFDEF PORTUGUES}
     {:
@@ -133,7 +138,7 @@ type
     @seealso(TGraphicZones)
     }
     {$ENDIF}
-    property Zones:TGraphicZones read GetAnimationZones write SetAnimationZones;
+    property Zones: TGraphicZones read GetAnimationZones write SetAnimationZones;
 
     {$IFDEF PORTUGUES}
     {:
@@ -152,16 +157,16 @@ type
     @seealso(TPLCTagNumber)
     }
     {$ENDIF}
-    property PLCTag:TPLCTag read GetHMITag write SetHMITag;
+    property PLCTag: TPLCTag read GetHMITag write SetHMITag;
     //: @exclude
-    property Enabled:Boolean read FIsEnabled write SetEnabled;
+    property Enabled: Boolean read FIsEnabled write SetEnabled;
 
     {$IFDEF PORTUGUES}
     //: Codigo de segurança que libera acesso ao controle
     {$ELSE}
     //: Security code that allows access to control.
     {$ENDIF}
-    property SecurityCode:UTF8String read FSecurityCode write SetSecurityCode;
+    property SecurityCode: UTF8String read FSecurityCode write SetSecurityCode;
 
     property AntialiasingMode;
     property Align;
@@ -197,42 +202,44 @@ type
     property Stretch;
     property Transparent;
     property Visible;
-    property ZoneChanged:TZoneChanged read FZoneChanged write FZoneChanged;
+    property ZoneChanged: TZoneChanged read FZoneChanged write FZoneChanged;
   end;
 
 implementation
 
 uses hsstrings, ControlSecurityManager, Forms, hmi_animation_timers;
 
-constructor THMIAnimation.Create(AOwner:TComponent);
+constructor THMIAnimation.Create(AOwner: TComponent);
 begin
-   inherited Create(AOwner);
-   FRegInSecMan:=GetControlSecurityManager.RegisterControl(Self as IHMIInterface);
-   if not FRegInSecMan then begin
+  inherited Create(AOwner);
+  FRegInSecMan := GetControlSecurityManager.RegisterControl(Self as IHMIInterface);
+  if not FRegInSecMan then
+  begin
     {$IFNDEF WINDOWS}
-    writeln('FIX-ME: Failed to register class ',ClassName,' instace with name="',Name,'" in the ControlSecurityManager?',{$i %FILE%},':',{$i %LINE%});
+    writeln('FIX-ME: Failed to register class ', ClassName, ' instace with name="', Name, '" in the ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
     {$ENDIF}
   end;
-   FIsEnabled:=true;
-   FAnimationZones:=TGraphicZones.Create(Self);
-   FAnimationZones.OnNeedCompState:=@NeedComState;
-   FAnimationZones.OnCollectionItemChange:=@ZoneChange;
+  FIsEnabled := True;
+  FAnimationZones := TGraphicZones.Create(Self);
+  FAnimationZones.OnNeedCompState := @NeedComState;
+  FAnimationZones.OnCollectionItemChange := @ZoneChange;
 end;
 
 destructor THMIAnimation.Destroy;
 begin
   if FRegInSecMan then
     GetControlSecurityManager.UnRegisterControl(Self as IHMIInterface)
-  else begin
+  else
+  begin
     {$IFNDEF WINDOWS}
-    writeln('FIX-ME: Why class ',ClassName,', instace name="',Name,'" ins''t registered in ControlSecurityManager?',{$i %FILE%},':',{$i %LINE%});
+    writeln('FIX-ME: Why class ', ClassName, ', instace name="', Name, '" ins''t registered in ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
     {$ENDIF}
   end;
 
   Application.RemoveAsyncCalls(Self);
   GetAnimationTimer.RemoveCallbacksFromObject(Self);
 
-  if FTag<>nil then
+  if FTag <> nil then
     FTag.RemoveAllHandlersFromObject(Self);
 
   FreeAndNil(FAnimationZones);
@@ -241,188 +248,203 @@ end;
 
 procedure THMIAnimation.RefreshAnimation(Data: PtrInt);
 begin
-   if [csReading,csDestroying,csLoading]*ComponentState=[] then begin
-      if FTag=nil then begin
-        ShowDefaultZone;
-      end else begin
-        if Supports(FTag, ITagNumeric) then
-           SetValue((FTag as ITagNumeric).Value)
-      end;
-   end;
+  if [csReading, csDestroying, csLoading] * ComponentState = [] then
+  begin
+    if FTag = nil then
+    begin
+      ShowDefaultZone;
+    end
+    else
+    begin
+      if Supports(FTag, ITagNumeric) then
+        SetValue((FTag as ITagNumeric).Value);
+    end;
+  end;
 end;
 
-procedure THMIAnimation.SetSecurityCode(sc: UTF8String);
+procedure THMIAnimation.SetSecurityCode(ASecurityCode: UTF8String);
 begin
-  if Trim(sc)='' then
-    Self.CanBeAccessed(true)
+  if Trim(ASecurityCode) = '' then
+    Self.CanBeAccessed(True)
   else
-    with GetControlSecurityManager do begin
-      ValidateSecurityCode(sc);
-      if not SecurityCodeExists(sc) then
-        RegisterSecurityCode(sc);
+    with GetControlSecurityManager do
+    begin
+      ValidateSecurityCode(ASecurityCode);
+      if not SecurityCodeExists(ASecurityCode) then
+        RegisterSecurityCode(ASecurityCode);
 
-      Self.CanBeAccessed(CanAccess(sc));
+      Self.CanBeAccessed(CanAccess(ASecurityCode));
     end;
 
-  FSecurityCode:=sc;
+  FSecurityCode := ASecurityCode;
 end;
 
 function THMIAnimation.GetAnimationZone: TAnimationZone;
 begin
-  Result:=FCurrentZone;
+  Result := FCurrentZone;
 end;
 
-procedure THMIAnimation.ZoneChange(Sender:TObject);
+procedure THMIAnimation.ZoneChange(Sender: TObject);
 var
-  az: TGraphicZone;
-  c: Integer;
+  AZone: TGraphicZone;
+  i: Integer;
 begin
-   if [csReading,csDestroying, csLoading, csUpdating]*ComponentState<>[] then exit;
+  if [csReading, csDestroying, csLoading, csUpdating] * ComponentState <> [] then Exit;
 
-   for c:=0 to FAnimationZones.Count-1 do begin
-     az:=TGraphicZone(FAnimationZones.Items[c]);
-     if assigned(az.ImageList) then
-       az.ImageList.FreeNotification(Self);
-   end;
+  for i := 0 to FAnimationZones.Count - 1 do
+  begin
+    AZone := TGraphicZone(FAnimationZones.Items[i]);
+    if Assigned(AZone.ImageList) then
+      AZone.ImageList.FreeNotification(Self);
+  end;
 
-   RefreshAnimation(0);
+  RefreshAnimation(0);
 end;
 
-function  THMIAnimation.GetAnimationZones:TGraphicZones;
+function THMIAnimation.GetAnimationZones: TGraphicZones;
 begin
-   Result := FAnimationZones;
+  Result := FAnimationZones;
 end;
 
-procedure THMIAnimation.SetAnimationZones(v:TGraphicZones);
+procedure THMIAnimation.SetAnimationZones(V: TGraphicZones);
 begin
-   FAnimationZones.Assign(v);
+  FAnimationZones.Assign(V);
 end;
 
-procedure THMIAnimation.NeedComState(var CurState:TComponentState);
+procedure THMIAnimation.NeedComState(var CurState: TComponentState);
 begin
-   CurState:=ComponentState;
+  CurState := ComponentState;
 end;
 
-procedure THMIAnimation.SetValue(v:Double);
+procedure THMIAnimation.SetValue(AValue: Double);
 begin
-   FCurrentZone:=FAnimationZones.GetZoneFromValue(v) as TGraphicZone;
-   GetAnimationTimer.RemoveCallback(@BlinkTimer);
-   ShowZone(FCurrentZone);
-   //FOwnerZoneShowed:=true;
-   if (FCurrentZone<>nil) and (FCurrentZone.BlinkWith<>(-1)) and (FCurrentZone.BlinkTime>0) then begin
-     GetAnimationTimer.AddTimerCallback(FCurrentZone.BlinkTime,@BlinkTimer);
-   end;
+  FCurrentZone := FAnimationZones.GetZoneFromValue(AValue) as TGraphicZone;
+  GetAnimationTimer.RemoveCallback(@BlinkTimer);
+  ShowZone(FCurrentZone);
+  //FOwnerZoneShowed:=true;
+  if (FCurrentZone <> nil) and (FCurrentZone.BlinkWith <> (-1)) and (FCurrentZone.BlinkTime > 0) then
+  begin
+    GetAnimationTimer.AddTimerCallback(FCurrentZone.BlinkTime, @BlinkTimer);
+  end;
 end;
 
 procedure THMIAnimation.ShowDefaultZone;
 begin
-   FCurrentZone:=FAnimationZones.GetDefaultZone as TGraphicZone;
-   GetAnimationTimer.RemoveCallback(@BlinkTimer);
-   ShowZone(FCurrentZone);
-   //FOwnerZoneShowed:=true;
-   if (FCurrentZone<>nil) and (FCurrentZone.BlinkWith<>(-1)) and (FCurrentZone.BlinkTime>0) then begin
-     GetAnimationTimer.AddTimerCallback(FCurrentZone.BlinkTime,@BlinkTimer);
-   end;
+  FCurrentZone := FAnimationZones.GetDefaultZone as TGraphicZone;
+  GetAnimationTimer.RemoveCallback(@BlinkTimer);
+  ShowZone(FCurrentZone);
+  //FOwnerZoneShowed:=true;
+  if (FCurrentZone <> nil) and (FCurrentZone.BlinkWith <> (-1)) and (FCurrentZone.BlinkTime > 0) then
+  begin
+    GetAnimationTimer.AddTimerCallback(FCurrentZone.BlinkTime, @BlinkTimer);
+  end;
 end;
 
-procedure THMIAnimation.ShowZone(zone:TGraphicZone);
+procedure THMIAnimation.ShowZone(Zone: TGraphicZone);
 {$IFNDEF FPC}
 var
-   x:TPicture;
+  x: TPicture;
 {$ENDIF}
 begin
-   FCurrentZone:=zone;
-   {$IFDEF FPC}
+  FCurrentZone := Zone;
+  {$IFDEF FPC}
    //limpa a imagem
    //Clears the image
    Picture.Clear;
-   {$ELSE}
-   x:= TPicture.Create;
-   self.Picture.Assign(x);
-   x.Destroy;
-   {$ENDIF}
+  {$ELSE}
+  x := TPicture.Create;
+  Self.Picture.Assign(x);
+  x.Destroy;
+  {$ENDIF}
 
-   if zone<>nil then begin
-      if zone.ImageListAsDefault then begin
-         if Assigned(zone.ImageList) AND (zone.ImageIndex<>-1) then begin
-            zone.ImageList.GetBitmap(zone.ImageIndex, Picture.Bitmap);
-            Repaint;
-         end else
-            if FileExists(zone.FileName) then
-               Picture.LoadFromFile(zone.FileName);
-      end else begin
-         if FileExists(zone.FileName) then
-            Picture.LoadFromFile(zone.FileName)
-         else
-            if Assigned(zone.ImageList) AND (zone.ImageIndex<>-1) then begin
-               zone.ImageList.GetBitmap(zone.ImageIndex, Picture.Bitmap);
-               Repaint;
-            end;
+  if Zone <> nil then
+  begin
+    if Zone.ImageListAsDefault then
+    begin
+      if Assigned(Zone.ImageList) and (Zone.ImageIndex <> -1) then
+      begin
+        Zone.ImageList.GetBitmap(Zone.ImageIndex, Picture.Bitmap);
+        Repaint;
+      end
+      else if FileExists(Zone.FileName) then
+        Picture.LoadFromFile(Zone.FileName);
+    end
+    else
+    begin
+      if FileExists(Zone.FileName) then
+        Picture.LoadFromFile(Zone.FileName)
+      else if Assigned(Zone.ImageList) and (Zone.ImageIndex <> -1) then
+      begin
+        Zone.ImageList.GetBitmap(Zone.ImageIndex, Picture.Bitmap);
+        Repaint;
       end;
-      Transparent := zone.Transparent;
-      if zone.Transparent then
-         Picture.Bitmap.TransparentColor:=zone.TransparentColor;
+    end;
+    Transparent := Zone.Transparent;
+    if Zone.Transparent then
+      Picture.Bitmap.TransparentColor := Zone.TransparentColor;
 
-      if Assigned(FZoneChanged) then
-         FZoneChanged(Self, zone.Index);
-   end else
-     if Assigned(FZoneChanged) then
-        FZoneChanged(Self, -1);
+    if Assigned(FZoneChanged) then
+      FZoneChanged(Self, Zone.Index);
+  end
+  else if Assigned(FZoneChanged) then
+    FZoneChanged(Self, -1);
 end;
 
-procedure THMIAnimation.SetTestValue(v:Double);
+procedure THMIAnimation.SetTestValue(Val: Double);
 begin
-   if [csDesigning]*ComponentState=[] then exit;
+  if [csDesigning] * ComponentState = [] then Exit;
 
-   FTestValue:=v;
-   SetValue(v);
+  FTestValue := Val;
+  SetValue(Val);
 end;
 
 function THMIAnimation.GetControlSecurityCode: UTF8String;
 begin
-   Result:=FSecurityCode;
+  Result := FSecurityCode;
 end;
 
-procedure THMIAnimation.SetHMITag(t:TPLCTag);
+procedure THMIAnimation.SetHMITag(APLCTag: TPLCTag);
 begin
-   //se o tag esta entre um dos aceitos.
-   //if the new tag is valid.
-   if (t<>nil) and (not Supports(t, ITagNumeric)) then
-      raise Exception.Create(SonlyNumericTags);
+  //se o tag esta entre um dos aceitos.
+  //if the new tag is valid.
+  if (APLCTag <> nil) and (not Supports(APLCTag, ITagNumeric)) then
+    raise Exception.Create(SonlyNumericTags);
 
-   //se ja estou associado a um tag, remove
-   //if the control are linked with some tag, remove the link.
-   if FTag<>nil then begin
-      FTag.RemoveAllHandlersFromObject(Self);
-   end;
+  //se ja estou associado a um tag, remove
+  //if the control are linked with some tag, remove the link.
+  if FTag <> nil then
+  begin
+    FTag.RemoveAllHandlersFromObject(Self);
+  end;
 
-   //adiona o callback para o novo tag
-   //link with the new tag.
-   if t<>nil then begin
-      t.AddRemoveTagHandler(@RemoveTagCallBack);
-      t.AddTagChangeHandler(@TagChangeCallBack);
-      t.AddWriteFaultHandler(@WriteFaultCallBack);
-      FTag := t;
-      RefreshAnimation(0);
-   end;
-   FTag := t;
+  //adiona o callback para o novo tag
+  //link with the new tag.
+  if APLCTag <> nil then
+  begin
+    APLCTag.AddRemoveTagHandler(@RemoveTagCallBack);
+    APLCTag.AddTagChangeHandler(@TagChangeCallBack);
+    APLCTag.AddWriteFaultHandler(@WriteFaultCallBack);
+    FTag := APLCTag;
+    RefreshAnimation(0);
+  end;
+  FTag := APLCTag;
 end;
 
-function  THMIAnimation.GetHMITag:TPLCTag;
+function THMIAnimation.GetHMITag: TPLCTag;
 begin
-  Result:=FTag;
+  Result := FTag;
 end;
 
-procedure THMIAnimation.CanBeAccessed(a:Boolean);
+procedure THMIAnimation.CanBeAccessed(A: Boolean);
 begin
-  FIsEnabledBySecurity :=a;
+  FIsEnabledBySecurity := A;
   SetEnabled(FIsEnabled);
 end;
 
 procedure THMIAnimation.MakeUnsecure;
 begin
-  FSecurityCode:='';
-  CanBeAccessed(true);
+  FSecurityCode := '';
+  CanBeAccessed(True);
 end;
 
 procedure THMIAnimation.Loaded;
@@ -433,27 +455,29 @@ begin
   TagChangeCallBack(FTag);
 end;
 
-procedure THMIAnimation.Notification(AComponent: TComponent;
-  Operation: TOperation);
+procedure THMIAnimation.Notification(AComponent: TComponent; Operation: TOperation);
 var
-  az: TGraphicZone;
-  c: Integer;
+  AZone: TGraphicZone;
+  i: Integer;
   UpdateDone: Boolean;
 begin
   inherited Notification(AComponent, Operation);
 
-  if (Operation=opRemove) then begin
-    if AComponent=self then exit;
+  if (Operation = opRemove) then
+  begin
+    if AComponent = Self then Exit;
     Updating;
     try
-      UpdateDone:=false;
-      for c:=0 to FAnimationZones.Count-1 do begin
-         az:=TGraphicZone(FAnimationZones.Items[c]);
-         if assigned(az.ImageList) and (az.ImageList=AComponent) then begin
-           az.ImageList := nil;
-           UpdateDone:=true;
-         end;
-       end;
+      UpdateDone := False;
+      for i := 0 to FAnimationZones.Count - 1 do
+      begin
+        AZone := TGraphicZone(FAnimationZones.Items[i]);
+        if Assigned(AZone.ImageList) and (AZone.ImageList = AComponent) then
+        begin
+          AZone.ImageList := nil;
+          UpdateDone := True;
+        end;
+      end;
     finally
       Updated;
       if UpdateDone then
@@ -462,13 +486,15 @@ begin
   end;
 end;
 
-procedure THMIAnimation.BlinkTimer(Sender:TObject);
+procedure THMIAnimation.BlinkTimer(Sender: TObject);
 begin
-  if (FCurrentZone.BlinkWith<0) or (TGraphicZone(FAnimationZones.Items[FCurrentZone.BlinkWith]).BlinkTime<>FCurrentZone.BlinkTime) then
+  if (FCurrentZone.BlinkWith < 0)
+    or (TGraphicZone(FAnimationZones.Items[FCurrentZone.BlinkWith]).BlinkTime <> FCurrentZone.BlinkTime) then
     GetAnimationTimer.RemoveCallback(@BlinkTimer); //FTimer.Enabled:=false
 
-  if (FCurrentZone.BlinkWith>=0) AND (TGraphicZone(FAnimationZones.Items[FCurrentZone.BlinkWith]).BlinkTime<>FCurrentZone.BlinkTime) and (TGraphicZone(FAnimationZones.Items[FCurrentZone.BlinkWith]).BlinkTime>0) then
-      GetAnimationTimer.AddTimerCallback(TGraphicZone(FAnimationZones.Items[FCurrentZone.BlinkWith]).BlinkTime, @BlinkTimer);
+  if (FCurrentZone.BlinkWith >= 0)
+    and (TGraphicZone(FAnimationZones.Items[FCurrentZone.BlinkWith]).BlinkTime <> FCurrentZone.BlinkTime) and (TGraphicZone(FAnimationZones.Items[FCurrentZone.BlinkWith]).BlinkTime > 0) then
+    GetAnimationTimer.AddTimerCallback(TGraphicZone(FAnimationZones.Items[FCurrentZone.BlinkWith]).BlinkTime, @BlinkTimer);
 
   ShowZone(TGraphicZone(FAnimationZones.Items[FCurrentZone.BlinkWith]));
 end;
@@ -480,18 +506,18 @@ end;
 
 procedure THMIAnimation.TagChangeCallBack(Sender: TObject);
 begin
-  if ((Application.Flags*[AppDoNotCallAsyncQueue])=[]) and (([csDestroying]*ComponentState)=[]) then
-    Application.QueueAsyncCall(@RefreshAnimation,0);
+  if ((Application.Flags * [AppDoNotCallAsyncQueue]) = []) and (([csDestroying] * ComponentState) = []) then
+    Application.QueueAsyncCall(@RefreshAnimation, 0);
 end;
 
 procedure THMIAnimation.RemoveTagCallBack(Sender: TObject);
 begin
-  FTag:=nil;
+  FTag := nil;
 end;
 
-procedure THMIAnimation.SetEnabled(e:Boolean);
+procedure THMIAnimation.SetEnabled(E: Boolean);
 begin
-  FIsEnabled:=e;
+  FIsEnabled := E;
   inherited SetEnabled(FIsEnabled and FIsEnabledBySecurity);
 end;
 

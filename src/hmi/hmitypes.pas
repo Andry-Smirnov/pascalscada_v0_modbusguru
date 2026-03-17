@@ -131,7 +131,7 @@ type
     {$ELSE}
     //: Gets the access code of the control.
     {$ENDIF}
-    function GetControlSecurityCode:UTF8String;
+    function GetControlSecurityCode: UTF8String;
 
     {$IFDEF PORTUGUES}
     //: Remove o codigo de segurança do controle, tornando-o inseguro.
@@ -145,21 +145,21 @@ type
     {$ELSE}
     //: Updates the link of the control with a tag
     {$ENDIF}
-    procedure SetHMITag(t:TPLCTag);
+    procedure SetHMITag(t: TPLCTag);
 
     {$IFDEF PORTUGUES}
     //: Retorna o tag em uso pelo controle.
     {$ELSE}
     //: Returns the tag linked with the control.
     {$ENDIF}
-    function  GetHMITag:TPLCTag;
+    function GetHMITag: TPLCTag;
 
     {$IFDEF PORTUGUES}
     //: Habilita/desabilita o controle pelas suas permissões. @seealso(Enabled)
     {$ELSE}
     //: Enables/disables the control. @seealso(Enabled)
     {$ENDIF}
-    procedure CanBeAccessed(a:Boolean);
+    procedure CanBeAccessed(a: Boolean);
 
 
     {$IFDEF PORTUGUES}
@@ -167,14 +167,14 @@ type
     {$ELSE}
     //: Property to get/set the tag of the control through the interface.
     {$ENDIF}
-    property  Tag:TPLCTag read GetHMITag write SetHMITag;
+    property Tag: TPLCTag read GetHMITag write SetHMITag;
   end;
 
-  TBeforeSendNumericValueToTagEvent = procedure(Sender:TObject; Value:Double; var SendIt:Boolean) of object;
-  TAfterSendNumericValueToTagEvent = procedure(Sender:TObject; Value:Double) of object;
+  TBeforeSendNumericValueToTagEvent = procedure(Sender: TObject; Value: Double; var SendIt: Boolean) of object;
+  TAfterSendNumericValueToTagEvent = procedure(Sender: TObject; Value: Double) of object;
 
-  TBeforeSendStringValueToTagEvent = procedure(Sender:TObject; Value:TCaption; var SendIt:Boolean) of object;
-  TAfterSendStringValueToTagEvent = procedure(Sender:TObject; Value:TCaption) of object;
+  TBeforeSendStringValueToTagEvent = procedure(Sender: TObject; Value: TCaption; var SendIt: Boolean) of object;
+  TAfterSendStringValueToTagEvent = procedure(Sender: TObject; Value: TCaption) of object;
 
   TOnScreenKeyboardBehavior = (oskbDisabled, oskbEnabled, oskbManager);
 

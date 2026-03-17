@@ -297,7 +297,7 @@ var
 begin
   if (ComponentState*[csReading,csLoading])<>[] then begin
     FOrientationLoaded:=AValue;
-    exit;
+    Exit;
   end;
 
   if FOrientation=AValue then Exit;
@@ -508,7 +508,7 @@ var
   l: Integer;
   line: String;
 begin
-  if assigned(AValue) then begin
+  if Assigned(AValue) then begin
     for l:=0 to AValue.Count-1 do begin
       line:=AValue.Strings[l];
       if ValidStatement(line)=false then begin
@@ -559,11 +559,11 @@ begin
   //1234567
   Result:=false;
   aRGBStr:=LowerCase(aRGBStr);
-  if Length(aRGBStr)<>7 then exit;
-  if aRGBStr[1]<>'#' then exit;
+  if Length(aRGBStr)<>7 then Exit;
+  if aRGBStr[1]<>'#' then Exit;
   for i:=2 to 7 do
     if (not (aRGBStr[i] in ['0'..'9'])) and (not (aRGBStr[i] in ['a'..'f'])) then
-      exit;
+      Exit;
 
   Result:=true;
 end;
@@ -587,7 +587,7 @@ begin
   //default flow output.
   if aCleanLine='flow' then begin
     Result:=true;
-    exit;
+    Exit;
   end;
 
   LineParts1 := ExplodeString('=', aCleanLine);
@@ -597,7 +597,7 @@ begin
     //checks if some_id.someprop is valid
     if Length(LineParts2)=2 then begin
       //checks if some_id is valid.
-      if pos(' ',LineParts2[0])>0 then exit;
+      if pos(' ',LineParts2[0])>0 then Exit;
       //some_id.fill=... or some_id.border=...
       if (LineParts2[1]='fill') or (LineParts2[1]='stop-color') or (LineParts2[1]='border') then begin
         if (LineParts1[1]='fill') or (LineParts1[1]='border') or (LineParts1[1]='flow') then begin
@@ -632,7 +632,7 @@ begin
   //default flow output.
   if aCleanLine='flow' then begin
     Result:=TOutputChange.Create;
-    exit;
+    Exit;
   end;
 
   LineParts1 := ExplodeString('=', aCleanLine);
@@ -642,7 +642,7 @@ begin
     //checks if some_id.someprop is valid
     if Length(LineParts2)=2 then begin
       //checks if some_id is valid.
-      if pos(' ',LineParts2[0])>0 then exit;
+      if pos(' ',LineParts2[0])>0 then Exit;
       //some_id.fill=... or some_id.border=...
       aClass:=0;
       if (LineParts2[1]='fill')   then AClass:=1;
@@ -718,7 +718,7 @@ procedure THMICustomFlowVectorControl.BlinkTimer(Sender: TObject);
 begin
   if FCurrentZone=nil then begin
     GetAnimationTimer.RemoveCallback(@BlinkTimer);
-    exit;
+    Exit;
   end;
   if (FCurrentZone.BlinkWith<0) or ((FCurrentZone.BlinkWith<FStates.Count) and (THMIVectorFlowZone(FStates.Items[FCurrentZone.BlinkWith]).BlinkTime<>FCurrentZone.BlinkTime)) then
     GetAnimationTimer.RemoveCallback(@BlinkTimer);
@@ -736,7 +736,7 @@ begin
     Exit;
 
   if Assigned(aValue) and (not Supports(AValue, IColorChangeNotification)) then
-    exit;
+    Exit;
 
   if Assigned(FInputFlowPolyline) then
     (FInputFlowPolyline as IColorChangeNotification).RemoveNotifyCallback(Self as IColorChangeNotification);
@@ -764,7 +764,7 @@ var
   zone: THMIVectorFlowZone;
   value:Double = Infinity;
 begin
-  if [csReading,csLoading,csDestroying]*ComponentState<>[] then exit;
+  if [csReading,csLoading,csDestroying]*ComponentState<>[] then Exit;
   if Assigned(FPLCTag) and Supports(FPLCTag, ITagNumeric) then
     value:=(FPLCTag as ITagNumeric).GetValue;
 
@@ -810,7 +810,7 @@ procedure THMICustomFlowVectorControl.NotifyFree(
 begin
   if WhoWasDestroyed=FInputFlowPolyline then begin
     FInputFlowPolyline:=nil;
-    exit;
+    Exit;
   end;
 end;
 
@@ -861,7 +861,7 @@ var
     a, b, c: Boolean;
   begin
     Result:=False;
-    if SVGContents=nil then exit;
+    if SVGContents=nil then Exit;
     for i:=0 to SVGContents.ElementCount-1 do begin
       a:=SVGContents.IsSVGElement[i];
       if a then
@@ -1131,7 +1131,7 @@ procedure THMICustomVectorControl.ReloadDrawing;
 var
   SVGStream: TMemoryStream;
 begin
-  if FSVGContents.Count<=0 then exit;
+  if FSVGContents.Count<=0 then Exit;
 
   SVGStream:=TMemoryStream.Create;
   try

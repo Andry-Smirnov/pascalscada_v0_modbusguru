@@ -77,7 +77,7 @@ procedure TForm1.FormCreate(Sender: TObject);
 var
   x:TForm1;
 begin
-  if favoidrecreate then exit;
+  if favoidrecreate then Exit;
 
   x:=TForm1.Create(Application, True);
   x.Left:=Left+Width;

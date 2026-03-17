@@ -127,7 +127,7 @@ begin
           nameitem:=1;
 
         confItem:=SeekFirstItem(dlg.CurItem);
-        if confItem=nil then exit;
+        if confItem=nil then Exit;
 
         ////////////////////////////////////////////////////////////////////////
         //plcnumber and string

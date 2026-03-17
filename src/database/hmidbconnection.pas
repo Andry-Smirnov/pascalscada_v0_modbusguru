@@ -17,7 +17,7 @@ unit HMIDBConnection;
 interface
 
 uses
-  Classes, sysutils, ZConnection, MessageSpool, CrossEvent,
+  Classes, SysUtils, ZConnection, MessageSpool, CrossEvent,
   syncobjs, ZDataset, psbufdataset, fgl, crossthreads;
 
 type
@@ -29,9 +29,9 @@ type
   {$ELSE}
   //: Procedure called by thread to execute the query.
   {$ENDIF}
-  TExecSQLProc = procedure(sqlcmd:Utf8String; outputdataset:TFPSBufDataSet; out Error:Boolean; NewConnection:Boolean) of object;
+  TExecSQLProc = procedure(SQLCmd: UTF8String; OutputDataset: TFPSBufDataSet; out Error: Boolean; NewConnection: Boolean) of object;
 
-  TStartTransaction = procedure(NewConnection:Boolean) of object;
+  TStartTransaction = procedure(NewConnection: Boolean) of object;
 
   TCommitTransaction = procedure of object;
 
@@ -42,9 +42,9 @@ type
   {$ELSE}
   //: Procedure called by thread to return the dataset after the query execution.
   {$ENDIF}
-  TReturnDataSetProc = procedure(Sender:TObject; DS:TFPSBufDataSet; error:Exception) of object;
+  TReturnDataSetProc = procedure(Sender: TObject; DS: TFPSBufDataSet; Error: Exception) of object;
 
-  TReturnTransactionStatementsProc = procedure(Sender:TObject; aStatements:THMIDBConnectionStatementList; Sucess:Boolean; LineOfError:Integer; Error:Exception) of object;
+  TReturnTransactionStatementsProc = procedure(Sender: TObject; AStatements: THMIDBConnectionStatementList; Sucess: Boolean; LineOfError: Integer; Error: Exception) of object;
 
   {$IFDEF PORTUGUES}
   //: Inteface para interação com objetos privados do THMIDBConnection
@@ -58,7 +58,7 @@ type
     {$ELSE}
     //: Returns the TZConnection to be used by property editors.
     {$ENDIF}
-    function GetSyncConnection:TZConnection;
+    function GetSyncConnection: TZConnection;
 
     {$IFDEF PORTUGUES}
     {:
@@ -79,7 +79,7 @@ type
                          called to return the data to the application.)
     }
     {$ENDIF}
-    procedure ExecSQL(sql:UTF8String; ReturnDatasetCallback:TReturnDataSetProc; ReturnSync:Boolean=true; NewConnection:Boolean=true);
+    procedure ExecSQL(SQL: UTF8String; ReturnDatasetCallback: TReturnDataSetProc; ReturnSync: Boolean = True; NewConnection: Boolean = True);
   end;
 
   {$IFDEF PORTUGUES}
@@ -96,9 +96,9 @@ type
   }
   {$ENDIF}
   TSQLCmdRec = record
-    SQLCmd:String;
-    ReturnSync, NewConnection:Boolean;
-    ReturnDataSetCallback:TReturnDataSetProc;
+    SQLCmd: string;
+    ReturnSync, NewConnection: Boolean;
+    ReturnDatasetCallback: TReturnDataSetProc;
   end;
 
   {$IFDEF PORTUGUES}
@@ -117,10 +117,11 @@ type
   PSQLCmdRec = ^TSQLCmdRec;
 
   TStatementCmdRec = record
-    statements:THMIDBConnectionStatementList;
-    ReturnTransactionResult:TReturnTransactionStatementsProc;
-    FreeStatemensAfterExecute,
-    ReturnSync, NewConnection:Boolean;
+    Statements: THMIDBConnectionStatementList;
+    ReturnTransactionResult: TReturnTransactionStatementsProc;
+    FreeStatemensAfterExecute: Boolean;
+    ReturnSync: Boolean;
+    NewConnection: Boolean;
   end;
   PStatementCmdRec = ^TStatementCmdRec;
 
@@ -135,21 +136,21 @@ type
   @author(Fabio Luis Girardi <fabio@pascalscada.com>)
   }
   {$ENDIF}
-  TProcessSQLCommandThread=class(TpSCADACoreAffinityThread)
+  TProcessSQLCommandThread = class(TpSCADACoreAffinityThread)
   private
-    FProcessingCmd:Integer;
-    FQueue:TMessageSpool;
-    FEnd:TCrossEvent;
-    cmd:PSQLCmdRec;
-    statements:PStatementCmdRec;
-    fds:TFPSBufDataSet;
-    ferror:Exception;
-    fLineError:Integer;
-    FErrorOnSync:Boolean;
-    fOnExecSQL:TExecSQLProc;
-    fStartTransaction:TStartTransaction;
-    fCommitTransaction:TCommitTransaction;
-    fRollbackTransaction:TRollbackTransaction;
+    FProcessingCmd: Integer;
+    FQueue: TMessageSpool;
+    FEnd: TCrossEvent;
+    Cmd: PSQLCmdRec;
+    Statements: PStatementCmdRec;
+    FDs: TFPSBufDataSet;
+    FError: Exception;
+    FLineError: Integer;
+    FErrorOnSync: Boolean;
+    FOnExecSQL: TExecSQLProc;
+    FStartTransaction: TStartTransaction;
+    FCommitTransaction: TCommitTransaction;
+    FRollbackTransaction: TRollbackTransaction;
     function GetPendingMsgs: Integer;
     procedure ProcessMessages;
   protected
@@ -181,10 +182,7 @@ type
                                      to executes the SQL queries.)
     }
     {$ENDIF}
-    constructor Create(CreateSuspended: Boolean; ExecSQLProc:TExecSQLProc;
-                       StartTransactionProc:TStartTransaction;
-                       CommitTransactionProc:TCommitTransaction;
-                       RollbackTransactionProc:TRollbackTransaction);
+    constructor Create(CreateSuspended: Boolean; ExecSQLProc: TExecSQLProc; StartTransactionProc: TStartTransaction; CommitTransactionProc: TCommitTransaction; RollbackTransactionProc: TRollbackTransaction);
     //: @exclude
     destructor Destroy; override;
     {$IFDEF PORTUGUES}
@@ -207,7 +205,7 @@ type
              procedure, it can return wrAbandoned or wrError.)
     }
     {$ENDIF}
-    function WaitEnd(Timeout:Cardinal):TWaitResult;
+    function WaitEnd(Timeout: Cardinal): TWaitResult;
   public
     {$IFDEF PORTUGUES}
     {:
@@ -220,7 +218,7 @@ type
     @param(sql String. SQL query command.)
     }
     {$ENDIF}
-    procedure ExecSQLWithoutResultSet(sql:UTF8String; ReturnSync:Boolean=true; NewConnection:Boolean=true);
+    procedure ExecSQLWithoutResultSet(SQL: UTF8String; ReturnSync: Boolean = True; NewConnection: Boolean = True);
 
     {$IFDEF PORTUGUES}
     {:
@@ -238,10 +236,10 @@ type
                                                   to return the dataset.)
     }
     {$ENDIF}
-    procedure ExecSQLWithResultSet(sql:UTF8String; ReturnDataCallback:TReturnDataSetProc; ReturnSync, NewConnection:Boolean);
+    procedure ExecSQLWithResultSet(SQL: UTF8String; ReturnDataCallback: TReturnDataSetProc; ReturnSync, NewConnection: Boolean);
 
-    procedure ExecTransaction(aStatements:THMIDBConnectionStatementList; ReturnTransactionResult:TReturnTransactionStatementsProc; FreeStatemensAfterExecute:Boolean; ReturnSync, NewConnection:Boolean);
-    property PendingMsgs:Integer read GetPendingMsgs;
+    procedure ExecTransaction(AStatements: THMIDBConnectionStatementList; ReturnTransactionResult: TReturnTransactionStatementsProc; FreeStatemensAfterExecute: Boolean; ReturnSync, NewConnection: Boolean);
+    property PendingMsgs: Integer read GetPendingMsgs;
   end;
 
   {$IFDEF PORTUGUES}
@@ -258,173 +256,168 @@ type
   {$ENDIF}
   THMIDBConnection = class(TComponent, IHMIDBConnection)
   private
-    FConnectRead:Boolean;
+    FConnectRead: Boolean;
     FCustomCommitTransaction: TNotifyEvent;
     FCustomExecSQL: TExecSQLProc;
     FCustomRollbackTransaction: TNotifyEvent;
     FCustomStartTransaction: TNotifyEvent;
-    FLibraryLocation: String;
+    FLibraryLocation: string;
     FReadOnly: Boolean;
-    FSyncConnection,
-    FASyncConnection:TZConnection;
-    FASyncQuery:TZQuery;
-    FCS:TCriticalSection;
-    FSQLSpooler:TProcessSQLCommandThread;
-    function  GetPendingSQLCmds: Integer;
-    function  getProperties: TStrings;
-    function  GetSyncConnection:TZConnection;
-    procedure ExecuteSQLCommand(sqlcmd:Utf8String; outputdataset:TFPSBufDataSet; out Error:Boolean; NewConnection:Boolean);
-    procedure SetLibraryLocation(AValue: String);
+    FSyncConnection, FASyncConnection: TZConnection;
+    FASyncQuery: TZQuery;
+    FCS: TCriticalSection;
+    FSQLSpooler: TProcessSQLCommandThread;
+    function GetPendingSQLCmds: Integer;
+    function getProperties: TStrings;
+    function GetSyncConnection: TZConnection;
+    procedure ExecuteSQLCommand(SQLCmd: UTF8String; OutputDataset: TFPSBufDataSet; out Error: Boolean; NewConnection: Boolean);
+    procedure SetLibraryLocation(AValue: string);
     procedure SetProperties(AValue: TStrings);
     procedure SetReadOnly(AValue: Boolean);
   protected
     FProtocol: string;
     FHostName: string;
-    FPort: LongInt;
+    FPort: Longint;
     FDatabase: string;
     FUser: string;
     FPassword: string;
     FCatalog: string;
-    FProperties:TStringList;
+    FProperties: TStringList;
     procedure Loaded; override;
   protected
-    function GetConnected:Boolean;
+    function GetConnected: Boolean;
 
-    procedure SetConnected(x:Boolean);
-    procedure SetProtocol(x: String);
-    procedure SetHostName(x: String);
-    procedure SetPort(x: LongInt);
-    procedure SetDatabase(x: String);
-    procedure SetUser(x: String);
-    procedure SetPassword(x: String);
-    procedure SetCatalog(x: String);
-    procedure StartTransaction(NewConnection:Boolean);
+    procedure SetConnected(x: Boolean);
+    procedure SetProtocol(x: string);
+    procedure SetHostName(x: string);
+    procedure SetPort(x: Longint);
+    procedure SetDatabase(x: string);
+    procedure SetUser(x: string);
+    procedure SetPassword(x: string);
+    procedure SetCatalog(x: string);
+    procedure StartTransaction(NewConnection: Boolean);
     procedure CommitTransaction;
     procedure RollBackTransaction;
   public
     constructor Create(AOwner: TComponent); override;
-    destructor  Destroy; override;
-    procedure   ExecSQL(sql:UTF8String; ReturnDatasetCallback:TReturnDataSetProc; ReturnSync:Boolean=true; NewConnection:Boolean=false);
-    procedure   ExecTransaction(statements:THMIDBConnectionStatementList; ReturnTransactionResult:TReturnTransactionStatementsProc; FreeStatemensAfterExecute:Boolean; ReturnSync:Boolean=true; NewConnection:Boolean=false);
-    property    GetPendingSQLCommands:Integer read GetPendingSQLCmds;
+    destructor Destroy; override;
+    procedure ExecSQL(SQL: UTF8String; ReturnDatasetCallback: TReturnDataSetProc; ReturnSync: Boolean = True; NewConnection: Boolean = False);
+    procedure ExecTransaction(Statements: THMIDBConnectionStatementList; ReturnTransactionResult: TReturnTransactionStatementsProc; FreeStatemensAfterExecute: Boolean; ReturnSync: Boolean = True; NewConnection: Boolean = False);
+    property GetPendingSQLCommands: Integer read GetPendingSQLCmds;
   public
-    class function FormatPGDatetime(aDateTime: TDateTime): String;
-    class function FormatSQLNumber(aNumber: Double; decimalplaces: Byte=0): String;
-    class function FormatSQLString(aStr: String; EmptyIsNull: Boolean=false
-      ): String;
-    class function FormatSQLUUID(aUUID: TGuid): String;
+    class function FormatPGDatetime(ADateTime: TDateTime): string;
+    class function FormatSQLNumber(ANumber: Double; DecimalPlaces: Byte = 0): string;
+    class function FormatSQLString(AStr: string; EmptyIsNull: Boolean = False): string;
+    class function FormatSQLUUID(AUUID: TGuid): string;
   published
     {$IFDEF PORTUGUES}
     //: Caso @true, conecta ou está conectado ao banco de dados.
     {$ELSE}
     //: If true, connects or are connected on database.
     {$ENDIF}
-    property Connected:Boolean read GetConnected write SetConnected;
+    property Connected: Boolean read GetConnected write SetConnected;
 
     {$IFDEF PORTUGUES}
     //: Força o ZeosLib usar a biblioteca de acesso nativo apontada por este caminho.
     {$ELSE}
     //: If true, connects or are connected on database.
     {$ENDIF}
-    property LibraryLocation:String read FLibraryLocation write SetLibraryLocation nodefault;
+    property LibraryLocation: string read FLibraryLocation write SetLibraryLocation nodefault;
 
     {$IFDEF PORTUGUES}
     //: Driver de banco de dados em uso para conexão ao banco de dados.
     {$ELSE}
     //: Database protocol driver used to connect on database.
     {$ENDIF}
-    property Protocol: string  read FProtocol    write SetProtocol;
+    property Protocol: string read FProtocol write SetProtocol;
 
     {$IFDEF PORTUGUES}
     //: Endereço ou nome da máquina onde está o banco de dados.
     {$ELSE}
     //: Address or machine name where is the database.
     {$ENDIF}
-    property HostName: string  read FHostName    write SetHostName;
+    property HostName: string read FHostName write SetHostName;
 
     {$IFDEF PORTUGUES}
     //: Número da porta usada para conectar no banco de dados (conexões TCP/UDP)
     {$ELSE}
     //: Port number to connect on database (TCP/UDP connections)
     {$ENDIF}
-    property Port:     LongInt read FPort        write SetPort default 0;
+    property Port: Longint read FPort write SetPort default 0;
 
     {$IFDEF PORTUGUES}
     //: Lista de propriedades da conexão
     {$ELSE}
     //: Connections properties.
     {$ENDIF}
-    property Properties:TStrings read getProperties write SetProperties;
+    property Properties: TStrings read getProperties write SetProperties;
 
     {$IFDEF PORTUGUES}
     //: Banco de dados a conectar.
     {$ELSE}
     //: Database name.
     {$ENDIF}
-    property Database: string  read FDatabase    write SetDatabase;
+    property Database: string read FDatabase write SetDatabase;
 
     {$IFDEF PORTUGUES}
     //: Usuário a conectar no banco de dados.
     {$ELSE}
     //: Username to connect on database.
     {$ENDIF}
-    property User:     string  read FUser        write SetUser;
+    property User: string read FUser write SetUser;
 
     {$IFDEF PORTUGUES}
     //: Senha do usuário para conectar ao banco de dados.
     {$ELSE}
     //: Password of the user to connect on database.
     {$ENDIF}
-    property Password: string  read FPassword    write SetPassword;
+    property Password: string read FPassword write SetPassword;
 
     {$IFDEF PORTUGUES}
     //: Verifique a documentação do TZConnection.Catalog do ZeosLib para maiores informações.
     {$ELSE}
     //: See the documentation of TZConnection.Catalog of ZeosLib for more information.
     {$ENDIF}
-    property Catalog:  string  read FCatalog     write SetCatalog;
+    property Catalog: string read FCatalog write SetCatalog;
 
     {$IFDEF PORTUGUES}
     //: Verifique a documentação do TZConnection.ReadOnly do ZeosLib para maiores informações.
     {$ELSE}
     //: See the documentation of TZConnection.ReadOnly of ZeosLib for more information.
     {$ENDIF}
-    property ReadOnly:Boolean  read FReadOnly    write SetReadOnly;
+    property ReadOnly: Boolean read FReadOnly write SetReadOnly;
 
-    property OnCustomStartTransaction:TNotifyEvent read FCustomStartTransaction write FCustomStartTransaction;
-    property OnCustomCommitTransaction:TNotifyEvent read FCustomCommitTransaction write FCustomCommitTransaction;
-    property OnCustomRollbackTransaction:TNotifyEvent read FCustomRollbackTransaction write FCustomRollbackTransaction;
-    property OnCustomExecSQL:TExecSQLProc read FCustomExecSQL write FCustomExecSQL;
+    property OnCustomStartTransaction: TNotifyEvent read FCustomStartTransaction write FCustomStartTransaction;
+    property OnCustomCommitTransaction: TNotifyEvent read FCustomCommitTransaction write FCustomCommitTransaction;
+    property OnCustomRollbackTransaction: TNotifyEvent read FCustomRollbackTransaction write FCustomRollbackTransaction;
+    property OnCustomExecSQL: TExecSQLProc read FCustomExecSQL write FCustomExecSQL;
   end;
 
 const
-  SQLCommandMSG        = 0;
+  SQLCommandMSG = 0;
   StatementsCommandMSG = 1;
 
 implementation
 
 uses StrUtils, hsutils;
 
-//##############################################################################
-//THREAD DE EXECUÇÃO DOS COMANDOS SQL THMIDBCONNECTION
-//SQL COMMANDS QUEUE THREAD CLASS.
-//##############################################################################
+  //##############################################################################
+  //THREAD DE EXECUÇÃO DOS COMANDOS SQL THMIDBCONNECTION
+  //SQL COMMANDS QUEUE THREAD CLASS.
+  //##############################################################################
 
-constructor TProcessSQLCommandThread.Create(CreateSuspended: Boolean;
-  ExecSQLProc: TExecSQLProc; StartTransactionProc: TStartTransaction;
-  CommitTransactionProc: TCommitTransaction;
-  RollbackTransactionProc: TRollbackTransaction);
+constructor TProcessSQLCommandThread.Create(CreateSuspended: Boolean; ExecSQLProc: TExecSQLProc; StartTransactionProc: TStartTransaction; CommitTransactionProc: TCommitTransaction; RollbackTransactionProc: TRollbackTransaction);
 begin
   inherited Create(CreateSuspended);
-  FQueue:=TMessageSpool.Create;
-  FEnd:=TCrossEvent.Create(true,false);
-  fOnExecSQL:=ExecSQLProc;
-  fStartTransaction:=StartTransactionProc;
-  fCommitTransaction:=CommitTransactionProc;
-  fRollbackTransaction:=RollbackTransactionProc;
+  FQueue := TMessageSpool.Create;
+  FEnd := TCrossEvent.Create(True, False);
+  FOnExecSQL := ExecSQLProc;
+  FStartTransaction := StartTransactionProc;
+  FCommitTransaction := CommitTransactionProc;
+  FRollbackTransaction := RollbackTransactionProc;
 end;
 
-destructor  TProcessSQLCommandThread.Destroy;
+destructor TProcessSQLCommandThread.Destroy;
 begin
   inherited Destroy;
   ProcessMessages;
@@ -432,10 +425,11 @@ begin
   FEnd.Destroy;
 end;
 
-procedure   TProcessSQLCommandThread.Execute;
+procedure TProcessSQLCommandThread.Execute;
 begin
   FEnd.ResetEvent;
-  while not Terminated do begin
+  while not Terminated do
+  begin
     ProcessMessages;
     Sleep(1);
   end;
@@ -443,117 +437,139 @@ begin
   FEnd.SetEvent;
 end;
 
-procedure   TProcessSQLCommandThread.ProcessMessages;
+procedure TProcessSQLCommandThread.ProcessMessages;
 var
-  msg:TMSMsg;
-  s: Integer;
-  err, isASelect: Boolean;
-  sql: String;
+  Msg: TMSMsg;
+  i: Integer;
+  Err: Boolean;
+  isASelect: Boolean;
+  SQL: string;
 begin
-  while FQueue.PeekMessage(msg,0,0,true) do begin
-    //executa o comando sql
-    //executes the sql commmand.
-    FErrorOnSync:=false;
-    if (msg.MsgID=SQLCommandMSG) and (msg.wParam<>nil) then begin
-      cmd:=PSQLCmdRec(msg.wParam);
-      InterlockedExchange(FProcessingCmd,1);
+  while FQueue.PeekMessage(Msg, 0, 0, True) do
+  begin
+    //executa o comando SQL
+    //executes the SQL commmand.
+    FErrorOnSync := False;
+    if (Msg.MsgID = SQLCommandMSG) and (Msg.wParam <> nil) then
+    begin
+      Cmd := PSQLCmdRec(Msg.wParam);
+      InterlockedExchange(FProcessingCmd, 1);
       try
         try
           //se é necessario retornar algo
           //cria o dataset de retorno de dados.
-          //
+
           //if are to return the data,
           //creates the dataset.
-          ferror:=nil;
+          FError := nil;
 
-          isASelect:=false;
-          sql:=Trim(LowerCase(cmd^.SQLCmd));
-          isASelect:=pos('select',sql)=1;
+          isASelect := False;
+          SQL := Trim(LowerCase(Cmd^.SQLCmd));
+          isASelect := pos('select', SQL) = 1;
 
-          if Assigned(cmd^.ReturnDataSetCallback) and isASelect then begin
-            fds:=TFPSBufDataSet.Create(Nil);
-          end else begin
-            fds:=nil;
+          if Assigned(Cmd^.ReturnDatasetCallback) and isASelect then
+          begin
+            FDs := TFPSBufDataSet.Create(nil);
+          end
+          else
+          begin
+            FDs := nil;
           end;
 
-          if Assigned(fOnExecSQL) then
-            try
-              fOnExecSQL(cmd^.SQLCmd, fds, err, cmd^.NewConnection);
-            finally
-            end;
+          if Assigned(FOnExecSQL) then
+          try
+            FOnExecSQL(Cmd^.SQLCmd, FDs, Err, Cmd^.NewConnection);
+          finally
+          end;
 
-          if Assigned(cmd^.ReturnDataSetCallback) then begin
-            if cmd^.ReturnSync then begin
-              FErrorOnSync:=true;
+          if Assigned(Cmd^.ReturnDatasetCallback) then
+          begin
+            if Cmd^.ReturnSync then
+            begin
+              FErrorOnSync := True;
               Synchronize(@ReturnData);
-            end else
+            end
+            else
               ReturnData;
           end;
         except
-          on e:Exception do begin
-            if not FErrorOnSync then begin
-              ferror:=e;
-              if Assigned(cmd^.ReturnDataSetCallback) then
-                Synchronize(@ReturnData);;
+          on E: Exception do
+          begin
+            if not FErrorOnSync then
+            begin
+              FError := E;
+              if Assigned(Cmd^.ReturnDatasetCallback) then
+                Synchronize(@ReturnData);
             end;
           end;
         end;
       finally
-        if Assigned(cmd) then Dispose(cmd);
-        InterlockedExchange(FProcessingCmd,0);
+        if Assigned(Cmd) then Dispose(Cmd);
+        InterlockedExchange(FProcessingCmd, 0);
       end;
     end;
 
-    if (msg.MsgID=StatementsCommandMSG) and (msg.wParam<>nil) then begin
-      statements:=PStatementCmdRec(msg.wParam);
+    if (Msg.MsgID = StatementsCommandMSG) and (Msg.wParam <> nil) then
+    begin
+      Statements := PStatementCmdRec(Msg.wParam);
       try
-        InterlockedExchange(FProcessingCmd,1);
-        if statements^.statements=nil then exit;
-        if not Assigned(fStartTransaction) then exit;
-        if not Assigned(fCommitTransaction) then exit;
-        if not Assigned(fRollbackTransaction) then exit;
-        if not Assigned(fOnExecSQL) then exit;
+        InterlockedExchange(FProcessingCmd, 1);
+        if Statements^.Statements = nil then
+          Exit;
+        if not Assigned(FStartTransaction) then
+          Exit;
+        if not Assigned(FCommitTransaction) then
+          Exit;
+        if not Assigned(FRollbackTransaction) then
+          Exit;
+        if not Assigned(FOnExecSQL) then
+          Exit;
 
         try
-          fStartTransaction(statements^.NewConnection);
-          ferror:=nil;
+          FStartTransaction(Statements^.NewConnection);
+          FError := nil;
           try
-            fLineError:=0;
-            for s:=0 to statements^.statements.Count-1 do begin
-              fOnExecSQL(statements^.statements.Items[s], nil, err, false);
-              if err then break;
+            FLineError := 0;
+            for i := 0 to Statements^.Statements.Count - 1 do
+            begin
+              FOnExecSQL(Statements^.Statements.Items[i], nil, Err, False);
+              if Err then Break;
             end;
           except
-            on e:Exception do begin
-              ferror:=e;
-              fLineError:=s;
-              exit;
+            on e: Exception do
+            begin
+              FError := e;
+              FLineError := i;
+              Exit;
             end;
           end;
         finally
-          if (err=false) and (ferror=nil) then
-            fCommitTransaction()
+          if (Err = False) and (FError = nil) then
+            FCommitTransaction()
           else
-            fRollbackTransaction();
+            FRollbackTransaction();
 
-          if Assigned(statements^.ReturnTransactionResult) then begin
-            if statements^.ReturnSync then
+          if Assigned(Statements^.ReturnTransactionResult) then
+          begin
+            if Statements^.ReturnSync then
               Synchronize(@ReturnStatementsResults)
-            else begin
-              if (err=false) and (ferror=nil) then
-                statements^.ReturnTransactionResult(self, statements^.statements, True, -1, nil)
+            else
+            begin
+              if (Err = False) and (FError = nil) then
+                Statements^.ReturnTransactionResult(self, Statements^.Statements, True, -1, nil)
               else
-                statements^.ReturnTransactionResult(self, statements^.statements, false, fLineError, ferror)
+                Statements^.ReturnTransactionResult(self, Statements^.Statements, False, FLineError, FError);
             end;
           end;
         end;
       finally
-        if statements^.FreeStatemensAfterExecute then begin
-          statements^.statements.Clear;
-          FreeAndNil(statements^.statements);
+        if Statements^.FreeStatemensAfterExecute then
+        begin
+          Statements^.Statements.Clear;
+          FreeAndNil(Statements^.Statements);
         end;
-        Dispose(statements);
-        InterlockedExchange(FProcessingCmd,0);
+        Dispose(Statements);
+        InterlockedExchange(FProcessingCmd, 0);
       end;
     end;
   end;
@@ -561,102 +577,93 @@ end;
 
 function TProcessSQLCommandThread.GetPendingMsgs: Integer;
 begin
-  Result:=FQueue.GetMsgCount+InterlockedExchange(FProcessingCmd,FProcessingCmd);
+  Result := FQueue.GetMsgCount + InterlockedExchange(FProcessingCmd, FProcessingCmd);
 end;
 
-procedure   TProcessSQLCommandThread.ReturnData;
+procedure TProcessSQLCommandThread.ReturnData;
 begin
-  if ferror<>nil then
-    cmd^.ReturnDataSetCallback(self,nil,ferror)
+  if FError <> nil then
+    Cmd^.ReturnDatasetCallback(self, nil, FError)
   else
-    cmd^.ReturnDataSetCallback(self,fds,nil);
+    Cmd^.ReturnDatasetCallback(self, FDs, nil);
 end;
 
 procedure TProcessSQLCommandThread.ReturnStatementsResults;
 begin
-  if ferror=nil then
-    statements^.ReturnTransactionResult(self, statements^.statements, True, -1, nil)
+  if FError = nil then
+    Statements^.ReturnTransactionResult(self, Statements^.Statements, True, -1, nil)
   else
-    statements^.ReturnTransactionResult(self, statements^.statements, false, fLineError, ferror)
+    Statements^.ReturnTransactionResult(self, Statements^.Statements, False, FLineError, FError);
 end;
 
-function    TProcessSQLCommandThread.WaitEnd(Timeout:Cardinal):TWaitResult;
+function TProcessSQLCommandThread.WaitEnd(Timeout: Cardinal): TWaitResult;
 begin
   Result := FEnd.WaitFor(Timeout);
 end;
 
-procedure TProcessSQLCommandThread.ExecSQLWithoutResultSet(sql: UTF8String;
-  ReturnSync: Boolean; NewConnection: Boolean);
+procedure TProcessSQLCommandThread.ExecSQLWithoutResultSet(SQL: UTF8String; ReturnSync: Boolean; NewConnection: Boolean);
 begin
-  ExecSQLWithResultSet(sql, nil, ReturnSync, NewConnection);
+  ExecSQLWithResultSet(SQL, nil, ReturnSync, NewConnection);
 end;
 
-procedure TProcessSQLCommandThread.ExecSQLWithResultSet(sql: UTF8String;
-  ReturnDataCallback: TReturnDataSetProc; ReturnSync, NewConnection: Boolean);
+procedure TProcessSQLCommandThread.ExecSQLWithResultSet(SQL: UTF8String; ReturnDataCallback: TReturnDataSetProc; ReturnSync, NewConnection: Boolean);
 var
-  sqlcmd:PSQLCmdRec;
+  SQLCmd: PSQLCmdRec;
 begin
-  if Terminated then exit;
-  new(sqlcmd);
-  sqlcmd^.SQLCmd:=sql;
-  sqlcmd^.ReturnSync:=ReturnSync;
-  sqlcmd^.NewConnection:=NewConnection;
-  sqlcmd^.ReturnDataSetCallback:=ReturnDataCallback;
-  FQueue.PostMessage(SQLCommandMSG,sqlcmd,nil,true);
+  if Terminated then Exit;
+  new(SQLCmd);
+  SQLCmd^.SQLCmd := SQL;
+  SQLCmd^.ReturnSync := ReturnSync;
+  SQLCmd^.NewConnection := NewConnection;
+  SQLCmd^.ReturnDatasetCallback := ReturnDataCallback;
+  FQueue.PostMessage(SQLCommandMSG, SQLCmd, nil, True);
 end;
 
-procedure TProcessSQLCommandThread.ExecTransaction(
-  aStatements: THMIDBConnectionStatementList;
-  ReturnTransactionResult: TReturnTransactionStatementsProc;
-  FreeStatemensAfterExecute: Boolean; ReturnSync, NewConnection: Boolean);
+procedure TProcessSQLCommandThread.ExecTransaction(AStatements: THMIDBConnectionStatementList; ReturnTransactionResult: TReturnTransactionStatementsProc; FreeStatemensAfterExecute: Boolean; ReturnSync, NewConnection: Boolean);
 var
-  statementcmd:PStatementCmdRec;
+  statementcmd: PStatementCmdRec;
 begin
-  if Terminated      then exit;
-  if aStatements=nil then exit;
+  if Terminated then Exit;
+  if AStatements = nil then Exit;
 
   new(statementcmd);
-  statementcmd^.statements:=aStatements;
-  statementcmd^.ReturnTransactionResult:=ReturnTransactionResult;
-  statementcmd^.FreeStatemensAfterExecute:=FreeStatemensAfterExecute;
-  statementcmd^.ReturnSync:=ReturnSync;
-  statementcmd^.NewConnection:=NewConnection;
+  statementcmd^.Statements := AStatements;
+  statementcmd^.ReturnTransactionResult := ReturnTransactionResult;
+  statementcmd^.FreeStatemensAfterExecute := FreeStatemensAfterExecute;
+  statementcmd^.ReturnSync := ReturnSync;
+  statementcmd^.NewConnection := NewConnection;
 
-  FQueue.PostMessage(StatementsCommandMSG,statementcmd,nil,true);
+  FQueue.PostMessage(StatementsCommandMSG, statementcmd, nil, True);
 end;
 
+
 //##############################################################################
-//CLASSE THMIDBCONNECTION
-//
-//THMIDBCONNECTION CLASS
+// THMIDBConnection class
 //##############################################################################
 
 constructor THMIDBConnection.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FCS:=TCriticalSection.Create;
-  FSyncConnection:=TZConnection.Create(nil);
-  FASyncConnection:=TZConnection.Create(nil);
-  FASyncQuery:=TZQuery.Create(FASyncConnection);
-  FASyncQuery.Connection:=FASyncConnection;
-  FProperties:=TStringList.Create;
+  FCS := TCriticalSection.Create;
+  FSyncConnection := TZConnection.Create(nil);
+  FASyncConnection := TZConnection.Create(nil);
+  FASyncQuery := TZQuery.Create(FASyncConnection);
+  FASyncQuery.Connection := FASyncConnection;
+  FProperties := TStringList.Create;
 
-  FSQLSpooler:=TProcessSQLCommandThread.Create(true,@ExecuteSQLCommand,
-                                               @StartTransaction,
-                                               @CommitTransaction,
-                                               @RollBackTransaction);
+  FSQLSpooler := TProcessSQLCommandThread.Create(True, @ExecuteSQLCommand, @StartTransaction, @CommitTransaction, @RollBackTransaction);
   FSQLSpooler.WakeUp;
 end;
 
-destructor  THMIDBConnection.Destroy;
+destructor THMIDBConnection.Destroy;
 begin
   inherited Destroy;
   //destroi a thread
-  //
+
   //Destroys the thread.
   FSQLSpooler.Terminate;
-  while FSQLSpooler.WaitEnd(1)<>wrSignaled do
-    if MainThreadID=GetCurrentThreadID then
+  while FSQLSpooler.WaitEnd(1) <> wrSignaled do
+    if MainThreadID = GetCurrentThreadID then
       CheckSynchronize(1)
     else
       Sleep(1);
@@ -671,58 +678,55 @@ end;
 
 procedure THMIDBConnection.Loaded;
 begin
-  Inherited loaded;
-  Connected:=FConnectRead;
+  inherited Loaded;
+  Connected := FConnectRead;
 end;
 
-function THMIDBConnection.GetSyncConnection:TZConnection;
+function THMIDBConnection.GetSyncConnection: TZConnection;
 begin
-  Result:=FSyncConnection;
+  Result := FSyncConnection;
 end;
 
 function THMIDBConnection.getProperties: TStrings;
 begin
-  Result:=FProperties;
+  Result := FProperties;
 end;
 
 function THMIDBConnection.GetPendingSQLCmds: Integer;
 begin
-  result := FSQLSpooler.PendingMsgs;
+  Result := FSQLSpooler.PendingMsgs;
 end;
 
-procedure THMIDBConnection.ExecSQL(sql: UTF8String;
-  ReturnDatasetCallback: TReturnDataSetProc; ReturnSync: Boolean;
-  NewConnection: Boolean);
+procedure THMIDBConnection.ExecSQL(SQL: UTF8String; ReturnDatasetCallback: TReturnDataSetProc; ReturnSync: Boolean; NewConnection: Boolean);
 begin
-  if Assigned(FSQLSpooler) THEN
-    FSQLSpooler.ExecSQLWithResultSet(sql, ReturnDatasetCallback, ReturnSync, NewConnection);
+  if Assigned(FSQLSpooler) then
+    FSQLSpooler.ExecSQLWithResultSet(SQL, ReturnDatasetCallback, ReturnSync, NewConnection);
 end;
 
-procedure THMIDBConnection.ExecTransaction(
-  statements: THMIDBConnectionStatementList;
-  ReturnTransactionResult: TReturnTransactionStatementsProc;
-  FreeStatemensAfterExecute: Boolean; ReturnSync: Boolean;
-  NewConnection: Boolean);
+procedure THMIDBConnection.ExecTransaction(Statements: THMIDBConnectionStatementList; ReturnTransactionResult: TReturnTransactionStatementsProc; FreeStatemensAfterExecute: Boolean; ReturnSync: Boolean; NewConnection: Boolean);
 begin
-  if Assigned(FSQLSpooler) THEN
-    FSQLSpooler.ExecTransaction(statements,ReturnTransactionResult,FreeStatemensAfterExecute,ReturnSync,NewConnection);
+  if Assigned(FSQLSpooler) then
+    FSQLSpooler.ExecTransaction(Statements, ReturnTransactionResult, FreeStatemensAfterExecute, ReturnSync, NewConnection);
 end;
 
 procedure THMIDBConnection.StartTransaction(NewConnection: Boolean);
 begin
   if Assigned(FCustomStartTransaction) then
-    FCustomStartTransaction(Self)
-  else begin
+    FCustomStartTransaction(self)
+  else
+  begin
     FCS.Enter;
     try
       try
-        if NewConnection then begin
+        if NewConnection then
+        begin
           FASyncConnection.Disconnect;
           FASyncConnection.Connect;
         end;
         FASyncConnection.StartTransaction;
       except
-        on e:Exception do begin
+        on e: Exception do
+        begin
           {$IFNDEF WINDOWS}
           writeln('Start transaction exception: ', e.Message);
           {$ENDIF}
@@ -737,8 +741,9 @@ end;
 procedure THMIDBConnection.CommitTransaction;
 begin
   if Assigned(FCustomCommitTransaction) then
-    FCustomCommitTransaction(Self)
-  else begin
+    FCustomCommitTransaction(self)
+  else
+  begin
     FCS.Enter;
     try
       FASyncConnection.Commit;
@@ -751,8 +756,9 @@ end;
 procedure THMIDBConnection.RollBackTransaction;
 begin
   if Assigned(FCustomRollbackTransaction) then
-    FCustomRollbackTransaction(Self)
-  else begin
+    FCustomRollbackTransaction(self)
+  else
+  begin
     FCS.Enter;
     try
       FASyncConnection.Rollback;
@@ -762,56 +768,59 @@ begin
   end;
 end;
 
-procedure THMIDBConnection.ExecuteSQLCommand(sqlcmd: Utf8String;
-  outputdataset: TFPSBufDataSet; out Error: Boolean; NewConnection: Boolean);
+procedure THMIDBConnection.ExecuteSQLCommand(SQLCmd: UTF8String; OutputDataset: TFPSBufDataSet; out Error: Boolean; NewConnection: Boolean);
 var
-  ts: TStringStream;
-  msg: String;
+  AStringStream: TStringStream;
+  Msg: string;
 begin
   if Assigned(FCustomExecSQL) then
-    FCustomExecSQL(sqlcmd,outputdataset,Error,NewConnection)
-  else begin
+    FCustomExecSQL(SQLCmd, OutputDataset, Error, NewConnection)
+  else
+  begin
     FCS.Enter;
     try
-
-      if FASyncConnection.ReadOnly then begin
-        Error:=true;
-        exit;
+      if FASyncConnection.ReadOnly then
+      begin
+        Error := True;
+        Exit;
       end;
 
       try
-
-        if NewConnection then begin
+        if NewConnection then
+        begin
           FASyncConnection.Disconnect;
           FASyncConnection.Connect;
         end;
 
-        Error:=false;
+        Error := False;
         FASyncQuery.SQL.Clear;
-        FASyncQuery.SQL.Add(sqlcmd);
-        if outputdataset=nil then begin
+        FASyncQuery.SQL.Add(SQLCmd);
+        if OutputDataset = nil then
+        begin
           try
             FASyncQuery.ExecSQL
           except
-            Error := true;
+            Error := True;
           end;
-        end else begin
-
+        end
+        else
+        begin
           FASyncQuery.Open;
-          outputdataset.CopyFromDataset(FASyncQuery);
+          OutputDataset.CopyFromDataset(FASyncQuery);
           FASyncQuery.Close;
         end;
       except
-        on e:Exception do begin
-          msg:=e.Message;
+        on e: Exception do
+        begin
+          Msg := e.Message;
           {$IFNDEF WINDOWS}
           writeln(e.Message);
-          WriteLn(sqlcmd);
+          writeln(SQLCmd);
           {$ENDIF}
-          //ts:=TStringStream.Create(sqlcmd);
-          //ts.SaveToFile('/tmp/teste.txt');
-          //ts.Free;
-          Error:=true;
+          //AStringStream:=TStringStream.Create(sqlcmd);
+          //AStringStream.SaveToFile('/tmp/teste.txt');
+          //AStringStream.Free;
+          Error := True;
         end;
       end;
     finally
@@ -820,16 +829,16 @@ begin
   end;
 end;
 
-procedure THMIDBConnection.SetLibraryLocation(AValue: String);
+procedure THMIDBConnection.SetLibraryLocation(AValue: string);
 begin
-  FSyncConnection.LibraryLocation:=AValue;
+  FSyncConnection.LibraryLocation := AValue;
   FCS.Enter;
   try
-    FASyncConnection.LibraryLocation:=AValue;
+    FASyncConnection.LibraryLocation := AValue;
   finally
     FCS.Leave;
   end;
-  FHostName:=FSyncConnection.LibraryLocation;
+  FHostName := FSyncConnection.LibraryLocation;
 end;
 
 procedure THMIDBConnection.SetProperties(AValue: TStrings);
@@ -846,169 +855,172 @@ end;
 
 procedure THMIDBConnection.SetReadOnly(AValue: Boolean);
 begin
-  FSyncConnection.ReadOnly:=AValue;
+  FSyncConnection.ReadOnly := AValue;
   FCS.Enter;
   try
-    FASyncConnection.ReadOnly:=AValue;
+    FASyncConnection.ReadOnly := AValue;
   finally
     FCS.Leave;
   end;
-  FReadOnly:=FSyncConnection.ReadOnly;
+  FReadOnly := FSyncConnection.ReadOnly;
 end;
 
-function  THMIDBConnection.GetConnected:Boolean;
+function THMIDBConnection.GetConnected: Boolean;
 begin
-  Result:=FSyncConnection.Connected;
+  Result := FSyncConnection.Connected;
 end;
 
-procedure THMIDBConnection.SetProtocol(x: String);
+procedure THMIDBConnection.SetProtocol(x: string);
 begin
-  FSyncConnection.Protocol:=x;
+  FSyncConnection.Protocol := x;
   FCS.Enter;
   try
-    FASyncConnection.Protocol:=x;
+    FASyncConnection.Protocol := x;
   finally
     FCS.Leave;
   end;
-  FProtocol:=FSyncConnection.Protocol;
+  FProtocol := FSyncConnection.Protocol;
 end;
 
-procedure THMIDBConnection.SetHostName(x: String);
+procedure THMIDBConnection.SetHostName(x: string);
 begin
-  FSyncConnection.HostName:=x;
+  FSyncConnection.HostName := x;
   FCS.Enter;
   try
-    FASyncConnection.HostName:=x;
+    FASyncConnection.HostName := x;
   finally
     FCS.Leave;
   end;
-  FHostName:=FSyncConnection.HostName;
+  FHostName := FSyncConnection.HostName;
 end;
 
-procedure THMIDBConnection.SetPort(x: LongInt);
+procedure THMIDBConnection.SetPort(x: Longint);
 begin
-  FSyncConnection.Port:=x;
+  FSyncConnection.Port := x;
   FCS.Enter;
   try
-    FASyncConnection.Port:=x;
+    FASyncConnection.Port := x;
   finally
     FCS.Leave;
   end;
-  FPort:=FSyncConnection.Port;
+  FPort := FSyncConnection.Port;
 end;
 
-procedure THMIDBConnection.SetDatabase(x: String);
+procedure THMIDBConnection.SetDatabase(x: string);
 begin
-  FSyncConnection.Database:=x;
+  FSyncConnection.Database := x;
   FCS.Enter;
   try
-    FASyncConnection.Database:=x;
+    FASyncConnection.Database := x;
   finally
     FCS.Leave;
   end;
-  FDatabase:=FSyncConnection.Database;
+  FDatabase := FSyncConnection.Database;
 end;
 
-procedure THMIDBConnection.SetUser(x: String);
+procedure THMIDBConnection.SetUser(x: string);
 begin
-  FSyncConnection.User:=x;
+  FSyncConnection.User := x;
   FCS.Enter;
   try
-    FASyncConnection.User:=x;
+    FASyncConnection.User := x;
   finally
     FCS.Leave;
   end;
-  FUser:=FSyncConnection.User;
+  FUser := FSyncConnection.User;
 end;
 
-procedure THMIDBConnection.SetPassword(x: String);
+procedure THMIDBConnection.SetPassword(x: string);
 begin
-  FSyncConnection.Password:=x;
+  FSyncConnection.Password := x;
   FCS.Enter;
   try
-    FASyncConnection.Password:=x;
+    FASyncConnection.Password := x;
   finally
     FCS.Leave;
   end;
-  FPassword:=FSyncConnection.Password;
+  FPassword := FSyncConnection.Password;
 end;
 
-procedure THMIDBConnection.SetCatalog(x: String);
+procedure THMIDBConnection.SetCatalog(x: string);
 begin
-  FSyncConnection.Catalog:=x;
+  FSyncConnection.Catalog := x;
   FCS.Enter;
   try
-    FASyncConnection.Catalog:=x;
+    FASyncConnection.Catalog := x;
   finally
     FCS.Leave;
   end;
-  FCatalog:=FSyncConnection.Catalog;
+  FCatalog := FSyncConnection.Catalog;
 end;
 
-procedure THMIDBConnection.SetConnected(x:Boolean);
+procedure THMIDBConnection.SetConnected(x: Boolean);
 begin
-  if [csReading, csLoading]*ComponentState<>[] then begin
-    FConnectRead:=x;
-    exit;
+  if [csReading, csLoading] * ComponentState <> [] then
+  begin
+    FConnectRead := x;
+    Exit;
   end;
-  FSyncConnection.Connected:=x;
-  if FSyncConnection.Connected=x then begin
+  FSyncConnection.Connected := x;
+  if FSyncConnection.Connected = x then
+  begin
     FCS.Enter;
     try
-      FASyncConnection.Connected:=x;
+      FASyncConnection.Connected := x;
     finally
       FCS.Leave;
     end;
   end;
 end;
 
-class function THMIDBConnection.FormatPGDatetime(aDateTime: TDateTime): String;
+class function THMIDBConnection.FormatPGDatetime(ADateTime: TDateTime): string;
 var
-  x:TFormatSettings;
+  AFormatSettings: TFormatSettings;
 begin
-  x:=DefaultFormatSettings;
-  x.DateSeparator:='-';
-  result:=''''+FormatDateTime('yyyy-mm-dd hh:nn:ss.zzz',aDateTime, x)+'''';
+  AFormatSettings := DefaultFormatSettings;
+  AFormatSettings.DateSeparator := '-';
+  Result := '''' + FormatDateTime('yyyy-mm-dd hh:nn:ss.zzz', ADateTime, AFormatSettings) + '''';
 end;
 
-class function THMIDBConnection.FormatSQLNumber(aNumber: Double;
-  decimalplaces: Byte): String;
+class function THMIDBConnection.FormatSQLNumber(ANumber: Double; DecimalPlaces: Byte): string;
 var
-  x:TFormatSettings;
-  fmtMask: String;
+  AFormatSettings: TFormatSettings;
+  FmtMask: string;
 begin
-  x:=DefaultFormatSettings;
-  x.DecimalSeparator:='.';
-  fmtMask := '#0';
-  if decimalplaces>0 then
-    fmtMask:=fmtMask + x.DecimalSeparator + AddChar('0','',decimalplaces);
-  result:=FormatFloat(fmtMask,aNumber, x);
+  AFormatSettings := DefaultFormatSettings;
+  AFormatSettings.DecimalSeparator := '.';
+  FmtMask := '#0';
+  if DecimalPlaces > 0 then
+    FmtMask := FmtMask + AFormatSettings.DecimalSeparator + AddChar('0', '', DecimalPlaces);
+  Result := FormatFloat(FmtMask, ANumber, AFormatSettings);
 end;
 
-class function THMIDBConnection.FormatSQLString(aStr: String; EmptyIsNull:Boolean=false): String;
+class function THMIDBConnection.FormatSQLString(AStr: string; EmptyIsNull: Boolean = False): string;
 var
-  p: TStringArray;
-  s: Integer;
-  sep: String;
+  AStringArray: TStringArray;
+  i: Integer;
+  Sep: string;
 begin
-  if (aStr='') and EmptyIsNull then begin
-    Result:='NULL';
-    exit;
+  if (AStr = '') and EmptyIsNull then
+  begin
+    Result := 'NULL';
+    Exit;
   end;
 
-  p:=ExplodeString('''',aStr);
-  Result:='';
-  sep:='';
-  for s:=0 to High(p) do begin
-    result:=Result+sep+p[s];
-    sep:='''''';
+  AStringArray := ExplodeString('''', AStr);
+  Result := '';
+  Sep := '';
+  for i := 0 to High(AStringArray) do
+  begin
+    Result := Result + Sep + AStringArray[i];
+    Sep := '''''';
   end;
-  Result:=''''+Result+'''';
+  Result := '''' + Result + '''';
 end;
 
-class function THMIDBConnection.FormatSQLUUID(aUUID: TGuid): String;
+class function THMIDBConnection.FormatSQLUUID(AUUID: TGuid): string;
 begin
-  Result:=''''+GUIDToString(aUUID)+'''';
+  Result := '''' + GUIDToString(AUUID) + '''';
 end;
 
 end.

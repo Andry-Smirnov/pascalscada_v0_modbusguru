@@ -115,10 +115,10 @@ var
   aux: TJSONData;
 begin
   aux:=Find(AName);
-  if assigned(aux) then begin
+  if Assigned(aux) then begin
     Remove(aux);
   end;
-  exit(Add(AName, AValue));
+  Exit(Add(AName, AValue));
 end;
 
 function TJSONObjectExt.AddOrSet(const AName: TJSONStringType; AValue: Boolean
@@ -127,10 +127,10 @@ var
   aux: TJSONData;
 begin
   aux:=Find(AName);
-  if assigned(aux) then begin
+  if Assigned(aux) then begin
     Remove(aux);
   end;
-  exit(Add(AName, AValue));
+  Exit(Add(AName, AValue));
 end;
 
 function TJSONObjectExt.AddOrSet(const AName: TJSONStringType;
@@ -139,10 +139,10 @@ var
   aux: TJSONData;
 begin
   aux:=Find(AName);
-  if assigned(aux) then begin
+  if Assigned(aux) then begin
     Remove(aux);
   end;
-  exit(Add(AName, AValue));
+  Exit(Add(AName, AValue));
 end;
 
 function TJSONObjectExt.AddOrSet(const AName, AValue: TJSONStringType): Integer;
@@ -150,10 +150,10 @@ var
   aux: TJSONData;
 begin
   aux:=Find(AName);
-  if assigned(aux) then begin
+  if Assigned(aux) then begin
     Remove(aux);
   end;
-  exit(Add(AName, AValue));
+  Exit(Add(AName, AValue));
 end;
 
 function TJSONObjectExt.AddOrSet(const AName: String;
@@ -162,10 +162,10 @@ var
   aux: TJSONData;
 begin
   aux:=Find(AName);
-  if assigned(aux) then begin
+  if Assigned(aux) then begin
     Remove(aux);
   end;
-  exit(Add(AName, AValue));
+  Exit(Add(AName, AValue));
 end;
 
 function TJSONObjectExt.AddOrSet(const AName: TJSONStringType; Avalue: Int64
@@ -174,10 +174,10 @@ var
   aux: TJSONData;
 begin
   aux:=Find(AName);
-  if assigned(aux) then begin
+  if Assigned(aux) then begin
     Remove(aux);
   end;
-  exit(Add(AName, AValue));
+  Exit(Add(AName, AValue));
 end;
 
 function TJSONObjectExt.AddOrSet(const AName: TJSONStringType; Avalue: QWord
@@ -186,10 +186,10 @@ var
   aux: TJSONData;
 begin
   aux:=Find(AName);
-  if assigned(aux) then begin
+  if Assigned(aux) then begin
     Remove(aux);
   end;
-  exit(Add(AName, AValue));
+  Exit(Add(AName, AValue));
 end;
 
 function TJSONObjectExt.AddOrSet(const AName: TJSONStringType; Avalue: Integer
@@ -198,10 +198,10 @@ var
   aux: TJSONData;
 begin
   aux:=Find(AName);
-  if assigned(aux) then begin
+  if Assigned(aux) then begin
     Remove(aux);
   end;
-  exit(Add(AName, AValue));
+  Exit(Add(AName, AValue));
 end;
 
 function TJSONObjectExt.AddOrSet(const AName: TJSONStringType): Integer;
@@ -209,10 +209,10 @@ var
   aux: TJSONData;
 begin
   aux:=Find(AName);
-  if assigned(aux) then begin
+  if Assigned(aux) then begin
     Remove(aux);
   end;
-  exit(Add(AName));
+  Exit(Add(AName));
 end;
 
 function TJSONObjectExt.AddOrSet(const AName: TJSONStringType;
@@ -221,10 +221,10 @@ var
   aux: TJSONData;
 begin
   aux:=Find(AName);
-  if assigned(aux) then begin
+  if Assigned(aux) then begin
     Remove(aux);
   end;
-  exit(Add(AName, AValue));
+  Exit(Add(AName, AValue));
 end;
 
 { TSecWSThread }
@@ -279,7 +279,7 @@ var
 begin
   if Terminated then begin
     AResponse.Code:=405;
-    exit;
+    Exit;
   end;
 
   CoInitialize(nil);
@@ -295,7 +295,7 @@ begin
 
       if ARequest.Method.ToUpper.Trim<>'POST' then begin
         AResponse.Code:=405;
-        exit;
+        Exit;
       end;
 
 
@@ -310,7 +310,7 @@ begin
             AddToLog(etDebug, cliIPAddr, 'Invalid request content: '+ARequest.Content);
             AResponse.Content := '{"error": "Requisicao invalida"}';
             AResponse.Code    := 500;
-            exit;
+            Exit;
           end;
           try
             if Assigned(logindata) and
@@ -378,7 +378,7 @@ begin
             end else begin
               AResponse.Content := 'Requisicao JSON mal formada';
               AResponse.Code    := 500;
-              exit;
+              Exit;
             end;
           finally
             if Assigned(logindata) then
@@ -395,7 +395,7 @@ begin
           except
             AResponse.Content := '{"error": "Requisicao invalida"}';
             AResponse.Code    := 500;
-            exit;
+            Exit;
           end;
           try
             if Assigned(logindata) and
@@ -497,7 +497,7 @@ begin
             end else begin
               AResponse.Content := '{"error": "Requisicao mal formada"}';
               AResponse.Code    := 500;
-              exit;
+              Exit;
             end;
           finally
             if Assigned(logindata) then
@@ -513,7 +513,7 @@ begin
           except
             AResponse.Content := '{"error": "Requisicao invalida"}';
             AResponse.Code    := 500;
-            exit;
+            Exit;
           end;
           try
             if Assigned(logindata) and (logindata is TJSONObject) and TJSONObject(logindata).Find('securitycode',securitycode) then begin
@@ -551,7 +551,7 @@ begin
             end else begin
               AResponse.Content := '{"error": "JSON mal formado"}';
               AResponse.Code    := 500;
-              exit;
+              Exit;
             end;
           finally
             if Assigned(logindata) then
@@ -601,7 +601,7 @@ begin
           except
             AResponse.Content := '{"error": "Requisicao invalida"}';
             AResponse.Code    := 500;
-            exit;
+            Exit;
           end;
 
           try
@@ -698,7 +698,7 @@ begin
               end;
             end;
           end;
-          exit;
+          Exit;
         end;
       end;
 
@@ -857,9 +857,9 @@ begin
     try
       if not inif.ValueExists(SectionName, aSecurityCode) then begin
         inif.WriteString(SectionName,aSecurityCode,'');
-        exit(false);
+        Exit(false);
       end else begin
-        exit(inif.ReadString(SectionName, aSecurityCode,'').Trim.IsEmpty=false);
+        Exit(inif.ReadString(SectionName, aSecurityCode,'').Trim.IsEmpty=false);
       end;
     finally
       FreeAndNil(inif);
@@ -875,7 +875,7 @@ var
   values: TStringList;
   i: Integer;
 begin
-  if not Assigned(aJArray) then exit;
+  if not Assigned(aJArray) then Exit;
 
   cs.Enter;
   try
@@ -907,7 +907,7 @@ var
   i: Integer;
   jBool:TJSONBoolean;
 begin
-  if not Assigned(aOriginalAuths) then exit;
+  if not Assigned(aOriginalAuths) then Exit;
   cs.Enter;
   try
     inif:=TIniFile.Create(ExtractFilePath(ParamStr(0))+IniFileName);
@@ -951,7 +951,7 @@ begin
 
         if not auxS.Trim.IsEmpty then begin
           aReplacedSecurityCode:=auxS;
-          exit(true);
+          Exit(true);
         end;
       end;
     finally
@@ -1046,7 +1046,7 @@ end;
 procedure TForm1.FormDestroy(Sender: TObject);
 begin
   wst.Terminate2;
-  while assigned(wst) do begin
+  while Assigned(wst) do begin
     CheckSynchronize(10);
     Application.ProcessMessages;
   end;

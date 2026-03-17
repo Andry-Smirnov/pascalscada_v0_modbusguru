@@ -109,7 +109,7 @@ end;
 
 procedure TTextStrings.SetTextStr(const AValue: UTF8string);
 begin
-  if FText=AValue then exit;
+  if FText=AValue then Exit;
   FText:=AValue;
   FArraysValid:=false;
 end;
@@ -120,7 +120,7 @@ var
   l: LongInt;
   ArraySize: LongInt;
 begin
-  if FArraysValid then exit;
+  if FArraysValid then Exit;
   ClearArrays;
   FArraysValid:=true;
   // count line ends
@@ -167,7 +167,7 @@ procedure TTextStrings.Changed;
 begin
   if (FUpdateCount>0) then begin
     FChangedWhileUpdate:=true;
-    exit;
+    Exit;
   end;
   if Assigned(FOnChange) then
     FOnChange(Self);
@@ -294,7 +294,7 @@ begin
   if FArraysValid then
     for i:=0 to FLineCount-1 do
       if FLineRanges[i].TheObject<>nil then
-        exit(true);
+        Exit(true);
   Result:=false;
 end;
 
@@ -340,7 +340,7 @@ end;
 
 procedure TTextStrings.SetText(TheText: PChar);
 begin
-  if FText=TheText then exit;
+  if FText=TheText then Exit;
   FText:=TheText;
   FArraysValid:=false;
 end;
@@ -439,7 +439,7 @@ var
   LineShortLen2: LongInt;
 begin
   // check values
-  if Index1=Index2 then exit;
+  if Index1=Index2 then Exit;
   if Index1<0 then
     Error(rsListIndexExceedsBounds, Index1);
   if Index2<0 then
@@ -471,7 +471,7 @@ begin
   // get line lengths including new line chars
   LineLen1:=GetLineLen(Index1,true);
   LineLen2:=GetLineLen(Index2,true);
-  if (LineLen1<1) and (LineLen2<1) then exit;
+  if (LineLen1<1) and (LineLen2<1) then Exit;
   LineShortLen1:=GetLineLen(Index1,false);
   LineShortLen2:=GetLineLen(Index2,false);
 
@@ -535,7 +535,7 @@ var
   LineShortLen: LongInt;
 begin
   // check values
-  if CurIndex=NewIndex then exit;
+  if CurIndex=NewIndex then Exit;
   if CurIndex<0 then
     Error(rsListIndexExceedsBounds, CurIndex);
   if NewIndex<0 then
@@ -708,14 +708,14 @@ procedure TTextStrings.AddStrings(TheStrings: TStrings);
   var
     i: LongInt;
   begin
-    if HasObjects then exit(true);
+    if HasObjects then Exit(true);
     if TheStrings is TTextStrings then
       Result:=TTextStrings(TheStrings).HasObjects
     else
     begin
       for i:=0 to TheStrings.Count-1 do
         if TheStrings.Objects[i]<>nil then
-          exit(true);
+          Exit(true);
       Result:=false;
     end;
   end;
@@ -724,7 +724,7 @@ var
   s: String;
   i: LongInt;
 begin
-  if TheStrings.Count=0 then exit;
+  if TheStrings.Count=0 then Exit;
   if MustAddObjects then
   begin
     for i:=0 to TheStrings.Count-1 do

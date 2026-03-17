@@ -9,8 +9,14 @@ unit HMIButton;
 interface
 
 uses
-  Classes, SysUtils, {$IFDEF FPC}LResources, LMessages, {$ENDIF}Controls,
-  Graphics, Dialogs, Buttons, HMITypes, messages, PLCTag, ProtocolTypes, Tag;
+  Classes,
+  SysUtils,
+  {$IFDEF FPC}
+  LResources,
+  LMessages,
+  {$ENDIF}
+  Controls,
+  Graphics, Dialogs, Buttons, HMITypes, Messages, PLCTag, ProtocolTypes, Tag;
 
 type
   {$IFDEF PORTUGUES}
@@ -22,84 +28,92 @@ type
   { THMIButton }
 
   THMIButton = class(TSpeedButton, IHMIInterface)
-  private 
-    FRegInSecMan:Boolean;
-    FTag:TPLCTag;
-    FIsEnabled,
-    FIsEnabledBySecurity:Boolean;
-    FClickFlag:Boolean;
-    FAfterGrayed:Boolean;
-    FButtonType:TButtonType;
-    FOtherValues:TOtherValues;
-    FValueDown, FValueUp:Double;
-    FGlyphDown, FGlyphUp, FGlyphGrayed:TBitmap;
-    FColorDown, FColorUp, FColorGrayed:TColor;
-    FCaptionDown, FCaptionUp, FCaptionGrayed:TCaption;
+  private
+    FRegInSecMan: Boolean;
+    FTag: TPLCTag;
+    FIsEnabled: Boolean;
+    FIsEnabledBySecurity: Boolean;
+    FClickFlag: Boolean;
+    FAfterGrayed: Boolean;
+    FButtonType: TButtonType;
+    FOtherValues: TOtherValues;
+    FValueDown: Double;
+    FValueUp: Double;
+    FGlyphDown: TBitmap;
+    FGlyphUp: TBitmap;
+    FGlyphGrayed: TBitmap;
+    FColorDown: TColor;
+    FColorUp: TColor;
+    FColorGrayed: TColor;
+    FCaptionDown: TCaption;
+    FCaptionUp: TCaption;
+    FCaptionGrayed: TCaption;
 
-    FSecurityCode:UTF8String;
-    procedure SetSecurityCode(sc:UTF8String);
+    FSecurityCode: UTF8String;
 
-    function GetTagValue:Double;
-    procedure SetValue(value:Double);
+    procedure SetSecurityCode(ASecurityCode: UTF8String);
 
-    procedure WriteFaultCallBack(Sender:TObject);
-    procedure TagChangeCallBack(Sender:TObject);
-    procedure RemoveTagCallBack(Sender:TObject);
+    function GetTagValue: Double;
+    procedure SetValue(Value: Double);
+
+    procedure WriteFaultCallBack(Sender: TObject);
+    procedure TagChangeCallBack(Sender: TObject);
+    procedure RemoveTagCallBack(Sender: TObject);
   protected
     //: Evita o processamento da mensagem no botão.
     procedure CMButtonPressed(var Message: TMessage); message CM_BUTTONPRESSED;
     //: @exclude
     //procedure SetDown(value:Boolean);
     //: @exclude
-    procedure SetButtonState(bs:TButtonState);
+    procedure SetButtonState(AButtonState: TButtonState);
 
     //: @seealso(IHMIInterface.SetHMITag)
-    procedure SetHMITag(t:TPLCTag);                    //seta um tag
+    procedure SetHMITag(APLCTag: TPLCTag);                    //seta um tag
     //: @seealso(IHMIInterface.GetHMITag)
-    function  GetHMITag:TPLCTag;
+    function GetHMITag: TPLCTag;
 
     //: @seealso(IHMIInterface.GetControlSecurityCode)
-     function GetControlSecurityCode:UTF8String;
+    function GetControlSecurityCode: UTF8String;
     //: @seealso(IHMIInterface.CanBeAccessed)
-    procedure CanBeAccessed(a:Boolean);
+    procedure CanBeAccessed(A: Boolean);
     //: @seealso(IHMIInterface.MakeUnsecure)
     procedure MakeUnsecure;
 
     //: @exclude
-    procedure SetEnabled(e:Boolean); override;
+    procedure SetEnabled(E: Boolean); override;
 
     //: @seealso OtherValuesIs
-    procedure SetOtherValues(v:TOtherValues);
-    procedure SetButtonType(v:TButtonType);
+    procedure SetOtherValues(Val: TOtherValues);
+    procedure SetButtonType(V: TButtonType);
 
     //: @exclude
-    function GetGroupIndex:LongInt;
+    function GetGroupIndex: Longint;
     //: @exclude
-    function GetAllowAllUp:Boolean;
+    function GetAllowAllUp: Boolean;
     //: @exclude
-    function GetDown:Boolean;
-    
+    function GetDown: Boolean;
+
     //: @exclude
-    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: LongInt); override;
+    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Longint); override;
 
     //: Retorna o caption corrente do botão;
-    function GetCaption:TCaption;
-    procedure SetCaptionDown(v:TCaption);
-    procedure SetCaptionUp(v:TCaption);
-    procedure SetCaptionGrayed(v:TCaption);
+    function GetCaption: TCaption;
+    procedure SetCaptionDown(v: TCaption);
+    procedure SetCaptionUp(v: TCaption);
+    procedure SetCaptionGrayed(v: TCaption);
 
     //: Retorna a cor corrente do botão;
-    function GetColor:TColor;
-    procedure SetColorDown(v:TColor);
-    procedure SetColorUp(v:TColor);
-    procedure SetColorGrayed(v:TColor);
-    
-    procedure SetValueDown(v:Double);
-    procedure SetValueUp(v:Double);
+    function GetColor: TColor;
+    procedure SetColorDown(v: TColor);
+    procedure SetColorUp(v: TColor);
+    procedure SetColorGrayed(v: TColor);
+
+    procedure SetValueDown(v: Double);
+    procedure SetValueUp(v: Double);
     procedure Loaded; override;
   public
     //: @exclude
-    constructor Create(AOwner:TComponent); override;
+    constructor Create(AOwner: TComponent); override;
     //: @exclude
     destructor Destroy; override;
     //: @exclude
@@ -110,12 +124,12 @@ type
     ValueUp.
     @seealso(TOtherValues);
     }
-    property OtherValuesIs:TOtherValues read FOtherValues write SetOtherValues;
+    property OtherValuesIs: TOtherValues read FOtherValues write SetOtherValues;
     {:
     Define qual será o comportamento do botão.
     @seealso(TButtonType)
     }
-    property ButtonType:TButtonType read FButtonType write SetButtonType;
+    property ButtonType: TButtonType read FButtonType write SetButtonType;
     {:
     Informa qual será o estado que o botão será passado quando ele estiver
     Grayed (nem Precionado e nem Livre).
@@ -123,10 +137,10 @@ type
     @True fará que o botão fique precionado e @false fara com que o botão fique
     livre (solto).
     }
-    property AfterGray:Boolean read FAfterGrayed write FAfterGrayed;
+    property AfterGray: Boolean read FAfterGrayed write FAfterGrayed;
 
     //: Retorna o caption corrente do botão.
-    property Caption:TCaption read GetCaption;
+    property Caption: TCaption read GetCaption;
     {:
     Caption do botão caso o valor do tag associado seja igual a ValueDown
     @seealso(CaptionUp)
@@ -134,7 +148,7 @@ type
     @seealso(Caption)
     @seealso(PLCTag)
     }
-    property CaptionDown:TCaption read FCaptionDown write SetCaptionDown;
+    property CaptionDown: TCaption read FCaptionDown write SetCaptionDown;
     {:
     Caption do botão caso o valor do tag associado seja igual a ValueUp
     @seealso(CaptionDown)
@@ -142,7 +156,7 @@ type
     @seealso(Caption)
     @seealso(PLCTag)
     }
-    property CaptionUp:TCaption read FCaptionUp write SetCaptionUp;
+    property CaptionUp: TCaption read FCaptionUp write SetCaptionUp;
     {:
     Caption do botão caso o valor do tag seja diferente de ValueDown e
     ValueUp.
@@ -151,11 +165,11 @@ type
     @seealso(Caption)
     @seealso(PLCTag)
     }
-    property CaptionGrayed:TCaption read FCaptionGrayed write SetCaptionGrayed;
-    
-    
+    property CaptionGrayed: TCaption read FCaptionGrayed write SetCaptionGrayed;
+
+
     //: Retorna o cor corrente do botão.
-    property Color:TColor read GetColor;
+    property Color: TColor read GetColor;
     {:
     Cor do botão caso o valor do tag associado seja igual a ValueDown
     @seealso(ColorUp)
@@ -163,7 +177,7 @@ type
     @seealso(Color)
     @seealso(PLCTag)
     }
-    property ColorDown:TColor read FColorDown write SetColorDown;
+    property ColorDown: TColor read FColorDown write SetColorDown;
     {:
     Cor do botão caso o valor do tag associado seja igual a ValueUp
     @seealso(ColorDown)
@@ -171,7 +185,7 @@ type
     @seealso(Color)
     @seealso(PLCTag)
     }
-    property ColorUp:TColor read FColorUp write SetColorUp;
+    property ColorUp: TColor read FColorUp write SetColorUp;
     {:
     Cor do botão caso o valor do tag seja diferente de ValueDown e
     ValueUp.
@@ -180,361 +194,380 @@ type
     @seealso(Color)
     @seealso(PLCTag)
     }
-    property ColorGrayed:TColor read FColorGrayed write SetColorGrayed;
+    property ColorGrayed: TColor read FColorGrayed write SetColorGrayed;
 
     //: @exclude
-    property Enabled:Boolean read FIsEnabled write SetEnabled;
-    
+    property Enabled: Boolean read FIsEnabled write SetEnabled;
+
     {:
     Tag numérico usado pelo controle.
     @seealso(TPLCTag)
     @seealso(TPLCBlockElement)
     @seealso(TPLCTagNumber)
     }
-    property PLCTag:TPLCTag read GetHMITag write SetHMITag;
+    property PLCTag: TPLCTag read GetHMITag write SetHMITag;
 
     //: Valor do tag que será considerado como botão precionado.
-    property ValueDown:Double read FValueDown write SetValueDown;
+    property ValueDown: Double read FValueDown write SetValueDown;
     //: Valor do tag que será considerado como botão solto.
-    property ValueUp:Double read FValueUp write SetValueUp;
-    
+    property ValueUp: Double read FValueUp write SetValueUp;
+
     //: Retorna se o botão esta precionado ou não. Esconde a propriedade herdada.
     property Down: Boolean read GetDown;
     //: GroupIndex do botão. Esconde a propriedade herdada.
-    property GroupIndex:LongInt read GetGroupIndex;
+    property GroupIndex: Longint read GetGroupIndex;
     //: Esconde a propriedade herdada.
-    property AllowAllUp:Boolean read GetAllowAllUp;
+    property AllowAllUp: Boolean read GetAllowAllUp;
 
     {$IFDEF PORTUGUES}
     //: Codigo de segurança que libera acesso ao controle
     {$ELSE}
     //: Security code that allows access to control.
     {$ENDIF}
-    property SecurityCode:UTF8String read FSecurityCode write SetSecurityCode;
+    property SecurityCode: UTF8String read FSecurityCode write SetSecurityCode;
   end;
 
 implementation
 
-uses hsstrings, ControlSecurityManager;
+uses
+  hsstrings,
+  ControlSecurityManager;
 
-constructor THMIButton.Create(AOwner:TComponent);
+constructor THMIButton.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FRegInSecMan:=GetControlSecurityManager.RegisterControl(Self as IHMIInterface);
-  if not FRegInSecMan then begin
+  FRegInSecMan := GetControlSecurityManager.RegisterControl(Self as IHMIInterface);
+  if not FRegInSecMan then
+  begin
     {$IFNDEF WINDOWS}
-    writeln('FIX-ME: Failed to register class ',ClassName,' instace with name="',Name,'" in the ControlSecurityManager?',{$i %FILE%},':',{$i %LINE%});
+    writeln('FIX-ME: Failed to register class ', ClassName, ' instace with name="', Name, '" in the ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
     {$ENDIF}
   end;
-  TSpeedButton(Self).AllowAllUp:=true;
-  TSpeedButton(Self).GroupIndex:=$FAB1016;
-  if csDesigning in componentState then begin
-    FValueDown  := 1;
+  TSpeedButton(Self).AllowAllUp := True;
+  TSpeedButton(Self).GroupIndex := $FAB1016;
+  if csDesigning in componentState then
+  begin
+    FValueDown := 1;
     FValueUp := 0;
-  end else begin
-    FValueDown  := 0;
+  end
+  else
+  begin
+    FValueDown := 0;
     FValueUp := 0;
   end;
-  FIsEnabled:=true;
-  FClickFlag:=false;
-  FGlyphDown:=TBitmap.Create;
-  FGlyphUp:=TBitmap.Create;
-  FGlyphGrayed:=TBitmap.Create;
-  FColorDown:=clBtnFace;
-  FColorUp:= clBtnFace;
-  FColorGrayed:=clBtnShadow;
+  FIsEnabled := True;
+  FClickFlag := False;
+  FGlyphDown := TBitmap.Create;
+  FGlyphUp := TBitmap.Create;
+  FGlyphGrayed := TBitmap.Create;
+  FColorDown := clBtnFace;
+  FColorUp := clBtnFace;
+  FColorGrayed := clBtnShadow;
 end;
 
 destructor THMIButton.Destroy;
 begin
-   if FRegInSecMan then
-     GetControlSecurityManager.UnRegisterControl(Self as IHMIInterface)
-   else begin
-     {$IFNDEF WINDOWS}
-     writeln('FIX-ME: Why class ',ClassName,', instace name="',Name,'" ins''t registered in ControlSecurityManager?',{$i %FILE%},':',{$i %LINE%});
-     {$ENDIF}
-   end;
+  if FRegInSecMan then
+    GetControlSecurityManager.UnRegisterControl(Self as IHMIInterface)
+  else
+  begin
+    {$IFNDEF WINDOWS}
+    writeln('FIX-ME: Why class ', ClassName, ', instace name="', Name, '" ins''t registered in ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
+    {$ENDIF}
+  end;
 
-   if FTag<>nil then
-      FTag.RemoveAllHandlersFromObject(Self);
-   FGlyphDown.Destroy;
-   FGlyphUp.Destroy;
-   FGlyphGrayed.Destroy;
-   inherited Destroy;
+  if FTag <> nil then
+    FTag.RemoveAllHandlersFromObject(Self);
+  FGlyphDown.Destroy;
+  FGlyphUp.Destroy;
+  FGlyphGrayed.Destroy;
+  inherited Destroy;
 end;
 
 procedure THMIButton.Click;
 var
-  writeflag:boolean;
-  valuetowrite:double;
+  WriteFlag: Boolean;
+  ValueToWrite: Double;
 begin
-   writeflag:=false;
-   try
-      //calcula o novo valor do botão..
-      if FButtonType = btOnOff  then begin
-         //click é chamado apos a atualização
-         //de FState
-         case FState of
-            bsUp {$IFDEF FPC}, bsHot{$ENDIF}:
-              valuetowrite := FValueUp;
-            bsDown, bsExclusive:
-              valuetowrite := FValueDown;
-            else
-              if FAfterGrayed then
-                 valuetowrite := FValueDown
-              else
-                 valuetowrite := FValueUp;
-         end;
-         writeflag := true;
-         SetButtonState(FState);
+  WriteFlag := False;
+  try
+    //calcula o novo valor do botão..
+    if FButtonType = btOnOff then
+    begin
+      //click é chamado apos a atualização
+      //de FState
+      case FState of
+        bsUp
+        {$IFDEF FPC}
+        , bsHot
+        {$ENDIF}: ValueToWrite := FValueUp;
+        bsDown,
+        bsExclusive: ValueToWrite := FValueDown;
+        else
+          if FAfterGrayed then
+            ValueToWrite := FValueDown
+          else
+            ValueToWrite := FValueUp;
       end;
-      
-      if (FButtonType=btJog) and ((FState=bsDown) or (FState=bsExclusive)) then begin
-         valuetowrite := FValueDown;
-         writeflag:=true;
-         FClickFlag:=true;
-         SetButtonState(bsDown);
-      end;
-
-      if (FButtonType=btMomentary) and ((FState=bsDown) or (FState=bsExclusive)) then begin
-         SetValue(FValueDown);
-         SetButtonState(bsDown);
-         Invalidate;
-         valuetowrite := FValueUp;
-         writeflag:=true;
-         SetButtonState(bsUp);
-      end;
-      
-      if writeflag then
-         SetValue(valuetowrite);
-   finally
-     inherited Click;
-   end;
-end;
-
-procedure THMIButton.SetSecurityCode(sc: UTF8String);
-begin
-  if Trim(sc)='' then
-    Self.CanBeAccessed(true)
-  else
-    with GetControlSecurityManager do begin
-      ValidateSecurityCode(sc);
-      if not SecurityCodeExists(sc) then
-        RegisterSecurityCode(sc);
-
-      Self.CanBeAccessed(CanAccess(sc));
+      WriteFlag := True;
+      SetButtonState(FState);
     end;
 
-  FSecurityCode:=sc;
+    if (FButtonType = btJog) and ((FState = bsDown) or (FState = bsExclusive)) then
+    begin
+      ValueToWrite := FValueDown;
+      WriteFlag := True;
+      FClickFlag := True;
+      SetButtonState(bsDown);
+    end;
+
+    if (FButtonType = btMomentary) and ((FState = bsDown) or (FState = bsExclusive)) then
+    begin
+      SetValue(FValueDown);
+      SetButtonState(bsDown);
+      Invalidate;
+      ValueToWrite := FValueUp;
+      WriteFlag := True;
+      SetButtonState(bsUp);
+    end;
+
+    if WriteFlag then
+      SetValue(ValueToWrite);
+  finally
+    inherited Click;
+  end;
 end;
 
-function THMIButton.GetTagValue:Double;
+procedure THMIButton.SetSecurityCode(ASecurityCode: UTF8String);
+begin
+  if Trim(ASecurityCode) = '' then
+    Self.CanBeAccessed(True)
+  else
+    with GetControlSecurityManager do
+    begin
+      ValidateSecurityCode(ASecurityCode);
+      if not SecurityCodeExists(ASecurityCode) then
+        RegisterSecurityCode(ASecurityCode);
+
+      Self.CanBeAccessed(CanAccess(ASecurityCode));
+    end;
+
+  FSecurityCode := ASecurityCode;
+end;
+
+function THMIButton.GetTagValue: Double;
 begin
   Result := 0;
-  if FTag=Nil then exit;
+  if FTag = nil then Exit;
 
   if Supports(FTag, ITagNumeric) then
     Result := (FTag as ITagNumeric).Value;
 end;
 
-procedure THMIButton.SetValue(value:Double);
+procedure THMIButton.SetValue(Value: Double);
 begin
-  if FTag=Nil then exit;
+  if FTag = nil then Exit;
 
   if Supports(FTag, ITagNumeric) then
-    (FTag as ITagNumeric).Value := value;
+    (FTag as ITagNumeric).Value := Value;
 end;
 
 
-procedure THMIButton.SetHMITag(t:TPLCTag);
+procedure THMIButton.SetHMITag(APLCTag: TPLCTag);
 begin
   //se o tag esta entre um dos aceitos.
-  if (t<>nil) AND (not Supports(t, ITagNumeric)) then
-     raise Exception.Create(SonlyNumericTags);
+  if (APLCTag <> nil) and (not Supports(APLCTag, ITagNumeric)) then
+    raise Exception.Create(SonlyNumericTags);
 
   //se ja estou associado a um tag, remove
-  if FTag<>nil then begin
-     FTag.RemoveAllHandlersFromObject(Self);
+  if FTag <> nil then
+  begin
+    FTag.RemoveAllHandlersFromObject(Self);
   end;
 
   //adiona o callback para o novo tag
-  if t<>nil then begin
-     t.AddRemoveTagHandler(@RemoveTagCallBack);
+  if APLCTag <> nil then
+  begin
+    APLCTag.AddRemoveTagHandler(@RemoveTagCallBack);
 
-     FTag := t;
-     TagChangeCallBack(self);
+    FTag := APLCTag;
+    TagChangeCallBack(Self);
   end;
-  FTag := t;
+  FTag := APLCTag;
 end;
 
-function  THMIButton.GetHMITag:TPLCTag;
+function THMIButton.GetHMITag: TPLCTag;
 begin
-   Result := FTag;
+  Result := FTag;
 end;
 
 function THMIButton.GetControlSecurityCode: UTF8String;
 begin
-   Result:=FSecurityCode;
+  Result := FSecurityCode;
 end;
 
-procedure THMIButton.CanBeAccessed(a:Boolean);
+procedure THMIButton.CanBeAccessed(A: Boolean);
 begin
-  FIsEnabledBySecurity :=a;
+  FIsEnabledBySecurity := A;
   SetEnabled(FIsEnabled);
 end;
 
 procedure THMIButton.MakeUnsecure;
 begin
-   FSecurityCode:='';
-   CanBeAccessed(true);
+  FSecurityCode := '';
+  CanBeAccessed(True);
 end;
 
-procedure THMIButton.SetEnabled(e:Boolean);
+procedure THMIButton.SetEnabled(E: Boolean);
 begin
-  FIsEnabled:=e;
+  FIsEnabled := E;
   inherited SetEnabled(FIsEnabled and FIsEnabledBySecurity);
 end;
 
 procedure THMIButton.CMButtonPressed(var Message: TMessage);
 begin
-   //nao faz nada alem de roubar o processamento da mensagem
-   //CM_BUTTONPRESSED de TSpeedButton.
+  //nao faz nada alem de roubar o processamento da mensagem
+  //CM_BUTTONPRESSED de TSpeedButton.
 end;
 
 //procedure THMIButton.SetDown(Value: Boolean);
 //begin
-   //FDown := Value;
-   //if Value  then
-      //FState := bsDown
-   //else
-      //FState :=  bsUp;
-   //Invalidate;
+//FDown := Value;
+//if Value  then
+//FState := bsDown
+//else
+//FState :=  bsUp;
+//Invalidate;
 //end;
 
-procedure THMIButton.SetButtonState(bs:TButtonState);
+procedure THMIButton.SetButtonState(AButtonState: TButtonState);
 begin
-   FState:=bs;
-   case bs of
-      bsUp {$IFDEF FPC}, bsHot{$ENDIF}:
-         with TSpeedButton(Self) do begin
-            Caption:=CaptionUp;
-            Color:=ColorUp;
-            Glyph.Assign(FGlyphUp);
-            if FButtonType in [btJog, btOnOff] then
-               SetDown(false);
-         end;
-      bsDisabled:
-         with TSpeedButton(Self) do begin
-            Caption:=CaptionGrayed;
-            Color:=ColorGrayed;
-            Glyph.Assign(FGlyphGrayed);
-            if FButtonType in [btJog, btOnOff] then
-               SetDown(false);
-         end;
-      bsDown, bsExclusive:
-         with TSpeedButton(Self) do begin
-            Caption:=CaptionDown;
-            Color:=ColorDown;
-            Glyph.Assign(FGlyphDown);
-            if FButtonType in [btJog, btOnOff] then
-               SetDown(true);
-         end;
-   end;
+  FState := AButtonState;
+  case AButtonState of
+    bsUp
+    {$IFDEF FPC}
+    , bsHot
+    {$ENDIF}: with TSpeedButton(Self) do
+      begin
+        Caption := CaptionUp;
+        Color := ColorUp;
+        Glyph.Assign(FGlyphUp);
+        if FButtonType in [btJog, btOnOff] then
+          SetDown(False);
+      end;
+    bsDisabled: with TSpeedButton(Self) do
+                  begin
+                    Caption := CaptionGrayed;
+                    Color := ColorGrayed;
+                    Glyph.Assign(FGlyphGrayed);
+                    if FButtonType in [btJog, btOnOff] then
+                      SetDown(False);
+                  end;
+    bsDown,
+    bsExclusive:  with TSpeedButton(Self) do
+                    begin
+                      Caption := CaptionDown;
+                      Color := ColorDown;
+                      Glyph.Assign(FGlyphDown);
+                      if FButtonType in [btJog, btOnOff] then
+                        SetDown(True);
+                    end;
+  end;
 end;
 
-procedure THMIButton.SetOtherValues(v: TOtherValues);
+procedure THMIButton.SetOtherValues(Val: TOtherValues);
 begin
-   FOtherValues:=V;
-   TagChangeCallBack(self);
+  FOtherValues := Val;
+  TagChangeCallBack(Self);
 end;
 
-procedure THMIButton.SetButtonType(v:TButtonType);
+procedure THMIButton.SetButtonType(V: TButtonType);
 begin
-   FButtonType:=v;
+  FButtonType := V;
 end;
 
-function THMIButton.GetGroupIndex:LongInt;
+function THMIButton.GetGroupIndex: Longint;
 begin
-   Result := TSpeedButton(Self).GroupIndex;
+  Result := TSpeedButton(Self).GroupIndex;
 end;
 
-function THMIButton.GetAllowAllUp:Boolean;
+function THMIButton.GetAllowAllUp: Boolean;
 begin
-   Result :=  TSpeedButton(Self).AllowAllUp;
+  Result := TSpeedButton(Self).AllowAllUp;
 end;
 
-function THMIButton.GetDown:Boolean;
+function THMIButton.GetDown: Boolean;
 begin
-   Result :=  FState = bsDown;
+  Result := FState = bsDown;
 end;
 
-procedure THMIButton.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: LongInt);
+procedure THMIButton.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Longint);
 begin
-    try
-       if FClickFlag and (FButtonType=btJog) then
-          SetValue(FValueUp);
-       FClickFlag:=false;
-    finally
-       inherited MouseUp(Button, Shift, X, Y);
-    end;
+  try
+    if FClickFlag and (FButtonType = btJog) then
+      SetValue(FValueUp);
+    FClickFlag := False;
+  finally
+    inherited MouseUp(Button, Shift, X, Y);
+  end;
 end;
 
-function THMIButton.GetCaption:TCaption;
+function THMIButton.GetCaption: TCaption;
 begin
-   Result := TSpeedButton(Self).Caption;
+  Result := TSpeedButton(Self).Caption;
 end;
 
-procedure THMIButton.SetCaptionDown(v:TCaption);
+procedure THMIButton.SetCaptionDown(v: TCaption);
 begin
-   FCaptionDown:=v;
-   SetButtonState(FState);
+  FCaptionDown := v;
+  SetButtonState(FState);
 end;
 
-procedure THMIButton.SetCaptionUp(v:TCaption);
+procedure THMIButton.SetCaptionUp(v: TCaption);
 begin
-   FCaptionUp:=v;
-   SetButtonState(FState);
+  FCaptionUp := v;
+  SetButtonState(FState);
 end;
 
-procedure THMIButton.SetCaptionGrayed(v:TCaption);
+procedure THMIButton.SetCaptionGrayed(v: TCaption);
 begin
-   FCaptionGrayed:=v;
-   SetButtonState(FState);
+  FCaptionGrayed := v;
+  SetButtonState(FState);
 end;
 
-function THMIButton.GetColor:TColor;
+function THMIButton.GetColor: TColor;
 begin
-   Result := TSpeedButton(Self).Color;
+  Result := TSpeedButton(Self).Color;
 end;
 
-procedure THMIButton.SetColorDown(v:TColor);
+procedure THMIButton.SetColorDown(v: TColor);
 begin
-   FColorDown := v;
-   SetButtonState(FState);
+  FColorDown := v;
+  SetButtonState(FState);
 end;
 
-procedure THMIButton.SetColorUp(v:TColor);
+procedure THMIButton.SetColorUp(v: TColor);
 begin
-   FColorUp := v;
-   SetButtonState(FState);
+  FColorUp := v;
+  SetButtonState(FState);
 end;
 
-procedure THMIButton.SetColorGrayed(v:TColor);
+procedure THMIButton.SetColorGrayed(v: TColor);
 begin
-   FColorGrayed := v;
-   SetButtonState(FState);
+  FColorGrayed := v;
+  SetButtonState(FState);
 end;
 
-procedure THMIButton.SetValueDown(v:Double);
+procedure THMIButton.SetValueDown(v: Double);
 begin
-   FValueDown:=v;
-   TagChangeCallBack(self);
+  FValueDown := v;
+  TagChangeCallBack(Self);
 end;
 
-procedure THMIButton.SetValueUp(v:Double);
+procedure THMIButton.SetValueUp(v: Double);
 begin
-   FValueUp:=v;
-   TagChangeCallBack(self);
+  FValueUp := v;
+  TagChangeCallBack(Self);
 end;
 
 procedure THMIButton.Loaded;
@@ -550,29 +583,24 @@ end;
 
 procedure THMIButton.TagChangeCallBack(Sender: TObject);
 var
-   value:Double;
+  Value: Double;
 begin
-   value := GetTagValue;
-   if value = FValueDown then
-      SetButtonState(bsDown)
-   else begin
-      if value = FValueUp then
-         SetButtonState(bsUp)
-      else
-         case FOtherValues of
-            isChecked:
-               SetButtonState(bsDown);
-            isUnchecked:
-               SetButtonState(bsUp);
-            IsGrayed:
-               SetButtonState(bsDisabled);
-         end;
-   end;
+  Value := GetTagValue;
+  if Value = FValueDown then
+    SetButtonState(bsDown)
+  else if Value = FValueUp then
+    SetButtonState(bsUp)
+  else
+    case FOtherValues of
+      isChecked: SetButtonState(bsDown);
+      isUnchecked: SetButtonState(bsUp);
+      IsGrayed: SetButtonState(bsDisabled);
+    end;
 end;
 
 procedure THMIButton.RemoveTagCallBack(Sender: TObject);
 begin
-   FTag := nil;
+  FTag := nil;
 end;
 
 end.

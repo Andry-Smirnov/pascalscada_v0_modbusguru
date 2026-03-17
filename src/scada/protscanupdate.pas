@@ -336,7 +336,7 @@ procedure TScanUpdate.SyncCallBack;
 var
   ReqID: LongWord;
 begin
-  if Terminated then exit;
+  if Terminated then Exit;
   //try
     if Assigned(FTagRec) then
       ReqID:=FTagRec^.ID

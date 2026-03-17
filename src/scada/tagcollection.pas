@@ -188,7 +188,7 @@ end;
 
 procedure   TTagCollectionItem.SetTag(t:TPLCTag);
 begin
-  if t=FTag then exit;
+  if t=FTag then Exit;
 
   if (t<>nil) and (not Supports(t, ITagInterface)) then
     raise Exception.Create(SinvalidTag);
@@ -282,7 +282,7 @@ end;
 
 procedure   TTagCollection.NeedCurrentCompState;
 begin
-  if assigned(FOnNeedCompState) then
+  if Assigned(FOnNeedCompState) then
     FOnNeedCompState(FComponentState);
 end;
 

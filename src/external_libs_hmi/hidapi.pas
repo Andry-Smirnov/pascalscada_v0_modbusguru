@@ -117,7 +117,7 @@ var
 
 begin
   if not Assigned(P) then
-    exit('');
+    Exit('');
 
   // strlen
   L := 0;

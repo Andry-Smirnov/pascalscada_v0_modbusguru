@@ -12,7 +12,7 @@ type
   TPointPersistent = class(TPersistent)
   private
     FOnChange: TNotifyEvent;
-    FPoint:TPoint;
+    FPoint: TPoint;
     function GetX: Integer;
     function GetY: Integer;
     procedure SetX(AValue: Integer);
@@ -20,12 +20,12 @@ type
   protected
     procedure DoOnChange; virtual;
   public
-    function Point:TPoint;
+    function Point: TPoint;
     procedure Assign(Source: TPersistent); override;
-    property OnChange:TNotifyEvent read FOnChange write FOnChange;
+    property OnChange: TNotifyEvent read FOnChange write FOnChange;
   published
-    property X:Integer read GetX write SetX;
-    property Y:Integer read GetY write SetY;
+    property X: Integer read GetX write SetX;
+    property Y: Integer read GetY write SetY;
   end;
 
   { THMIFlowImage }
@@ -41,18 +41,17 @@ type
     FOutputFlowPolyline: THMIFlowPolyline;
     FOutputPoint: TPointPersistent;
     procedure UpdateInOutLines; virtual;
-    procedure ChangeBounds(ALeft, ATop, AWidth, AHeight: Integer; KeepBase: Boolean
-  ); override;
+    procedure ChangeBounds(ALeft, ATop, AWidth, AHeight: Integer; KeepBase: Boolean); override;
     procedure SetInputFlowPolyline(AValue: THMIFlowPolyline);
     procedure SetOutputFlowPolyline(AValue: THMIFlowPolyline);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
   published
-    property InputPoint:TPointPersistent read FInputPoint write SetInputPoint;
-    property InputFlowPolyline:THMIFlowPolyline read FInputFlowPolyline write SetInputFlowPolyline;
-    property OutputPoint:TPointPersistent read FOutputPoint write SetOutputPoint;
-    property OutputFlowPolyline:THMIFlowPolyline read FOutputFlowPolyline write SetOutputFlowPolyline;
+    property InputPoint: TPointPersistent read FInputPoint write SetInputPoint;
+    property InputFlowPolyline: THMIFlowPolyline read FInputFlowPolyline write SetInputFlowPolyline;
+    property OutputPoint: TPointPersistent read FOutputPoint write SetOutputPoint;
+    property OutputFlowPolyline: THMIFlowPolyline read FOutputFlowPolyline write SetOutputFlowPolyline;
   end;
 
 implementation
@@ -61,25 +60,25 @@ implementation
 
 function TPointPersistent.GetX: Integer;
 begin
-  Result:=FPoint.X;
+  Result := FPoint.X;
 end;
 
 function TPointPersistent.GetY: Integer;
 begin
-  Result:=FPoint.Y;
+  Result := FPoint.Y;
 end;
 
 procedure TPointPersistent.SetX(AValue: Integer);
 begin
-  if AValue=FPoint.X then exit;
-  FPoint.X:=AValue;
+  if AValue = FPoint.X then Exit;
+  FPoint.X := AValue;
   DoOnChange;
 end;
 
 procedure TPointPersistent.SetY(AValue: Integer);
 begin
-  if AValue=FPoint.Y then exit;
-  FPoint.Y:=AValue;
+  if AValue = FPoint.Y then Exit;
+  FPoint.Y := AValue;
   DoOnChange;
 end;
 
@@ -91,16 +90,18 @@ end;
 
 function TPointPersistent.Point: TPoint;
 begin
-  Result:=FPoint;
+  Result := FPoint;
 end;
 
 procedure TPointPersistent.Assign(Source: TPersistent);
 var
-  sourceAsTPP:TPointPersistent absolute Source;
+  sourceAsTPP: TPointPersistent absolute Source;
 begin
-  if Source is TPointPersistent then begin
-    if (sourceAsTPP.FPoint.X<>FPoint.X) or (sourceAsTPP.FPoint.Y<>FPoint.Y) then begin
-      FPoint:=sourceAsTPP.FPoint;
+  if Source is TPointPersistent then
+  begin
+    if (sourceAsTPP.FPoint.X <> FPoint.X) or (sourceAsTPP.FPoint.Y <> FPoint.Y) then
+    begin
+      FPoint := sourceAsTPP.FPoint;
       DoOnChange;
     end;
   end;
@@ -126,14 +127,13 @@ end;
 procedure THMIFlowImage.UpdateInOutLines;
 begin
   if Assigned(FInputFlowPolyline) then
-    FInputFlowPolyline.UpdateEndPoints(true,ControlToScreen(FInputPoint.Point));
+    FInputFlowPolyline.UpdateEndPoints(True, ControlToScreen(FInputPoint.Point));
 
   if Assigned(FOutputFlowPolyline) then
-    FOutputFlowPolyline.UpdateEndPoints(false,ControlToScreen(FOutputPoint.Point));
+    FOutputFlowPolyline.UpdateEndPoints(False, ControlToScreen(FOutputPoint.Point));
 end;
 
-procedure THMIFlowImage.ChangeBounds(ALeft, ATop, AWidth, AHeight: Integer;
-  KeepBase: Boolean);
+procedure THMIFlowImage.ChangeBounds(ALeft, ATop, AWidth, AHeight: Integer; KeepBase: Boolean);
 begin
   inherited ChangeBounds(ALeft, ATop, AWidth, AHeight, KeepBase);
   UpdateInOutLines;
@@ -141,31 +141,31 @@ end;
 
 procedure THMIFlowImage.SetInputFlowPolyline(AValue: THMIFlowPolyline);
 begin
-  if FInputFlowPolyline=AValue then Exit;
+  if FInputFlowPolyline = AValue then Exit;
   if Assigned(FInputFlowPolyline) then FInputFlowPolyline.RemoveFreeNotification(Self);
   if Assigned(AValue) then AValue.FreeNotification(Self);
-  FInputFlowPolyline:=AValue;
+  FInputFlowPolyline := AValue;
   UpdateInOutLines;
 end;
 
 procedure THMIFlowImage.SetOutputFlowPolyline(AValue: THMIFlowPolyline);
 begin
-  if FOutputFlowPolyline=AValue then Exit;
+  if FOutputFlowPolyline = AValue then Exit;
   if Assigned(FOutputFlowPolyline) then FOutputFlowPolyline.RemoveFreeNotification(Self);
   if Assigned(AValue) then AValue.FreeNotification(Self);
-  FOutputFlowPolyline:=AValue;
+  FOutputFlowPolyline := AValue;
   UpdateInOutLines;
 end;
 
 constructor THMIFlowImage.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FInputFlowPolyline:=nil;
-  FOutputFlowPolyline:=nil;
-  FInputPoint:=TPointPersistent.Create;
-  FInputPoint.OnChange:=@PointChanges;
-  FOutputPoint:=TPointPersistent.Create;
-  FOutputPoint.OnChange:=@PointChanges;
+  FInputFlowPolyline := nil;
+  FOutputFlowPolyline := nil;
+  FInputPoint := TPointPersistent.Create;
+  FInputPoint.OnChange := @PointChanges;
+  FOutputPoint := TPointPersistent.Create;
+  FOutputPoint.OnChange := @PointChanges;
 end;
 
 destructor THMIFlowImage.Destroy;

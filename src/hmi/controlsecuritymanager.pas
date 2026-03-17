@@ -3,7 +3,7 @@ unit ControlSecurityManager;
 interface
 
 uses
-  Classes, sysutils, HMITypes, ActnList, PLCTag, BasicUserManagement, Controls,
+  Classes, SysUtils, HMITypes, ActnList, PLCTag, BasicUserManagement, Controls,
   LCLType;
 
 type
@@ -12,32 +12,33 @@ type
 
   TControlSecurityManager = class(TComponent)
   private
-    FControls:array of IHMIInterface;
-    FUserManagement:TBasicUserManagement;
-    procedure SetUserManagement(um:TBasicUserManagement);
+    FControls: array of IHMIInterface;
+    FUserManagement: TBasicUserManagement;
+
+    procedure SetUserManagement(AUserManagement: TBasicUserManagement);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    function   Login(Userlogin, Userpassword: UTF8String; var UID: Integer):Boolean; overload;
-    function   Login:Boolean; overload;
+    function Login(Userlogin, Userpassword: UTF8String; var UID: Integer): Boolean; overload;
+    function Login: Boolean; overload;
 
-    procedure  Logout;
-    procedure  Manage;
-    function   GetCurrentUserlogin:UTF8String;
-    function   GetCurrentUserName:UTF8String;
-    procedure  TryAccess(sc:UTF8String);
-    function   RegisterControl(control:IHMIInterface):Boolean;
-    procedure  UnRegisterControl(control:IHMIInterface);
-    procedure  UpdateControls;
-    function   CanAccess(sc:UTF8String):Boolean;
-    procedure  ValidateSecurityCode(sc:UTF8String);
-    procedure  RegisterSecurityCode(sc:UTF8String);
-    procedure  UnregisterSecurityCode(sc:UTF8String);
-    function   SecurityCodeExists(sc:UTF8String):Boolean;
-    function   GetRegisteredAccessCodes:TStringList;
-    function   CheckIfUserIsAllowed(sc:UTF8String; RequireUserLogin:Boolean; var userlogin:UTF8String; const UserHint:String):Boolean;
+    procedure Logout;
+    procedure Manage;
+    function GetCurrentUserlogin: UTF8String;
+    function GetCurrentUserName: UTF8String;
+    procedure TryAccess(ASecurityCode: UTF8String);
+    function RegisterControl(Control: IHMIInterface): Boolean;
+    procedure UnRegisterControl(Control: IHMIInterface);
+    procedure UpdateControls;
+    function CanAccess(ASecurityCode: UTF8String): Boolean;
+    procedure ValidateSecurityCode(ASecurityCode: UTF8String);
+    procedure RegisterSecurityCode(ASecurityCode: UTF8String);
+    procedure UnregisterSecurityCode(ASecurityCode: UTF8String);
+    function SecurityCodeExists(ASecurityCode: UTF8String): Boolean;
+    function GetRegisteredAccessCodes: TStringList;
+    function CheckIfUserIsAllowed(ASecurityCode: UTF8String; RequireUserLogin: Boolean; var Userlogin: UTF8String; const UserHint: string): Boolean;
   published
-    property UserManagement:TBasicUserManagement read FUserManagement write SetUserManagement;
+    property UserManagement: TBasicUserManagement read FUserManagement write SetUserManagement;
   end;
 
   //actions...
@@ -54,47 +55,46 @@ type
     function Execute: Boolean; override;
     function HandlesTarget({%H-}Target: TObject): Boolean; override;
   published
-    property AuthorizedBy:UTF8String read FAuthorizedBy;
-    property SecurityCode:UTF8String read FSecurityCode write SetSecurityCode;
-    property RequireLoginAlways:Boolean read FRequireLoginAlways write FRequireLoginAlways;
+    property AuthorizedBy: UTF8String read FAuthorizedBy;
+    property SecurityCode: UTF8String read FSecurityCode write SetSecurityCode;
+    property RequireLoginAlways: Boolean read FRequireLoginAlways write FRequireLoginAlways;
   end;
 
   { TPascalSCADAUserManagementAction }
 
   TPascalSCADAUserManagementAction = class(TAction, IHMIInterface)
   private
-    FRegInSecMan:Boolean;
+    FRegInSecMan: Boolean;
     FDisableIfNotAuthorized: Boolean;
     procedure SetDisableIfNotAuthorized(AValue: Boolean);
   protected
-    FEnabled,
-    FAccessAllowed:Boolean;
-    FSecurityCode:UTF8String;
+    FEnabled, FAccessAllowed: Boolean;
+    FSecurityCode: UTF8String;
 
     procedure SetEnabled(AValue: Boolean); virtual;
 
-    function  GetControlSecurityCode:UTF8String; virtual;
+    function GetControlSecurityCode: UTF8String; virtual;
     procedure MakeUnsecure; virtual;
-    procedure CanBeAccessed(a:Boolean); virtual;
+    procedure CanBeAccessed(A: Boolean); virtual;
 
     //unused procedures
-    procedure SetHMITag({%H-}t:TPLCTag);
-    function  GetHMITag:TPLCTag;
+    procedure SetHMITag({%H-}t: TPLCTag);
+    function GetHMITag: TPLCTag;
     procedure Loaded; override;
   public
     function HandlesTarget({%H-}Target: TObject): Boolean; override;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
   published
-    property Enabled:Boolean read FEnabled write SetEnabled default true;
-    property DisableIfNotAuthorized:Boolean read FDisableIfNotAuthorized write SetDisableIfNotAuthorized default true;
+    property Enabled: Boolean read FEnabled write SetEnabled default True;
+    property DisableIfNotAuthorized: Boolean read FDisableIfNotAuthorized write SetDisableIfNotAuthorized default True;
   end;
 
   { TPascalSCADALoginAction }
 
   TPascalSCADALoginAction = class(TPascalSCADAUserManagementAction)
   protected
-    procedure CanBeAccessed({%H-}a: Boolean); override;
+    procedure CanBeAccessed({%H-}A: Boolean); override;
   public
     procedure UpdateTarget({%H-}Target: TObject); override;
     procedure ExecuteTarget({%H-}Target: TObject); override;
@@ -104,7 +104,7 @@ type
 
   TPascalSCADALogoutAction = class(TPascalSCADAUserManagementAction)
   protected
-    procedure CanBeAccessed({%H-}a: Boolean); override;
+    procedure CanBeAccessed({%H-}A: Boolean); override;
   public
     procedure UpdateTarget({%H-}Target: TObject); override;
     procedure ExecuteTarget({%H-}Target: TObject); override;
@@ -116,48 +116,45 @@ type
   private
     FAfterLogin: TNotifyEvent;
     FBeforeLogin: TNotifyEvent;
-    FWithUserLoggedInImageIndex,
-    FWithoutUserLoggedInImageIndex:LongInt;
-    FWithUserLoggedInCaption,
-    FWithoutUserLoggedInCaption:TCaption;
-    FWithUserLoggedInHint,
-    FWithoutUserLoggedInHint:TTranslateString;
+    FWithUserLoggedInImageIndex, FWithoutUserLoggedInImageIndex: Longint;
+    FWithUserLoggedInCaption, FWithoutUserLoggedInCaption: TCaption;
+    FWithUserLoggedInHint, FWithoutUserLoggedInHint: TTranslateString;
     function GetCurrentCaption: TCaption;
     function GetCurrentHintMessage: TTranslateString;
-    function GetCurrentImageIndex: LongInt;
+    function GetCurrentImageIndex: Longint;
     procedure SetWithUserLoggedInCaption(const AValue: TCaption);
     procedure SetWithUserLoggedInHint(const AValue: TTranslateString);
-    procedure SetWithUserLoggedInImageIndex(const AValue: LongInt);
+    procedure SetWithUserLoggedInImageIndex(const AValue: Longint);
     procedure SetWithoutUserLoggedInCaption(const AValue: TCaption);
     procedure SetWithoutUserLoggedInHint(const AValue: TTranslateString);
-    procedure SetWithoutUserLoggedInImageIndex(const AValue: LongInt);
+    procedure SetWithoutUserLoggedInImageIndex(const AValue: Longint);
     procedure UpdateMyState;
   protected
-    procedure CanBeAccessed({%H-}a: Boolean); override;
+    procedure CanBeAccessed({%H-}A: Boolean); override;
   public
     constructor Create(AOwner: TComponent); override;
     procedure UpdateTarget({%H-}Target: TObject); override;
     procedure ExecuteTarget({%H-}Target: TObject); override;
   published
-    property Caption:TCaption read GetCurrentCaption;
-    property Hint:TTranslateString read GetCurrentHintMessage;
-    property ImageIndex:LongInt read GetCurrentImageIndex;
-    property WithUserLoggedInCaption:TCaption         read FWithUserLoggedInCaption    write SetWithUserLoggedInCaption;
-    property WithUserLoggedInHint:TTranslateString    read FWithUserLoggedInHint       write SetWithUserLoggedInHint;
-    property WithUserLoggedInImageIndex:LongInt       read FWithUserLoggedInImageIndex write SetWithUserLoggedInImageIndex;
+    property Caption: TCaption read GetCurrentCaption;
+    property Hint: TTranslateString read GetCurrentHintMessage;
+    property ImageIndex: Longint read GetCurrentImageIndex;
+    property WithUserLoggedInCaption: TCaption read FWithUserLoggedInCaption write SetWithUserLoggedInCaption;
+    property WithUserLoggedInHint: TTranslateString read FWithUserLoggedInHint write SetWithUserLoggedInHint;
+    property WithUserLoggedInImageIndex: Longint read FWithUserLoggedInImageIndex write SetWithUserLoggedInImageIndex;
 
-    property WithoutUserLoggedInCaption:TCaption      read FWithoutUserLoggedInCaption    write SetWithoutUserLoggedInCaption;
-    property WithoutUserLoggedInHint:TTranslateString read FWithoutUserLoggedInHint       write SetWithoutUserLoggedInHint;
-    property WithoutUserLoggedInImageIndex:LongInt    read FWithoutUserLoggedInImageIndex write SetWithoutUserLoggedInImageIndex;
-    property BeforeLogin:TNotifyEvent                 read FBeforeLogin                   write FBeforeLogin;
-    property AfterLogin:TNotifyEvent                  read FAfterLogin                    write FAfterLogin;
+    property WithoutUserLoggedInCaption: TCaption read FWithoutUserLoggedInCaption write SetWithoutUserLoggedInCaption;
+    property WithoutUserLoggedInHint: TTranslateString read FWithoutUserLoggedInHint write SetWithoutUserLoggedInHint;
+    property WithoutUserLoggedInImageIndex: Longint read FWithoutUserLoggedInImageIndex write SetWithoutUserLoggedInImageIndex;
+    property BeforeLogin: TNotifyEvent read FBeforeLogin write FBeforeLogin;
+    property AfterLogin: TNotifyEvent read FAfterLogin write FAfterLogin;
   end;
 
   { TPascalSCADAManageUsersAction }
 
   TPascalSCADAManageUsersAction = class(TPascalSCADAUserManagementAction)
   protected
-    procedure CanBeAccessed({%H-}a: Boolean); override;
+    procedure CanBeAccessed({%H-}A: Boolean); override;
   public
     procedure UpdateTarget({%H-}Target: TObject); override;
     procedure ExecuteTarget({%H-}Target: TObject); override;
@@ -167,7 +164,7 @@ type
 
   TPascalSCADASecureAction = class(TPascalSCADAUserManagementAction)
   protected
-    procedure SetSecurityCode(sc:UTF8String);
+    procedure SetSecurityCode(ASecurityCode: UTF8String);
   public
     procedure UpdateTarget(Target: TObject); override;
     function Execute: Boolean; override;
@@ -177,148 +174,148 @@ type
     {$ELSE}
     //: Security code that allows access to control.
     {$ENDIF}
-    property SecurityCode:UTF8String read FSecurityCode write SetSecurityCode;
+    property SecurityCode: UTF8String read FSecurityCode write SetSecurityCode;
   end;
 
-  function GetControlSecurityManager:TControlSecurityManager;
+function GetControlSecurityManager: TControlSecurityManager;
 
 implementation
 
 uses hsstrings, Dialogs;
 
-{ TPascalSCADACheckSpecialTokenAction }
+  { TPascalSCADACheckSpecialTokenAction }
 
 procedure TPascalSCADACheckSpecialTokenAction.SetSecurityCode(AValue: UTF8String);
 begin
-  if FSecurityCode=AValue then Exit;
+  if FSecurityCode = AValue then Exit;
 
-  if Trim(AValue)<>'' then
-    with GetControlSecurityManager do begin
+  if Trim(AValue) <> '' then
+    with GetControlSecurityManager do
+    begin
       ValidateSecurityCode(AValue);
       if not SecurityCodeExists(AValue) then
         RegisterSecurityCode(AValue);
     end;
 
-  FSecurityCode:=AValue;
+  FSecurityCode := AValue;
 end;
 
 function TPascalSCADACheckSpecialTokenAction.Execute: Boolean;
 begin
   if GetControlSecurityManager.CheckIfUserIsAllowed(FSecurityCode, FRequireLoginAlways, FAuthorizedBy, Hint) then
-    Result:=inherited Execute
+    Result := inherited Execute
   else
-    Result:=false;
+    Result := False;
 end;
 
-function TPascalSCADACheckSpecialTokenAction.HandlesTarget(Target: TObject
-  ): Boolean;
+function TPascalSCADACheckSpecialTokenAction.HandlesTarget(Target: TObject): Boolean;
 begin
-  Result:=true;
+  Result := True;
 end;
 
 { TPascalSCADALogin_LogoutAction }
 
 function TPascalSCADALogin_LogoutAction.GetCurrentCaption: TCaption;
 begin
-  Result:=inherited Caption;
+  Result := inherited Caption;
 end;
 
 function TPascalSCADALogin_LogoutAction.GetCurrentHintMessage: TTranslateString;
 begin
-  Result:=inherited Hint;
+  Result := inherited Hint;
 end;
 
-function TPascalSCADALogin_LogoutAction.GetCurrentImageIndex: LongInt;
+function TPascalSCADALogin_LogoutAction.GetCurrentImageIndex: Longint;
 begin
-  Result:=inherited ImageIndex;
+  Result := inherited ImageIndex;
 end;
 
-procedure TPascalSCADALogin_LogoutAction.SetWithUserLoggedInCaption(
-  const AValue: TCaption);
+procedure TPascalSCADALogin_LogoutAction.SetWithUserLoggedInCaption(const AValue: TCaption);
 begin
-  if FWithUserLoggedInCaption=AValue then exit;
-  FWithUserLoggedInCaption:=AValue;
+  if FWithUserLoggedInCaption = AValue then Exit;
+  FWithUserLoggedInCaption := AValue;
   UpdateMyState;
 end;
 
-procedure TPascalSCADALogin_LogoutAction.SetWithUserLoggedInHint(
-  const AValue: TTranslateString);
+procedure TPascalSCADALogin_LogoutAction.SetWithUserLoggedInHint(const AValue: TTranslateString);
 begin
-  if FWithUserLoggedInHint=AValue then exit;
-  FWithUserLoggedInHint:=AValue;
+  if FWithUserLoggedInHint = AValue then Exit;
+  FWithUserLoggedInHint := AValue;
   UpdateMyState;
 end;
 
-procedure TPascalSCADALogin_LogoutAction.SetWithUserLoggedInImageIndex(
-  const AValue: LongInt);
+procedure TPascalSCADALogin_LogoutAction.SetWithUserLoggedInImageIndex(const AValue: Longint);
 begin
-  if FWithUserLoggedInImageIndex=AValue then exit;
-  FWithUserLoggedInImageIndex:=AValue;
+  if FWithUserLoggedInImageIndex = AValue then Exit;
+  FWithUserLoggedInImageIndex := AValue;
   UpdateMyState;
 end;
 
-procedure TPascalSCADALogin_LogoutAction.SetWithoutUserLoggedInCaption(
-  const AValue: TCaption);
+procedure TPascalSCADALogin_LogoutAction.SetWithoutUserLoggedInCaption(const AValue: TCaption);
 begin
-  if FWithoutUserLoggedInCaption=AValue then exit;
-  FWithoutUserLoggedInCaption:=AValue;
+  if FWithoutUserLoggedInCaption = AValue then Exit;
+  FWithoutUserLoggedInCaption := AValue;
   UpdateMyState;
 end;
 
-procedure TPascalSCADALogin_LogoutAction.SetWithoutUserLoggedInHint(
-  const AValue: TTranslateString);
+procedure TPascalSCADALogin_LogoutAction.SetWithoutUserLoggedInHint(const AValue: TTranslateString);
 begin
-  if FWithoutUserLoggedInHint=AValue then exit;
-  FWithoutUserLoggedInHint:=AValue;
+  if FWithoutUserLoggedInHint = AValue then Exit;
+  FWithoutUserLoggedInHint := AValue;
   UpdateMyState;
 end;
 
-procedure TPascalSCADALogin_LogoutAction.SetWithoutUserLoggedInImageIndex(
-  const AValue: LongInt);
+procedure TPascalSCADALogin_LogoutAction.SetWithoutUserLoggedInImageIndex(const AValue: Longint);
 begin
-  if FWithoutUserLoggedInImageIndex=AValue then exit;
-  FWithoutUserLoggedInImageIndex:=AValue;
+  if FWithoutUserLoggedInImageIndex = AValue then Exit;
+  FWithoutUserLoggedInImageIndex := AValue;
   UpdateMyState;
 end;
 
 procedure TPascalSCADALogin_LogoutAction.UpdateMyState;
 begin
-  if GetControlSecurityManager.UserManagement<>nil then
-    if TBasicUserManagement(GetControlSecurityManager.UserManagement).UserLogged then begin
-      inherited Caption   :=FWithUserLoggedInCaption;
-      inherited Hint      :=FWithUserLoggedInHint;
-      inherited ImageIndex:=FWithUserLoggedInImageIndex;
-    end else begin
-      inherited Caption   :=FWithoutUserLoggedInCaption;
-      inherited Hint      :=FWithoutUserLoggedInHint;
-      inherited ImageIndex:=FWithoutUserLoggedInImageIndex;
+  if GetControlSecurityManager.UserManagement <> nil then
+    if TBasicUserManagement(GetControlSecurityManager.UserManagement).UserLogged then
+    begin
+      inherited Caption := FWithUserLoggedInCaption;
+      inherited Hint := FWithUserLoggedInHint;
+      inherited ImageIndex := FWithUserLoggedInImageIndex;
+    end
+    else
+    begin
+      inherited Caption := FWithoutUserLoggedInCaption;
+      inherited Hint := FWithoutUserLoggedInHint;
+      inherited ImageIndex := FWithoutUserLoggedInImageIndex;
     end;
 end;
 
-procedure TPascalSCADALogin_LogoutAction.CanBeAccessed(a: Boolean);
+procedure TPascalSCADALogin_LogoutAction.CanBeAccessed(A: Boolean);
 begin
-  inherited CanBeAccessed(true); //it can be accessed always.
+  inherited CanBeAccessed(True); //it can be accessed always.
   UpdateMyState;
 end;
 
 constructor TPascalSCADALogin_LogoutAction.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FWithUserLoggedInImageIndex:=-1;
-  FWithoutUserLoggedInImageIndex:=-1;
+  FWithUserLoggedInImageIndex := -1;
+  FWithoutUserLoggedInImageIndex := -1;
 end;
 
 procedure TPascalSCADALogin_LogoutAction.UpdateTarget(Target: TObject);
 begin
-  CanBeAccessed(true);
+  CanBeAccessed(True);
 end;
 
 procedure TPascalSCADALogin_LogoutAction.ExecuteTarget(Target: TObject);
 begin
-  if GetControlSecurityManager.UserManagement<>nil then
-    if TBasicUserManagement(GetControlSecurityManager.UserManagement).UserLogged then begin
+  if GetControlSecurityManager.UserManagement <> nil then
+    if TBasicUserManagement(GetControlSecurityManager.UserManagement).UserLogged then
+    begin
       GetControlSecurityManager.Logout;
-    end else begin
+    end
+    else
+    begin
       if Assigned(FBeforeLogin) then
         FBeforeLogin(Self);
 
@@ -333,227 +330,225 @@ end;
 constructor TControlSecurityManager.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FUserManagement:=nil;
-  SetLength(FControls,0);
+  FUserManagement := nil;
+  SetLength(FControls, 0);
 end;
 
 destructor TControlSecurityManager.Destroy;
 begin
-  if Length(FControls)>0 then
-    writeln('FIX-ME: ',SSecurityControlBusy,' ',{$i %FILE%},':',{$i %LINE%});
+  if Length(FControls) > 0 then
+    writeln('FIX-ME: ', SSecurityControlBusy, ' ', {$i %FILE%}, ':', {$i %LINE%});
   inherited Destroy;
 end;
 
-function TControlSecurityManager.Login(Userlogin, Userpassword: UTF8String; var UID:Integer): Boolean; overload;
+function TControlSecurityManager.Login(Userlogin, Userpassword: UTF8String; var UID: Integer): Boolean; overload;
 begin
-  if FUserManagement<>nil then
-    Result:=TBasicUserManagement(FUserManagement).Login(Userlogin,Userpassword,UID)
+  if FUserManagement <> nil then
+    Result := TBasicUserManagement(FUserManagement).Login(Userlogin, Userpassword, UID)
   else
-    Result:=false;
+    Result := False;
 end;
 
-function   TControlSecurityManager.Login:Boolean;
+function TControlSecurityManager.Login: Boolean;
 begin
-  if FUserManagement<>nil then
-    Result:=TBasicUserManagement(FUserManagement).Login
+  if FUserManagement <> nil then
+    Result := TBasicUserManagement(FUserManagement).Login
   else
-    Result:=false;
+    Result := False;
 end;
 
-procedure  TControlSecurityManager.Logout;
+procedure TControlSecurityManager.Logout;
 begin
-  if FUserManagement<>nil then
-    TBasicUserManagement(FUserManagement).Logout
+  if FUserManagement <> nil then
+    TBasicUserManagement(FUserManagement).Logout;
 end;
 
-procedure  TControlSecurityManager.Manage;
+procedure TControlSecurityManager.Manage;
 begin
-  if FUserManagement<>nil then
+  if FUserManagement <> nil then
     TBasicUserManagement(FUserManagement).Manage;
 end;
 
 function TControlSecurityManager.GetCurrentUserlogin: UTF8String;
 begin
-  Result:='';
-  if FUserManagement<>nil then
-    Result:=TBasicUserManagement(FUserManagement).CurrentUserLogin;
+  Result := '';
+  if FUserManagement <> nil then
+    Result := TBasicUserManagement(FUserManagement).CurrentUserLogin;
 end;
 
 function TControlSecurityManager.GetCurrentUserName: UTF8String;
 begin
-  Result:='';
-    if FUserManagement<>nil then
-      Result:=TBasicUserManagement(FUserManagement).CurrentUserName;
+  Result := '';
+  if FUserManagement <> nil then
+    Result := TBasicUserManagement(FUserManagement).CurrentUserName;
 end;
 
-procedure  TControlSecurityManager.TryAccess(sc:UTF8String);
+procedure TControlSecurityManager.TryAccess(ASecurityCode: UTF8String);
 begin
-  if FUserManagement<>nil then
-    if not TBasicUserManagement(FUserManagement).CanAccess(sc) then
+  if FUserManagement <> nil then
+    if not TBasicUserManagement(FUserManagement).CanAccess(ASecurityCode) then
       raise Exception.Create(SAccessDenied);
 end;
 
-procedure TControlSecurityManager.SetUserManagement(um:TBasicUserManagement);
+procedure TControlSecurityManager.SetUserManagement(AUserManagement: TBasicUserManagement);
 begin
-  if (um<>nil) and (not (um is TBasicUserManagement)) then
+  if (AUserManagement <> nil) and (not (AUserManagement is TBasicUserManagement)) then
     raise Exception.Create(SInvalidUserManager);
 
-  if (um<>nil) and (FUserManagement<>nil) then
+  if (AUserManagement <> nil) and (FUserManagement <> nil) then
     raise Exception.Create(SUserManagementIsSet);
 
-  FUserManagement:=um;
+  FUserManagement := AUserManagement;
   UpdateControls;
 end;
 
-function TControlSecurityManager.RegisterControl(control: IHMIInterface
-  ): Boolean;
+function TControlSecurityManager.RegisterControl(Control: IHMIInterface): Boolean;
 var
-  h:LongInt;
+  ALast: Longint;
 begin
-  Result:=false;
+  Result := False;
   try
-    h:=Length(FControls);
-    SetLength(FControls,h+1);
-    FControls[h]:=control;
-    Result:=true;
+    ALast := Length(FControls);
+    SetLength(FControls, ALast + 1);
+    FControls[ALast] := Control;
+    Result := True;
   except
   end;
 end;
 
-procedure  TControlSecurityManager.UnRegisterControl(control:IHMIInterface);
+procedure TControlSecurityManager.UnRegisterControl(Control: IHMIInterface);
 var
-  c, h:LongInt;
-  found: Boolean;
+  i: Longint;
+  h: Longint;
+  Found: Boolean;
 begin
-  h:=High(FControls);
-  for c:=0 to h do
-    if FControls[c]=control then begin
-      FControls[c]:=FControls[h];
-      SetLength(FControls,h);
-      break;
-      found:=true;
+  h := High(FControls);
+  for i := 0 to h do
+    if FControls[i] = Control then
+    begin
+      FControls[i] := FControls[h];
+      SetLength(FControls, h);
+      Break;
+      Found := True;
     end;
 
   {$IFNDEF WINDOWS}
   if not found then
-    writeln('FIX-ME: Control not found! ',{$i %FILE%},':',{$i %LINE%});
+    writeln('FIX-ME: Control not found! ', {$i %FILE%}, ':', {$i %LINE%});
   {$ENDIF}
 end;
 
-procedure  TControlSecurityManager.UpdateControls;
+procedure TControlSecurityManager.UpdateControls;
 var
-  c:LongInt;
+  i: Longint;
 begin
-  for c:=0 to High(FControls) do
-    FControls[c].CanBeAccessed(CanAccess(FControls[c].GetControlSecurityCode));
+  for i := 0 to High(FControls) do
+    FControls[i].CanBeAccessed(CanAccess(FControls[i].GetControlSecurityCode));
 end;
 
-function   TControlSecurityManager.CanAccess(sc:UTF8String):Boolean;
+function TControlSecurityManager.CanAccess(ASecurityCode: UTF8String): Boolean;
 begin
-  Result:=true;
+  Result := True;
 
-  if sc='' then exit;
+  if ASecurityCode = '' then Exit;
 
-  if (FUserManagement<>nil) and (FUserManagement is TBasicUserManagement) then
-    Result:=TBasicUserManagement(FUserManagement).CanAccess(sc);
+  if (FUserManagement <> nil) and (FUserManagement is TBasicUserManagement) then
+    Result := TBasicUserManagement(FUserManagement).CanAccess(ASecurityCode);
 end;
 
-procedure  TControlSecurityManager.ValidateSecurityCode(sc:UTF8String);
+procedure TControlSecurityManager.ValidateSecurityCode(ASecurityCode: UTF8String);
 begin
-  if FUserManagement<>nil then
-    TBasicUserManagement(FUserManagement).ValidateSecurityCode(sc);
+  if FUserManagement <> nil then
+    TBasicUserManagement(FUserManagement).ValidateSecurityCode(ASecurityCode);
 end;
 
-procedure  TControlSecurityManager.RegisterSecurityCode(sc:UTF8String);
+procedure TControlSecurityManager.RegisterSecurityCode(ASecurityCode: UTF8String);
 begin
-  if FUserManagement<>nil then
-    TBasicUserManagement(FUserManagement).RegisterSecurityCode(sc);
+  if FUserManagement <> nil then
+    TBasicUserManagement(FUserManagement).RegisterSecurityCode(ASecurityCode);
 end;
 
-procedure  TControlSecurityManager.UnregisterSecurityCode(sc:UTF8String);
+procedure TControlSecurityManager.UnregisterSecurityCode(ASecurityCode: UTF8String);
 var
-  being_used:Boolean;
-  c:LongInt;
+  BeingUsed: Boolean;
+  i: Longint;
 begin
-  being_used:=false;
-  for c:=0 to Length(FControls) do
-    being_used:=being_used or (FControls[c].GetControlSecurityCode=sc);
+  BeingUsed := False;
+  for i := 0 to Length(FControls) do
+    BeingUsed := BeingUsed or (FControls[i].GetControlSecurityCode = ASecurityCode);
 
-  if being_used then begin
-    case MessageDlg(SSecurityCodeBusyWantRemove,mtConfirmation,mbYesNoCancel,0) of
-      mrYes:
-        for c:=0 to Length(FControls) do
-          if FControls[c].GetControlSecurityCode=sc then
-            FControls[c].MakeUnsecure;
-      mrNo:
-        raise Exception.Create(SSecurityCodeStillBusy);
-      mrCancel:
-        exit;
+  if BeingUsed then
+  begin
+    case MessageDlg(SSecurityCodeBusyWantRemove, mtConfirmation, mbYesNoCancel, 0) of
+      mrYes:  for i := 0 to Length(FControls) do
+                if FControls[i].GetControlSecurityCode = ASecurityCode then
+                  FControls[i].MakeUnsecure;
+      mrNo: raise Exception.Create(SSecurityCodeStillBusy);
+      mrCancel: Exit;
     end;
   end;
 
-  if FUserManagement<>nil then
-    TBasicUserManagement(FUserManagement).UnregisterSecurityCode(sc);
+  if FUserManagement <> nil then
+    TBasicUserManagement(FUserManagement).UnregisterSecurityCode(ASecurityCode);
 end;
 
-function   TControlSecurityManager.SecurityCodeExists(sc:UTF8String):Boolean;
+function TControlSecurityManager.SecurityCodeExists(ASecurityCode: UTF8String): Boolean;
 begin
-  Result:=false;
-  if FUserManagement<>nil then
-    Result:=TBasicUserManagement(FUserManagement).SecurityCodeExists(sc);
+  Result := False;
+  if FUserManagement <> nil then
+    Result := TBasicUserManagement(FUserManagement).SecurityCodeExists(ASecurityCode);
 end;
 
-function   TControlSecurityManager.GetRegisteredAccessCodes:TStringList;
+function TControlSecurityManager.GetRegisteredAccessCodes: TStringList;
 begin
-  if FUserManagement=nil then begin
-    Result:=TStringList.Create
-  end else
-    Result:=TBasicUserManagement(FUserManagement).GetRegisteredAccessCodes;
+  if FUserManagement = nil then
+  begin
+    Result := TStringList.Create;
+  end
+  else
+    Result := TBasicUserManagement(FUserManagement).GetRegisteredAccessCodes;
 end;
 
-function TControlSecurityManager.CheckIfUserIsAllowed(sc: UTF8String;
-  RequireUserLogin: Boolean; var userlogin: UTF8String; const UserHint: String
-  ): Boolean;
+function TControlSecurityManager.CheckIfUserIsAllowed(ASecurityCode: UTF8String; RequireUserLogin: Boolean; var Userlogin: UTF8String; const UserHint: string): Boolean;
 begin
-  Result:=(Trim(sc)='');
-  if FUserManagement<>nil then
-    Result:=TBasicUserManagement(FUserManagement).CheckIfUserIsAllowed(sc, RequireUserLogin, userlogin, UserHint);
+  Result := (Trim(ASecurityCode) = '');
+  if FUserManagement <> nil then
+    Result := TBasicUserManagement(FUserManagement).CheckIfUserIsAllowed(ASecurityCode, RequireUserLogin, Userlogin, UserHint);
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
 //PascaSCADA user management Standart actions
 ////////////////////////////////////////////////////////////////////////////////
 
-procedure TPascalSCADAUserManagementAction.SetDisableIfNotAuthorized(
-  AValue: Boolean);
+procedure TPascalSCADAUserManagementAction.SetDisableIfNotAuthorized(AValue: Boolean);
 begin
-  if FDisableIfNotAuthorized=AValue then Exit;
-  FDisableIfNotAuthorized:=AValue;
+  if FDisableIfNotAuthorized = AValue then Exit;
+  FDisableIfNotAuthorized := AValue;
   CanBeAccessed(GetControlSecurityManager.CanAccess(FSecurityCode));
 end;
 
 procedure TPascalSCADAUserManagementAction.SetEnabled(AValue: Boolean);
 begin
-  if FEnabled=AValue then Exit;
-  FEnabled:=AValue;
-  inherited Enabled:=FEnabled and FAccessAllowed;
+  if FEnabled = AValue then Exit;
+  FEnabled := AValue;
+  inherited Enabled := FEnabled and FAccessAllowed;
 end;
 
 function TPascalSCADAUserManagementAction.GetControlSecurityCode: UTF8String;
 begin
-  Result:=FSecurityCode;
+  Result := FSecurityCode;
 end;
 
 procedure TPascalSCADAUserManagementAction.MakeUnsecure;
 begin
-  FSecurityCode:='';
-  CanBeAccessed(true);
+  FSecurityCode := '';
+  CanBeAccessed(True);
 end;
 
-procedure TPascalSCADAUserManagementAction.CanBeAccessed(a: Boolean);
+procedure TPascalSCADAUserManagementAction.CanBeAccessed(A: Boolean);
 begin
-  FAccessAllowed:=a or (FDisableIfNotAuthorized=false);
-  inherited Enabled:=FEnabled and FAccessAllowed;
+  FAccessAllowed := A or (FDisableIfNotAuthorized = False);
+  inherited Enabled := FEnabled and FAccessAllowed;
 end;
 
 procedure TPascalSCADAUserManagementAction.SetHMITag(t: TPLCTag);
@@ -563,7 +558,7 @@ end;
 
 function TPascalSCADAUserManagementAction.GetHMITag: TPLCTag;
 begin
-  Result:=nil;
+  Result := nil;
   //does nothing
 end;
 
@@ -575,29 +570,31 @@ end;
 
 function TPascalSCADAUserManagementAction.HandlesTarget(Target: TObject): Boolean;
 begin
-  Result:=true;
+  Result := True;
 end;
 
 constructor TPascalSCADAUserManagementAction.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FRegInSecMan:=GetControlSecurityManager.RegisterControl(Self as IHMIInterface);
-  if not FRegInSecMan then begin
+  FRegInSecMan := GetControlSecurityManager.RegisterControl(Self as IHMIInterface);
+  if not FRegInSecMan then
+  begin
     {$IFNDEF WINDOWS}
-    writeln('FIX-ME: Failed to register class ',ClassName,' instace with name="',Name,'" in the ControlSecurityManager?',{$i %FILE%},':',{$i %LINE%});
+    writeln('FIX-ME: Failed to register class ', ClassName, ' instace with name="', Name, '" in the ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
     {$ENDIF}
   end;
-  FEnabled:=true;
-  FDisableIfNotAuthorized:=true;
+  FEnabled := True;
+  FDisableIfNotAuthorized := True;
 end;
 
 destructor TPascalSCADAUserManagementAction.Destroy;
 begin
   if FRegInSecMan then
     GetControlSecurityManager.UnRegisterControl(Self as IHMIInterface)
-  else begin
+  else
+  begin
     {$IFNDEF WINDOWS}
-    writeln('FIX-ME: Why class ',ClassName,', instace name="',Name,'" ins''t registered in ControlSecurityManager?',{$i %FILE%},':',{$i %LINE%});
+    writeln('FIX-ME: Why class ', ClassName, ', instace name="', Name, '" ins''t registered in ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
     {$ENDIF}
   end;
   inherited Destroy;
@@ -607,16 +604,16 @@ end;
 //PascaSCADA Login Action
 ////////////////////////////////////////////////////////////////////////////////
 
-procedure TPascalSCADALoginAction.CanBeAccessed(a: Boolean);
+procedure TPascalSCADALoginAction.CanBeAccessed(A: Boolean);
 begin
-  if GetControlSecurityManager.UserManagement<>nil then
+  if GetControlSecurityManager.UserManagement <> nil then
     with GetControlSecurityManager.UserManagement as TBasicUserManagement do
       inherited CanBeAccessed(not UserLogged);
 end;
 
 procedure TPascalSCADALoginAction.UpdateTarget(Target: TObject);
 begin
-  CanBeAccessed(true);
+  CanBeAccessed(True);
 end;
 
 procedure TPascalSCADALoginAction.ExecuteTarget(Target: TObject);
@@ -628,16 +625,16 @@ end;
 //PascaSCADA Logout Action
 ////////////////////////////////////////////////////////////////////////////////
 
-procedure TPascalSCADALogoutAction.CanBeAccessed(a: Boolean);
+procedure TPascalSCADALogoutAction.CanBeAccessed(A: Boolean);
 begin
-  if GetControlSecurityManager.UserManagement<>nil then
+  if GetControlSecurityManager.UserManagement <> nil then
     with GetControlSecurityManager.UserManagement as TBasicUserManagement do
       inherited CanBeAccessed(UserLogged);
 end;
 
 procedure TPascalSCADALogoutAction.UpdateTarget(Target: TObject);
 begin
-  CanBeAccessed(true);
+  CanBeAccessed(True);
 end;
 
 procedure TPascalSCADALogoutAction.ExecuteTarget(Target: TObject);
@@ -649,16 +646,16 @@ end;
 //PascaSCADA User management action
 ////////////////////////////////////////////////////////////////////////////////
 
-procedure TPascalSCADAManageUsersAction.CanBeAccessed(a: Boolean);
+procedure TPascalSCADAManageUsersAction.CanBeAccessed(A: Boolean);
 begin
-  if GetControlSecurityManager.UserManagement<>nil then
+  if GetControlSecurityManager.UserManagement <> nil then
     with GetControlSecurityManager.UserManagement as TBasicUserManagement do
       inherited CanBeAccessed(UserLogged);
 end;
 
 procedure TPascalSCADAManageUsersAction.UpdateTarget(Target: TObject);
 begin
-  CanBeAccessed(false);
+  CanBeAccessed(False);
 end;
 
 procedure TPascalSCADAManageUsersAction.ExecuteTarget(Target: TObject);
@@ -670,7 +667,7 @@ end;
 //PascaSCADA General purpose secure action
 ////////////////////////////////////////////////////////////////////////////////
 
-procedure   TPascalSCADASecureAction.UpdateTarget(Target: TObject);
+procedure TPascalSCADASecureAction.UpdateTarget(Target: TObject);
 begin
   CanBeAccessed(FAccessAllowed);
   inherited UpdateTarget(Target);
@@ -679,27 +676,29 @@ end;
 function TPascalSCADASecureAction.Execute: Boolean;
 begin
   if GetControlSecurityManager.CanAccess(FSecurityCode) then
-    Result:=inherited Execute
-  else begin
-    MessageDlg('Error','Access denied!',mtInformation,[mbOK],0);
-    Result:=false;
+    Result := inherited Execute
+  else
+  begin
+    MessageDlg('Error', 'Access denied', mtInformation, [mbOK], 0);
+    Result := False;
   end;
 end;
 
-procedure TPascalSCADASecureAction.SetSecurityCode(sc: UTF8String);
+procedure TPascalSCADASecureAction.SetSecurityCode(ASecurityCode: UTF8String);
 begin
-  if Trim(sc)='' then
-    Self.CanBeAccessed(true)
+  if Trim(ASecurityCode) = '' then
+    Self.CanBeAccessed(True)
   else
-    with GetControlSecurityManager do begin
-      ValidateSecurityCode(sc);
-      if not SecurityCodeExists(sc) then
-        RegisterSecurityCode(sc);
+    with GetControlSecurityManager do
+    begin
+      ValidateSecurityCode(ASecurityCode);
+      if not SecurityCodeExists(ASecurityCode) then
+        RegisterSecurityCode(ASecurityCode);
 
-      Self.CanBeAccessed(CanAccess(sc));
+      Self.CanBeAccessed(CanAccess(ASecurityCode));
     end;
 
-  FSecurityCode:=sc;
+  FSecurityCode := ASecurityCode;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -707,15 +706,16 @@ end;
 ////////////////////////////////////////////////////////////////////////////////
 
 var
-  QPascalControlSecurityManager:TControlSecurityManager;
+  QPascalControlSecurityManager: TControlSecurityManager;
 
-function GetControlSecurityManager:TControlSecurityManager;
+function GetControlSecurityManager: TControlSecurityManager;
 begin
-  Result:=QPascalControlSecurityManager;
+  Result := QPascalControlSecurityManager;
 end;
 
 initialization
-  QPascalControlSecurityManager:=TControlSecurityManager.Create(nil);
+  QPascalControlSecurityManager := TControlSecurityManager.Create(nil);
+
 finalization
   QPascalControlSecurityManager.Destroy;
 

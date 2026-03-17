@@ -680,13 +680,13 @@ begin
     FAddress[0].Address := Add;
     FAddress[0].Count := 1;
     FAddress[0].MinScan := Scan;
-    exit;
+    Exit;
   end;
   IF Length(FAddress)=1 THEN begin
     if FAddress[0].Address = add then begin
       inc(FAddress[0].Count);
       FAddress[0].MinScan := Min(FAddress[0].MinScan,Scan);
-      exit;
+      Exit;
     end else begin
       SetLength(FAddress,2);
       if FAddress[0].Address<add then begin
@@ -702,7 +702,7 @@ begin
         FAddress[0].MinScan := Scan;
       end;
     end;
-    exit;
+    Exit;
   end;
 
   //procura e adiciona no lugar correto...
@@ -762,9 +762,9 @@ var
 begin
   c:=0;
   //se não encontrou cai fora...
-  //if not found the addres, exit.
+  //if not found the addres, Exit.
   if not FindAddress(add, c) then
-    exit;
+    Exit;
 
   dec(FAddress[c].Count);
   //caso zerou um endereco, é necessário remover ele da lista...
@@ -781,14 +781,14 @@ end;
 
 procedure TPLCMemoryManager.SetHoleSize(size:LongInt);
 begin
-  if size=FMaxHole then exit;
+  if size=FMaxHole then Exit;
   FMaxHole := size;
   RebuildBlocks;
 end;
 
 procedure TPLCMemoryManager.SetBlockSize(size:LongInt);
 begin
-  if size=FMaxBlockSize then exit;
+  if size=FMaxBlockSize then Exit;
   FMaxBlockSize := size;
   RebuildBlocks; //rebuild the blocks.
 end;

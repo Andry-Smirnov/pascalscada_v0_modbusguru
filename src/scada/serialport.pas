@@ -654,7 +654,7 @@ label erro1, erro2, erro3;
 begin
   if PActive then begin
     Ok := true;
-    exit;
+    Exit;
   end;
   PPortEventName := Name+'_'+PPortName;
 
@@ -722,7 +722,7 @@ begin
 
   ok := true;
   PActive := true;
-  exit;
+  Exit;
 
 erro3:
   if PBackupPortSettings then
@@ -757,7 +757,7 @@ begin
      RefreshLastOSError;
      Ok := false;
      PActive := false;
-     exit;
+     Exit;
   end;
   
   //se e para salvar as configs da porta...
@@ -908,7 +908,7 @@ begin
      RefreshLastOSError;
      Ok := false;
      PActive := false;
-     exit;
+     Exit;
   end;
   
   tcflush(PPortHandle, TCIOFLUSH);
@@ -1021,7 +1021,7 @@ var
 begin
   if PAcceptAnyPortName then begin
     Result:=true;
-    exit;
+    Exit;
   end;
   //dcbstring := v+': baud=1200 parity=N data=8 stop=1';
   //Result := BuildCommDCB(PChar(dcbstring),d)
@@ -1054,7 +1054,7 @@ var
 begin
   if PAcceptAnyPortName then begin
     Result:=true;
-    exit;
+    Exit;
   end;
 
   Result := false;
@@ -1063,7 +1063,7 @@ begin
       //fd:=fpopen('/dev/'+PPortName, O_RDWR or O_NOCTTY or O_NONBLOCK);
 
       Result := true;
-      exit;
+      Exit;
     end;
 {$ENDIF}
 end;
@@ -1333,7 +1333,7 @@ procedure TSerialPortDriver.SetActive(v: Boolean);
 begin
   if [csLoading, csReading]*ComponentState<>[] then begin
     PActivatedOnLoad:=v;
-    exit;
+    Exit;
   end;
   inherited SetActive(v);
 end;

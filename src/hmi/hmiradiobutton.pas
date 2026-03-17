@@ -17,8 +17,14 @@ unit HMIRadioButton;
 interface
 
 uses
-  HMICheckBox, Classes, Controls, {$IFDEF FPC}LCLIntf, LCLType,
-  WSLCLClasses,{$ELSE}Windows,{$ENDIF} StdCtrls, HMITypes;
+  HMICheckBox, Classes, Controls,
+  {$IFDEF FPC}
+LCLIntf, LCLType,
+  WSLCLClasses,
+  {$ELSE}
+  Windows,
+  {$ENDIF}
+  StdCtrls, HMITypes;
 
 type
   {$IFDEF PORTUGUES}
@@ -36,22 +42,22 @@ type
   {$ENDIF}
   THMIRadioButton = class(THMICheckBox)
   private
-    FRegInSecMan:Boolean;
+    FRegInSecMan: Boolean;
   protected
-  {$IFDEF FPC}
+    {$IFDEF FPC}
     //: @exclude
     procedure Click; override;
-  {$ELSE}
+    {$ELSE}
     //: @exclude
     procedure CreateParams(var Params: TCreateParams); override;
-  {$ENDIF}
+    {$ENDIF}
     //: @exclude
     procedure Loaded; override;
   public
     //: @exclude
-    constructor Create(AOwner:TComponent); override;
+    constructor Create(AOwner: TComponent); override;
     //: @exclude
-    destructor  Destroy; override;
+    destructor Destroy; override;
   published
     //: @exclude
     property OtherValuesIS default IsUnchecked;
@@ -61,19 +67,20 @@ implementation
 
 uses ControlSecurityManager;
 
-constructor THMIRadioButton.Create(AOwner:TComponent);
+constructor THMIRadioButton.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FRegInSecMan:=GetControlSecurityManager.RegisterControl(Self as IHMIInterface);
-  if not FRegInSecMan then begin
+  FRegInSecMan := GetControlSecurityManager.RegisterControl(Self as IHMIInterface);
+  if not FRegInSecMan then
+  begin
     {$IFNDEF WINDOWS}
-    writeln('FIX-ME: Failed to register class ',ClassName,' instace with name="',Name,'" in the ControlSecurityManager?',{$i %FILE%},':',{$i %LINE%});
+    writeln('FIX-ME: Failed to register class ', ClassName, ' instace with name="', Name, '" in the ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
     {$ENDIF}
   end;
   {$IFDEF FPC}
   fCompStyle := csRadioButton;
   {$ENDIF}
-  OtherValuesIS := isUnchecked;
+  OtherValuesIS := IsUnchecked;
 
 end;
 
@@ -81,9 +88,10 @@ destructor THMIRadioButton.Destroy;
 begin
   if FRegInSecMan then
     GetControlSecurityManager.UnRegisterControl(Self as IHMIInterface)
-  else begin
+  else
+  begin
     {$IFNDEF WINDOWS}
-    writeln('FIX-ME: Why class ',ClassName,', instace name="',Name,'" ins''t registered in ControlSecurityManager?',{$i %FILE%},':',{$i %LINE%});
+    writeln('FIX-ME: Why class ', ClassName, ', instace name="', Name, '" ins''t registered in ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
     {$ENDIF}
   end;
   inherited Destroy;
@@ -98,6 +106,7 @@ begin
 end;
 
 {$ELSE}
+
 procedure THMIRadioButton.CreateParams(var Params: TCreateParams);
 const
   Alignments: array[Boolean, TLeftRight] of Cardinal =
@@ -105,9 +114,10 @@ const
 begin
   inherited CreateParams(Params);
   CreateSubClass(Params, 'BUTTON');
-  with Params do begin
+  with Params do
+  begin
     Style := Style xor BS_3STATE or BS_RADIOBUTTON or Alignments[UseRightToLeftAlignment, Alignment];
-    WindowClass.style := WindowClass.style and (CS_HREDRAW or CS_VREDRAW);        
+    WindowClass.Style := WindowClass.Style and (CS_HREDRAW or CS_VREDRAW);
   end;
 end;
 {$ENDIF}

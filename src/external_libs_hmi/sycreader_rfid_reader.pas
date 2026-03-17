@@ -179,7 +179,7 @@ begin
   if ShouldReopen or (Device=nil) then begin
     InterlockedExchange(FReady, 0);
 
-    if assigned(Device) then begin
+    if Assigned(Device) then begin
       Device^.Close;
       Device:=nil;
     end;
@@ -196,7 +196,7 @@ begin
       Device:=nil
     end;
 
-    if Num<>8 then exit;
+    if Num<>8 then Exit;
     if FNextBuffer=nil  then begin
       New(FNextBuffer);
       FNextBuffer^.StrBuffer:='';
@@ -250,7 +250,7 @@ begin
   if Assigned(auxptr) then begin
     strBuffer:=auxptr^.StrBuffer;
     dispose(auxptr);
-    exit(true);
+    Exit(true);
   end;
 end;
 
@@ -308,7 +308,7 @@ begin
     FSycRFIDReader.LoopStarted(1000);
     Result:=FSycRFIDReader.GetReady;
   end else
-    exit(true);
+    Exit(true);
 end;
 
 function TSycRFIDReader.IsEmptyChipCard: Boolean;

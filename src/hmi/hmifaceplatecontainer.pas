@@ -20,7 +20,7 @@ type
     procedure setTransparent(AValue: Boolean);
   protected
 
-    function  IsControlArea(X,Y:Integer):Boolean; virtual;
+    function IsControlArea(X, Y: Integer): Boolean; virtual;
 
     procedure setfaceplateTag(AValue: TPLCStruct);
     procedure Loaded; override;
@@ -30,9 +30,9 @@ type
     constructor Create(TheOwner: TComponent); override;
     procedure Paint; override;
   published
-    property FaceplatePLCTag:TPLCStruct read ffaceplatetag write setfaceplateTag;
-    property OnLoaded:TNotifyEvent read FOnLoaded write FOnLoaded;
-    property Transparent:Boolean read FTransparent write setTransparent;
+    property FaceplatePLCTag: TPLCStruct read ffaceplatetag write setfaceplateTag;
+    property OnLoaded: TNotifyEvent read FOnLoaded write FOnLoaded;
+    property Transparent: Boolean read FTransparent write setTransparent;
   end;
 
   TFaceplateFormClass = class of TFaceplateFrame;
@@ -41,7 +41,7 @@ implementation
 
 uses StdCtrls, LazRegions, LCLIntf, Math;
 
-{ TFaceplate }
+  { TFaceplate }
 
 procedure TFaceplateFrame.Paint;
 begin
@@ -51,28 +51,31 @@ end;
 
 procedure TFaceplateFrame.setTransparent(AValue: Boolean);
 begin
-  if FTransparent=AValue then Exit;
-  FTransparent:=AValue;
+  if FTransparent = AValue then Exit;
+  FTransparent := AValue;
 end;
 
 function TFaceplateFrame.IsControlArea(X, Y: Integer): Boolean;
 begin
-  Result:=not FTransparent;
+  Result := not FTransparent;
 end;
 
 procedure TFaceplateFrame.setfaceplateTag(AValue: TPLCStruct);
 var
   c: Integer;
 begin
-  for c:=0 to ComponentCount-1 do begin
+  for c := 0 to ComponentCount - 1 do
+  begin
     //TODO mudar somente tags de faceplate. Change only faceplate tags
-    if (Components[c] is TPLCStructItem) {and Tag.Faceplate} then begin
-      (Components[c] as TPLCStructItem).PLCBlock:=aValue;
-      continue;
+    if (Components[c] is TPLCStructItem) {and Tag.Faceplate} then
+    begin
+      (Components[c] as TPLCStructItem).PLCBlock := AValue;
+      Continue;
     end;
-    if (Components[c] is TPLCStructString) {and Tag.Faceplate} then begin
-      (Components[c] as TPLCStructString).PLCBlock:=aValue;
-      continue;
+    if (Components[c] is TPLCStructString) {and Tag.Faceplate} then
+    begin
+      (Components[c] as TPLCStructString).PLCBlock := AValue;
+      Continue;
     end;
   end;
 end;
@@ -83,22 +86,23 @@ var
   rgn, rgn2: HRGN;
 begin
   inherited Loaded;
-  rgn:=CreateRectRgn(0,0,0,0);
+  rgn := CreateRectRgn(0, 0, 0, 0);
   try
-    for c:=0 to ControlCount-1 do begin
+    for c := 0 to ControlCount - 1 do
+    begin
       try
-        rgn2:=CreateRectRgn(
-                            Controls[c].Left,
-                            Controls[c].Top,
-                            Controls[c].Left + Controls[c].Width,
-                            Controls[c].Top + Controls[c].Height);
-        CombineRgn(rgn,rgn,rgn2,RGN_OR);
-        Controls[c].ControlStyle:=Controls[c].ControlStyle+[csNoDesignSelectable];
+        rgn2 := CreateRectRgn(
+          Controls[c].Left,
+          Controls[c].Top,
+          Controls[c].Left + Controls[c].Width,
+          Controls[c].Top + Controls[c].Height);
+        CombineRgn(rgn, rgn, rgn2, RGN_OR);
+        Controls[c].ControlStyle := Controls[c].ControlStyle + [csNoDesignSelectable];
       finally
-        DeleteObject(Rgn2);
+        DeleteObject(rgn2);
       end;
     end;
-    SetWindowRgn(Handle,rgn,true);
+    SetWindowRgn(Handle, rgn, True);
   finally
     DeleteObject(rgn);
   end;
@@ -109,13 +113,13 @@ end;
 
 procedure TFaceplateFrame.CMHitTest(var Message: TCMHittest);
 begin
-  Message.Result:=ifthen(FTransparent,0,1);
+  Message.Result := ifthen(FTransparent, 0, 1);
 end;
 
 constructor TFaceplateFrame.Create(TheOwner: TComponent);
 begin
   inherited Create(TheOwner);
-  ControlStyle:=ControlStyle+[csOwnedChildrenNotSelectable];// + [csOpaque];
+  ControlStyle := ControlStyle + [csOwnedChildrenNotSelectable];// + [csOpaque];
 end;
 
 end.

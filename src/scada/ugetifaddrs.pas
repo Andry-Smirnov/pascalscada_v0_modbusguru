@@ -47,7 +47,7 @@ begin
                                                 curif^.ifa_addr^.sin_addr.s_bytes[2],
                                                 curif^.ifa_addr^.sin_addr.s_bytes[3],
                                                 curif^.ifa_addr^.sin_addr.s_bytes[4]]) then begin
-              exit(true);
+              Exit(true);
             end;
           end;
         end;
@@ -58,7 +58,7 @@ begin
     end;
   end;
 
-  exit(false);
+  Exit(false);
 end;
 
 end.

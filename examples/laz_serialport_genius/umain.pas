@@ -203,12 +203,12 @@ end;
 
 procedure TCommThread.InsertRecord;
 begin
-  if frmRank=nil then exit;
+  if frmRank=nil then Exit;
   try
     frmRank.tblRank.DisableControls;
 
-    //if the game number is already registered, exit...
-    if frmRank.tblRank.Locate('id_jogo',cur_game_number,[]) then exit;
+    //if the game number is already registered, Exit...
+    if frmRank.tblRank.Locate('id_jogo',cur_game_number,[]) then Exit;
 
     //only append if not in edit mode.
     if not (frmRank.tblRank.State in dsEditModes) then

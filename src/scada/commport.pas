@@ -1135,7 +1135,7 @@ procedure TEventNotificationThread.SyncCommErrorEvent;
 var
   ievt:TCommPortErrorEvent;
 begin
-  if FEvent=nil then exit;
+  if FEvent=nil then Exit;
   try
     ievt:=TCommPortErrorEvent(FEvent^);
     ievt(FError);
@@ -1147,7 +1147,7 @@ procedure TEventNotificationThread.SyncPortEvent;
 var
   ievt:TNotifyEvent;
 begin
-  if FEvent=nil then exit;
+  if FEvent=nil then Exit;
   try
     ievt:=TNotifyEvent(FEvent^);
     ievt(FOwner);
@@ -1281,7 +1281,7 @@ end;
 procedure TCommPortDriver.IOCommand(cmd:TIOCommand; Packet:PIOPacket);
 begin
   if csDestroying in ComponentState then
-     exit;
+     Exit;
 
   FDelayBetweenCmds:=Packet^.DelayBetweenCommand;
   case cmd of
@@ -1327,7 +1327,7 @@ procedure TCommPortDriver.CommPortOpened;
 var
   c:LongInt;
 begin
-  if [csDestroying]*ComponentState<>[] then exit;
+  if [csDestroying]*ComponentState<>[] then Exit;
 
   if MainThreadID=GetCurrentThreadId then
     DoPortOpened(Self)
@@ -1341,7 +1341,7 @@ end;
 
 procedure TCommPortDriver.CommPortOpenError;
 begin
-  if [csDestroying]*ComponentState<>[] then exit;
+  if [csDestroying]*ComponentState<>[] then Exit;
 
   if MainThreadID=GetCurrentThreadId then
     DoPortOpenError(self)
@@ -1353,7 +1353,7 @@ procedure TCommPortDriver.CommPortClose;
 var
   c:LongInt;
 begin
-  if [csDestroying]*ComponentState<>[] then exit;
+  if [csDestroying]*ComponentState<>[] then Exit;
 
   if MainThreadID=GetCurrentThreadId then
     DoPortClose(self)
@@ -1367,7 +1367,7 @@ end;
 
 procedure TCommPortDriver.CommPortCloseError;
 begin
-  if [csDestroying]*ComponentState<>[] then exit;
+  if [csDestroying]*ComponentState<>[] then Exit;
 
   if MainThreadID=GetCurrentThreadId then
     DoPortCloseError(self)
@@ -1379,7 +1379,7 @@ procedure TCommPortDriver.CommPortDisconected;
 var
   c:LongInt;
 begin
-  if [csDestroying]*ComponentState<>[] then exit;
+  if [csDestroying]*ComponentState<>[] then Exit;
 
   if MainThreadID=GetCurrentThreadId then
     DoPortDisconnected(Self)
@@ -1524,7 +1524,7 @@ begin
   //if it is being loading.
   if csReading in ComponentState then begin
     FReadActive := v;
-    exit;
+    Exit;
   end;
 
   //evita a abertura/fechamento da porta em edição, quando um dispositivo
@@ -1585,7 +1585,7 @@ begin
     Result := 0;
 
     if (csDestroying in ComponentState) or (FExclusiveDevice and (csDesigning in ComponentState)) then
-       exit;
+       Exit;
 
     //verify if another driver is the owner of the comm port...
     PLockCS.Enter;
@@ -1604,7 +1604,7 @@ begin
     PIOCmdCS.Enter;
     InIOCmdCS:=true;
     if (not ReallyActive) then
-       exit;
+       Exit;
 
     if Assigned(OnBegin) then
       OnBegin(Self);
@@ -1674,7 +1674,7 @@ begin
       PPacket:=pkt;
 
     if (csDestroying in ComponentState) or (FExclusiveDevice and (csDesigning in ComponentState)) then
-       exit;
+       Exit;
 
     //verify if another driver is the owner of the comm port...
     PLockCS.Enter;
@@ -1693,7 +1693,7 @@ begin
     PIOCmdCS.Enter;
     InIOCmdCS:=true;
     //if (not ReallyActive) then
-       //exit;
+       //Exit;
 
     if Assigned(OnBegin) then
       OnBegin(Self);
@@ -1720,7 +1720,7 @@ begin
     SetLength(PPacket^.BufferToRead,BytesToRead);
 
     if (not ReallyActive) then
-    exit;
+    Exit;
     //executes the I/O command.
     InternalIOCommand(Cmd,@PPacket^);
 
@@ -1858,16 +1858,16 @@ begin
   PIOCmdCS.Enter;
   try
     canopen:=false;
-    if Log=FLogActions then exit;
+    if Log=FLogActions then Exit;
 
     if [csReading]*ComponentState<>[] then begin
       FReadedLogActions:=Log;
-      exit;
+      Exit;
     end;
 
     if [csDesigning]*ComponentState<>[] then begin
       canopen:=(Trim(FLogFile)<>'');
-      exit;
+      Exit;
     end;
 
     if log then begin
@@ -1892,7 +1892,7 @@ var
 begin
   PIOCmdCS.Enter;
   try
-    if nFile=FLogFile then exit;
+    if nFile=FLogFile then Exit;
     islogging:=FLogActions;
     LogIOActions:=false;
     FLogFile:=nFile;
@@ -1943,9 +1943,9 @@ procedure  TCommPortDriver.LogAction(cmd:TIOCommand; Packet:TIOPacket);
     FS:TStringStream;
     timestamp:AnsiString;
 begin
-  if not FLogActions then exit;
+  if not FLogActions then Exit;
 
-  if [csDesigning]*ComponentState<>[] then exit;
+  if [csDesigning]*ComponentState<>[] then Exit;
 
   try
     FS:=TStringStream.Create('');

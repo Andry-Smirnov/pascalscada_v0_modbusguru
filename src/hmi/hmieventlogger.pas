@@ -16,17 +16,17 @@ type
   TEventCollectionItem = class(TCollectionItem)
   private
     FEventColor: TColor;
-    FEventDescription: String;
+    FEventDescription: string;
     FEventValue: Integer;
     procedure SetEventColor(AValue: TColor);
-    procedure SetEventDescription(AValue: String);
+    procedure SetEventDescription(AValue: string);
     procedure SetEventValue(AValue: Integer);
   protected
     function GetDisplayName: string; override;
   published
-    property EventDescription:String read FEventDescription write SetEventDescription;
-    property EventValue:Integer read FEventValue write SetEventValue;
-    property EventColor:TColor read FEventColor write SetEventColor;
+    property EventDescription: string read FEventDescription write SetEventDescription;
+    property EventValue: Integer read FEventValue write SetEventValue;
+    property EventColor: TColor read FEventColor write SetEventColor;
   end;
 
   { TEventCollection }
@@ -39,7 +39,7 @@ type
 
   { TEventTagColletionItem }
 
-  TEventTagColletionItem=class(TCollectionItem)
+  TEventTagColletionItem = class(TCollectionItem)
   private
     FIgnoreDescriptionList: Boolean;
     FLastEventGUID: TGuid;
@@ -48,44 +48,44 @@ type
     FLastTagValue: Double;
     FPendingUpdate: Boolean;
     FPLCTag: TPLCTag;
-    FTagDesc: String;
+    FTagDesc: string;
     FTagID: Integer;
-    FTagPath: String;
-    FLastValueInitialized:Boolean;
+    FTagPath: string;
+    FLastValueInitialized: Boolean;
     procedure SetLastTagValue(AValue: Double);
     procedure SetPLCTag(AValue: TPLCTag);
-    procedure SetTagDesc(AValue: String);
+    procedure SetTagDesc(AValue: string);
     procedure SetTagID(AValue: Integer);
-    procedure SetTagPath(AValue: String);
+    procedure SetTagPath(AValue: string);
   protected
     function GetDisplayName: string; override;
   public
-    property LastEventGUID:TGuid read FLastEventGUID write FLastEventGUID;
-    property LastEventPointerID:Pointer read FLastEventPointerID write FLastEventPointerID;
-    property LastEventIntID:Int64 read FLastEventIntID write fLastEventIntID;
-    property LastTagValue:Double read FLastTagValue write SetLastTagValue;
-    property PendingUpdate:Boolean read FPendingUpdate write FPendingUpdate;
-    function LastValueInitialized:Boolean;
+    property LastEventGUID: TGuid read FLastEventGUID write FLastEventGUID;
+    property LastEventPointerID: Pointer read FLastEventPointerID write FLastEventPointerID;
+    property LastEventIntID: Int64 read FLastEventIntID write FLastEventIntID;
+    property LastTagValue: Double read FLastTagValue write SetLastTagValue;
+    property PendingUpdate: Boolean read FPendingUpdate write FPendingUpdate;
+    function LastValueInitialized: Boolean;
   published
-    property PLCTag:TPLCTag read FPLCTag write SetPLCTag;
-    property TagID:Integer  read FTagID write SetTagID;
-    property TagPath:String read FTagPath write SetTagPath;
-    property TagDesc:String read FTagDesc write SetTagDesc;
-    property IgnoreDescriptionList:Boolean read FIgnoreDescriptionList write FIgnoreDescriptionList;
+    property PLCTag: TPLCTag read FPLCTag write SetPLCTag;
+    property TagID: Integer read FTagID write SetTagID;
+    property TagPath: string read FTagPath write SetTagPath;
+    property TagDesc: string read FTagDesc write SetTagDesc;
+    property IgnoreDescriptionList: Boolean read FIgnoreDescriptionList write FIgnoreDescriptionList;
   end;
 
   { TEventTagColletion }
 
-  TEventTagColletion=class(TOwnedCollection)
+  TEventTagColletion = class(TOwnedCollection)
   public
     function Add: TEventTagColletionItem;
     constructor Create(AOwner: TPersistent);
   end;
 
-  TTagEventFinished = procedure (Sender:TObject; EventIntID:Int64; EventGUID:TGuid; var FinishEventSQL:String) of object;
-  TFinishAllTagEvents = procedure(Sender:TObject; var FinishAllEventsSQL:String) of object;
-  TNewTagEvent = procedure(Sender:TObject; TagItem:TEventTagColletionItem; EventIntID:Int64; EventGUID:TGuid; EventDesc:TEventCollectionItem; var NewTagEventSQL:THMIDBConnectionStatementList) of object;
-  TGenerateNewEventID = function(var EventIntID:Int64; var EventGUID:TGuid):Boolean of object;
+  TTagEventFinished = procedure(Sender: TObject; EventIntID: Int64; EventGUID: TGuid; var FinishEventSQL: string) of object;
+  TFinishAllTagEvents = procedure(Sender: TObject; var FinishAllEventsSQL: string) of object;
+  TNewTagEvent = procedure(Sender: TObject; TagItem: TEventTagColletionItem; EventIntID: Int64; EventGUID: TGuid; EventDesc: TEventCollectionItem; var NewTagEventSQL: THMIDBConnectionStatementList) of object;
+  TGenerateNewEventID = function(var EventIntID: Int64; var EventGUID: TGuid): Boolean of object;
 
   { THMIEventLogger }
 
@@ -99,7 +99,7 @@ type
     FOnGenerateNewEventID: TGenerateNewEventID;
     FOnNewTagEvent: TNewTagEvent;
     FOnTagEventFinished: TTagEventFinished;
-    FInternalEventIDCounter:Integer;
+    FInternalEventIDCounter: Integer;
     procedure SetAsyncDBConnection(AValue: THMIDBConnection);
     procedure SetEventDescriptions(AValue: TEventCollection);
     procedure SetEventTags(AValue: TEventTagColletion);
@@ -110,34 +110,32 @@ type
   protected
     procedure FinishCurrentEvent(aItem: TEventTagColletionItem);
     procedure Loaded; override;
-    procedure DoTagEventFinished(Sender:TObject; EventIntID:Int64; EventGUID:TGuid; var FinishEventSQL:String); virtual;
-    procedure DoFinishAllTagEvents(Sender:TObject; var FinishAllEventsSQL:String); virtual;
-    procedure DoNewTagEvent(Sender: TObject; TagItem:TEventTagColletionItem; EventIntID: Int64; EventGUID: TGuid;
-      EventDesc: TEventCollectionItem;
-  var NewEventSQL: THMIDBConnectionStatementList); virtual;
-    function  GenerateNewEventID(var EventIntID:Int64; var EventGUID:TGuid):Boolean; virtual;
+    procedure DoTagEventFinished(Sender: TObject; EventIntID: Int64; EventGUID: TGuid; var FinishEventSQL: string); virtual;
+    procedure DoFinishAllTagEvents(Sender: TObject; var FinishAllEventsSQL: string); virtual;
+    procedure DoNewTagEvent(Sender: TObject; TagItem: TEventTagColletionItem; EventIntID: Int64; EventGUID: TGuid; EventDesc: TEventCollectionItem; var NewEventSQL: THMIDBConnectionStatementList); virtual;
+    function GenerateNewEventID(var EventIntID: Int64; var EventGUID: TGuid): Boolean; virtual;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
-  published                                                                                        
-    property AsyncDBConnection:THMIDBConnection read FAsyncDBConnection write SetAsyncDBConnection;
-    property EventDescriptions:TEventCollection read FEventDescriptions write SetEventDescriptions;
-    property EventTags:TEventTagColletion read FEventTags write SetEventTags;
+  published
+    property AsyncDBConnection: THMIDBConnection read FAsyncDBConnection write SetAsyncDBConnection;
+    property EventDescriptions: TEventCollection read FEventDescriptions write SetEventDescriptions;
+    property EventTags: TEventTagColletion read FEventTags write SetEventTags;
   protected
-    property OnTagEventFinished:TTagEventFinished read FOnTagEventFinished write FOnTagEventFinished;
-    property OnFinishAllTagEvents:TFinishAllTagEvents read FOnFinishAllTagEvents write FOnFinishAllTagEvents;
-    property OnNewTagEvent:TNewTagEvent read FOnNewTagEvent write FOnNewTagEvent;
-    property OnGenerateNewEventID:TGenerateNewEventID read FOnGenerateNewEventID write FOnGenerateNewEventID;
-    property CurrentEventTimestamp:TDateTime read FCurrentEventTimestamp;
+    property OnTagEventFinished: TTagEventFinished read FOnTagEventFinished write FOnTagEventFinished;
+    property OnFinishAllTagEvents: TFinishAllTagEvents read FOnFinishAllTagEvents write FOnFinishAllTagEvents;
+    property OnNewTagEvent: TNewTagEvent read FOnNewTagEvent write FOnNewTagEvent;
+    property OnGenerateNewEventID: TGenerateNewEventID read FOnGenerateNewEventID write FOnGenerateNewEventID;
+    property CurrentEventTimestamp: TDateTime read FCurrentEventTimestamp;
   end;
 
   THMIEventLogger = class(THMICustomEventLogger)
   published
-    property OnTagEventFinished   ;
-    property OnFinishAllTagEvents ;
-    property OnNewTagEvent        ;
-    property OnGenerateNewEventID ;
+    property OnTagEventFinished;
+    property OnFinishAllTagEvents;
+    property OnNewTagEvent;
+    property OnGenerateNewEventID;
     property CurrentEventTimestamp;
   end;
 
@@ -147,25 +145,25 @@ implementation
 
 procedure TEventCollectionItem.SetEventColor(AValue: TColor);
 begin
-  if FEventColor=AValue then Exit;
-  FEventColor:=AValue;
+  if FEventColor = AValue then Exit;
+  FEventColor := AValue;
 end;
 
-procedure TEventCollectionItem.SetEventDescription(AValue: String);
+procedure TEventCollectionItem.SetEventDescription(AValue: string);
 begin
-  if FEventDescription=AValue then Exit;
-  FEventDescription:=AValue;
+  if FEventDescription = AValue then Exit;
+  FEventDescription := AValue;
 end;
 
 procedure TEventCollectionItem.SetEventValue(AValue: Integer);
 begin
-  if FEventValue=AValue then Exit;
-  FEventValue:=AValue;
+  if FEventValue = AValue then Exit;
+  FEventValue := AValue;
 end;
 
 function TEventCollectionItem.GetDisplayName: string;
 begin
-  Result:=FEventValue.ToString+'="'+FEventDescription+'" ('+ColorToString(FEventColor)+')';
+  Result := FEventValue.ToString + '="' + FEventDescription + '" (' + ColorToString(FEventColor) + ')';
 end;
 
 { TEventCollection }
@@ -179,79 +177,84 @@ end;
 constructor TEventCollection.Create(AOwner: TPersistent);
 begin
   //inherited Create(TEventCollectionItem);
-    inherited Create(AOwner, TEventCollectionItem);
+  inherited Create(AOwner, TEventCollectionItem);
 end;
 
 { TEventTagColletionItem }
 
 procedure TEventTagColletionItem.SetPLCTag(AValue: TPLCTag);
 begin
-  if FPLCTag=AValue then Exit;
+  if FPLCTag = AValue then Exit;
 
-  if Collection.Owner is THMICustomEventLogger then begin
-    if assigned(FPLCTag) then begin
+  if Collection.Owner is THMICustomEventLogger then
+  begin
+    if assigned(FPLCTag) then
+    begin
       FPLCTag.RemoveAllHandlersFromObject(Collection.Owner as THMICustomEventLogger);
       (Collection.Owner as THMICustomEventLogger).RemoveFreeNotification(FPLCTag);
     end;
 
-    if assigned(AValue) and ((((Collection as TOwnedCollection).Owner as TComponent).ComponentState*[csReading,csLoading])=[]) then begin
+    if assigned(AValue) and ((((Collection as TOwnedCollection).Owner as TComponent).ComponentState * [csReading, csLoading]) = []) then
+    begin
       AValue.AddTagChangeHandler(@THMICustomEventLogger(Collection.Owner).TagFromListChanged);
       (Collection.Owner as THMICustomEventLogger).FreeNotification(AValue);
     end;
   end;
 
-  FPLCTag:=AValue;
+  FPLCTag := AValue;
 end;
 
 procedure TEventTagColletionItem.SetLastTagValue(AValue: Double);
 begin
-  if FLastValueInitialized and (FLastTagValue=AValue) then Exit;
-  FLastTagValue:=AValue;
-  FLastValueInitialized:=true;
+  if FLastValueInitialized and (FLastTagValue = AValue) then Exit;
+  FLastTagValue := AValue;
+  FLastValueInitialized := True;
 end;
 
-procedure TEventTagColletionItem.SetTagDesc(AValue: String);
+procedure TEventTagColletionItem.SetTagDesc(AValue: string);
 begin
-  if FTagDesc=AValue then Exit;
-  FTagDesc:=AValue;
+  if FTagDesc = AValue then Exit;
+  FTagDesc := AValue;
 end;
 
 procedure TEventTagColletionItem.SetTagID(AValue: Integer);
 begin
-  if FTagID=AValue then Exit;
-  FTagID:=AValue;
+  if FTagID = AValue then Exit;
+  FTagID := AValue;
 end;
 
-procedure TEventTagColletionItem.SetTagPath(AValue: String);
+procedure TEventTagColletionItem.SetTagPath(AValue: string);
 begin
-  if FTagPath=AValue then Exit;
-  FTagPath:=AValue;
+  if FTagPath = AValue then Exit;
+  FTagPath := AValue;
 end;
 
 function TEventTagColletionItem.GetDisplayName: string;
 begin
-  Result:=inttostr(FTagID) + ' = ' + FTagDesc+' (';
-  if Assigned(FPLCTag) then begin
+  Result := IntToStr(FTagID) + ' = ' + FTagDesc + ' (';
+  if assigned(FPLCTag) then
+  begin
     if String(PLCTag.Name).IsEmpty then
-      Result:=Result+'<empty name>'
+      Result := Result + '<empty name>'
     else
-      Result:=Result+FPLCTag.Name;
-  end else
-    Result:=Result+'<Nil>';
+      Result := Result + FPLCTag.Name;
+  end
+  else
+    Result := Result + '<Nil>';
 
-  Result:=Result+')';
+  Result := Result + ')';
 end;
 
 function TEventTagColletionItem.LastValueInitialized: Boolean;
 begin
-  exit(FLastValueInitialized);
+  Exit(FLastValueInitialized);
 end;
 
 { TEventTagColletion }
 
 function TEventTagColletion.Add: TEventTagColletionItem;
 begin
-  Result:=TEventTagColletionItem(inherited Add);
+  Result := TEventTagColletionItem(inherited Add);
 end;
 
 constructor TEventTagColletion.Create(AOwner: TPersistent);
@@ -269,21 +272,22 @@ end;
 
 procedure THMICustomEventLogger.SetAsyncDBConnection(AValue: THMIDBConnection);
 begin
-  if FAsyncDBConnection=AValue then Exit;
+  if FAsyncDBConnection = AValue then Exit;
 
-  if Assigned(FAsyncDBConnection) then begin
+  if assigned(FAsyncDBConnection) then
+  begin
     FAsyncDBConnection.RemoveFreeNotification(self);
   end;
 
-  if Assigned(AValue) then
-    AValue.FreeNotification(Self);
+  if assigned(AValue) then
+    AValue.FreeNotification(self);
 
-  FAsyncDBConnection:=AValue;
+  FAsyncDBConnection := AValue;
 end;
 
 procedure THMICustomEventLogger.SetEventTags(AValue: TEventTagColletion);
 begin
-  if Assigned(FEventTags) then
+  if assigned(FEventTags) then
     FEventTags.Assign(AValue);
 end;
 
@@ -292,16 +296,21 @@ var
   auxItem: TEventTagColletionItem;
   c: Integer;
 begin
-  if Assigned(FEventTags) then begin
-     for c:=0 to FEventTags.Count-1 do begin
-       auxItem:=TEventTagColletionItem(FEventTags.Items[c]);
-       if Assigned(auxItem.PLCTag) then begin
-         if auxItem.PendingUpdate then begin
-           TagFromListChanged(auxItem.PLCTag);
-         end;
-       end else
-         auxItem.PendingUpdate:=false;
-     end;
+  if assigned(FEventTags) then
+  begin
+    for c := 0 to FEventTags.Count - 1 do
+    begin
+      auxItem := TEventTagColletionItem(FEventTags.Items[c]);
+      if assigned(auxItem.PLCTag) then
+      begin
+        if auxItem.PendingUpdate then
+        begin
+          TagFromListChanged(auxItem.PLCTag);
+        end;
+      end
+      else
+        auxItem.PendingUpdate := False;
+    end;
   end;
 end;
 
@@ -318,60 +327,69 @@ var
   auxReal: Double;
   auxItemEvt: TEventCollectionItem;
   NewGUID: TGuid;
-  SQL: String;
+  SQL: string;
   sqlcmds: THMIDBConnectionStatementList;
   b, a, c1: Boolean;
 begin
-  if ([csReading,csLoading]*ComponentState<>[]) then
-    exit;
+  if ([csReading, csLoading] * ComponentState <> []) then
+    Exit;
 
-  if Assigned(FEventTags) then begin
-    for c:=0 to FEventTags.Count-1 do begin
-      auxItem:=TEventTagColletionItem(FEventTags.Items[c]);
-      if assigned(auxItem.PLCTag) and (auxItem.PLCTag=Sender) then begin
-        auxReal:=(auxItem.PLCTag as ITagNumeric).GetValue;
+  if assigned(FEventTags) then
+  begin
+    for c := 0 to FEventTags.Count - 1 do
+    begin
+      auxItem := TEventTagColletionItem(FEventTags.Items[c]);
+      if assigned(auxItem.PLCTag) and (auxItem.PLCTag = Sender) then
+      begin
+        auxReal := (auxItem.PLCTag as ITagNumeric).GetValue;
 
         try
-          if auxItem.LastValueInitialized and (auxReal=auxItem.LastTagValue) then
-            exit;
+          if auxItem.LastValueInitialized and (auxReal = auxItem.LastTagValue) then
+            Exit;
 
-          TagValue:=trunc(auxReal);
-          FCurrentEventTimestamp:=Now;
+          TagValue := trunc(auxReal);
+          FCurrentEventTimestamp := Now;
 
           FinishCurrentEvent(auxItem);
 
-          for i:=0 to FEventDescriptions.Count-1 do begin
-            auxItemEvt:=TEventCollectionItem(FEventDescriptions.Items[i]);
-            if (auxItemEvt.EventValue=TagValue) or ((auxItem.FIgnoreDescriptionList) and ([csDesigning]*ComponentState=[])) then begin
-              if not GenerateNewEventID(NewIntID, NewGUID) then exit;
+          for i := 0 to FEventDescriptions.Count - 1 do
+          begin
+            auxItemEvt := TEventCollectionItem(FEventDescriptions.Items[i]);
+            if (auxItemEvt.EventValue = TagValue) or ((auxItem.FIgnoreDescriptionList) and ([csDesigning] * ComponentState = [])) then
+            begin
+              if not GenerateNewEventID(NewIntID, NewGUID) then Exit;
               try
-                sqlcmds:=THMIDBConnectionStatementList.Create;
-                DoNewTagEvent(auxItem.PLCTag, auxItem, NewIntID, NewGUID,auxItemEvt, sqlcmds);
-                a:=Assigned(FAsyncDBConnection);
-                b:=FAsyncDBConnection.Connected;
-                c1:=(sqlcmds.Count > 0);
-                if a and b and c1 then begin
-                  FAsyncDBConnection.ExecTransaction(sqlcmds,nil,true, false);
-                  auxItem.PendingUpdate:=false;
-                end else begin
+                sqlcmds := THMIDBConnectionStatementList.Create;
+                DoNewTagEvent(auxItem.PLCTag, auxItem, NewIntID, NewGUID, auxItemEvt, sqlcmds);
+                a := assigned(FAsyncDBConnection);
+                b := FAsyncDBConnection.Connected;
+                c1 := (sqlcmds.Count > 0);
+                if a and b and c1 then
+                begin
+                  FAsyncDBConnection.ExecTransaction(sqlcmds, nil, True, False);
+                  auxItem.PendingUpdate := False;
+                end
+                else
+                begin
                   FreeAndNil(sqlcmds);
-                  if FAsyncDBConnection.Connected=false then begin
-                    auxItem.PendingUpdate:=true;
-                    auxItem.FLastValueInitialized:=false;
+                  if FAsyncDBConnection.Connected = False then
+                  begin
+                    auxItem.PendingUpdate := True;
+                    auxItem.FLastValueInitialized := False;
                     Application.QueueAsyncCall(@TagChangedDelayed2, PtrInt(Sender));
                   end;
                 end;
-                exit;
+                Exit;
               finally
-                auxItem.LastEventGUID:= NewGUID;
-                auxItem.LastEventIntID:= NewIntID;
+                auxItem.LastEventGUID := NewGUID;
+                auxItem.LastEventIntID := NewIntID;
               end;
-              break;
+              Break;
             end;
           end;
         finally
           if not auxItem.PendingUpdate then
-            auxItem.LastTagValue:=auxReal;
+            auxItem.LastTagValue := auxReal;
         end;
       end;
     end;
@@ -380,26 +398,27 @@ end;
 
 procedure THMICustomEventLogger.FinishAllEventsDelayed;
 var
-  SQL: String;
+  SQL: string;
 begin
-  DoFinishAllTagEvents(Self, SQL);
-  if Assigned(FAsyncDBConnection) and FAsyncDBConnection.Connected then
-    FAsyncDBConnection.ExecSQL(SQL,nil,false)
+  DoFinishAllTagEvents(self, SQL);
+  if assigned(FAsyncDBConnection) and FAsyncDBConnection.Connected then
+    FAsyncDBConnection.ExecSQL(SQL, nil, False);
 end;
 
-procedure THMICustomEventLogger.FinishCurrentEvent(aItem:TEventTagColletionItem);
+procedure THMICustomEventLogger.FinishCurrentEvent(aItem: TEventTagColletionItem);
 var
   auxItem: TEventTagColletionItem;
-  SQL: String;
+  SQL: string;
 begin
-  auxItem:=aItem;
-  if (not IsEqualGUID(auxItem.LastEventGUID, GUID_NULL)) or (auxItem.LastEventIntID<>0) or Assigned(auxItem.LastEventPointerID) then begin
+  auxItem := aItem;
+  if (not IsEqualGUID(auxItem.LastEventGUID, GUID_NULL)) or (auxItem.LastEventIntID <> 0) or assigned(auxItem.LastEventPointerID) then
+  begin
     DoTagEventFinished(auxItem.PLCTag, auxItem.LastEventIntID, auxItem.LastEventGUID, SQL);
-    if Assigned(FAsyncDBConnection) and FAsyncDBConnection.Connected and not SQL.Trim.IsEmpty then
-      FAsyncDBConnection.ExecSQL(sql,nil,false);
-    auxItem.LastEventGUID     := GUID_NULL;
-    auxItem.LastEventIntID    := 0;
-    auxItem.LastEventPointerID:=nil;
+    if assigned(FAsyncDBConnection) and FAsyncDBConnection.Connected and not SQL.Trim.IsEmpty then
+      FAsyncDBConnection.ExecSQL(SQL, nil, False);
+    auxItem.LastEventGUID := GUID_NULL;
+    auxItem.LastEventIntID := 0;
+    auxItem.LastEventPointerID := nil;
   end;
 end;
 
@@ -410,11 +429,14 @@ var
 begin
   inherited Loaded;
 
-  if Assigned(FEventTags) then begin
-    for c:=0 to FEventTags.Count-1do begin
-      auxItem:=TEventTagColletionItem(FEventTags.Items[c]);
-      if assigned(auxItem.PLCTag) then begin
-        auxItem.PLCTag.FreeNotification(Self);
+  if assigned(FEventTags) then
+  begin
+    for c := 0 to FEventTags.Count - 1 do
+    begin
+      auxItem := TEventTagColletionItem(FEventTags.Items[c]);
+      if assigned(auxItem.PLCTag) then
+      begin
+        auxItem.PLCTag.FreeNotification(self);
         auxItem.PLCTag.AddTagChangeHandler(@TagFromListChanged);
       end;
     end;
@@ -423,48 +445,44 @@ begin
   TThread.ForceQueue(nil, @FinishAllEventsDelayed);
 end;
 
-procedure THMICustomEventLogger.DoTagEventFinished(Sender: TObject;
-  EventIntID: Int64; EventGUID: TGuid; var FinishEventSQL: String);
+procedure THMICustomEventLogger.DoTagEventFinished(Sender: TObject; EventIntID: Int64; EventGUID: TGuid; var FinishEventSQL: string);
 begin
-  if Assigned(FOnTagEventFinished) then
+  if assigned(FOnTagEventFinished) then
     FOnTagEventFinished(Sender, EventIntID, EventGUID, FinishEventSQL);
 end;
 
-procedure THMICustomEventLogger.DoFinishAllTagEvents(Sender: TObject; var FinishAllEventsSQL: String);
+procedure THMICustomEventLogger.DoFinishAllTagEvents(Sender: TObject; var FinishAllEventsSQL: string);
 begin
-  if Assigned(FOnFinishAllTagEvents) then
+  if assigned(FOnFinishAllTagEvents) then
     FOnFinishAllTagEvents(Sender, FinishAllEventsSQL);
 end;
 
-procedure THMICustomEventLogger.DoNewTagEvent(Sender: TObject;
-  TagItem: TEventTagColletionItem; EventIntID: Int64; EventGUID: TGuid;
-  EventDesc: TEventCollectionItem;
-  var NewEventSQL: THMIDBConnectionStatementList);
+procedure THMICustomEventLogger.DoNewTagEvent(Sender: TObject; TagItem: TEventTagColletionItem; EventIntID: Int64; EventGUID: TGuid; EventDesc: TEventCollectionItem; var NewEventSQL: THMIDBConnectionStatementList);
 begin
-  if Assigned(FOnNewTagEvent) then
+  if assigned(FOnNewTagEvent) then
     FOnNewTagEvent(Sender, TagItem, EventIntID, EventGUID, EventDesc, NewEventSQL);
 end;
 
-function THMICustomEventLogger.GenerateNewEventID(var EventIntID: Int64;
-  var EventGUID: TGuid): Boolean;
+function THMICustomEventLogger.GenerateNewEventID(var EventIntID: Int64; var EventGUID: TGuid): Boolean;
 begin
-  Result:=false;
-  if Assigned(FOnGenerateNewEventID) then
-    Result:=FOnGenerateNewEventID(EventIntID, EventGUID)
-  else begin
-    inc(FInternalEventIDCounter);
-    EventIntID:=FInternalEventIDCounter;
+  Result := False;
+  if assigned(FOnGenerateNewEventID) then
+    Result := FOnGenerateNewEventID(EventIntID, EventGUID)
+  else
+  begin
+    Inc(FInternalEventIDCounter);
+    EventIntID := FInternalEventIDCounter;
 
     CreateGUID(EventGUID);
-    exit(true);
+    Exit(True);
   end;
 end;
 
 constructor THMICustomEventLogger.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FEventTags:=TEventTagColletion.Create(Self);
-  FEventDescriptions:=TEventCollection.Create(Self);
+  FEventTags := TEventTagColletion.Create(self);
+  FEventDescriptions := TEventCollection.Create(self);
 end;
 
 destructor THMICustomEventLogger.Destroy;
@@ -472,16 +490,19 @@ var
   auxItem: TEventTagColletionItem;
   c: Integer;
 begin
-  if Assigned(FEventDescriptions) then
+  if assigned(FEventDescriptions) then
     FreeAndNil(FEventDescriptions);
 
-  AsyncDBConnection:=nil; //release the connection
+  AsyncDBConnection := nil; //release the connection
 
-  if Assigned(FEventTags) then begin
-    for c:=FEventTags.Count-1 downto 0 do begin
-      auxItem:=TEventTagColletionItem(FEventTags.Items[c]);
-      if assigned(auxItem.PLCTag) then begin
-        auxItem.PLCTag.RemoveFreeNotification(Self);
+  if assigned(FEventTags) then
+  begin
+    for c := FEventTags.Count - 1 downto 0 do
+    begin
+      auxItem := TEventTagColletionItem(FEventTags.Items[c]);
+      if assigned(auxItem.PLCTag) then
+      begin
+        auxItem.PLCTag.RemoveFreeNotification(self);
       end;
     end;
     FreeAndNil(FEventTags);
@@ -490,23 +511,26 @@ begin
   inherited Destroy;
 end;
 
-procedure THMICustomEventLogger.Notification(AComponent: TComponent;
-  Operation: TOperation);
+procedure THMICustomEventLogger.Notification(AComponent: TComponent; Operation: TOperation);
 var
   auxItem: TEventTagColletionItem;
   c: Integer;
 begin
   inherited Notification(AComponent, Operation);
-  if (Operation=opRemove) and  Assigned(FEventTags) then begin
-    if AComponent=FAsyncDBConnection then begin
-      FAsyncDBConnection:=nil;
-      exit;
+  if (Operation = opRemove) and assigned(FEventTags) then
+  begin
+    if AComponent = FAsyncDBConnection then
+    begin
+      FAsyncDBConnection := nil;
+      Exit;
     end;
 
-    for c:=FEventTags.Count-1 downto 0 do begin
-      auxItem:=TEventTagColletionItem(FEventTags.Items[c]);
-      if (auxItem.PLCTag=AComponent) and  assigned(auxItem.PLCTag) then begin
-        auxItem.FPLCTag:=nil;
+    for c := FEventTags.Count - 1 downto 0 do
+    begin
+      auxItem := TEventTagColletionItem(FEventTags.Items[c]);
+      if (auxItem.PLCTag = AComponent) and assigned(auxItem.PLCTag) then
+      begin
+        auxItem.FPLCTag := nil;
         //TODO finish the active event?
         FEventTags.Delete(c);
       end;

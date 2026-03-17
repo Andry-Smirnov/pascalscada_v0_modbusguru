@@ -15,29 +15,29 @@ type
     procedure SetBorderColor(AValue: TColor);
     procedure SetFlow(AValue: Boolean);
   protected
-    function GetDisplayName: AnsiString; override;
+    function GetDisplayName: Ansistring; override;
   published
-    property Flow:Boolean read FFlow write SetFlow;
-    property BorderColor:TColor read FBorderColor write SetBorderColor;
+    property Flow: Boolean read FFlow write SetFlow;
+    property BorderColor: TColor read FBorderColor write SetBorderColor;
   end;
 
   THMIFlowZones = class(TZones)
     //: @exclude
-    constructor Create(aOwner:TPersistent);
+    constructor Create(aOwner: TPersistent);
 
     {$IFDEF PORTUGUES}
     //: Adiciona uma nova zona de cor.
     {$ELSE}
     //: Adds a new color and flow zone into the collection.
     {$ENDIF}
-    function Add:THMIFlowZone;
+    function Add: THMIFlowZone;
   end;
 
 implementation
 
 uses strutils;
 
-{ THMIFlowZones }
+  { THMIFlowZones }
 
 constructor THMIFlowZones.Create(aOwner: TPersistent);
 begin
@@ -46,29 +46,28 @@ end;
 
 function THMIFlowZones.Add: THMIFlowZone;
 begin
-  Result:=THMIFlowZone(inherited Add);
+  Result := THMIFlowZone(inherited Add);
 end;
 
 { THMIFlowZone }
 
 procedure THMIFlowZone.SetFlow(AValue: Boolean);
 begin
-  if FFlow=AValue then Exit;
-  FFlow:=AValue;
+  if FFlow = AValue then Exit;
+  FFlow := AValue;
   NotifyChange;
 end;
 
-function THMIFlowZone.GetDisplayName: AnsiString;
+function THMIFlowZone.GetDisplayName: Ansistring;
 begin
-  Result:=inherited GetDisplayName+' '+IfThen(FFlow,'','BREAK FLOW');
+  Result := inherited GetDisplayName + ' ' + IfThen(FFlow, '', 'BREAK FLOW');
 end;
 
 procedure THMIFlowZone.SetBorderColor(AValue: TColor);
 begin
-  if FBorderColor=AValue then Exit;
-  FBorderColor:=AValue;
+  if FBorderColor = AValue then Exit;
+  FBorderColor := AValue;
   NotifyChange;
 end;
 
 end.
-

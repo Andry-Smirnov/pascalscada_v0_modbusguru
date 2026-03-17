@@ -264,12 +264,12 @@ begin
       DoCommPortDisconected();
     CommResult:=iorPortError;
     Result:=false;
-    exit;
+    Exit;
   end;
 
   if (nbytes>0) then begin   // there is something in receive buffer, it doesn't seem the socket has been closed
     Result:=true;
-    exit;
+    Exit;
   end;
 
   t.tv_usec:=1;
@@ -283,7 +283,7 @@ begin
     Result:=true;
     CommResult:=iorTimeOut;
     incRetries:=true;
-    exit;
+    Exit;
   end;
 
   if (retval<0) then begin //error on socket...
@@ -292,7 +292,7 @@ begin
       DoCommPortDisconected();
     CommResult:=iorPortError;
     Result:=false;
-    exit;
+    Exit;
   end;
 
   if (retval=1) then begin  // seems there is something in our receive buffer!!
@@ -305,7 +305,7 @@ begin
         DoCommPortDisconected();
       CommResult:=iorPortError;
       Result:=false;
-      exit;
+      Exit;
     end;
 
     if (nbytes=0) then begin
@@ -314,7 +314,7 @@ begin
         DoCommPortDisconected();
       CommResult:=iorNotReady;
       Result:=false;
-      exit;
+      Exit;
     end;
 
     incRetries:=true;
@@ -360,7 +360,7 @@ begin
 
   if retval<>0 then begin
     Result:=-1;
-    exit;
+    Exit;
   end;
 
   if (nbytes>0) then

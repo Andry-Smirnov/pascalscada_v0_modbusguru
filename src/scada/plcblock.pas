@@ -193,7 +193,7 @@ var
   TagValues:TArrayOfDouble;
   PreviousTimestamp:TDateTime;
 begin
-  if (csDestroying in ComponentState) then exit;
+  if (csDestroying in ComponentState) then Exit;
   PreviousTimestamp:=PValueTimeStamp;
   try
     inherited TagCommandCallBack(ReqID, Values, ValuesTimeStamp, TagCommand, LastResult, Offset);
@@ -335,7 +335,7 @@ procedure TPLCBlock.AsyncNotifyChange(data: Pointer);
 var
   x:PArrayOfDouble;
 begin
-  if not Assigned(POnAsyncValueChange) then exit;
+  if not Assigned(POnAsyncValueChange) then Exit;
   x:=data;
   POnAsyncValueChange(self,x^);
 end;
@@ -417,13 +417,13 @@ begin
   if Assigned(ElementMapperEditor) then
     ElementMapperEditor(Self, Self.Owner,InsertHook,CreateProc)
   else
-    raise exception.Create('None element mapper tool has been assigned!');
+    raise exception.Create('None element mapper tool has been Assigned!');
 end;
 
 procedure SetBlockElementMapper(ElementMapperTool:TOpenTagEditor);
 begin
-  if assigned(ElementMapperEditor) then
-    raise Exception.Create('A Bit Mapper editor was already assigned.')
+  if Assigned(ElementMapperEditor) then
+    raise Exception.Create('A Bit Mapper editor was already Assigned.')
   else
     ElementMapperEditor:=ElementMapperTool;
 end;

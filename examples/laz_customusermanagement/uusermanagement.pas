@@ -150,7 +150,7 @@ end;
 procedure TfrmUserManagement.userMemberListMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
-  if (Button=mbLeft) and assigned(userMemberList.Selected) then begin
+  if (Button=mbLeft) and Assigned(userMemberList.Selected) then begin
     userMemberList.BeginDrag(false, 10);
   end;
 end;
@@ -169,7 +169,7 @@ end;
 
 procedure TfrmUserManagement.CheckIfCardHasBeenRemoved(Sender: TObject);
 begin
-  if assigned(dm.CustomizedUserManagement1.ChipCardReader) and (Sender is TTimer) and (TTimer(sender).Owner is TForm) then begin
+  if Assigned(dm.CustomizedUserManagement1.ChipCardReader) and (Sender is TTimer) and (TTimer(sender).Owner is TForm) then begin
     if dm.CustomizedUserManagement1.ChipCardReader.IsEmptyChipCard then begin
       TForm(TTimer(sender).Owner).ModalResult:=mrOK;
       TTimer(sender).Enabled:=false;
@@ -249,12 +249,12 @@ function TfrmUserManagement.ValidLogin(aStr: String): Boolean;
 var
   c: Integer;
 begin
-  if aStr.Trim='' then exit(False);
-  if aStr.Contains(' ') then exit(false);
-  if not (aStr[1] in ['a'..'z','A'..'Z']) then exit(false);
+  if aStr.Trim='' then Exit(False);
+  if aStr.Contains(' ') then Exit(false);
+  if not (aStr[1] in ['a'..'z','A'..'Z']) then Exit(false);
   for c:=1 to Length(aStr) do
-    if not (aStr[1] in ['a'..'z','A'..'Z','0'..'9']) then exit(false);
-  exit(true);
+    if not (aStr[1] in ['a'..'z','A'..'Z','0'..'9']) then Exit(false);
+  Exit(true);
 end;
 
 procedure TfrmUserManagement.userListContextPopup(Sender: TObject;
@@ -315,7 +315,7 @@ end;
 procedure TfrmUserManagement.AvailableUserListMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
-  if (Button=mbLeft) and assigned(AvailableUserList.Selected) then begin
+  if (Button=mbLeft) and Assigned(AvailableUserList.Selected) then begin
     AvailableUserList.BeginDrag(false, 10);
   end;
 end;
@@ -502,7 +502,7 @@ begin
   if Selected and (Item<>nil) and (item.Data<>nil) then begin
     if not dm.tblGroups.Locate('id_group',PtrInt(item.Data),[]) then begin
       RefreshGroupList;
-      exit;
+      Exit;
     end;
 
     AvailableUserList.Items.Clear;
@@ -592,7 +592,7 @@ end;
 
 procedure TfrmUserManagement.ChipCardReaderProc(Data:PtrInt);
 begin
-  if assigned(dm.CustomizedUserManagement1.ChipCardReader) and Assigned(frmChipCardRead) then begin
+  if Assigned(dm.CustomizedUserManagement1.ChipCardReader) and Assigned(frmChipCardRead) then begin
     if dm.CustomizedUserManagement1.ChipCardReader.ChipCardRead(frmChipCardRead.ChipCard) then begin
       frmChipCardRead.ModalResult:=mrOK;
     end else
@@ -611,7 +611,7 @@ end;
 
 procedure TfrmUserManagement.StartDelayedChipCardRead;
 begin
-  if assigned(dm.CustomizedUserManagement1.ChipCardReader) and ((Application.Flags*[AppDoNotCallAsyncQueue])=[]) then begin
+  if Assigned(dm.CustomizedUserManagement1.ChipCardReader) and ((Application.Flags*[AppDoNotCallAsyncQueue])=[]) then begin
     Application.QueueAsyncCall(@ChipCardReaderProc,0);
   end;
 end;
@@ -662,7 +662,7 @@ var
 begin
   if Not Assigned(dm.CustomizedUserManagement1.ChipCardReader) then begin
     MessageDlg('A funcionalidade chipcard não está instalada neste sistema!',mtError,[mbOK],0);
-    exit;
+    Exit;
   end;
 
   try

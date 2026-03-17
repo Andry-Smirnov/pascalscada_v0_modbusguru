@@ -389,7 +389,7 @@ var
       if WantsFunction <> (ExprWord.IsFunction and not ExprWord.IsOperator) then
       begin
         error := 4;
-        exit;
+        Exit;
       end;
 
       while (I < ExprWord.MaxFunctionArg) and (ArgList[I] <> nil) and (error = 0) do
@@ -678,7 +678,7 @@ begin
   if LastItem < FirstItem then
   begin
     Result := nil;
-    exit;
+    Exit;
   end;
 
   // get new record
@@ -689,7 +689,7 @@ begin
   begin
     Result^.ExprWord := TExprWord(Expr.Items[FirstItem]);
     Result^.Oper := Result^.ExprWord.ExprFunc;
-    exit;
+    Exit;
   end;
 
   // no...more complex, find operator with lowest precedence
@@ -1424,7 +1424,7 @@ begin
     // first copy
     dest := (Res.MemoryPos)^;
     Res.Append(Args[0], StrLen(Args[0]));
-    // make lowercase
+    // make LowerCase
     AnsiStrLower(dest);
   end;
 end;

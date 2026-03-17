@@ -5,29 +5,31 @@ unit pscada_dbreg;
 
 interface
 
-uses Classes;
+uses
+  Classes;
 
 procedure Register;
 
 implementation
 
-uses hsstrings, HMIDBConnection, hmidbconnection_dsgn, psbufdataset,
-  {$IFDEF FPC}
-    LResources, PropEdits, ComponentEditors;
+uses
+  hsstrings, HMIDBConnection, hmidbconnection_dsgn, psbufdataset,
+{$IFDEF FPC}
+  LResources, PropEdits, ComponentEditors;
+{$ELSE}
+  Types,
+  {$IFDEF DELPHI2009_UP}
+    //demais versoes do delphi
+    //others versions of delphi.
+    DesignIntf, DesignEditors;
   {$ELSE}
-    Types,
-    {$IFDEF DELPHI2009_UP}
-      //demais versoes do delphi
-      //others versions of delphi.
-      DesignIntf, DesignEditors;
+    {$IFDEF PORTUGUES}
+      {$MESSAGE ERROR 'Somente versões posteriores ao Delphi 2009 são suportadas!'}
     {$ELSE}
-      {$IFDEF PORTUGUES}
-        {$MESSAGE ERROR 'Somente versões posteriores ao Delphi 2009 são suportadas!'}
-      {$ELSE}
-        {$MESSAGE ERROR 'Only Delphi 2009 or later are supported!'}
-      {$ENDIF}
+      {$MESSAGE ERROR 'Only Delphi 2009 or later are supported!'}
     {$ENDIF}
   {$ENDIF}
+{$ENDIF}
 
 procedure Register;
 begin
