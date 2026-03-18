@@ -17,7 +17,10 @@ interface
 uses
   SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, Spin, ExtCtrls, Buttons, us7tagbuilder
-  {$IFDEF FPC}, LCLIntf, LResources{$ENDIF};
+  {$IFDEF FPC}
+, LCLIntf, LResources
+  {$ENDIF}
+  ;
 
 type
 
@@ -51,30 +54,34 @@ type
     procedure FormShow(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
   private
-    FTagList,
-    ItemsToDel:TList;
-    FItemId:LongInt;
-    procedure CheckNames(Sender:TObject; NewName:AnsiString; var AcceptNewName:Boolean);
-    procedure btnUpClick(Sender:TObject);
-    procedure btnDownClick(Sender:TObject);
-    procedure btnDelClick(Sender:TObject);
-    procedure btnBitsClick(Sender:TObject);
-    procedure BitItemDeleted(Sender:TObject);
-    function  GetStructItemsCount:LongInt;
-    function  GetStructItem(index:LongInt):TS7TagItemEditor;
+    FTagList: TList;
+    ItemsToDel: TList;
+    FItemId: Longint;
+    procedure CheckNames(Sender: TObject; NewName: AnsiString; var AcceptNewName: Boolean);
+    procedure btnUpClick(Sender: TObject);
+    procedure btnDownClick(Sender: TObject);
+    procedure btnDelClick(Sender: TObject);
+    procedure btnBitsClick(Sender: TObject);
+    procedure BitItemDeleted(Sender: TObject);
+    function GetStructItemsCount: Longint;
+    function GetStructItem(Index: Longint): TS7TagItemEditor;
   public
     destructor Destroy; override;
-    function HasAtLeastOneValidItem:Boolean;
-    property StructItemsCount:LongInt read GetStructItemsCount;
-    property StructItem[index:LongInt]:TS7TagItemEditor read GetStructItem;
+    function HasAtLeastOneValidItem: Boolean;
+    property StructItemsCount: Longint read GetStructItemsCount;
+    property StructItem[index: Longint]: TS7TagItemEditor read GetStructItem;
   end;
 
 var
   frmStructureEditor: TfrmStructureEditor;
 
+
 implementation
 
-uses Tag, ubitmapper, hsstrings;
+
+uses
+  Tag, ubitmapper, hsstrings;
+
 
 {$IFDEF FPC }
   {$IF defined(FPC) AND (FPC_FULLVERSION >= 20400) }
@@ -83,6 +90,7 @@ uses Tag, ubitmapper, hsstrings;
 {$ELSE}
   {$R *.dfm}
 {$ENDIF}
+
 
 destructor TfrmStructureEditor.Destroy;
 begin
@@ -93,57 +101,60 @@ end;
 
 procedure TfrmStructureEditor.Button1Click(Sender: TObject);
 var
-  aTag, lastitem:TS7TagItemEditor;
+  ATag: TS7TagItemEditor;
+  LastItem: TS7TagItemEditor;
 begin
-  aTag:=TS7TagItemEditor.Create(Self);
-  aTag.Parent := ScrollBox1;
-  aTag.PopulateCombo;
-  aTag.OnCheckNames:=@CheckNames;
-  aTag.OnUpClick:=@btnUpClick;
-  aTag.OnDownClickEvent:=@btnDownClick;
-  aTag.OnDelClickEvent:=@btnDelClick;
-  aTag.OnBitsClickEvent:=@btnBitsClick;
-  aTag.OnDelBitItem:=@BitItemDeleted;
-  aTag.TagScan:=1000;
-  aTag.TagType:=pttDefault;
-  aTag.SwapBytes:=false;
-  aTag.SwapWords:=false;
-  if FTagList.Count>0 then begin
-    lastitem:=TS7TagItemEditor(FTagList.Items[FTagList.Count-1]);
-    aTag.Top:=lastitem.Top+lastitem.Height;
-  end else begin
-    aTag.Top:=0;
+  ATag := TS7TagItemEditor.Create(Self);
+  ATag.Parent := ScrollBox1;
+  ATag.PopulateCombo;
+  ATag.OnCheckNames := @CheckNames;
+  ATag.OnUpClick := @btnUpClick;
+  ATag.OnDownClickEvent := @btnDownClick;
+  ATag.OnDelClickEvent := @btnDelClick;
+  ATag.OnBitsClickEvent := @btnBitsClick;
+  ATag.OnDelBitItem := @BitItemDeleted;
+  ATag.TagScan := 1000;
+  ATag.TagType := pttDefault;
+  ATag.SwapBytes := False;
+  ATag.SwapWords := False;
+  if FTagList.Count > 0 then
+  begin
+    LastItem := TS7TagItemEditor(FTagList.Items[FTagList.Count - 1]);
+    ATag.Top := LastItem.Top + LastItem.Height;
+  end
+  else
+  begin
+    ATag.Top := 0;
   end;
 
-  while not aTag.AcceptName('StructItem'+IntToStr(FItemId)) do
-    inc(FItemId);
-  aTag.TagName:='StructItem'+IntToStr(FItemId);
+  while not ATag.AcceptName('StructItem' + IntToStr(FItemId)) do
+    Inc(FItemId);
+  ATag.TagName := 'StructItem' + IntToStr(FItemId);
 
-  FTagList.Add(aTag);
+  FTagList.Add(ATag);
 end;
 
 procedure TfrmStructureEditor.BitBtn2Click(Sender: TObject);
 begin
-  //
+
 end;
 
 procedure TfrmStructureEditor.BitBtn1Click(Sender: TObject);
 begin
   if not HasAtLeastOneValidItem then
-    Raise Exception.Create(SYouMustHaveAtLeastOneStructureItem);
+    raise Exception.Create(SYouMustHaveAtLeastOneStructureItem);
 end;
 
 procedure TfrmStructureEditor.FormCreate(Sender: TObject);
 begin
-  FItemId:=1;
-  FTagList:=TList.Create;
-  ItemsToDel:=TList.Create;
+  FItemId := 1;
+  FTagList := TList.Create;
+  ItemsToDel := TList.Create;
 end;
 
-procedure TfrmStructureEditor.FormClose(Sender: TObject;
-  var aAction: TCloseAction);
+procedure TfrmStructureEditor.FormClose(Sender: TObject; var aAction: TCloseAction);
 begin
-  //
+
 end;
 
 procedure TfrmStructureEditor.FormShow(Sender: TObject);
@@ -151,194 +162,218 @@ begin
   Button1Click(Sender);
 end;
 
-procedure TfrmStructureEditor.CheckNames(Sender:TObject; NewName:AnsiString; var AcceptNewName:Boolean);
+procedure TfrmStructureEditor.CheckNames(Sender: TObject; NewName: AnsiString; var AcceptNewName: Boolean);
 var
-  t,b:LongInt;
+  i: Longint;
+  j: Longint;
 begin
-  for t:=0 to FTagList.Count-1 do begin
-    if TObject(FTagList.Items[t])=Sender then continue;
-    if TS7TagItemEditor(FTagList.Items[t]).TagName=NewName then begin
-      AcceptNewName:=false;
+  for i := 0 to FTagList.Count - 1 do
+  begin
+    if TObject(FTagList.Items[i]) = Sender then
+      Continue;
+    if TS7TagItemEditor(FTagList.Items[i]).TagName = NewName then
+    begin
+      AcceptNewName := False;
       Exit;
     end;
-    for b:=0 to TS7TagItemEditor(FTagList.Items[t]).BitCount-1 do begin
-      if TS7TagItemEditor(FTagList.Items[t]).Bit[b]=Sender then continue;
-      if TTagBitItemEditor(TS7TagItemEditor(FTagList.Items[t]).Bit[b]).TagName=NewName then begin
-        AcceptNewName:=false;
+    for j := 0 to TS7TagItemEditor(FTagList.Items[i]).BitCount - 1 do
+    begin
+      if TS7TagItemEditor(FTagList.Items[i]).Bit[j] = Sender then
+        Continue;
+      if TTagBitItemEditor(TS7TagItemEditor(FTagList.Items[i]).Bit[j]).TagName = NewName then
+      begin
+        AcceptNewName := False;
         Exit;
       end;
     end;
   end;
 end;
 
-procedure TfrmStructureEditor.btnUpClick(Sender:TObject);
+procedure TfrmStructureEditor.btnUpClick(Sender: TObject);
 var
-  idx:LongInt;
-  priortop, actualTop:LongInt;
-  prior:TS7TagItemEditor;
+  Idx: Longint;
+  PriorTop: Longint;
+  ActualTop: Longint;
+  Prior: TS7TagItemEditor;
 begin
   if not (Sender is TS7TagItemEditor) then Exit;
 
-  idx := FTagList.IndexOf(Sender);
-  if idx>0 then begin
-    prior:=TS7TagItemEditor(FTagList.Items[idx-1]);
+  Idx := FTagList.IndexOf(Sender);
+  if Idx > 0 then
+  begin
+    Prior := TS7TagItemEditor(FTagList.Items[Idx - 1]);
 
-    priortop:=prior.Top;
-    actualTop:=(Sender as TS7TagItemEditor).Top;
+    PriorTop := Prior.Top;
+    ActualTop := (Sender as TS7TagItemEditor).Top;
 
-    FTagList.Exchange(idx-1, idx);
+    FTagList.Exchange(Idx - 1, Idx);
 
-    (Sender as TS7TagItemEditor).Top:=priortop;
-    (Sender as TS7TagItemEditor).TabOrder:=prior.TabOrder;
-    prior.Top:=actualTop;
+    (Sender as TS7TagItemEditor).Top := PriorTop;
+    (Sender as TS7TagItemEditor).TabOrder := Prior.TabOrder;
+    Prior.Top := ActualTop;
   end;
 end;
 
-procedure TfrmStructureEditor.btnDownClick(Sender:TObject);
+procedure TfrmStructureEditor.btnDownClick(Sender: TObject);
 var
-  idx:LongInt;
-  nexttop, actualTop:LongInt;
-  aNext:TS7TagItemEditor;
+  Idx: Longint;
+  NextTop: Longint;
+  ActualTop: Longint;
+  ANext: TS7TagItemEditor;
 begin
   if not (Sender is TS7TagItemEditor) then Exit;
 
-  idx := FTagList.IndexOf(Sender);
-  if (idx<>-1) and (idx<(FTagList.Count-1)) then begin
-    aNext:=TS7TagItemEditor(FTagList.Items[idx+1]);
+  Idx := FTagList.IndexOf(Sender);
+  if (Idx <> -1) and (Idx < (FTagList.Count - 1)) then
+  begin
+    ANext := TS7TagItemEditor(FTagList.Items[Idx + 1]);
 
-    nexttop:=aNext.Top;
-    actualTop:=(Sender as TS7TagItemEditor).Top;
+    NextTop := ANext.Top;
+    ActualTop := (Sender as TS7TagItemEditor).Top;
 
-    FTagList.Exchange(idx+1, idx);
+    FTagList.Exchange(Idx + 1, Idx);
 
-    (Sender as TS7TagItemEditor).Top:=nexttop;
-    aNext.TabOrder:=(Sender as TS7TagItemEditor).TabOrder;
-    aNext.Top:=actualTop;
+    (Sender as TS7TagItemEditor).Top := NextTop;
+    ANext.TabOrder := (Sender as TS7TagItemEditor).TabOrder;
+    ANext.Top := ActualTop;
   end;
 end;
 
-procedure TfrmStructureEditor.btnDelClick(Sender:TObject);
+procedure TfrmStructureEditor.btnDelClick(Sender: TObject);
 begin
-  if ItemsToDel.IndexOf(Sender)=-1 then
-    if MessageDlg('Remove the structure item called "'+TS7TagItemEditor(Sender).TagName+'"?', mtConfirmation,[mbYes,mbNo],0)=mrYes then begin
+  if ItemsToDel.IndexOf(Sender) = -1 then
+    if MessageDlg('Remove the structure item called "' + TS7TagItemEditor(Sender).TagName + '"?', mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+    begin
       ItemsToDel.Add(Sender);
-      Timer1.Enabled:=true;
+      Timer1.Enabled := True;
     end;
 end;
 
-procedure TfrmStructureEditor.btnBitsClick(Sender:TObject);
+procedure TfrmStructureEditor.btnBitsClick(Sender: TObject);
 var
-  frmbit:TfrmBitMapper;
-  ti:TTagBitItemEditor;
-  s7tageditor:TS7TagItemEditor;
-  bitnum,
-  bytenum,
-  wordnum,
-  startbit,
-  endbit,
-  curbit:LongInt;
+  BitForm: TfrmBitMapper;
+  TagItemEditor: TTagBitItemEditor;
+  S7TagEditor: TS7TagItemEditor;
+  BitNum: Longint;
+  ByteNum: Longint;
+  WordNum: Longint;
+  StartBit: Longint;
+  EndBit: Longint;
+  CurBit: Longint;
 
   procedure updatenumbers;
   begin
-    bitnum:=curbit;
-    if frmbit.bitnamestartsfrom1.Checked then inc(bitnum);
+    BitNum := CurBit;
+    if BitForm.BitNameStartsFrom1.Checked then
+      Inc(BitNum);
 
-    bytenum:=curbit div 8;
-    if frmbit.bytenamestartsfrom1.Checked then inc(bytenum);
+    ByteNum := CurBit Div 8;
+    if BitForm.ByteNameStartsFrom1.Checked then
+      Inc(ByteNum);
 
-    wordnum:=curbit div 16;
-    if frmbit.Wordnamestartsfrom1.Checked then inc(wordnum);
+    WordNum := CurBit Div 16;
+    if BitForm.WordNameStartsFrom1.Checked then
+      Inc(WordNum);
   end;
 
-  function GetNewTagBitName:AnsiString;
+  function GetNewTagBitName: AnsiString;
   var
-    n:AnsiString;
+    N: AnsiString;
   begin
-    n:=IntToStr(bitnum);
-    Result:=frmbit.edtNamepattern.Text;
-    Result := StringReplace(Result,'%b',n,[rfReplaceAll]);
+    N := IntToStr(BitNum);
+    Result := BitForm.edtNamePattern.Text;
+    Result := StringReplace(Result, '%b', N, [rfReplaceAll]);
 
-    n:=IntToStr(bytenum);
-    Result := StringReplace(Result,'%B',n,[rfReplaceAll]);
+    N := IntToStr(ByteNum);
+    Result := StringReplace(Result, '%B', N, [rfReplaceAll]);
 
-    n:=IntToStr(wordnum);
-    Result := StringReplace(Result,'%w',n,[rfReplaceAll]);
+    N := IntToStr(WordNum);
+    Result := StringReplace(Result, '%w', N, [rfReplaceAll]);
 
-    n:=(Sender as TS7TagItemEditor).TagName;
-    Result := StringReplace(Result,'%t',n,[rfReplaceAll]);
+    N := (Sender as TS7TagItemEditor).TagName;
+    Result := StringReplace(Result, '%t', N, [rfReplaceAll]);
   end;
+
 begin
   if not (Sender is TS7TagItemEditor) then Exit;
 
-  s7tageditor := (Sender as TS7TagItemEditor);
+  S7TagEditor := (Sender as TS7TagItemEditor);
 
-  frmbit:=TfrmBitMapper.Create(Self);
+  BitForm := TfrmBitMapper.Create(Self);
   try
-    if frmbit.ShowModal=mrOk then begin
-      startbit:=31-frmbit.StringGrid1.Selection.Right;
-      endbit:=31-frmbit.StringGrid1.Selection.Left;
-      curbit:=startbit;
-      if frmbit.eachbitastag.Checked then begin
-        while curbit<=endbit do begin
+    if BitForm.ShowModal = mrOk then
+    begin
+      StartBit := 31 - BitForm.StringGrid1.Selection.Right;
+      EndBit := 31 - BitForm.StringGrid1.Selection.Left;
+      CurBit := StartBit;
+      if BitForm.EachBitAsTag.Checked then
+      begin
+        while CurBit <= EndBit do
+        begin
           updatenumbers;
-          ti:=s7tageditor.AddBit;
-          ti.TagName:=GetNewTagBitName;
-          ti.EndBit:=curbit;
-          ti.StartBit:=curbit;
-          inc(curbit);
+          TagItemEditor := S7TagEditor.AddBit;
+          TagItemEditor.TagName := GetNewTagBitName;
+          TagItemEditor.endbit := CurBit;
+          TagItemEditor.startbit := CurBit;
+          Inc(CurBit);
         end;
-      end else begin
+      end
+      else
+      begin
         updatenumbers;
-        ti:=s7tageditor.AddBit;
-        ti.TagName:=GetNewTagBitName;
-        ti.EndBit:=endbit;
-        ti.StartBit:=startbit;
+        TagItemEditor := S7TagEditor.AddBit;
+        TagItemEditor.TagName := GetNewTagBitName;
+        TagItemEditor.endbit := EndBit;
+        TagItemEditor.startbit := StartBit;
       end;
     end;
   finally
-    frmbit.Destroy;
+    BitForm.Destroy;
   end;
 end;
 
-procedure TfrmStructureEditor.BitItemDeleted(Sender:TObject);
+procedure TfrmStructureEditor.BitItemDeleted(Sender: TObject);
 begin
-  //
+
 end;
 
-function  TfrmStructureEditor.GetStructItemsCount:LongInt;
+function TfrmStructureEditor.GetStructItemsCount: Longint;
 begin
-  Result:=FTagList.Count;
+  Result := FTagList.Count;
 end;
 
-function  TfrmStructureEditor.GetStructItem(index:LongInt):TS7TagItemEditor;
+function TfrmStructureEditor.GetStructItem(Index: Longint): TS7TagItemEditor;
 begin
-  Result:=TS7TagItemEditor(FTagList.Items[index]);
+  Result := TS7TagItemEditor(FTagList.Items[Index]);
 end;
 
-function TfrmStructureEditor.HasAtLeastOneValidItem:Boolean;
+function TfrmStructureEditor.HasAtLeastOneValidItem: Boolean;
 var
-  c:LongInt;
+  i: Longint;
 begin
-  Result:=false;
-  for c:=0 to StructItemsCount-1 do
-    if not StructItem[c].SkipTag then begin
-      Result:=true;
-      break;
+  Result := False;
+  for i := 0 to StructItemsCount - 1 do
+    if not StructItem[i].SkipTag then
+    begin
+      Result := True;
+      Break;
     end;
 end;
 
 procedure TfrmStructureEditor.Timer1Timer(Sender: TObject);
 var
-  c:LongInt;
+  i: Longint;
 begin
-  for c:=ItemsToDel.Count-1 downto 0 do begin
-    FTagList.Remove(ItemsToDel.Items[c]);
-    TS7TagItemEditor(ItemsToDel.Items[c]).Destroy;
-    ItemsToDel.Delete(c);
+  for i := ItemsToDel.Count - 1 downto 0 do
+  begin
+    FTagList.Remove(ItemsToDel.Items[i]);
+    TS7TagItemEditor(ItemsToDel.Items[i]).Destroy;
+    ItemsToDel.Delete(i);
   end;
-  Timer1.Enabled:=false;
-  if FTagList.Count=0 then FItemId:=1;
+  Timer1.Enabled := False;
+  if FTagList.Count = 0 then FItemId := 1;
 end;
+
 
 {$IFDEF FPC }
   {$IF defined(FPC) AND (FPC_FULLVERSION < 20400) }
@@ -346,5 +381,6 @@ initialization
   {$i ustructuremapper.lrs}
   {$IFEND}
 {$ENDIF}
+
 
 end.

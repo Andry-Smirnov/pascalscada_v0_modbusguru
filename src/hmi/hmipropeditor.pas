@@ -26,19 +26,25 @@ uses
   Classes, SysUtils, HMIZones, Dialogs, Menus, ProtocolDriver, typinfo,
   HMIControlDislocatorAnimation, hmiobjectcolletion, Controls,
   ControlSecurityManager, Graphics, scadapropeditor, fpexprpars,
-  {$IFDEF FPC}
-    PropEdits, ComponentEditors, GraphPropEdits, ImgList,
-    hmibooleanpropertyconnector, hmicolorpropertyconnector, hmi_polyline;
-  {$ELSE}
+{$IFDEF FPC}
+  PropEdits,
+  ComponentEditors,
+  GraphPropEdits,
+  ImgList,
+  hmibooleanpropertyconnector,
+  hmicolorpropertyconnector,
+  hmi_polyline;
+{$ELSE}
   Types,
   //if is a delphi 6+
   {$IF defined(DELPHI6_UP)}
-  DesignIntf, DesignEditors;
+  DesignIntf,
+  DesignEditors;
   {$ELSE}
-      //delphi 5-
-      DsgnIntf;
+  //delphi 5-
+  DsgnIntf;
   {$IFEND}
-  {$ENDIF}
+{$ENDIF}
 
 type
   {$IFDEF PORTUGUES}
@@ -60,7 +66,7 @@ type
     procedure SetValue(const Value: Ansistring); override;
   end;
 
-  {$IFDEF FPC}
+{$IFDEF FPC}
   {$IFDEF PORTUGUES}
   {:
   Editor da propriedade TGraphicZone.ImageIndex
@@ -120,7 +126,7 @@ type
   end;
 
   {$ENDIF}
-  {$ENDIF}
+{$ENDIF}
 
   {$IFDEF PORTUGUES}
   {:
@@ -204,45 +210,55 @@ type
 
   TControlPosSizePropertyEditor = class(TIntegerExpressionPropertyEditor)
   protected
-    procedure RegisterExpressionVariables(const i: Integer; var parser: TFPExpressionParser); override;
+    procedure RegisterExpressionVariables(const i: Integer; var Parser: TFPExpressionParser); override;
   end;
+
 
 implementation
 
-uses HMITypes;
+
+uses
+  HMITypes;
+
 
   { TControlPosSizePropertyEditor }
 
-procedure TControlPosSizePropertyEditor.RegisterExpressionVariables(const i: Integer; var parser: TFPExpressionParser);
+procedure TControlPosSizePropertyEditor.RegisterExpressionVariables(const i: Integer; var Parser: TFPExpressionParser);
+const
+  S_PROP_LEFT = 'left';
+  S_PROP_TOP = 'top';
+  S_PROP_WIDTH = 'width';
+  S_PROP_HEIGHT = 'height';
+  S_PROP_TAG = 'tag';
 var
-  propertyName: Ansistring;
+  PropertyName: Ansistring;
 begin
-  if Assigned(parser) then
+  if Assigned(Parser) then
   begin
     //unregister all possible registered variables.
-    parser.Identifiers.Clear;
+    Parser.Identifiers.Clear;
 
-    propertyName := LowerCase(GetPropInfo^.Name);
+    PropertyName := LowerCase(GetPropInfo^.Name);
 
     if (GetComponent(i) is TControl) then
     begin
       //register only if the property is not being edited,
       //to avoid circular references.
 
-      if (propertyName <> 'left') then
-        parser.Identifiers.AddIntegerVariable('left', (GetComponent(i) as TControl).Left);
+      if (PropertyName <> S_PROP_LEFT) then
+        Parser.Identifiers.AddIntegerVariable(S_PROP_LEFT, (GetComponent(i) as TControl).Left);
 
-      if (propertyName <> 'top') then
-        parser.Identifiers.AddIntegerVariable('top', (GetComponent(i) as TControl).top);
+      if (PropertyName <> S_PROP_TOP) then
+        Parser.Identifiers.AddIntegerVariable(S_PROP_TOP, (GetComponent(i) as TControl).Top);
 
-      if (propertyName <> 'width') then
-        parser.Identifiers.AddIntegerVariable('width', (GetComponent(i) as TControl).Width);
+      if (PropertyName <> S_PROP_WIDTH) then
+        Parser.Identifiers.AddIntegerVariable(S_PROP_WIDTH, (GetComponent(i) as TControl).Width);
 
-      if (propertyName <> 'height') then
-        parser.Identifiers.AddIntegerVariable('height', (GetComponent(i) as TControl).Height);
+      if (PropertyName <> S_PROP_HEIGHT) then
+        Parser.Identifiers.AddIntegerVariable(S_PROP_HEIGHT, (GetComponent(i) as TControl).Height);
 
-      if (propertyName <> 'tag') then
-        parser.Identifiers.AddIntegerVariable('tag', (GetComponent(i) as TControl).Tag);
+      if (PropertyName <> S_PROP_TAG) then
+        Parser.Identifiers.AddIntegerVariable(S_PROP_TAG, (GetComponent(i) as TControl).Tag);
     end;
   end;
 end;
@@ -325,40 +341,41 @@ function TSelectObjectPropPropertyEditor.GetAttributes: TPropertyAttributes;
 begin
   if GetComponent(0) is FExpectedClass then
     Result := [paValueList
-      {$IFDEF FPC}
-                ,paPickList
-      {$ELSE}
-      {$IFDEF DELPHI2005_UP}
-                  , paReadOnly, paValueEditable
-      {$ENDIF}
-      {$ENDIF}
-      ];
+{$IFDEF FPC}
+      , paPickList
+{$ELSE}
+  {$IFDEF DELPHI2005_UP}
+      , paReadOnly
+      , paValueEditable
+  {$ENDIF}
+{$ENDIF}
+    ];
 end;
 
 procedure TSelectObjectPropPropertyEditor.GetValues(Proc: TGetStrProc);
 var
   PL: PPropList;
-  tdata: PTypeData;
-  nprops: Integer;
-  p: Integer;
-  obj: TComponent;
+  ATypeData: PTypeData;
+  NProps: Integer;
+  i: Integer;
+  Obj: TComponent;
 begin
   Proc('(none)');
   if GetComponent(0) is FExpectedClass then
     if Assigned((GetComponent(0) as FExpectedClass).TargetObject) then
     begin
-      obj := (GetComponent(0) as FExpectedClass).TargetObject;
+      Obj := (GetComponent(0) as FExpectedClass).TargetObject;
 
-      tdata := GetTypeData(obj.ClassInfo);
+      ATypeData := GetTypeData(Obj.ClassInfo);
 
-      GetMem(PL, tdata^.PropCount * SizeOf(Pointer));
+      GetMem(PL, ATypeData^.PropCount * SizeOf(Pointer));
       try
-        nprops := GetPropList(obj, PL);
-        for p := 0 to nprops - 1 do
+        NProps := GetPropList(Obj, PL);
+        for i := 0 to NProps - 1 do
         begin
-          if (LowerCase(PL^[p]^.PropType^.Name) = LowerCase(FOnlyPropertiesOfType)) or (FOnlyPropertiesOfType = '') then
+          if (LowerCase(PL^[i]^.PropType^.Name) = LowerCase(FOnlyPropertiesOfType)) or (FOnlyPropertiesOfType = '') then
           begin
-            Proc(PL^[p]^.Name);
+            Proc(PL^[i]^.Name);
           end;
         end;
       finally
@@ -379,12 +396,12 @@ function TZoneFileNamePropertyEditor.GetAttributes: TPropertyAttributes;
 begin
   if GetComponent(0) is TGraphicZone then
     Result := [paDialog
-      {$IFNDEF FPC}
-      {$IFDEF DELPHI2005_UP}
-, paReadOnly,
-                 paValueEditable
-      {$ENDIF}
-      {$ENDIF}
+{$IFNDEF FPC}
+  {$IFDEF DELPHI2005_UP}
+        , paReadOnly,
+        paValueEditable
+  {$ENDIF}
+{$ENDIF}
       ];
 end;
 
@@ -395,21 +412,21 @@ end;
 
 procedure TZoneFileNamePropertyEditor.Edit;
 var
-  od: TOpenDialog;
+  Od: TOpenDialog;
 begin
   if GetComponent(0) is TGraphicZone then
   begin
-    od := TOpenDialog.Create(nil);
+    Od := TOpenDialog.Create(nil);
     {$IFDEF FPC}
-    od.Filter:='Imagens *.ico *.ppm *.pgm *.pbm *.png *.xpm *.bpm|*.ico;*.ppm;*.pgm;*.pbm;*.png;*.xpm;*.bpm';
+    Od.Filter := 'Imagens *.ico *.ppm *.pgm *.pbm *.png *.xpm *.bpm|*.ico;*.ppm;*.pgm;*.pbm;*.png;*.xpm;*.bpm';
     {$ELSE}
     od.Filter := 'Imagens *.jpg *.jpeg *.bmp *.ico *.emf *.wmf|*.jpg;*.jpeg;*.bmp;*.ico;*.emf;*.wmf';
     {$ENDIF}
     try
-      if od.Execute then
-        TGraphicZone(GetComponent(0)).FileName := od.FileName;
+      if Od.Execute then
+        TGraphicZone(GetComponent(0)).FileName := Od.FileName;
     finally
-      od.Destroy;
+      Od.Destroy;
     end;
   end;
 end;
@@ -424,20 +441,23 @@ end;
 {$IFDEF FPC}
 procedure TGraphiZoneImageIndexPropertyEditor.SetValue(const NewValue: ansistring);
 var
-  x:LongInt;
+  AValue: LongInt;
 begin
   try
     if NewValue='(none)' then
        inherited SetValue('-1')
-    else begin
-      if GetImageList<>nil then begin
-        x:=StrToInt(NewValue);
-        if (x>=0) and (x<GetImageList.Count) then
-          inherited SetValue(NewValue)
-        else
-          inherited SetValue('-1');
-      end else
+    else
+    begin
+    if GetImageList <> nil then
+    begin
+      AValue := StrToInt(NewValue);
+      if (AValue >= 0) and (AValue < GetImageList.Count) then
+        inherited SetValue(NewValue)
+      else
         inherited SetValue('-1');
+    end
+    else
+      inherited SetValue('-1');
     end;
   except
     inherited SetValue('-1');
@@ -456,7 +476,7 @@ var
   var
     Style: TTextStyle;
   begin
-    FillChar(Style{%H-},SizeOf(Style),0);
+    FillChar(Style{%H-}, SizeOf(Style), 0);
     With Style do begin
       Alignment := taLeftJustify;
       Layout := tlCenter;
@@ -467,15 +487,16 @@ var
       SingleLine := True;
       SystemFont := False;
     end;
-    ACanvas.TextRect(ARect, ARect.Left+2,ARect.Top, CurValue, Style);
+    ACanvas.TextRect(ARect, ARect.Left+2, ARect.Top, CurValue, Style);
   end;
 
 begin
-  if Index=0 then  begin
+  if Index = 0 then
+  begin
     DrawText;
     Exit;
   end;
-  dec(Index);
+  Dec(Index);
   Images := GetImageList;
   R := ARect;
   if Assigned(Images) then
@@ -491,7 +512,7 @@ begin
       ACanvas.Brush.Color := OldColor;
     end;
 
-    Images.Draw(ACanvas, R.Left+Images.Width+ 3, R.Top + 1, Index, True);
+    Images.Draw(ACanvas, R.Left + Images.Width + 3, R.Top + 1, Index, True);
     R.Left := R.Left + Images.Width + 2;
   end;
   DrawText;
@@ -500,26 +521,29 @@ end;
 function TGraphiZoneImageIndexPropertyEditor.GetImageList: TCustomImageList;
 begin
   if GetComponent(0) is TGraphicZone then
-    Result:=TGraphicZone(GetComponent(0)).ImageList
+    Result := TGraphicZone(GetComponent(0)).ImageList
   else
-    Result:=nil;
+    Result := nil;
 end;
 
 procedure TPascalSCADALoginLogoutImageIndexPropertyEditor.SetValue(const NewValue: ansistring);
 var
-  x:LongInt;
+  x: LongInt;
 begin
   try
-    if NewValue='(none)' then
+    if NewValue = '(none)' then
        inherited SetValue('-1')
-    else begin
-      if GetImageList<>nil then begin
+    else
+    begin
+      if GetImageList<>nil then
+      begin
         x:=StrToInt(NewValue);
         if x in [0..GetImageList.Count-1] then
           inherited SetValue(NewValue)
         else
           inherited SetValue('-1');
-      end else
+      end
+      else
         inherited SetValue('-1');
     end;
   except
@@ -530,9 +554,9 @@ end;
 function TPascalSCADALoginLogoutImageIndexPropertyEditor.GetImageList: TCustomImageList;
 begin
   if GetComponent(0) is TPascalSCADALogin_LogoutAction then
-    Result:=TPascalSCADALogin_LogoutAction(GetComponent(0)).ActionList.Images
+    Result := TPascalSCADALogin_LogoutAction(GetComponent(0)).ActionList.Images
   else
-    Result:=nil;
+    Result := nil;
 end;
 
 procedure TPascalSCADALoginLogoutImageIndexPropertyEditor.GetValues(Proc: TGetStrProc);
@@ -548,7 +572,7 @@ begin
     Result := [paValueList
       {$IFNDEF FPC}
       {$IFDEF DELPHI2005_UP}
-, paReadOnly,
+      , paReadOnly,
                  paValueEditable
       {$ENDIF}
       {$ENDIF}
@@ -574,7 +598,7 @@ begin
     Result := [paValueList
       {$IFNDEF FPC}
       {$IFDEF DELPHI2005_UP}
-, paReadOnly,
+      , paReadOnly,
                  paValueEditable
       {$ENDIF}
       {$ENDIF}
@@ -603,7 +627,7 @@ begin
     Result := [paDialog
       {$IFNDEF FPC}
       {$IFDEF DELPHI2005_UP}
-, paReadOnly,
+      , paReadOnly,
                  paValueEditable
       {$ENDIF}
       {$ENDIF}
@@ -617,28 +641,28 @@ end;
 
 procedure TPositionPropertyEditor.Edit;
 var
-  pname: Ansistring;
+  PName: Ansistring;
 begin
   if GetComponent(0) is THMIControlDislocatorAnimation then
   begin
     with GetComponent(0) as THMIControlDislocatorAnimation do
     begin
       if Control = nil then Exit;
-      pname := LowerCase(GetName);
-      if pname = 'gets_p0_position' then
+      PName := LowerCase(GetName);
+      if PName = 'gets_p0_position' then
       begin
         P0_X := Control.Left;
         P0_Y := Control.top;
         Exit;
       end;
 
-      if pname = 'gets_p1_position' then
+      if PName = 'gets_p1_position' then
       begin
         P1_X := Control.Left;
         P1_Y := Control.top;
         Exit;
       end;
-      if pname = 'goto_p0_position' then
+      if PName = 'goto_p0_position' then
       begin
         Control.Left := P0_X;
         Control.top := P0_Y;

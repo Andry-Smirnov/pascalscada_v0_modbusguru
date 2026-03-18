@@ -22,12 +22,14 @@ type
     FInputPolyline: THMIFlowPolyline;
     FOutputPolyline: THMIFlowPolyline;
     FPumpStates: THMIFlowZones;
-    FCurrentZone, FOwnerZone: THMIFlowZone;
+    FCurrentZone: THMIFlowZone;
+    FOwnerZone: THMIFlowZone;
     FZoneTimer: TTimer;
+
     procedure SetInputPolyline(AValue: THMIFlowPolyline);
     procedure SetOutputPolyline(AValue: THMIFlowPolyline);
     procedure SetPumpStates(AValue: THMIFlowZones);
-    procedure ShowZone(aZone: THMIFlowZone);
+    procedure ShowZone(AZone: THMIFlowZone);
     procedure UpdateFlow; virtual;
     property InputPolyline: THMIFlowPolyline read FInputPolyline write SetInputPolyline;
     property OutputPolyline: THMIFlowPolyline read FOutputPolyline write SetOutputPolyline;
@@ -87,9 +89,13 @@ type
     property OnStateChange;
   end;
 
+
 implementation
 
-uses Forms, ProtocolTypes, hsstrings, Math;
+
+uses
+  Forms, ProtocolTypes, hsstrings, Math;
+
 
   { THMICustomLinkedFlowValve }
 
@@ -151,17 +157,18 @@ end;
 
 procedure THMICustomLinkedFlowPump.UpdateValveDelayed(Data: PtrInt);
 var
-  zone: THMIFlowZone;
+  AZone: THMIFlowZone;
   Value: Double = Infinity;
 begin
-  if [csReading, csLoading, csDestroying] * ComponentState <> [] then Exit;
+  if [csReading, csLoading, csDestroying] * ComponentState <> [] then
+    Exit;
   if Assigned(FPLCTag) then
     Value := (FPLCTag as ITagNumeric).GetValue;
 
-  zone := THMIFlowZone(FPumpStates.GetZoneFromValue(Value));
-  if FOwnerZone <> zone then
+  AZone := THMIFlowZone(FPumpStates.GetZoneFromValue(Value));
+  if FOwnerZone <> AZone then
   begin
-    FOwnerZone := zone;
+    FOwnerZone := AZone;
     ShowZone(FOwnerZone);
     if FCurrentZone <> nil then
     begin
@@ -192,13 +199,13 @@ begin
   FPumpStates.Assign(AValue);
 end;
 
-procedure THMICustomFlowPump.ShowZone(aZone: THMIFlowZone);
+procedure THMICustomFlowPump.ShowZone(AZone: THMIFlowZone);
 begin
-  FCurrentZone := aZone;
-  if aZone <> nil then
+  FCurrentZone := AZone;
+  if AZone <> nil then
   begin
-    SetBodyColor(aZone.Color);
-    SetBorderColor(aZone.BorderColor);
+    SetBodyColor(AZone.Color);
+    SetBorderColor(AZone.BorderColor);
     UpdateFlow;
   end;
 end;
@@ -226,8 +233,10 @@ end;
 
 procedure THMICustomFlowPump.NotifyFree(const WhoWasDestroyed: THMIFlowPolyline);
 begin
-  if WhoWasDestroyed = FInputPolyline then FInputPolyline := nil;
-  if WhoWasDestroyed = FOutputPolyline then FOutputPolyline := nil;
+  if WhoWasDestroyed = FInputPolyline then
+    FInputPolyline := nil;
+  if WhoWasDestroyed = FOutputPolyline then
+    FOutputPolyline := nil;
 end;
 
 procedure THMICustomFlowPump.NotifyChange(const WhoChanged: THMIFlowPolyline);
@@ -261,7 +270,8 @@ end;
 
 procedure THMICustomFlowPump.SetOutputPolyline(AValue: THMIFlowPolyline);
 begin
-  if FOutputPolyline = AValue then Exit;
+  if FOutputPolyline = AValue then
+    Exit;
   if Assigned(FOutputPolyline) then
     FOutputPolyline.RemoveFreeNotification(Self);
   if Assigned(AValue) then
@@ -314,7 +324,8 @@ begin
     if FZoneTimer.Interval <> THMIFlowZone(FPumpStates.Items[FCurrentZone.BlinkWith]).BlinkTime then
       FZoneTimer.Interval := THMIFlowZone(FPumpStates.Items[FCurrentZone.BlinkWith]).BlinkTime;
     ShowZone(THMIFlowZone(FPumpStates.Items[FCurrentZone.BlinkWith]));
-    if not FZoneTimer.Enabled then FZoneTimer.Enabled := True;
+    if not FZoneTimer.Enabled then
+      FZoneTimer.Enabled := True;
   end;
 end;
 

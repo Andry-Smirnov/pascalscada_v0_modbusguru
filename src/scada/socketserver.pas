@@ -19,78 +19,76 @@ interface
 uses
   Classes, SysUtils, socket_types, CrossEvent, crossthreads,
   syncobjs
-  {$IF defined(WIN32) or defined(WIN64)} //delphi or lazarus over windows
-    {$IFDEF FPC}
-    , WinSock2,
-    {$ELSE}
-    , WinSock,
-    {$ENDIF}
-    sockets_w32_w64
+{$IF defined(WIN32) or defined(WIN64)}
+ //delphi or lazarus over windows
+  {$IFDEF FPC}
+  , WinSock2,
   {$ELSE}
+  , WinSock,
+  {$ENDIF}
+  sockets_w32_w64
+{$ELSE}
   {$IF defined(FPC) AND (defined(UNIX) or defined(WINCE))}
   , Sockets {$IFDEF UNIX}  , sockets_unix, netdb, Unix{$ENDIF}
             {$IFDEF WINCE} , sockets_wince {$ENDIF}
             {$IFDEF FDEBUG}, LCLProc{$ENDIF}
   {$IFEND}
-  {$IFEND};
+{$IFEND}
+  ;
 
 type
 
   { TSocketAcceptThread }
 
-  TSocketAcceptThread = Class(TpSCADACoreAffinityThread)
+  TSocketAcceptThread = class(TpSCADACoreAffinityThread)
   protected
-    FServerSocket:TSocket;
-    FEnd:TCrossEvent;
-    FClientThread:TpSCADACoreAffinityThread;
-    FAddClientThread,
-    FRemoveClientThread:TNotifyEvent;
-    function WaitEnd(timeout:Cardinal): TWaitResult;
+    FServerSocket: TSocket;
+    FEnd: TCrossEvent;
+    FClientThread: TpSCADACoreAffinityThread;
+    FAddClientThread: TNotifyEvent;
+    FRemoveClientThread: TNotifyEvent;
+    function WaitEnd(TimeOut: Cardinal): TWaitResult;
     procedure AddClientToMainThread;
   protected
     {$IF defined(FPC) AND defined(UNIX)}
-    ClientSockInfoLen:TSocklen;
+    ClientSockInfoLen: TSocklen;
     {$ENDIF}
-    ClientSockInfo:TSockAddr;
-    ClientSocket:TSocket;
+    ClientSockInfo: TSockAddr;
+    ClientSocket: TSocket;
     procedure Execute; override;
     procedure LaunchNewThread; virtual;
   public
     procedure Terminate;
-    constructor Create(CreateSuspended: Boolean;
-                       ServerSocket:TSocket;
-                       AddClientThread,
-                       RemoveClientThread:TNotifyEvent);
+    constructor Create(CreateSuspended: Boolean; ServerSocket: TSocket; AddClientThread, RemoveClientThread: TNotifyEvent);
   end;
 
   { TSocketClientThread }
 
-  TSocketClientThread = Class(TpSCADACoreAffinityThread)
+  TSocketClientThread = class(TpSCADACoreAffinityThread)
   protected
-    FClientInfo:TSockAddr;
-    FSocket:TSocket;
-    FEnd:TCrossEvent;
-    FRemoveClientThread:TNotifyEvent;
-    function WaitEnd(timeout:Cardinal): TWaitResult;
+    FClientInfo: TSockAddr;
+    FSocket: TSocket;
+    FEnd: TCrossEvent;
+    FRemoveClientThread: TNotifyEvent;
+    function WaitEnd(TimeOut: Cardinal): TWaitResult;
     procedure ClientFinished;
   protected
     procedure Execute; override;
     procedure ThreadLoop; virtual;
   public
     procedure Terminate;
-    constructor Create(CreateSuspended: Boolean;
-                       ClientSocket:TSocket;
-                       ClientSockinfo:TSockAddr;
-                       RemoveClientThread:TNotifyEvent); virtual;
+    constructor Create(CreateSuspended: Boolean; ClientSocket: TSocket; ClientSockInfo: TSockAddr; RemoveClientThread: TNotifyEvent); virtual;
   end;
+
 
 implementation
 
+
 { TSocketClientThread }
 
-function TSocketClientThread.WaitEnd(timeout: Cardinal): TWaitResult;
+function TSocketClientThread.WaitEnd(TimeOut: Cardinal): TWaitResult;
 begin
-  Result := FEnd.WaitFor(timeout);
+  Result := FEnd.WaitFor(TimeOut);
 end;
 
 procedure TSocketClientThread.ClientFinished;
@@ -119,30 +117,28 @@ end;
 
 procedure TSocketClientThread.Terminate;
 begin
-  TpSCADACoreAffinityThread(self).Terminate;
+  TpSCADACoreAffinityThread(Self).Terminate;
   repeat
-     CheckSynchronize(1);
-  until WaitEnd(1)=wrSignaled;
+    CheckSynchronize(1);
+  until WaitEnd(1) = wrSignaled;
   FEnd.Destroy;
 end;
 
-constructor TSocketClientThread.Create(CreateSuspended: Boolean;
-  ClientSocket: TSocket; ClientSockinfo: TSockAddr;
-  RemoveClientThread: TNotifyEvent);
+constructor TSocketClientThread.Create(CreateSuspended: Boolean; ClientSocket: TSocket; ClientSockInfo: TSockAddr; RemoveClientThread: TNotifyEvent);
 begin
   inherited Create(CreateSuspended);
-  FSocket             := ClientSocket;
-  FClientInfo         := ClientSockinfo;
-  FEnd                := TCrossEvent.Create(true, false);
-  FRemoveClientThread :=RemoveClientThread;
+  FSocket := ClientSocket;
+  FClientInfo := ClientSockInfo;
+  FEnd := TCrossEvent.Create(True, False);
+  FRemoveClientThread := RemoveClientThread;
   FEnd.ResetEvent;
 end;
 
 { TSocketAcceptThread }
 
-function TSocketAcceptThread.WaitEnd(timeout: Cardinal): TWaitResult;
+function TSocketAcceptThread.WaitEnd(TimeOut: Cardinal): TWaitResult;
 begin
-  Result := FEnd.WaitFor(timeout);
+  Result := FEnd.WaitFor(TimeOut);
 end;
 
 procedure TSocketAcceptThread.AddClientToMainThread;
@@ -153,7 +149,8 @@ end;
 
 procedure TSocketAcceptThread.Execute;
 begin
-  while not Terminated do begin
+  while not Terminated do
+  begin
     //Linux, BSDs
     {$IF defined(FPC) AND defined(UNIX)}
     ClientSockInfoLen:=sizeof(ClientSockInfo);
@@ -195,24 +192,22 @@ end;
 
 procedure TSocketAcceptThread.Terminate;
 begin
-  TpSCADACoreAffinityThread(self).Terminate;
+  TpSCADACoreAffinityThread(Self).Terminate;
   repeat
-     CheckSynchronize(1);
-  until WaitEnd(1)=wrSignaled;
+    CheckSynchronize(1);
+  until WaitEnd(1) = wrSignaled;
   FEnd.Destroy;
 end;
 
-constructor TSocketAcceptThread.Create(CreateSuspended: Boolean;
-  ServerSocket: TSocket; AddClientThread, RemoveClientThread: TNotifyEvent);
+constructor TSocketAcceptThread.Create(CreateSuspended: Boolean; ServerSocket: TSocket; AddClientThread, RemoveClientThread: TNotifyEvent);
 begin
   inherited Create(CreateSuspended);
-  FServerSocket       := ServerSocket;
-  FAddClientThread    := AddClientThread;
+  FServerSocket := ServerSocket;
+  FAddClientThread := AddClientThread;
   FRemoveClientThread := RemoveClientThread;
-  FEnd                := TCrossEvent.Create(true, false);
+  FEnd := TCrossEvent.Create(True, False);
 
   FEnd.ResetEvent;
 end;
 
 end.
-

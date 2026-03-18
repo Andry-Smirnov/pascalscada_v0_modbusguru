@@ -8,14 +8,12 @@ object frmS7TagBuilder: TfrmS7TagBuilder
   ClientHeight = 441
   ClientWidth = 756
   Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Position = poScreenCenter
+  LCLVersion = '4.6.0.0'
   OnClose = FormClose
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnShow = FormShow
-  Position = poScreenCenter
-  LCLVersion = '1.7'
-  Visible = False
   object Panel2: TPanel
     Left = 0
     Height = 404
@@ -33,22 +31,25 @@ object frmS7TagBuilder: TfrmS7TagBuilder
       Width = 756
       ActivePage = TabSheet1
       Align = alClient
+      Font.Height = -11
+      Font.Name = 'Segoe UI'
+      ParentFont = False
       TabIndex = 0
       TabOrder = 0
       OnChanging = PageControl1Changing
       object TabSheet1: TTabSheet
         Caption = 'Area and type'
-        ClientHeight = 374
-        ClientWidth = 752
+        ClientHeight = 378
+        ClientWidth = 748
         OnShow = TabSheet1Show
         object MemoryArea: TRadioGroup
           Left = 0
           Height = 144
           Top = 57
-          Width = 752
+          Width = 748
           Align = alTop
           AutoFill = True
-          Caption = 'Qual é a área de memória que deseja endereçar'
+          Caption = 'Memory address'
           ChildSizing.LeftRightSpacing = 6
           ChildSizing.TopBottomSpacing = 6
           ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
@@ -76,14 +77,14 @@ object frmS7TagBuilder: TfrmS7TagBuilder
             'Analog Input (PIW), S7-300/400/1200'
             'VB, VW, VD, S7-200'
           )
-          OnClick = MemoryAreaClick
           TabOrder = 1
+          OnClick = MemoryAreaClick
         end
         object Panel3: TPanel
           Left = 0
           Height = 6
           Top = 201
-          Width = 752
+          Width = 748
           Align = alTop
           BevelOuter = bvNone
           TabOrder = 2
@@ -92,17 +93,17 @@ object frmS7TagBuilder: TfrmS7TagBuilder
           Left = 0
           Height = 57
           Top = 0
-          Width = 752
+          Width = 748
           Align = alTop
           BevelOuter = bvNone
           ClientHeight = 57
-          ClientWidth = 752
+          ClientWidth = 748
           TabOrder = 0
           object PLCAddress: TGroupBox
             Left = 0
             Height = 53
             Top = 0
-            Width = 752
+            Width = 748
             Align = alTop
             Caption = 'PLC Address'
             ClientHeight = 35
@@ -143,7 +144,7 @@ object frmS7TagBuilder: TfrmS7TagBuilder
             end
             object PLCStation: TSpinEdit
               Left = 74
-              Height = 26
+              Height = 21
               Top = 6
               Width = 73
               MaxValue = 255
@@ -152,7 +153,7 @@ object frmS7TagBuilder: TfrmS7TagBuilder
             end
             object PLCSlot: TSpinEdit
               Left = 233
-              Height = 26
+              Height = 21
               Top = 6
               Width = 73
               MaxValue = 255
@@ -160,7 +161,7 @@ object frmS7TagBuilder: TfrmS7TagBuilder
             end
             object PLCRack: TSpinEdit
               Left = 385
-              Height = 26
+              Height = 21
               Top = 6
               Width = 73
               MaxValue = 255
@@ -170,12 +171,12 @@ object frmS7TagBuilder: TfrmS7TagBuilder
         end
         object grptagtype: TGroupBox
           Left = 0
-          Height = 167
+          Height = 171
           Top = 207
-          Width = 752
+          Width = 748
           Align = alClient
-          Caption = 'Qual o tipo do tag que deseja usar para endereçar a(s) memoria(s) selecionada(s)'
-          ClientHeight = 149
+          Caption = 'Type of tag do you want to use to address the selected memory'
+          ClientHeight = 153
           ClientWidth = 744
           TabOrder = 3
           object lblBlockType: TLabel
@@ -185,67 +186,67 @@ object frmS7TagBuilder: TfrmS7TagBuilder
             Width = 90
             Alignment = taRightJustify
             AutoSize = False
-            Caption = 'Tipo de dado:'
+            Caption = 'Data type:'
             Layout = tlCenter
             ParentColor = False
           end
           object lblBlockScan: TLabel
-            Left = 365
+            Left = 376
             Height = 21
             Top = 56
-            Width = 90
+            Width = 114
             Alignment = taRightJustify
             AutoSize = False
-            Caption = 'Varredura (ms):'
+            Caption = 'Scanning speed (ms):'
             Layout = tlCenter
             ParentColor = False
           end
           object lblStructScan: TLabel
-            Left = 30
+            Left = 14
             Height = 21
             Top = 124
-            Width = 100
+            Width = 116
             Alignment = taRightJustify
             AutoSize = False
-            Caption = 'Varredura (ms):'
+            Caption = 'Scanning speed (ms):'
             Layout = tlCenter
             ParentColor = False
           end
           object optplctagnumber: TRadioButton
             Left = 16
-            Height = 20
+            Height = 17
             Top = 8
-            Width = 210
-            Caption = 'PLCTagNumber (tags separados)'
-            OnClick = optplcblockClick
+            Width = 173
+            Caption = 'PLCTagNumber (separate tags)'
             TabOrder = 0
+            OnClick = optplcblockClick
           end
           object optplcblock: TRadioButton
             Left = 16
-            Height = 20
+            Height = 17
             Top = 32
-            Width = 312
-            Caption = 'PLCBlock (tag agrupados do mesmo tipo de dados)'
+            Width = 258
+            Caption = 'PLCBlock (tags grouped by the same data type)'
             Checked = True
-            OnClick = optplcblockClick
             TabOrder = 1
             TabStop = True
+            OnClick = optplcblockClick
           end
           object optplcStruct: TRadioButton
             Left = 16
-            Height = 20
+            Height = 17
             Top = 104
-            Width = 344
-            Caption = 'PLCStruck (tags agrupados de diferentes tipos de dados)'
-            OnClick = optplcblockClick
+            Width = 265
+            Caption = 'PLCStruck (grouped tags of different data types)'
             TabOrder = 3
+            OnClick = optplcblockClick
           end
           object BlockType: TComboBox
             Left = 128
-            Height = 22
+            Height = 21
             Top = 56
             Width = 225
-            ItemHeight = 16
+            ItemHeight = 13
             ItemIndex = 0
             Items.Strings = (
               'pttDefault,  Protocol defined word size'
@@ -257,14 +258,14 @@ object frmS7TagBuilder: TfrmS7TagBuilder
               'pttDWord,   Integer, 32 bits, unsignaled'
               'pttFloat       32 bits real'
             )
-            OnChange = BlockTypeChange
             Style = csDropDownList
             TabOrder = 2
             Text = 'pttDefault,  Protocol defined word size'
+            OnChange = BlockTypeChange
           end
           object BlockScan: TSpinEdit
-            Left = 458
-            Height = 26
+            Left = 488
+            Height = 21
             Top = 56
             Width = 81
             MaxValue = 2147483647
@@ -274,9 +275,9 @@ object frmS7TagBuilder: TfrmS7TagBuilder
           end
           object BlockSwapBytes: TCheckBox
             Left = 128
-            Height = 20
+            Height = 17
             Top = 82
-            Width = 94
+            Width = 76
             Caption = 'Swap bytes'
             Checked = True
             State = cbChecked
@@ -284,9 +285,9 @@ object frmS7TagBuilder: TfrmS7TagBuilder
           end
           object BlockSwapWords: TCheckBox
             Left = 232
-            Height = 20
+            Height = 17
             Top = 82
-            Width = 97
+            Width = 81
             Caption = 'Swap words'
             Checked = True
             State = cbChecked
@@ -294,7 +295,7 @@ object frmS7TagBuilder: TfrmS7TagBuilder
           end
           object StructScan: TSpinEdit
             Left = 130
-            Height = 26
+            Height = 21
             Top = 124
             Width = 81
             MaxValue = 2147483647
@@ -329,7 +330,7 @@ object frmS7TagBuilder: TfrmS7TagBuilder
             AutoSize = False
             Caption = 'Number of structures to create'
             Font.Height = -11
-            Font.Name = 'MS Sans Serif'
+            Font.Name = 'Segoe UI'
             Font.Style = [fsBold]
             Layout = tlCenter
             ParentColor = False
@@ -344,7 +345,7 @@ object frmS7TagBuilder: TfrmS7TagBuilder
             AutoSize = False
             Caption = 'Start address '
             Font.Height = -11
-            Font.Name = 'MS Sans Serif'
+            Font.Name = 'Segoe UI'
             Font.Style = [fsBold]
             Layout = tlCenter
             ParentColor = False
@@ -359,7 +360,7 @@ object frmS7TagBuilder: TfrmS7TagBuilder
             AutoSize = False
             Caption = 'From DB number'
             Font.Height = -11
-            Font.Name = 'MS Sans Serif'
+            Font.Name = 'Segoe UI'
             Font.Style = [fsBold]
             Layout = tlCenter
             ParentColor = False
@@ -374,7 +375,7 @@ object frmS7TagBuilder: TfrmS7TagBuilder
             AutoSize = False
             Caption = 'Item Name'
             Font.Height = -11
-            Font.Name = 'MS Sans Serif'
+            Font.Name = 'Segoe UI'
             Font.Style = [fsBold]
             ParentColor = False
             ParentFont = False
@@ -388,7 +389,7 @@ object frmS7TagBuilder: TfrmS7TagBuilder
             AutoSize = False
             Caption = 'Item Type'
             Font.Height = -11
-            Font.Name = 'MS Sans Serif'
+            Font.Name = 'Segoe UI'
             Font.Style = [fsBold]
             ParentColor = False
             ParentFont = False
@@ -402,7 +403,7 @@ object frmS7TagBuilder: TfrmS7TagBuilder
             AutoSize = False
             Caption = 'Scan'
             Font.Height = -11
-            Font.Name = 'MS Sans Serif'
+            Font.Name = 'Segoe UI'
             Font.Style = [fsBold]
             ParentColor = False
             ParentFont = False
@@ -416,7 +417,7 @@ object frmS7TagBuilder: TfrmS7TagBuilder
             AutoSize = False
             Caption = 'SWAP'
             Font.Height = -11
-            Font.Name = 'MS Sans Serif'
+            Font.Name = 'Segoe UI'
             Font.Style = [fsBold]
             ParentColor = False
             ParentFont = False
@@ -430,7 +431,7 @@ object frmS7TagBuilder: TfrmS7TagBuilder
             AutoSize = False
             Caption = 'SKIP'
             Font.Height = -11
-            Font.Name = 'MS Sans Serif'
+            Font.Name = 'Segoe UI'
             Font.Style = [fsBold]
             ParentColor = False
             ParentFont = False
@@ -445,7 +446,7 @@ object frmS7TagBuilder: TfrmS7TagBuilder
             Caption = 'Block'
             Color = clBtnFace
             Font.Height = -11
-            Font.Name = 'MS Sans Serif'
+            Font.Name = 'Segoe UI'
             Font.Style = [fsBold]
             Layout = tlCenter
             ParentColor = False
@@ -459,9 +460,9 @@ object frmS7TagBuilder: TfrmS7TagBuilder
             Width = 73
             MaxValue = 100000000
             MinValue = 1
-            OnChange = spinStartAddressChange
             TabOrder = 0
             Value = 1
+            OnChange = spinStartAddressChange
           end
           object spinStartAddress: TSpinEdit
             Left = 192
@@ -469,8 +470,8 @@ object frmS7TagBuilder: TfrmS7TagBuilder
             Top = 26
             Width = 73
             MaxValue = 100000000
-            OnChange = spinStartAddressChange
             TabOrder = 1
+            OnChange = spinStartAddressChange
           end
           object spinDBNumber: TSpinEdit
             Left = 404
@@ -479,9 +480,9 @@ object frmS7TagBuilder: TfrmS7TagBuilder
             Width = 80
             MaxValue = 65535
             MinValue = 1
-            OnChange = spinDBNumberChange
             TabOrder = 3
             Value = 1
+            OnChange = spinDBNumberChange
           end
           object Button1: TButton
             Left = 656
@@ -489,8 +490,8 @@ object frmS7TagBuilder: TfrmS7TagBuilder
             Top = 8
             Width = 88
             Caption = '&Add struct item'
-            OnClick = Button1Click
             TabOrder = 4
+            OnClick = Button1Click
           end
           object BlockName: TEdit
             Left = 404
@@ -509,7 +510,7 @@ object frmS7TagBuilder: TfrmS7TagBuilder
             AutoSize = False
             Caption = ' to DB number'
             Font.Height = -11
-            Font.Name = 'MS Sans Serif'
+            Font.Name = 'Segoe UI'
             Font.Style = [fsBold]
             Layout = tlCenter
             ParentColor = False
@@ -522,9 +523,9 @@ object frmS7TagBuilder: TfrmS7TagBuilder
             Width = 80
             MaxValue = 65535
             MinValue = 1
-            OnChange = spinFinalDBNumberChange
             TabOrder = 5
             Value = 1
+            OnChange = spinFinalDBNumberChange
           end
         end
         object ScrollBox1: TScrollBox
@@ -549,6 +550,9 @@ object frmS7TagBuilder: TfrmS7TagBuilder
     BevelOuter = bvNone
     ClientHeight = 37
     ClientWidth = 756
+    Font.Height = -11
+    Font.Name = 'Segoe UI'
+    ParentFont = False
     TabOrder = 0
     object btnCancel: TButton
       Left = 416
@@ -565,8 +569,8 @@ object frmS7TagBuilder: TfrmS7TagBuilder
       Top = 8
       Width = 75
       Caption = 'Back'
-      OnClick = btnBackClick
       TabOrder = 1
+      OnClick = btnBackClick
     end
     object btnNext: TButton
       Left = 576
@@ -574,8 +578,8 @@ object frmS7TagBuilder: TfrmS7TagBuilder
       Top = 8
       Width = 75
       Caption = 'Next'
-      OnClick = btnNextClick
       TabOrder = 2
+      OnClick = btnNextClick
     end
     object btnFinish: TButton
       Left = 656
@@ -584,15 +588,15 @@ object frmS7TagBuilder: TfrmS7TagBuilder
       Width = 75
       Caption = 'Finish'
       ModalResult = 1
-      OnClick = btnFinishClick
       TabOrder = 3
+      OnClick = btnFinishClick
     end
   end
   object Timer1: TTimer
     Enabled = False
     Interval = 5
     OnTimer = Timer1Timer
-    left = 664
-    top = 48
+    Left = 664
+    Top = 48
   end
 end

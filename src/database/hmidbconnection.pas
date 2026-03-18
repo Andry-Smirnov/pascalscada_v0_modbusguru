@@ -287,14 +287,14 @@ type
   protected
     function GetConnected: Boolean;
 
-    procedure SetConnected(x: Boolean);
-    procedure SetProtocol(x: string);
-    procedure SetHostName(x: string);
-    procedure SetPort(x: Longint);
-    procedure SetDatabase(x: string);
-    procedure SetUser(x: string);
-    procedure SetPassword(x: string);
-    procedure SetCatalog(x: string);
+    procedure SetConnected(AValue: Boolean);
+    procedure SetProtocol(AValue: string);
+    procedure SetHostName(AValue: string);
+    procedure SetPort(AValue: Longint);
+    procedure SetDatabase(AValue: string);
+    procedure SetUser(AValue: string);
+    procedure SetPassword(AValue: string);
+    procedure SetCatalog(AValue: string);
     procedure StartTransaction(NewConnection: Boolean);
     procedure CommitTransaction;
     procedure RollBackTransaction;
@@ -611,7 +611,7 @@ var
   SQLCmd: PSQLCmdRec;
 begin
   if Terminated then Exit;
-  new(SQLCmd);
+  New(SQLCmd);
   SQLCmd^.SQLCmd := SQL;
   SQLCmd^.ReturnSync := ReturnSync;
   SQLCmd^.NewConnection := NewConnection;
@@ -621,19 +621,19 @@ end;
 
 procedure TProcessSQLCommandThread.ExecTransaction(AStatements: THMIDBConnectionStatementList; ReturnTransactionResult: TReturnTransactionStatementsProc; FreeStatemensAfterExecute: Boolean; ReturnSync, NewConnection: Boolean);
 var
-  statementcmd: PStatementCmdRec;
+  StatementCmd: PStatementCmdRec;
 begin
   if Terminated then Exit;
   if AStatements = nil then Exit;
 
-  new(statementcmd);
-  statementcmd^.Statements := AStatements;
-  statementcmd^.ReturnTransactionResult := ReturnTransactionResult;
-  statementcmd^.FreeStatemensAfterExecute := FreeStatemensAfterExecute;
-  statementcmd^.ReturnSync := ReturnSync;
-  statementcmd^.NewConnection := NewConnection;
+  New(StatementCmd);
+  StatementCmd^.Statements := AStatements;
+  StatementCmd^.ReturnTransactionResult := ReturnTransactionResult;
+  StatementCmd^.FreeStatemensAfterExecute := FreeStatemensAfterExecute;
+  StatementCmd^.ReturnSync := ReturnSync;
+  StatementCmd^.NewConnection := NewConnection;
 
-  FQueue.PostMessage(StatementsCommandMSG, statementcmd, nil, True);
+  FQueue.PostMessage(StatementsCommandMSG, StatementCmd, nil, True);
 end;
 
 
@@ -728,7 +728,7 @@ begin
         on e: Exception do
         begin
           {$IFNDEF WINDOWS}
-          writeln('Start transaction exception: ', e.Message);
+          WriteLn('Start transaction exception: ', e.Message);
           {$ENDIF}
         end;
       end;
@@ -814,10 +814,10 @@ begin
         begin
           Msg := e.Message;
           {$IFNDEF WINDOWS}
-          writeln(e.Message);
-          writeln(SQLCmd);
+          WriteLn(e.Message);
+          WriteLn(SQLCmd);
           {$ENDIF}
-          //AStringStream:=TStringStream.Create(sqlcmd);
+          //AStringStream := TStringStream.Create(sqlcmd);
           //AStringStream.SaveToFile('/tmp/teste.txt');
           //AStringStream.Free;
           Error := True;
@@ -870,103 +870,103 @@ begin
   Result := FSyncConnection.Connected;
 end;
 
-procedure THMIDBConnection.SetProtocol(x: string);
+procedure THMIDBConnection.SetProtocol(AValue: string);
 begin
-  FSyncConnection.Protocol := x;
+  FSyncConnection.Protocol := AValue;
   FCS.Enter;
   try
-    FASyncConnection.Protocol := x;
+    FASyncConnection.Protocol := AValue;
   finally
     FCS.Leave;
   end;
   FProtocol := FSyncConnection.Protocol;
 end;
 
-procedure THMIDBConnection.SetHostName(x: string);
+procedure THMIDBConnection.SetHostName(AValue: string);
 begin
-  FSyncConnection.HostName := x;
+  FSyncConnection.HostName := AValue;
   FCS.Enter;
   try
-    FASyncConnection.HostName := x;
+    FASyncConnection.HostName := AValue;
   finally
     FCS.Leave;
   end;
   FHostName := FSyncConnection.HostName;
 end;
 
-procedure THMIDBConnection.SetPort(x: Longint);
+procedure THMIDBConnection.SetPort(AValue: Longint);
 begin
-  FSyncConnection.Port := x;
+  FSyncConnection.Port := AValue;
   FCS.Enter;
   try
-    FASyncConnection.Port := x;
+    FASyncConnection.Port := AValue;
   finally
     FCS.Leave;
   end;
   FPort := FSyncConnection.Port;
 end;
 
-procedure THMIDBConnection.SetDatabase(x: string);
+procedure THMIDBConnection.SetDatabase(AValue: string);
 begin
-  FSyncConnection.Database := x;
+  FSyncConnection.Database := AValue;
   FCS.Enter;
   try
-    FASyncConnection.Database := x;
+    FASyncConnection.Database := AValue;
   finally
     FCS.Leave;
   end;
   FDatabase := FSyncConnection.Database;
 end;
 
-procedure THMIDBConnection.SetUser(x: string);
+procedure THMIDBConnection.SetUser(AValue: string);
 begin
-  FSyncConnection.User := x;
+  FSyncConnection.User := AValue;
   FCS.Enter;
   try
-    FASyncConnection.User := x;
+    FASyncConnection.User := AValue;
   finally
     FCS.Leave;
   end;
   FUser := FSyncConnection.User;
 end;
 
-procedure THMIDBConnection.SetPassword(x: string);
+procedure THMIDBConnection.SetPassword(AValue: string);
 begin
-  FSyncConnection.Password := x;
+  FSyncConnection.Password := AValue;
   FCS.Enter;
   try
-    FASyncConnection.Password := x;
+    FASyncConnection.Password := AValue;
   finally
     FCS.Leave;
   end;
   FPassword := FSyncConnection.Password;
 end;
 
-procedure THMIDBConnection.SetCatalog(x: string);
+procedure THMIDBConnection.SetCatalog(AValue: string);
 begin
-  FSyncConnection.Catalog := x;
+  FSyncConnection.Catalog := AValue;
   FCS.Enter;
   try
-    FASyncConnection.Catalog := x;
+    FASyncConnection.Catalog := AValue;
   finally
     FCS.Leave;
   end;
   FCatalog := FSyncConnection.Catalog;
 end;
 
-procedure THMIDBConnection.SetConnected(x: Boolean);
+procedure THMIDBConnection.SetConnected(AValue: Boolean);
 begin
   if [csReading, csLoading] * ComponentState <> [] then
   begin
-    FConnectRead := x;
+    FConnectRead := AValue;
     Exit;
   end;
-  FSyncConnection.Connected := x;
-  if FSyncConnection.Connected = x then
+  FSyncConnection.Connected := AValue;
+  if FSyncConnection.Connected = AValue then
   begin
     FCS.Enter;
     try
-      FASyncConnection.Connected := x;
+      FASyncConnection.Connected := AValue;
     finally
       FCS.Leave;
     end;

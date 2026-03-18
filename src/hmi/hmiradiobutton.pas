@@ -17,14 +17,18 @@ unit HMIRadioButton;
 interface
 
 uses
-  HMICheckBox, Classes, Controls,
+  HMICheckBox,
+  Classes,
+  Controls,
   {$IFDEF FPC}
-LCLIntf, LCLType,
+  LCLIntf,
+  LCLType,
   WSLCLClasses,
   {$ELSE}
   Windows,
   {$ENDIF}
-  StdCtrls, HMITypes;
+  StdCtrls,
+  HMITypes;
 
 type
   {$IFDEF PORTUGUES}
@@ -63,9 +67,13 @@ type
     property OtherValuesIS default IsUnchecked;
   end;
 
+
 implementation
 
-uses ControlSecurityManager;
+
+uses
+  ControlSecurityManager;
+
 
 constructor THMIRadioButton.Create(AOwner: TComponent);
 begin
@@ -74,11 +82,11 @@ begin
   if not FRegInSecMan then
   begin
     {$IFNDEF WINDOWS}
-    writeln('FIX-ME: Failed to register class ', ClassName, ' instace with name="', Name, '" in the ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
+    WriteLn('FIX-ME: Failed to register class ', ClassName, ' instace with name="', Name, '" in the ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
     {$ENDIF}
   end;
   {$IFDEF FPC}
-  fCompStyle := csRadioButton;
+  FCompStyle := csRadioButton;
   {$ENDIF}
   OtherValuesIS := IsUnchecked;
 
@@ -91,7 +99,7 @@ begin
   else
   begin
     {$IFNDEF WINDOWS}
-    writeln('FIX-ME: Why class ', ClassName, ', instace name="', Name, '" ins''t registered in ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
+    WriteLn('FIX-ME: Why class ', ClassName, ', instace name="', Name, '" ins''t registered in ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
     {$ENDIF}
   end;
   inherited Destroy;
@@ -109,14 +117,14 @@ end;
 
 procedure THMIRadioButton.CreateParams(var Params: TCreateParams);
 const
-  Alignments: array[Boolean, TLeftRight] of Cardinal =
+  ALIGNMENTS: array[Boolean, TLeftRight] of Cardinal =
     ((BS_LEFTTEXT, 0), (0, BS_LEFTTEXT));
 begin
   inherited CreateParams(Params);
   CreateSubClass(Params, 'BUTTON');
   with Params do
   begin
-    Style := Style xor BS_3STATE or BS_RADIOBUTTON or Alignments[UseRightToLeftAlignment, Alignment];
+    Style := Style xor BS_3STATE or BS_RADIOBUTTON or ALIGNMENTS[UseRightToLeftAlignment, Alignment];
     WindowClass.Style := WindowClass.Style and (CS_HREDRAW or CS_VREDRAW);
   end;
 end;

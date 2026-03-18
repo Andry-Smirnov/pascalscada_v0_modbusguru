@@ -16,11 +16,13 @@ type
     function InitializeChipCard: Boolean; virtual;
     function ChipCardReady: Boolean; virtual;
     function IsEmptyChipCard: Boolean; virtual;
-    function ChipCardRead(var aChipCardCode: UTF8String): Boolean; virtual;
+    function ChipCardRead(var AChipCardCode: UTF8String): Boolean; virtual;
     function FinishChipCard: Boolean; virtual;
   end;
 
+
 implementation
+
 
 { TChipCardReader }
 
@@ -39,7 +41,7 @@ begin
   Result := True;
 end;
 
-function TChipCardReader.ChipCardRead(var aChipCardCode: UTF8String): Boolean;
+function TChipCardReader.ChipCardRead(var AChipCardCode: UTF8String): Boolean;
 begin
   Result := False;
 end;

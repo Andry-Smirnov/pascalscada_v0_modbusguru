@@ -18,6 +18,7 @@ type
     FFooterColor: TColor;
     FHeadColor: TColor;
     FExitPoint: TPoint;
+
     procedure SetHeadAtLeft(AValue: Boolean);
     procedure SetBodyWidth(AValue: Byte);
     procedure SetFooterColor(AValue: TColor);
@@ -61,12 +62,13 @@ type
     FPaintBodyWithFlowColor: Boolean;
     FPaintFooterWithFlowColor: Boolean;
     FPaintHeaderWithFlowColor: Boolean;
+
     procedure SetEmptyColor(AValue: TColor);
     procedure SetPaintBodyWithFlowColor(AValue: Boolean);
     procedure SetPaintFooterWithFlowColor(AValue: Boolean);
     procedure SetPaintHeaderWithFlowColor(AValue: Boolean);
   public
-    constructor Create(aCollection: TCollection); override;
+    constructor Create(ACollection: TCollection); override;
   published
     property EmptyColor: TColor read FEmptyColor write SetEmptyColor;
     property PaintHeaderWithFlowColor: Boolean read FPaintHeaderWithFlowColor write SetPaintHeaderWithFlowColor;
@@ -96,6 +98,7 @@ type
     FUseStaticBodyColor: Boolean;
     FUseStaticFooterColor: Boolean;
     FUseStaticHeaderColor: Boolean;
+
     procedure SetUseStaticBodyColor(AValue: Boolean);
     procedure SetUseStaticFooterColor(AValue: Boolean);
     procedure SetUseStaticHeaderColor(AValue: Boolean);
@@ -109,13 +112,15 @@ type
     FInputPolyline: THMIFlowPolyline;
     FOutputPolyline: THMIFlowPolyline;
     FElevatorStates: THMIElevatorFlowZones;
-    FCurrentZone, FOwnerZone: THMIElevatorFlowZone;
+    FCurrentZone: THMIElevatorFlowZone;
+    FOwnerZone: THMIElevatorFlowZone;
     FZoneTimer: TTimer;
+
     procedure ChangeBounds(ALeft, ATop, AWidth, AHeight: Integer; KeepBase: Boolean); override;
     procedure SetInputPolyline(AValue: THMIFlowPolyline);
     procedure SetOutputPolyline(AValue: THMIFlowPolyline);
     procedure SetElevatorStates(AValue: THMIElevatorFlowZones);
-    procedure ShowZone(aZone: THMIElevatorFlowZone);
+    procedure ShowZone(AZone: THMIElevatorFlowZone);
     procedure UpdateFlow; virtual;
     property InputPolyline: THMIFlowPolyline read FInputPolyline write SetInputPolyline;
     property OutputPolyline: THMIFlowPolyline read FOutputPolyline write SetOutputPolyline;
@@ -236,9 +241,9 @@ begin
   NotifyChange;
 end;
 
-constructor THMIElevatorFlowZone.Create(aCollection: TCollection);
+constructor THMIElevatorFlowZone.Create(ACollection: TCollection);
 begin
-  inherited Create(aCollection);
+  inherited Create(ACollection);
   FEmptyColor := clSilver;
 end;
 
@@ -291,16 +296,16 @@ end;
 procedure THMICustomLinkedFlowElevator.UpdateControlDelayed(Data: PtrInt);
 var
   Value: Double;
-  zone: THMIElevatorFlowZone;
+  AZone: THMIElevatorFlowZone;
 begin
   if [csReading, csLoading, csDestroying] * ComponentState <> [] then Exit;
   if Assigned(FPLCTag) then
     Value := (FPLCTag as ITagNumeric).GetValue;
 
-  zone := THMIElevatorFlowZone(FElevatorStates.GetZoneFromValue(Value));
-  if FOwnerZone <> zone then
+  AZone := THMIElevatorFlowZone(FElevatorStates.GetZoneFromValue(Value));
+  if FOwnerZone <> AZone then
   begin
-    FOwnerZone := zone;
+    FOwnerZone := AZone;
     ShowZone(FOwnerZone);
     if FCurrentZone <> nil then
     begin
@@ -347,7 +352,7 @@ end;
 
 procedure THMICustomElevadorBasico.DrawControl;
 var
-  x: array of TPointF;
+  Points: array of TPointF;
 begin
   inherited DrawControl;
 
@@ -357,41 +362,41 @@ begin
   //###############################################################################
   //coordenadas de que desenham a cabeca do elevador
   //###############################################################################
-  SetLength(x, 4);
+  SetLength(Points, 4);
 
   if FHeadAtLeft then
   begin
-    x[0].x := 0;
-    x[0].Y := BodyWidth + (BorderWidth / 2);
+    Points[0].x := 0;
+    Points[0].Y := BodyWidth + (BorderWidth / 2);
 
-    FExitPoint := x[0].Truncate;
+    FExitPoint := Points[0].Truncate;
     FExitPoint.x := FExitPoint.x + 8;
 
-    x[1].x := BodyWidth;
-    x[1].Y := (BorderWidth / 2);
+    Points[1].x := BodyWidth;
+    Points[1].Y := (BorderWidth / 2);
 
-    x[2].x := 2 * BodyWidth - 1;
-    x[2].Y := (BorderWidth / 2);
+    Points[2].x := 2 * BodyWidth - 1;
+    Points[2].Y := (BorderWidth / 2);
 
-    x[3].x := 2 * BodyWidth - 1;
-    x[3].Y := BodyWidth + (BorderWidth / 2);
+    Points[3].x := 2 * BodyWidth - 1;
+    Points[3].Y := BodyWidth + (BorderWidth / 2);
   end
   else
   begin
-    x[0].x := BodyWidth;
-    x[0].Y := (BorderWidth / 2);
+    Points[0].x := BodyWidth;
+    Points[0].Y := (BorderWidth / 2);
 
-    x[1].x := 2 * BodyWidth - 1;
-    x[1].Y := (BorderWidth / 2);
+    Points[1].x := 2 * BodyWidth - 1;
+    Points[1].Y := (BorderWidth / 2);
 
-    x[2].x := 3 * BodyWidth - 1;
-    x[2].Y := BodyWidth + (BorderWidth / 2);
+    Points[2].x := 3 * BodyWidth - 1;
+    Points[2].Y := BodyWidth + (BorderWidth / 2);
 
-    FExitPoint := x[2].Truncate;
+    FExitPoint := Points[2].Truncate;
     FExitPoint.x := FExitPoint.x - 8;
 
-    x[3].x := BodyWidth;
-    x[3].Y := BodyWidth + (BorderWidth / 2);
+    Points[3].x := BodyWidth;
+    Points[3].Y := BodyWidth + (BorderWidth / 2);
   end;
 
   //###############################################################################
@@ -405,22 +410,22 @@ begin
   //###############################################################################
   //desenha a cabeca do elevador.
   //###############################################################################
-  FControlArea.CanvasBGRA.PolygonF(x);
+  FControlArea.CanvasBGRA.PolygonF(Points);
 
   //###############################################################################
   //coordenadas que desenham o pé do elevador.
   //###############################################################################
-  x[0].x := 0;
-  x[0].Y := Height - BodyWidth - (BorderWidth / 2);
+  Points[0].x := 0;
+  Points[0].Y := Height - BodyWidth - (BorderWidth / 2);
 
-  x[1].x := 3 * BodyWidth - 1;
-  x[1].Y := Height - BodyWidth - (BorderWidth / 2);
+  Points[1].x := 3 * BodyWidth - 1;
+  Points[1].Y := Height - BodyWidth - (BorderWidth / 2);
 
-  x[2].x := 2 * BodyWidth - 1;
-  x[2].Y := Height - (BorderWidth / 2);
+  Points[2].x := 2 * BodyWidth - 1;
+  Points[2].Y := Height - (BorderWidth / 2);
 
-  x[3].x := BodyWidth;
-  x[3].Y := Height - (BorderWidth / 2);
+  Points[3].x := BodyWidth;
+  Points[3].Y := Height - (BorderWidth / 2);
 
   //###############################################################################
   //preenchimento do pé do elevador.
@@ -430,26 +435,26 @@ begin
   //###############################################################################
   //desenha o pé do elevador.
   //###############################################################################
-  FControlArea.CanvasBGRA.PolygonF(x);
+  FControlArea.CanvasBGRA.PolygonF(Points);
 
   //###############################################################################
   //preenchimento do corpo do elevador.
   //###############################################################################
   FControlArea.CanvasBGRA.Brush.Color := FBodyColor;
 
-  x[0].x := FBodyWidth;
-  x[0].Y := (BorderWidth / 2);
+  Points[0].x := FBodyWidth;
+  Points[0].Y := (BorderWidth / 2);
 
-  x[1].x := 2 * BodyWidth - 1;
-  x[1].Y := (BorderWidth / 2);
+  Points[1].x := 2 * BodyWidth - 1;
+  Points[1].Y := (BorderWidth / 2);
 
-  x[2].x := 2 * BodyWidth - 1;
-  x[2].Y := Height - (BorderWidth / 2);
+  Points[2].x := 2 * BodyWidth - 1;
+  Points[2].Y := Height - (BorderWidth / 2);
 
-  x[3].x := BodyWidth;
-  x[3].Y := Height - (BorderWidth / 2);
+  Points[3].x := BodyWidth;
+  Points[3].Y := Height - (BorderWidth / 2);
 
-  FControlArea.CanvasBGRA.PolygonF(x);
+  FControlArea.CanvasBGRA.PolygonF(Points);
 
   //###############################################################################
   //Risquinhos, acabamento.
@@ -508,15 +513,21 @@ begin
   FElevatorStates.Assign(AValue);
 end;
 
-procedure THMICustomFlowElevator.ShowZone(aZone: THMIElevatorFlowZone);
+procedure THMICustomFlowElevator.ShowZone(AZone: THMIElevatorFlowZone);
 begin
-  FCurrentZone := aZone;
-  if aZone <> nil then
+  FCurrentZone := AZone;
+  if AZone <> nil then
   begin
-    if (FUseStaticBodyColor = False) and (aZone.PaintBodyWithFlowColor = False) then SetBodyColor(aZone.Color);
-    if (FUseStaticHeaderColor = False) and (aZone.PaintHeaderWithFlowColor = False) then SetHeadColor(aZone.Color);
-    if (FUseStaticFooterColor = False) and (aZone.PaintFooterWithFlowColor = False) then SetFooterColor(aZone.Color);
-    SetBorderColor(aZone.BorderColor);
+    if (FUseStaticBodyColor = False)
+      and (AZone.PaintBodyWithFlowColor = False) then
+      SetBodyColor(AZone.Color);
+    if (FUseStaticHeaderColor = False)
+      and (AZone.PaintHeaderWithFlowColor = False) then
+      SetHeadColor(AZone.Color);
+    if (FUseStaticFooterColor = False)
+      and (AZone.PaintFooterWithFlowColor = False) then
+      SetFooterColor(AZone.Color);
+    SetBorderColor(AZone.BorderColor);
     UpdateFlow;
     InvalidateDraw;
   end;
@@ -528,7 +539,6 @@ begin
   begin
     if FCurrentZone.Flow then
     begin
-
       if (FUseStaticBodyColor = False) and FCurrentZone.FPaintBodyWithFlowColor then
       begin
         if FInputPolyline.LineColor = FInputPolyline.EmptyColor then
@@ -664,8 +674,10 @@ end;
 
 procedure THMICustomFlowElevator.NotifyFree(const WhoWasDestroyed: THMIFlowPolyline);
 begin
-  if WhoWasDestroyed = FInputPolyline then FInputPolyline := nil;
-  if WhoWasDestroyed = FOutputPolyline then FOutputPolyline := nil;
+  if WhoWasDestroyed = FInputPolyline then
+    FInputPolyline := nil;
+  if WhoWasDestroyed = FOutputPolyline then
+    FOutputPolyline := nil;
 end;
 
 procedure THMICustomFlowElevator.NotifyChange(const WhoChanged: THMIFlowPolyline);

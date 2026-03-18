@@ -14,27 +14,26 @@ type
   TPLCStructString = class(TPLCTag, ITagInterface, ITagString)
   private
     FStringEncoding: TStringEncodings;
-    PLoadedBlock,
-    PBlock: TPLCStruct;
+    PLoadedBlock, PBlock: TPLCStruct;
     PIndex: Cardinal;
     PStringSize: Cardinal;
     PStringType: TPLCStringTypes;
     PValue: UTF8String;
     function GetRealStringSize: Integer;
     function GetValueChangeData: Pointer;
-    procedure ReleaseChangeData(data: Pointer);
+    procedure ReleaseChangeData(Data: Pointer);
     procedure SetBlock(AValue: TPLCStruct);
     procedure SetIndex(AValue: Cardinal);
     procedure SetStringEncoding(AValue: TStringEncodings);
     procedure SetStringSize(AValue: Cardinal);
     procedure SetStringType(AValue: TPLCStringTypes);
   private
-    procedure BlockReadOk(Sender:TObject);
-    procedure BlockReadFault(Sender:TObject);
-    procedure BlockWriteOk(Sender:TObject);
-    procedure BlockWriteFault(Sender:TObject);
-    procedure BlockTagChange(Sender:TObject);
-    procedure BlockRemoveTag(Sender:TObject);
+    procedure BlockReadOk(Sender: TObject);
+    procedure BlockReadFault(Sender: TObject);
+    procedure BlockWriteOk(Sender: TObject);
+    procedure BlockWriteFault(Sender: TObject);
+    procedure BlockTagChange(Sender: TObject);
+    procedure BlockRemoveTag(Sender: TObject);
   private
     ////////////////////////////////////////////////////////////////////////////
     // ITAGInterface
@@ -45,35 +44,35 @@ type
     {$ELSE}
     //: Returns the tag value as string, including the format (if applicable), prefix and suffix.
     {$ENDIF}
-    function  GetValueAsText(Prefix, Sufix, Format:UTF8String; FormatDateTimeOptions:TFormatDateTimeOptions=[]):UTF8String;
+    function GetValueAsText(Prefix, Sufix, Format: UTF8String; FormatDateTimeOptions: TFormatDateTimeOptions = []): UTF8String;
 
     {$IFDEF PORTUGUES}
     //: Retorna o valor do tag como variant.
     {$ELSE}
     //: Returns the tag value as variant.
     {$ENDIF}
-    function  GetVariantValue:Variant;
+    function GetVariantValue: Variant;
 
     {$IFDEF PORTUGUES}
     //: Seta um variant como valor do tag se possível.
     {$ELSE}
     //: If possible, sets a variant as tag value.
     {$ENDIF}
-    procedure SetVariantValue(V:Variant);
+    procedure SetVariantValue(V: Variant);
 
     {$IFDEF PORTUGUES}
     //: Retorna @true se o valor é aceito pelo tag.
     {$ELSE}
     //: Returns @true if the variant value will be accept by tag.
     {$ENDIF}
-    function  IsValidValue(Value:Variant):Boolean;
+    function IsValidValue(Value: Variant): Boolean;
 
     {$IFDEF PORTUGUES}
     //: Retorna a data/hora em que o tag foi atualizado pela última vez.
     {$ELSE}
     //: Returns the date/time of the last time wich the tag was updated.
     {$ENDIF}
-    function  GetValueTimestamp:TDatetime;
+    function GetValueTimestamp: TDatetime;
   private
     POnAsyncStringValueChange: TASyncStringValueChange;
     ////////////////////////////////////////////////////////////////////////////
@@ -85,17 +84,17 @@ type
     {$ELSE}
     //: Returns the text value of tag.
     {$ENDIF}
-    function  GetValue:UTF8String;
+    function GetValue: UTF8String;
 
     {$IFDEF PORTUGUES}
     //: Escreve um texto no tag.
     {$ELSE}
     //: Writes a text value on tag.
     {$ENDIF}
-    procedure SetValue(AValue:UTF8String);
+    procedure SetValue(AValue: UTF8String);
   protected
     procedure Loaded; override;
-    function ValidSettings(aBlockSize, aIndex, aStrSize:Cardinal; aStrType:TPLCStringTypes):Boolean;
+    function ValidSettings(aBlockSize, aIndex, aStrSize: Cardinal; aStrType: TPLCStringTypes): Boolean;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -106,30 +105,30 @@ type
     {$ELSE}
     //: Index of tag element on the Tag Block.
     {$ENDIF}
-    property Index:Cardinal read PIndex write SetIndex;
+    property Index: Cardinal read PIndex write SetIndex;
 
     {$IFDEF PORTUGUES}
     //: Bloco de comunicações que o elemento pertence.
     {$ELSE}
     //: Communication Block of the element.
     {$ENDIF}
-    property PLCBlock:TPLCStruct read PBlock write SetBlock;
+    property PLCBlock: TPLCStruct read PBlock write SetBlock;
 
     {$IFDEF PORTUGUES}
     //: Tamanho real do bloco (somente-leitura).
     {$ELSE}
     //: Real block size (read-only).
     {$ENDIF}
-    property StringBlockSize:Integer read GetRealStringSize;
+    property StringBlockSize: Integer read GetRealStringSize;
 
-    property StringEncoding:TStringEncodings read FStringEncoding write SetStringEncoding default UTF_8;
+    property StringEncoding: TStringEncodings read FStringEncoding write SetStringEncoding default UTF_8;
 
     {$IFDEF PORTUGUES}
     //: Quantidade máxima de caracteres da string.
     {$ELSE}
     //: Maximum length of your string.
     {$ENDIF}
-    property StringSize:Cardinal read PStringSize write SetStringSize;
+    property StringSize: Cardinal read PStringSize write SetStringSize;
 
     {$IFDEF PORTUGUES}
     {:
@@ -142,14 +141,14 @@ type
     @seealso(TPLCStringTypes)
     }
     {$ENDIF}
-    property StringType:TPLCStringTypes read PStringType write SetStringType default stC;
+    property StringType: TPLCStringTypes read PStringType write SetStringType default stC;
 
     {$IFDEF PORTUGUES}
     //: Lê/escreve uma string do equipamento.
     {$ELSE}
     //: Read/writes a string value on device
     {$ENDIF}
-    property Value:UTF8String read PValue write SetValue;
+    property Value: UTF8String read PValue write SetValue;
 
     //: @seealso(TTag.OnValueChangeFirst)
     property OnValueChangeFirst;
@@ -160,105 +159,109 @@ type
     {$ELSE}
     //: Asynchronous event called when the tag value changes.
     {$ENDIF}
-    property OnAsyncStringChange:TASyncStringValueChange read POnAsyncStringValueChange write POnAsyncStringValueChange;
+    property OnAsyncStringChange: TASyncStringValueChange read POnAsyncStringValueChange write POnAsyncStringValueChange;
   end;
+
 
 implementation
 
-uses Math, Variants;
 
-{ TPLCStructString }
+uses
+  Math, Variants;
+
+
+  { TPLCStructString }
 
 function TPLCStructString.GetValueChangeData: Pointer;
 var
-  x:PUTF8String;
+  x: PUTF8String;
 begin
   New(x);
-  x^:=Value;
-  Result:=x;
+  x^ := Value;
+  Result := x;
 end;
 
-procedure TPLCStructString.ReleaseChangeData(data: Pointer);
+procedure TPLCStructString.ReleaseChangeData(Data: Pointer);
 var
-  x:PUTF8String;
+  x: PUTF8String;
 begin
-  x:=data;
-  SetLength(x^,0);
+  x := Data;
+  SetLength(x^, 0);
   Dispose(x);
 end;
 
 function TPLCStructString.GetRealStringSize: Integer;
 begin
   case PStringType of
-    stC: Result:=StringSize+1;        //+1 = Null terminator at string end.
-    stSIEMENS: Result:=StringSize+2;  //+2 string size and string capacity at begining of string.
-    stROCKWELL: Result:=StringSize+4; //+4 string size (dword) at begining of string;
+    stC: Result := StringSize + 1;        //+1 = Null terminator at string end.
+    stSIEMENS: Result := StringSize + 2;  //+2 string size and string capacity at begining of string.
+    stROCKWELL: Result := StringSize + 4; //+4 string size (dword) at begining of string;
   end;
 end;
 
 procedure TPLCStructString.SetBlock(AValue: TPLCStruct);
 begin
-  if [csLoading,csReading]*ComponentState<>[] then begin
-    PLoadedBlock:=AValue;
+  if [csLoading, csReading] * ComponentState <> [] then
+  begin
+    PLoadedBlock := AValue;
     Exit;
   end;
 
-  if PBlock=AValue then Exit;
+  if PBlock = AValue then Exit;
 
   if Assigned(PBlock) then
     PBlock.RemoveAllHandlersFromObject(Self);
 
-  if Assigned(AValue) then begin
-    if not ValidSettings(AValue.Size,PIndex,PStringSize,PStringType) then
+  if Assigned(AValue) then
+  begin
+    if not ValidSettings(AValue.Size, PIndex, PStringSize, PStringType) then
       Exit;
 
     AValue.AddTagChangeHandler(@BlockTagChange);
     AValue.AddRemoveTagHandler(@BlockRemoveTag);
-    aValue.AddWriteFaultHandler(@BlockWriteFault);
+    AValue.AddWriteFaultHandler(@BlockWriteFault);
 
     BlockTagChange(AValue);
   end;
 
-
-
-  PBlock:=AValue;
+  PBlock := AValue;
 end;
 
 procedure TPLCStructString.SetIndex(AValue: Cardinal);
 begin
-  if PIndex=AValue then Exit;
+  if PIndex = AValue then Exit;
 
-  if Assigned(PBlock) and (not ValidSettings(PBlock.Size,AValue,PStringSize,PStringType)) then
-      Exit;
+  if Assigned(PBlock) and (not ValidSettings(PBlock.Size, AValue, PStringSize, PStringType)) then
+    Exit;
 
-  PIndex:=AValue;
+  PIndex := AValue;
 end;
 
 procedure TPLCStructString.SetStringEncoding(AValue: TStringEncodings);
 begin
-  if FStringEncoding=AValue then Exit;
-  FStringEncoding:=AValue;
+  if FStringEncoding = AValue then Exit;
+  FStringEncoding := AValue;
   BlockTagChange(Self);
 end;
 
 procedure TPLCStructString.SetStringSize(AValue: Cardinal);
 begin
-  if PStringSize=AValue then Exit;
+  if PStringSize = AValue then Exit;
 
-  if Assigned(PBlock) and (not ValidSettings(PBlock.Size,PIndex,AValue,PStringType)) then
+  if Assigned(PBlock) and (not ValidSettings(PBlock.Size, PIndex, AValue, PStringType)) then
     Exit;
 
-  PStringSize:=AValue;
+  PStringSize := AValue;
 end;
 
 procedure TPLCStructString.SetStringType(AValue: TPLCStringTypes);
 begin
-  if PStringType=AValue then Exit;
+  if PStringType = AValue then Exit;
 
-  if Assigned(PBlock) and (not ValidSettings(PBlock.Size,PIndex,PStringSize,AValue)) then
+  if Assigned(PBlock) and (not ValidSettings(PBlock.Size, PIndex, PStringSize, AValue)) then
     Exit;
 
-  PStringType:=AValue;
+  PStringType := AValue;
 end;
 
 procedure TPLCStructString.BlockReadOk(Sender: TObject);
@@ -283,45 +286,50 @@ end;
 
 procedure TPLCStructString.BlockTagChange(Sender: TObject);
 var
-  aux:RawByteString;
-  PCurrStrSize: LongWord;
+  Aux: Rawbytestring;
+  PCurrStrSize: Longword;
   i: Cardinal;
   b: Byte;
-  aux2: UTF8String;
+  Aux2: UTF8String;
 begin
-  if Assigned(PBlock) and ValidSettings(PLCBlock.Size,PIndex,PStringSize,PStringType) then begin
+  if Assigned(PBlock) and ValidSettings(PLCBlock.Size, PIndex, PStringSize, PStringType) then
+  begin
     case PStringType of
-      stC: begin
-        aux:='';
-        for i:=PIndex to (PIndex+PStringSize)-1 do begin
-          b:=PBlock.GetByte(i);
-          if b=0 then break;
-          aux:=aux+chr(PBlock.GetByte(i));
-        end;
-        aux2:=TPLCString.ConvertRawByteStringToUTF8(aux,FStringEncoding);
-      end;
+      stC:  begin
+              Aux := '';
+              for i := PIndex to (PIndex + PStringSize) - 1 do
+              begin
+                b := PBlock.GetByte(i);
+                if b = 0 then Break;
+                Aux := Aux + chr(PBlock.GetByte(i));
+              end;
+              Aux2 := TPLCString.ConvertRawByteStringToUTF8(Aux, FStringEncoding);
+            end;
 
-      stSIEMENS: begin
-        aux:='';
-        aux:=PBlock.GetSiemensString(PIndex,PStringSize);
-        aux2:=TPLCString.ConvertRawByteStringToUTF8(aux,FStringEncoding);
-      end;
+      stSIEMENS:  begin
+                    Aux := '';
+                    Aux := PBlock.GetSiemensString(PIndex, PStringSize);
+                    Aux2 := TPLCString.ConvertRawByteStringToUTF8(Aux, FStringEncoding);
+                  end;
 
       stROCKWELL: begin
-        aux:='';
-        PCurrStrSize:=PBlock.GetLongWord(PIndex,false,false);
-        for i:=PIndex+4 to PIndex+3+min(PCurrStrSize,PStringSize) do begin
-          b:=PBlock.GetByte(i);
-          if b=0 then break;
-          aux:=aux+chr(PBlock.GetByte(i));
-        end;
-        aux2:=TPLCString.ConvertRawByteStringToUTF8(aux,FStringEncoding);
-      end;
-      else aux2:='';
+                    Aux := '';
+                    PCurrStrSize := PBlock.GetLongWord(PIndex, False, False);
+                    for i := PIndex + 4 to PIndex + 3 + min(PCurrStrSize, PStringSize) do
+                    begin
+                      b := PBlock.GetByte(i);
+                      if b = 0 then Break;
+                      Aux := Aux + chr(PBlock.GetByte(i));
+                    end;
+                    Aux2 := TPLCString.ConvertRawByteStringToUTF8(Aux, FStringEncoding);
+                  end;
+      else
+        Aux2 := '';
     end;
 
-    if aux2<>PValue then begin
-      PValue:=aux2;
+    if Aux2 <> PValue then
+    begin
+      PValue := Aux2;
       NotifyChange;
     end;
   end;
@@ -329,53 +337,58 @@ end;
 
 procedure TPLCStructString.BlockRemoveTag(Sender: TObject);
 begin
-  if Sender=PBlock then PBlock:=nil;
+  if Sender = PBlock then PBlock := nil;
 end;
 
 procedure TPLCStructString.SetValue(AValue: UTF8String);
 var
-  aux:TArrayOfDouble;
-  limit: Extended;
-  c, PCurrStrSize: Integer;
+  Aux: TArrayOfDouble;
+  Limit: Extended;
+  c: Integer;
+  PCurrStrSize: Integer;
 begin
-  if Assigned(PBlock) and ValidSettings(PLCBlock.Size,PIndex,PStringSize,PStringType) then begin
+  if Assigned(PBlock) and ValidSettings(PLCBlock.Size, PIndex, PStringSize, PStringType) then
+  begin
     case PStringType of
-      stC: begin
-        limit:=min(PStringSize,Length(AValue));
-        SetLength(aux,PStringSize);
-        for c:=0 to high(aux) do begin
-          if c<limit then
-            aux[c]:=TPLCString.ConvertUTF8CharToByte(AValue,FStringEncoding,c+1)
-          else
-            aux[c]:=0;
-        end;
-        aux[high(aux)]:=0;
-      end;
-      stSIEMENS: begin
-        SetLength(aux,PStringSize+2);
-        PBlock.AddSiemensString(aux,0,AValue,PStringSize);
-      end;
+      stC:  begin
+              Limit := min(PStringSize, Length(AValue));
+              SetLength(Aux, PStringSize);
+              for c := 0 to high(Aux) do
+              begin
+                if c < Limit then
+                  Aux[c] := TPLCString.ConvertUTF8CharToByte(AValue, FStringEncoding, c + 1)
+                else
+                  Aux[c] := 0;
+              end;
+              Aux[high(Aux)] := 0;
+            end;
+      stSIEMENS:  begin
+                    SetLength(Aux, PStringSize + 2);
+                    PBlock.AddSiemensString(Aux, 0, AValue, PStringSize);
+                  end;
       stROCKWELL: begin
-        SetLength(aux,PStringSize+4);
-        PCurrStrSize:=Length(AValue);
+                    SetLength(Aux, PStringSize + 4);
+                    PCurrStrSize := Length(AValue);
 
-        PBlock.AddDWord(aux,0,PCurrStrSize,false,false);
-        limit:=min(PStringSize,Length(AValue));
-        for c:=4 to high(aux) do begin
-          if (c-4)<limit then
-            aux[c]:=TPLCString.ConvertUTF8CharToByte(AValue,FStringEncoding,c-3)
-          else
-            aux[c]:=0;
-        end;
-        aux[high(aux)]:=0;
-      end
-      else Exit;
+                    PBlock.AddDWord(Aux, 0, PCurrStrSize, False, False);
+                    Limit := min(PStringSize, Length(AValue));
+                    for c := 4 to high(Aux) do
+                    begin
+                      if (c - 4) < Limit then
+                        Aux[c] := TPLCString.ConvertUTF8CharToByte(AValue, FStringEncoding, c - 3)
+                      else
+                        Aux[c] := 0;
+                    end;
+                    Aux[high(Aux)] := 0;
+                  end
+      else
+        Exit;
     end;
-    PBlock.ScanWrite(aux, Length(aux), PIndex);
+    PBlock.ScanWrite(Aux, Length(Aux), PIndex);
   end;
 
-  if PValue<>AValue then NotifyChange;
-  PValue:=AValue;
+  if PValue <> AValue then NotifyChange;
+  PValue := AValue;
 end;
 
 procedure TPLCStructString.Loaded;
@@ -384,55 +397,54 @@ begin
   SetBlock(PLoadedBlock);
 end;
 
-function TPLCStructString.ValidSettings(aBlockSize, aIndex, aStrSize: Cardinal;
-  aStrType: TPLCStringTypes): Boolean;
+function TPLCStructString.ValidSettings(aBlockSize, aIndex, aStrSize: Cardinal; aStrType: TPLCStringTypes): Boolean;
 var
-  RealSize:Integer;
+  RealSize: Integer;
 begin
   case aStrType of
-    stC:        RealSize:=aStrSize+1; //+1 = Null terminator at string end.
-    stSIEMENS:  RealSize:=aStrSize+2; //+2 string size and string capacity at begining of string.
-    stROCKWELL: RealSize:=aStrSize+4; //+4 string size (dword) at begining of string;
-    else Exit(false);
+    stC: RealSize := aStrSize + 1; //+1 = Null terminator at string end.
+    stSIEMENS: RealSize := aStrSize + 2; //+2 string size and string capacity at begining of string.
+    stROCKWELL: RealSize := aStrSize + 4; //+4 string size (dword) at begining of string;
+    else
+      Exit(False);
   end;
 
-  if (aindex+RealSize)>aBlockSize then Exit(false);
+  if (aIndex + RealSize) > aBlockSize then Exit(False);
 
-  Result:=true;
+  Result := True;
 end;
 
-function TPLCStructString.GetValueAsText(Prefix, Sufix, Format: UTF8String;
-  FormatDateTimeOptions: TFormatDateTimeOptions): UTF8String;
+function TPLCStructString.GetValueAsText(Prefix, Sufix, Format: UTF8String; FormatDateTimeOptions: TFormatDateTimeOptions): UTF8String;
 begin
   Result := Prefix + Value + Sufix;
 end;
 
 function TPLCStructString.GetVariantValue: Variant;
 begin
-  Result:=Value;
+  Result := Value;
 end;
 
 procedure TPLCStructString.SetVariantValue(V: Variant);
 begin
-  Value:=V;
+  Value := V;
 end;
 
 function TPLCStructString.IsValidValue(Value: Variant): Boolean;
 begin
   Result := VarIsNumeric(Value) or VarIsStr(Value) or
-            VarIsType(Value,vardate) or VarIsType(Value,varboolean);
+    VarIsType(Value, vardate) or VarIsType(Value, varboolean);
 end;
 
 function TPLCStructString.GetValueTimestamp: TDatetime;
 begin
-  Result:=0;
+  Result := 0;
   if Assigned(PBlock) then
-    Result:=PBlock.ValueTimestamp;
+    Result := PBlock.ValueTimestamp;
 end;
 
 function TPLCStructString.GetValue: UTF8String;
 begin
-  Result:=Value;
+  Result := Value;
 end;
 
 constructor TPLCStructString.Create(AOwner: TComponent);
@@ -450,4 +462,3 @@ begin
 end;
 
 end.
-

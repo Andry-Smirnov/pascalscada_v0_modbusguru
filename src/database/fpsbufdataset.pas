@@ -2704,7 +2704,7 @@ var ABlobBuffer : PBlobBuffer;
 
 begin
   setlength(FBlobBuffers,length(FBlobBuffers)+1);
-  new(ABlobBuffer);
+  New(ABlobBuffer);
   FillMemory(ABlobBuffer,sizeof(ABlobBuffer^),0);
   ABlobBuffer^.OrgBufID := high(FUpdateBlobBuffers);
   FBlobBuffers[high(FBlobBuffers)] := ABlobBuffer;
@@ -2717,7 +2717,7 @@ var ABlobBuffer : PBlobBuffer;
 
 begin
   setlength(FUpdateBlobBuffers,length(FUpdateBlobBuffers)+1);
-  new(ABlobBuffer);
+  New(ABlobBuffer);
   FillMemory(ABlobBuffer,sizeof(ABlobBuffer^),0);
   FUpdateBlobBuffers[high(FUpdateBlobBuffers)] := ABlobBuffer;
   result := ABlobBuffer;

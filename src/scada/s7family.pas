@@ -157,23 +157,23 @@ type
     {$IFDEF PORTUGUES}
     //: Pega um byte de um ponteiro de bytes.
     {$ELSE}
-    //: Gets a byte from a pointer of bytes.
+    //: Gets a byte from a pointer of Bytes.
     {$ENDIF}
     //function  GetByte(Ptr:PByte; idx:LongInt):LongInt;
 
     {$IFDEF PORTUGUES}
     //: Seta um byte em um ponteiro de bytes.
     {$ELSE}
-    //: Sets a byte in a pointer of bytes.
+    //: Sets a byte in a pointer of Bytes.
     {$ENDIF}
     //procedure SetByte(Ptr:PByte; idx:LongInt; value:Byte);
 
     {$IFDEF PORTUGUES}
     //: Seta varios bytes em um ponteiro de bytes.
     {$ELSE}
-    //: Sets a lot of bytes in a pointer of bytes.
+    //: Sets a lot of Bytes in a pointer of Bytes.
     {$ENDIF}
-    procedure SetBytes(Ptr:PByte; idx:LongInt; values:BYTES);
+    procedure SetBytes(Ptr:PByte; idx:LongInt; values:Bytes);
   protected
     {$IFDEF PORTUGUES}
     //: Onde inicia a PDU nos pacotes que chegam e que saem.
@@ -261,14 +261,14 @@ type
     {:
     Exchange data with a PLC.
     @param(CPU TS7CPU. PLC to exchange data.)
-    @param(msgOut BYTES. Packet to send to PLC.)
-    @param(msgIn BYTES. Stores the received packet from PLC.)
+    @param(msgOut Bytes. Packet to send to PLC.)
+    @param(msgIn Bytes. Stores the received packet from PLC.)
     @param(IsWrite Boolean. Tells if the message to be send to PLC will write
            in PLC memory.)
     @returns(@True if successful.)
     }
     {$ENDIF}
-    function  exchange(var CPU:TS7CPU; var msgOut:BYTES; var msgIn:BYTES; IsWrite:Boolean):Boolean; virtual;
+    function  exchange(var CPU:TS7CPU; var msgOut:Bytes; var msgIn:Bytes; IsWrite:Boolean):Boolean; virtual;
 
     {$IFDEF PORTUGUES}
     {:
@@ -278,10 +278,10 @@ type
     {$ELSE}
     {:
     Sends a message.
-    @param(msgOut BYTES. Message to send.)
+    @param(msgOut Bytes. Message to send.)
     }
     {$ENDIF}
-    procedure sendMessage(var msgOut:BYTES); virtual;
+    procedure sendMessage(var msgOut:Bytes); virtual;
 
     {$IFDEF PORTUGUES}
     {:
@@ -293,12 +293,12 @@ type
     {$ELSE}
     {:
     Gets a incoming packet from the communication port.
-    @param(msgIn BYTES. Stores the incoming packet.)
+    @param(msgIn Bytes. Stores the incoming packet.)
     @param(BytesRead LongInt. Packet length.)
     @returns(iorOK if was come some packet.)
     }
     {$ENDIF}
-    function  getResponse(var msgIn:BYTES; var BytesRead:LongInt):TIOResult; virtual;
+    function  getResponse(var msgIn:Bytes; var BytesRead:LongInt):TIOResult; virtual;
 
     //: @exclude
     procedure listReachablePartners; virtual;
@@ -311,9 +311,9 @@ type
     }
     {$ELSE}
     {:
-    Swap the bytes of a word.
-    @param(W Word. Word to swap their bytes.)
-    @returns(The word with their bytes swaped.)
+    Swap the Bytes of a word.
+    @param(W Word. Word to swap their Bytes.)
+    @returns(The word with their Bytes swaped.)
     }
     {$ENDIF}
     function  SwapBytesInWord(W:Word):Word;
@@ -325,10 +325,10 @@ type
     {$ELSE}
     {:
     Prepares a message to be sent.
-    @param(msg BYTES. Message to be prepared.)
+    @param(msg Bytes. Message to be prepared.)
     }
     {$ENDIF}
-    procedure PrepareToSend(var msg:BYTES); virtual;
+    procedure PrepareToSend(var msg:Bytes); virtual;
   protected
     {$IFDEF PORTUGUES}
     {:
@@ -339,11 +339,11 @@ type
     {$ELSE}
     {:
     Adds a parameter into the message to be sent.
-    @param(MsgOut BYTES. Message to be sent.)
-    @param(param BYTES. Parameter to be added.)
+    @param(MsgOut Bytes. Message to be sent.)
+    @param(param Bytes. Parameter to be added.)
     }
     {$ENDIF}
-    procedure AddParam(var MsgOut:BYTES; const param:BYTES); virtual;
+    procedure AddParam(var MsgOut:Bytes; const param:Bytes); virtual;
 
     {$IFDEF PORTUGUES}
     {:
@@ -354,11 +354,11 @@ type
     {$ELSE}
     {:
     Adds a dataset into the message to be sent.
-    @param(MsgOut BYTES. Message to be sent.)
-    @param(data BYTES. Data to be added.)
+    @param(MsgOut Bytes. Message to be sent.)
+    @param(data Bytes. Data to be added.)
     }
     {$ENDIF}
-    procedure AddData(var MsgOut:BYTES; const data:BYTES); virtual;
+    procedure AddData(var MsgOut:Bytes; const data:Bytes); virtual;
 
     {$IFDEF PORTUGUES}
     {:
@@ -369,11 +369,11 @@ type
     {$ELSE}
     {:
     Initialize the PDU on outgoing message.
-    @param(MsgOut BYTES. Outgoing message to initiate the PDU.)
+    @param(MsgOut Bytes. Outgoing message to initiate the PDU.)
     @param(PDUType LongInt. Kind of PDU to create.)
     }
     {$ENDIF}
-    procedure InitiatePDUHeader(var MsgOut:BYTES; PDUType:LongInt); virtual;
+    procedure InitiatePDUHeader(var MsgOut:Bytes; PDUType:LongInt); virtual;
 
     {$IFDEF PORTUGUES}
     {:
@@ -400,14 +400,14 @@ type
     {$ELSE}
     {:
     Creates a PDU structure from message.
-    @param(msg BYTES. Menssage to get the PDU structure.)
+    @param(msg Bytes. Menssage to get the PDU structure.)
     @param(MsgOutgoing Boolean. If @true the message will be sent to PLC, if not
            the message is comming from the PLC.)
     @param(PDU TPDU. The PDU structure extracted from message.)
     @returns(The error number of PDU, if exists.)
     }
     {$ENDIF}
-    function  SetupPDU(var msg:BYTES; MsgOutgoing:Boolean; out PDU:TPDU; out error:integer):Boolean; virtual;
+    function  SetupPDU(var msg:Bytes; MsgOutgoing:Boolean; out PDU:TPDU; out error:integer):Boolean; virtual;
 
     {$IFDEF PORTUGUES}
     {:
@@ -417,10 +417,10 @@ type
     {$ELSE}
     {:
     Prepares the message to do a memory read request from PLC.
-    @param(msgOut BYTES. Message to be sent to PLC requesting a memory read.)
+    @param(msgOut Bytes. Message to be sent to PLC requesting a memory read.)
     }
     {$ENDIF}
-    procedure PrepareReadRequest(var msgOut:BYTES); virtual;
+    procedure PrepareReadRequest(var msgOut:Bytes); virtual;
 
     {$IFDEF PORTUGUES}
     {:
@@ -430,10 +430,10 @@ type
     {$ELSE}
     {:
     Prepares the message to write data into the PLC memory.
-    @param(msgOut BYTES. Message to sent to write data into the PLC memory.)
+    @param(msgOut Bytes. Message to sent to write data into the PLC memory.)
     }
     {$ENDIF}
-    procedure PrepareWriteRequest(var msgOut:BYTES); virtual;
+    procedure PrepareWriteRequest(var msgOut:Bytes); virtual;
 
     {$IFDEF PORTUGUES}
     {:
@@ -445,10 +445,10 @@ type
     {:
     Prepares the message to read or write on PLC.
     @param(WriteRequest Boolean. If @true, the message will write something in PLC memory.)
-    @param(msgOut BYTES. Message to be prepared to request a read/write.)
+    @param(msgOut Bytes. Message to be prepared to request a read/write.)
     }
     {$ENDIF}
-    procedure PrepareReadOrWriteRequest(const WriteRequest:Boolean; var msgOut:BYTES); virtual;
+    procedure PrepareReadOrWriteRequest(const WriteRequest:Boolean; var msgOut:Bytes); virtual;
 
     {$IFDEF PORTUGUES}
     {:
@@ -479,7 +479,7 @@ type
     {$ELSE}
     {:
     Add into the outgoing message, informations about what must be read from PLC.
-    @param(msgOut BYTES. Message to be sent to PLC requesting a memory read.)
+    @param(msgOut Bytes. Message to be sent to PLC requesting a memory read.)
     @param(iArea LongInt. Wanted memory area.
            @seealso(vtS7_200_SysInfo)
            @seealso(vtS7_200_SM)
@@ -500,10 +500,10 @@ type
     )
     @param(iDBnum LongInt. If iArea is vtS7_DB, what's the DB number.)
     @param(iStart LongInt. Start address of memory.)
-    @param(iByteCount LongInt. How many bytes to read.)
+    @param(iByteCount LongInt. How many Bytes to read.)
     }
     {$ENDIF}
-    procedure AddToReadRequest(var msgOut:BYTES; iArea, iDBnum, iStart, iByteCount:LongInt); virtual;
+    procedure AddToReadRequest(var msgOut:Bytes; iArea, iDBnum, iStart, iByteCount:LongInt); virtual;
 
     {$IFDEF PORTUGUES}
     {:
@@ -534,7 +534,7 @@ type
     {$ELSE}
     {:
     Add into the outgoing message, informations about the data to be written on PLC.
-    @param(msgOut BYTES. Message to be sent to write data on PLC.)
+    @param(msgOut Bytes. Message to be sent to write data on PLC.)
     @param(iArea LongInt. Wanted memory area.
            @seealso(vtS7_200_SysInfo)
            @seealso(vtS7_200_SM)
@@ -555,10 +555,10 @@ type
     )
     @param(iDBnum LongInt. If iArea is vtS7_DB, what's the DB number.)
     @param(iStart LongInt. Start address of memory.)
-    @param(buffer BYTES. Data to be written on PLC.)
+    @param(buffer Bytes. Data to be written on PLC.)
     }
     {$ENDIF}
-    procedure AddParamToWriteRequest(var msgOut:BYTES; iArea, iDBnum, iStart:LongInt; buffer:BYTES); virtual;
+    procedure AddParamToWriteRequest(var msgOut:Bytes; iArea, iDBnum, iStart:LongInt; buffer:Bytes); virtual;
 
     {$IFDEF PORTUGUES}
     {:
@@ -589,7 +589,7 @@ type
     {$ELSE}
     {:
     Add into the outgoing message the data to be written on PLC.
-    @param(msgOut BYTES. Message to be sent to write data on PLC.)
+    @param(msgOut Bytes. Message to be sent to write data on PLC.)
     @param(iArea LongInt. Wanted memory area.
            @seealso(vtS7_200_SysInfo)
            @seealso(vtS7_200_SM)
@@ -610,10 +610,10 @@ type
     )
     @param(iDBnum LongInt. If iArea is vtS7_DB, what's the DB number.)
     @param(iStart LongInt. Start address of memory.)
-    @param(buffer BYTES. Data to be written on PLC.)
+    @param(buffer Bytes. Data to be written on PLC.)
     }
     {$ENDIF}
-    procedure AddDataToWriteRequest(var msgOut:BYTES; iArea, iDBnum, iStart:LongInt; buffer:BYTES); virtual;
+    procedure AddDataToWriteRequest(var msgOut:Bytes; iArea, iDBnum, iStart:LongInt; buffer:Bytes); virtual;
   protected
     {$IFDEF PORTUGUES}
     //: Coloca o CLP em RUN, se possível. Não funciona ainda.
@@ -651,14 +651,14 @@ type
     }
     {$ELSE}
     {:
-    Converts TArrayOfDouble to BYTES.
+    Converts TArrayOfDouble to Bytes.
     @param(Values TArrayOfDouble. Array to be converted.)
     @param(Start LongInt. First element of Values to be converted.)
     @param(Len LongInt. How many elements to convert from Start.)
-    @returns(Converted Array of BYTES.)
+    @returns(Converted Array of Bytes.)
     }
     {$ENDIF}
-    function  DoublesToBytes(const Values:TArrayOfDouble; Start, Len:LongInt):BYTES;
+    function  DoublesToBytes(const Values:TArrayOfDouble; Start, Len:LongInt):Bytes;
 
     {$IFDEF PORTUGUES}
     {:
@@ -670,14 +670,14 @@ type
     }
     {$ELSE}
     {:
-    Converts BYTES to TArrayOfDouble.
-    @param(ByteSeq BYTES. Array of byte to be converted to Double.)
+    Converts Bytes to TArrayOfDouble.
+    @param(ByteSeq Bytes. Array of byte to be converted to Double.)
     @param(Start LongInt. First element of ByteSeq to be converted.)
     @param(Len LongInt. How many elements to convert from Start.)
     @returns(Array of TArrayOfDouble.)
     }
     {$ENDIF}
-    function  BytesToDoubles(const ByteSeq:BYTES; Start, Len:LongInt):TArrayOfDouble;
+    function  BytesToDoubles(const ByteSeq:Bytes; Start, Len:LongInt):TArrayOfDouble;
 
     {$IFDEF PORTUGUES}
     {:
@@ -724,14 +724,14 @@ type
     {$ELSE}
     {:
     Updates the manager of non-continuous memory blocks.
-    @param(pkgin BYTES. Message received from PLC)
-    @param(pkgout BYTES. Message sent to PLC)
+    @param(pkgin Bytes. Message received from PLC)
+    @param(pkgout Bytes. Message sent to PLC)
     @param(writepkg Boolean. If @true, the packet sent will change the PLC memory.)
     @param(ReqList TS7ReqList. List of all requests sent.)
     @param(ResultValues TArrayOfDouble. Values of the last request.)
     }
     {$ENDIF}
-    procedure UpdateMemoryManager(pkgin, pkgout:BYTES; writepkg:Boolean; ReqList:TS7ReqList; var ResultValues:TArrayOfDouble);
+    procedure UpdateMemoryManager(pkgin, pkgout:Bytes; writepkg:Boolean; ReqList:TS7ReqList; var ResultValues:TArrayOfDouble);
     //: @seealso(TProtocolDriver.DoAddTag)
     procedure DoAddTag(TagObj:TTag; TagValid:Boolean); override;
     //: @seealso(TProtocolDriver.DoDelTag)
@@ -1077,7 +1077,7 @@ begin
   Result:=false;
 end;
 
-function TSiemensProtocolFamily.exchange(var CPU:TS7CPU; var msgOut:BYTES; var msgIn:BYTES; IsWrite:Boolean):Boolean;
+function TSiemensProtocolFamily.exchange(var CPU:TS7CPU; var msgOut:Bytes; var msgIn:Bytes; IsWrite:Boolean):Boolean;
 var
   pduo:TPDU;
   err:Integer;
@@ -1097,12 +1097,12 @@ begin
   Result := false;
 end;
 
-procedure TSiemensProtocolFamily.sendMessage(var msgOut:BYTES);
+procedure TSiemensProtocolFamily.sendMessage(var msgOut:Bytes);
 begin
 
 end;
 
-function  TSiemensProtocolFamily.getResponse(var msgIn:BYTES; var BytesRead:LongInt):TIOResult;
+function  TSiemensProtocolFamily.getResponse(var msgIn:Bytes; var BytesRead:LongInt):TIOResult;
 begin
   Result:=iorNone;
 end;
@@ -1116,14 +1116,14 @@ begin
   Result:=(bl*$100)+bh;
 end;
 
-procedure TSiemensProtocolFamily.PrepareToSend(var msg:BYTES);
+procedure TSiemensProtocolFamily.PrepareToSend(var msg:Bytes);
 begin
 
 end;
 
 function  TSiemensProtocolFamily.NegotiatePDUSize(var CPU:TS7CPU):Boolean;
 var
-  param, Msg, msgIn:BYTES;
+  param, Msg, msgIn:Bytes;
   pdu:TPDU;
   err:Integer;
   db:LongInt;
@@ -1131,7 +1131,7 @@ var
 begin
   Result := false;
   SetLength(param,8);
-  SetLength(msg, PDUOutgoing+10+8); //ISO = 25 bytes
+  SetLength(msg, PDUOutgoing+10+8); //ISO = 25 Bytes
   SetLength(msgIn, 0);
 
   param[0] := $F0;
@@ -1151,7 +1151,7 @@ begin
 
     if SetupPDU(msgIn, false, pdu, err) then begin
       CPU.MaxPDULen:=Min(ForcedPduSize, pdu.param[6]*256+pdu.param[7]);
-      CPU.MaxBlockSize:=CPU.MaxPDULen-18; //10 bytes of header + 2 bytes of error code + 2 bytes of read request + 4 bytes of informations about the request.
+      CPU.MaxBlockSize:=CPU.MaxPDULen-18; //10 Bytes of header + 2 Bytes of error code + 2 Bytes of read request + 4 Bytes of informations about the request.
       //ajusta o tamanho máximo dos blocos;
       //adjust the maximum block size.
       with CPU do begin
@@ -1176,7 +1176,7 @@ begin
   end;
 end;
 
-function TSiemensProtocolFamily.SetupPDU(var msg: BYTES; MsgOutgoing: Boolean;
+function TSiemensProtocolFamily.SetupPDU(var msg: Bytes; MsgOutgoing: Boolean;
   out PDU: TPDU; out error: integer): Boolean;
 var
   position:LongInt;
@@ -1226,19 +1226,19 @@ begin
   Result := true;
 end;
 
-procedure TSiemensProtocolFamily.PrepareReadRequest(var msgOut:BYTES);
+procedure TSiemensProtocolFamily.PrepareReadRequest(var msgOut:Bytes);
 begin
   PrepareReadOrWriteRequest(false, msgOut);
 end;
 
-procedure TSiemensProtocolFamily.PrepareWriteRequest(var msgOut:BYTES);
+procedure TSiemensProtocolFamily.PrepareWriteRequest(var msgOut:Bytes);
 begin
   PrepareReadOrWriteRequest(True, msgOut);
 end;
 
-procedure TSiemensProtocolFamily.PrepareReadOrWriteRequest(const WriteRequest:Boolean; var msgOut:BYTES);
+procedure TSiemensProtocolFamily.PrepareReadOrWriteRequest(const WriteRequest:Boolean; var msgOut:Bytes);
 var
-  param:BYTES;
+  param:Bytes;
 begin
   SetLength(param, 2);
 
@@ -1250,9 +1250,9 @@ begin
   SetLength(param,0);
 end;
 
-procedure TSiemensProtocolFamily.AddToReadRequest(var msgOut:BYTES; iArea, iDBnum, iStart, iByteCount:LongInt);
+procedure TSiemensProtocolFamily.AddToReadRequest(var msgOut:Bytes; iArea, iDBnum, iStart, iByteCount:LongInt);
 var
-  param:BYTES;
+  param:Bytes;
   p:PS7Req;
   PDU:TPDU;
   NumReq:Byte;
@@ -1312,9 +1312,9 @@ end;
 
 //executa somente uma escrita por vez!!!
 //executes only one write per request.
-procedure TSiemensProtocolFamily.AddParamToWriteRequest(var msgOut:BYTES; iArea, iDBnum, iStart:LongInt; buffer:BYTES);
+procedure TSiemensProtocolFamily.AddParamToWriteRequest(var msgOut:Bytes; iArea, iDBnum, iStart:LongInt; buffer:Bytes);
 var
-  param:BYTES;
+  param:Bytes;
   bufferLen:LongInt;
   p:PS7Req;
   PDU:TPDU;
@@ -1382,9 +1382,9 @@ begin
   SetLength(param, 0);
 end;
 
-procedure TSiemensProtocolFamily.AddDataToWriteRequest(var msgOut:BYTES; iArea, iDBnum, iStart:LongInt; buffer:BYTES);
+procedure TSiemensProtocolFamily.AddDataToWriteRequest(var msgOut:Bytes; iArea, iDBnum, iStart:LongInt; buffer:Bytes);
 var
-  da:BYTES;
+  da:Bytes;
   //extra:LongInt;
   bufferlen:LongInt;
   lastdatabyte:LongInt;
@@ -1408,7 +1408,7 @@ begin
   AddData(msgOut, da);
 end;
 
-procedure TSiemensProtocolFamily.AddParam(var MsgOut:BYTES; const param:BYTES);
+procedure TSiemensProtocolFamily.AddParam(var MsgOut:Bytes; const param:Bytes);
 var
   pdu:TPDU;
   paramlen, extra, newparamlen, err:LongInt;
@@ -1429,7 +1429,7 @@ begin
   PPDUHeader(pdu.header)^.param_len:=SwapBytesInWord(paramlen + Length(param));
 end;
 
-procedure TSiemensProtocolFamily.AddData(var MsgOut:BYTES; const data:BYTES);
+procedure TSiemensProtocolFamily.AddData(var MsgOut:Bytes; const data:Bytes);
 var
   pdu:TPDU;
   paramlen, datalen, extra, newdatalen, err:LongInt;
@@ -1452,7 +1452,7 @@ begin
   PPDUHeader(pdu.header)^.data_len:=SwapBytesInWord(datalen + Length(data));
 end;
 
-procedure TSiemensProtocolFamily.InitiatePDUHeader(var MsgOut:BYTES; PDUType:LongInt);
+procedure TSiemensProtocolFamily.InitiatePDUHeader(var MsgOut:Bytes; PDUType:LongInt);
 var
   pduh:PPDUHeader;
   extra:LongInt;
@@ -1489,7 +1489,7 @@ end;
 // FUNCTIONS OF DRIVER HANDLING.
 ////////////////////////////////////////////////////////////////////////////////
 
-function  TSiemensProtocolFamily.DoublesToBytes(const Values:TArrayOfDouble; Start, Len:LongInt):BYTES;
+function  TSiemensProtocolFamily.DoublesToBytes(const Values:TArrayOfDouble; Start, Len:LongInt):Bytes;
 var
   arraylen,
   c:LongInt;
@@ -1504,7 +1504,7 @@ begin
   end;
 end;
 
-function  TSiemensProtocolFamily.BytesToDoubles(const ByteSeq:BYTES; Start, Len:LongInt):TArrayOfDouble;
+function  TSiemensProtocolFamily.BytesToDoubles(const ByteSeq:Bytes; Start, Len:LongInt):TArrayOfDouble;
 var
   arraylen,
   c:LongInt;
@@ -1590,7 +1590,7 @@ begin
   end;
 end;
 
-procedure TSiemensProtocolFamily.UpdateMemoryManager(pkgin, pkgout:BYTES; writepkg:Boolean; ReqList:TS7ReqList; var ResultValues:TArrayOfDouble);
+procedure TSiemensProtocolFamily.UpdateMemoryManager(pkgin, pkgout:Bytes; writepkg:Boolean; ReqList:TS7ReqList; var ResultValues:TArrayOfDouble);
 var
   PDU:TPDU;
   NumResults,
@@ -1625,13 +1625,13 @@ begin
     if (writepkg or (ResultCode=$FF)) AND (DataLen>4) then begin
       ResultLen:=PDU.data[DataIdx+2]*$100 + PDU.data[DataIdx+3];
       //o tamanho está em bits, precisa de ajuste.
-      //if the size is in bits, adjust to bytes
+      //if the size is in bits, adjust to Bytes
       if PDU.data[DataIdx+1]=4 then
         ResultLen:=ResultLen div 8
       else begin
-        //3 o restultado já está em bytes
+        //3 o restultado já está em Bytes
         //e 9 o resultado está em bits, mas cada bit em um byte.
-        //if 3, the result already is in bytes
+        //if 3, the result already is in Bytes
         //if 9, the result is in bits, but each byte stores one bit
         if not (PDU.data[DataIdx+1] in [3,9]) then
           Exit;
@@ -1915,7 +1915,7 @@ procedure TSiemensProtocolFamily.DoScanRead(Sender:TObject; var NeedSleep:LongIn
 var
   plc, db, block, retries:LongInt;
   FMaxUpdtRate:Integer = 0;
-  msgout, msgin:BYTES;
+  msgout, msgin:Bytes;
   initialized:Boolean;
   ReqList:TS7ReqList;
   ReqOutOfScan:TS7ReqList;
@@ -1934,8 +1934,8 @@ var
   procedure pkg_initialized;
   begin
     if not initialized then begin
-      OutgoingPDUSize:=10+2; //10 of header + 2 bytes of read request;
-      IncomingPDUSize:=10+2+2; //10 of header + 2 bytes of the error code + 2 bytes of the read request;
+      OutgoingPDUSize:=10+2; //10 of header + 2 Bytes of read request;
+      IncomingPDUSize:=10+2+2; //10 of header + 2 Bytes of the error code + 2 Bytes of the read request;
       MsgOutSize:=PDUOutgoing+12;
       SetLength(msgout,MsgOutSize);
       PrepareReadRequest(msgout);
@@ -2028,7 +2028,7 @@ var
   var
     info:TS7ScanReqItem;
   begin
-    //new(info);
+    //New(info);
     info.iPLC          :=iPLC;
     info.iDB           :=iDB;
     info.iDBNum        :=iDBNum;
@@ -2365,7 +2365,7 @@ var
   foundplc,
   hasAtLeastOneSuccess:Boolean;
   PLCPtr:PS7CPU;
-  msgout, msgin, BytesBuffer:BYTES;
+  msgout, msgin, BytesBuffer:Bytes;
   incomingPDU:TPDU;
   ReqList:TS7ReqList;
   ivalues:TArrayOfDouble;
@@ -2526,7 +2526,7 @@ var
   foundplc,
   hasAtLeastOneSuccess:Boolean;
   PLCPtr:PS7CPU;
-  msgout, msgin:BYTES;
+  msgout, msgin:Bytes;
   incomingPDU:TPDU;
   ReqList:TS7ReqList;
   ivalues:TArrayOfDouble;
@@ -2605,7 +2605,7 @@ begin
     end;
   end;
 
-  MaxBytesToRecv:=PLCPtr^.MaxPDULen-18; //10 bytes of header, 2 bytes of error code, 2 bytes of read request, 4 bytes of result header.
+  MaxBytesToRecv:=PLCPtr^.MaxPDULen-18; //10 Bytes of header, 2 Bytes of error code, 2 Bytes of read request, 4 Bytes of result header.
   BytesReceived:=0;
   hasAtLeastOneSuccess:=false;
 
@@ -2617,7 +2617,7 @@ begin
     BytesToRecv:=Min(MaxBytesToRecv, tagrec.Size-BytesReceived);
 
     IncomingPacketSize:=PDUIncoming+18+BytesToRecv;
-    OutgoingPacketSize:=PDUOutgoing+24; //10 bytes of header, 2 bytes of read request, 12 bytes of read request header.
+    OutgoingPacketSize:=PDUOutgoing+24; //10 Bytes of header, 2 Bytes of read request, 12 Bytes of read request header.
 
     SetLength(msgout,OutgoingPacketSize);
     SetLength(msgin, IncomingPacketSize);
@@ -2674,7 +2674,7 @@ end;
 
 procedure TSiemensProtocolFamily.RunPLC(CPU:TS7CPU);
 var
-  paramToRun, msgout, msgin:BYTES;
+  paramToRun, msgout, msgin:Bytes;
 begin
   SetLength(paramToRun,20);
   SetLength(msgout, 0);
@@ -2806,7 +2806,7 @@ begin
   raise Exception.Create(SinvalidTag);
 end;
 
-procedure TSiemensProtocolFamily.SetBytes(Ptr:PByte; idx:LongInt; values:BYTES);
+procedure TSiemensProtocolFamily.SetBytes(Ptr:PByte; idx:LongInt; values:Bytes);
 var
   inptr:PByte;
 begin

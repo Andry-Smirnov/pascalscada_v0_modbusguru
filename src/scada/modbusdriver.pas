@@ -24,7 +24,10 @@ interface
 uses
   SysUtils, Classes, CommTypes, ProtocolDriver, ProtocolTypes, Tag, PLCTagNumber,
   PLCMemoryManager, PLCBlock, PLCString, fgl, modbus_tagscan_req
-  {$IFNDEF FPC}, Windows{$ENDIF};
+  {$IFNDEF FPC}
+  , Windows
+  {$ENDIF}
+  ;
 
 type
 
@@ -78,14 +81,14 @@ type
   }
   {$ENDIF}
   TModBusPLC = record
-    Station:LongInt;
-    Inputs:TPLCMemoryManager;
-    OutPuts:TPLCMemoryManager;
-    Registers:TPLCMemoryManager;
-    AnalogReg:TPLCMemoryManager;
-    Status07Value:Double;
-    Status07TimeStamp:TDateTime;
-    Status07LastError:TProtocolIOResult;
+    Station: Longint;
+    Inputs: TPLCMemoryManager;
+    OutPuts: TPLCMemoryManager;
+    Registers: TPLCMemoryManager;
+    AnalogReg: TPLCMemoryManager;
+    Status07Value: Double;
+    Status07TimeStamp: TDateTime;
+    Status07LastError: TProtocolIOResult;
   end;
 
   {$IFDEF PORTUGUES}
@@ -160,7 +163,7 @@ type
   {$ENDIF}
   TModBusDriver = class(TProtocolDriver)
   private
-    FMustReleaseResources:Boolean;
+    FMustReleaseResources: Boolean;
     PAnalogRegsMaxBlockSize: TAnalogBlockSize;
     PHoldingRegsMaxBlockSize: THoldingRegistersBlockSize;
     PInputBlockSize: TInputBlockSize;
@@ -171,56 +174,56 @@ type
     procedure SetOutputBlockSize(AValue: TOutputBlockSize);
 
   protected
-    PFirstRequestLen,
-    PFuncByteOffset,
-    PCRCLen:LongInt;
-    POutputMaxHole,
-    PInputMaxHole,
-    PRegistersMaxHole:Cardinal;
-    PInternalDelayBetweenCmds:Cardinal;
-    PModbusPLC:array of TModBusPLC;
-    function  AllowBroadCast:Boolean; virtual;
-    function  GetTagProperts(TagObj:TTag; var Station, Address, Size, RegType, ScanTime:LongInt):Boolean;
-    procedure SetOutputMaxHole(v:Cardinal);
-    procedure SetInputMaxHole(v:Cardinal);
-    procedure SetRegisterMaxHole(v:Cardinal);
-    procedure BuildTagRec(plc,func,startaddress,size:LongInt; out tr:TTagRec);
+    PFirstRequestLen: Longint;
+    PFuncByteOffset: Longint;
+    PCRCLen: Longint;
+    POutputMaxHole: Cardinal;
+    PInputMaxHole: Cardinal;
+    PRegistersMaxHole: Cardinal;
+    PInternalDelayBetweenCmds: Cardinal;
+    PModbusPLC: array of TModBusPLC;
+    function AllowBroadCast: Boolean; virtual;
+    function GetTagProperts(TagObj: TTag; var Station, Address, Size, RegType, ScanTime: Longint): Boolean;
+    procedure SetOutputMaxHole(AValue: Cardinal);
+    procedure SetInputMaxHole(AValue: Cardinal);
+    procedure SetRegisterMaxHole(AValue: Cardinal);
+    procedure BuildTagRec(PLC, Func, StartAddress, Size: Longint; out ATagRec: TTagRec);
 
     {$IFDEF PORTUGUES}
     //: Cria um pacote modbus
     {$ELSE}
     //: Encode a modbus packet.
     {$ENDIF}
-    function  EncodePkg(TagObj:TTagRec; ToWrite:TArrayOfDouble; var ResultLen:LongInt):BYTES; virtual;
+    function EncodePkg(TagObj: TTagRec; ToWrite: TArrayOfDouble; var ResultLen: Longint): Bytes; virtual;
 
     {$IFDEF PORTUGUES}
     //: Extrai os dados de um pacote modbus
     {$ELSE}
     //: Decodes a modbus packet.
     {$ENDIF}
-    function  DecodePkg(pkg:TIOPacket; out values:TArrayOfDouble):TProtocolIOResult; virtual;
+    function DecodePkg(pkg: TIOPacket; out values: TArrayOfDouble): TProtocolIOResult; virtual;
 
     {$IFDEF PORTUGUES}
     //: Retorna os bytes que restaram no buffer RX da porta de comunicação.
     {$ELSE}
-    //: Returns the remaing bytes on RX buffer of communication port.
+    //: Returns the remaing Bytes on RX buffer of communication port.
     {$ENDIF}
-    function RemainingBytes(buffer:BYTES):LongInt; virtual;
+    function RemainingBytes(buffer: Bytes): Longint; virtual;
 
     //: @seealso(TProtocolDriver.DoAddTag)
-    procedure DoAddTag(TagObj:TTag; TagValid:Boolean); override;
+    procedure DoAddTag(TagObj: TTag; TagValid: Boolean); override;
     //: @seealso(TProtocolDriver.DoDelTag)
-    procedure DoDelTag(TagObj:TTag); override;
+    procedure DoDelTag(TagObj: TTag); override;
 
     //: @seealso(TProtocolDriver.DoScanRead)
-    procedure DoScanRead(Sender:TObject; var NeedSleep:LongInt); override;
+    procedure DoScanRead(Sender: TObject; var NeedSleep: Longint); override;
     //: @seealso(TProtocolDriver.DoGetValue)
-    procedure DoGetValue(TagObj:TTagRec; var values:TScanReadRec); override;
+    procedure DoGetValue(TagObj: TTagRec; var Values: TScanReadRec); override;
 
     //: @seealso(TProtocolDriver.DoWrite)
-    function  DoWrite(const tagrec:TTagRec; const Values:TArrayOfDouble; Sync:Boolean):TProtocolIOResult; override;
+    function DoWrite(const ATagRec: TTagRec; const Values: TArrayOfDouble; Sync: Boolean): TProtocolIOResult; override;
     //: @seealso(TProtocolDriver.DoRead)
-    function  DoRead (const tagrec:TTagRec; out   Values:TArrayOfDouble; Sync:Boolean):TProtocolIOResult; override;
+    function DoRead(const ATagRec: TTagRec; out Values: TArrayOfDouble; Sync: Boolean): TProtocolIOResult; override;
 
     {$IFDEF PORTUGUES}
     {:
@@ -234,7 +237,7 @@ type
     @seealso(TPLCMemoryManager.MaxHole)
     }
     {$ENDIF}
-    property OutputMaxHole:Cardinal read POutputMaxHole write SetOutputMaxHole default 50;
+    property OutputMaxHole: Cardinal read POutputMaxHole write SetOutputMaxHole default 50;
 
     {$IFDEF PORTUGUES}
     {:
@@ -248,7 +251,7 @@ type
     @seealso(TPLCMemoryManager.MaxHole)
     }
     {$ENDIF}
-    property InputMaxHole:Cardinal read PInputMaxHole write SetInputMaxHole default 50;
+    property InputMaxHole: Cardinal read PInputMaxHole write SetInputMaxHole default 50;
 
     {$IFDEF PORTUGUES}
     {:
@@ -262,7 +265,7 @@ type
     @seealso(TPLCMemoryManager.MaxHole)
     }
     {$ENDIF}
-    property RegisterMaxHole:Cardinal read PRegistersMaxHole write SetRegisterMaxHole default 10;
+    property RegisterMaxHole: Cardinal read PRegistersMaxHole write SetRegisterMaxHole default 10;
 
     {$IFDEF PORTUGUES}
     {:
@@ -276,7 +279,7 @@ type
     @seealso(TPLCMemoryManager.MaxBlockItems)
     }
     {$ENDIF}
-    property InputsMaxBlockSize:TInputBlockSize read PInputBlockSize write SetInputBlockSize default 2000;
+    property InputsMaxBlockSize: TInputBlockSize read PInputBlockSize write SetInputBlockSize default 2000;
 
     {$IFDEF PORTUGUES}
     {:
@@ -290,7 +293,7 @@ type
     @seealso(TPLCMemoryManager.MaxBlockItems)
     }
     {$ENDIF}
-    property OutputsMaxBlockSize:TOutputBlockSize read POutputBlockSize write SetOutputBlockSize default 2000;
+    property OutputsMaxBlockSize: TOutputBlockSize read POutputBlockSize write SetOutputBlockSize default 2000;
 
     {$IFDEF PORTUGUES}
     {:
@@ -304,7 +307,7 @@ type
     @seealso(TPLCMemoryManager.MaxBlockItems)
     }
     {$ENDIF}
-    property AnalogRegsMaxBlockSize:TAnalogBlockSize read PAnalogRegsMaxBlockSize write SetAnalogRegsMaxBlockSize default 125;
+    property AnalogRegsMaxBlockSize: TAnalogBlockSize read PAnalogRegsMaxBlockSize write SetAnalogRegsMaxBlockSize default 125;
 
     {$IFDEF PORTUGUES}
     {:
@@ -318,282 +321,291 @@ type
     @seealso(TPLCMemoryManager.MaxBlockItems)
     }
     {$ENDIF}
-    property HoldingRegsMaxBlockSize:THoldingRegistersBlockSize read PHoldingRegsMaxBlockSize write SetHoldingRegsMaxBlockSize default 125;
+    property HoldingRegsMaxBlockSize: THoldingRegistersBlockSize read PHoldingRegsMaxBlockSize write SetHoldingRegsMaxBlockSize default 125;
   public
     //: @exclude
-    constructor Create(AOwner:TComponent); override;
+    constructor Create(AOwner: TComponent); override;
     //: @exclude
     destructor Destroy; override;
     //: @seealso(TProtocolDriver.SizeOfTag)
-    function  SizeOfTag(aTag:TTag; isWrite:Boolean; var ProtocolTagType:TProtocolTagType):BYTE; override;
+    function SizeOfTag(ATag: TTag; isWrite: Boolean; var ProtocolTagType: TProtocolTagType): Byte; override;
 
     //: @seealso(TProtocolDriver.OpenTagEditor)
-    procedure OpenTagEditor(InsertHook: TAddTagInEditorHook;
-      CreateProc: TCreateTagProc); override;
+    procedure OpenTagEditor(InsertHook: TAddTagInEditorHook; CreateProc: TCreateTagProc); override;
 
     //: @seealso(TProtocolDriver.HasTabBuilderEditor)
     function HasTabBuilderEditor: Boolean; override;
   end;
 
-  procedure SetTagBuilderToolForModBusProtocolFamily(TagBuilderTool:TOpenTagEditor);
+procedure SetTagBuilderToolForModBusProtocolFamily(TagBuilderTool: TOpenTagEditor);
+
 
 implementation
 
-uses crossdatetime, pascalScadaMTPCPU, math, dateutils;
+
+uses
+  crossdatetime, pascalScadaMTPCPU, Math, dateutils;
+
 
 function SortGenericTagList(const Item1, Item2: TReqItem): Integer;
 var
-  BitCombination:Integer;
-  ScanPercent1, ScanPercent2:Double;
+  BitCombination: Integer;
+  ScanPercent1: Double;
+  ScanPercent2: Double;
 begin
-
-  BitCombination:=ifthen(Item1.NeedUpdate,1,0)+ifthen(Item2.NeedUpdate,2,0);
+  BitCombination := ifthen(Item1.NeedUpdate, 1, 0) + ifthen(Item2.NeedUpdate, 2, 0);
   case BitCombination of
-    1:
-      Result:=-1;
-    2:
-      Result:= 1;
-    0,3: begin
-      ScanPercent1:=0;
-      if Item1.UpdateRate<>0 then ScanPercent1:=(MilliSecondsBetween(Now,Item1.LastUpdate)/Item1.UpdateRate);
+    1: Result := -1;
+    2: Result := 1;
+    0,
+    3:  begin
+          ScanPercent1 := 0;
+          if Item1.UpdateRate <> 0 then ScanPercent1 := (MilliSecondsBetween(Now, Item1.LastUpdate) / Item1.UpdateRate);
 
-      ScanPercent2:=0;
-      if Item2.UpdateRate<>0 then ScanPercent2:=(MilliSecondsBetween(Now,Item2.LastUpdate)/Item2.UpdateRate);
+          ScanPercent2 := 0;
+          if Item2.UpdateRate <> 0 then ScanPercent2 := (MilliSecondsBetween(Now, Item2.LastUpdate) / Item2.UpdateRate);
 
-
-      if ScanPercent1=ScanPercent2 then
-        Result:=0
-      else begin
-        if ScanPercent1>ScanPercent2 then
-          Result:=-1
-        else
-          Result:=1;
-      end;
-    end;
+          if ScanPercent1 = ScanPercent2 then
+            Result := 0
+          else if ScanPercent1 > ScanPercent2 then
+            Result := -1
+          else
+            Result := 1;
+        end;
   end;
 end;
 
-constructor TModBusDriver.Create(AOwner:TComponent);
+constructor TModBusDriver.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FProtocolReady:=false;
+  FProtocolReady := False;
   POutputMaxHole := 50;
   PInputMaxHole := 50;
   PRegistersMaxHole := 10;
-  PInputBlockSize:=2000;
-  POutputBlockSize:=2000;
-  PHoldingRegsMaxBlockSize:=125;
-  PAnalogRegsMaxBlockSize:=125;
-  PReadSomethingAlways := true;
-  PInternalDelayBetweenCmds:=5;
-  SetLength(PModbusPLC,0);
+  PInputBlockSize := 2000;
+  POutputBlockSize := 2000;
+  PHoldingRegsMaxBlockSize := 125;
+  PAnalogRegsMaxBlockSize := 125;
+  PReadSomethingAlways := True;
+  PInternalDelayBetweenCmds := 5;
+  SetLength(PModbusPLC, 0);
 end;
 
 destructor TModBusDriver.Destroy;
 var
-  plc:LongInt;
+  PLC: Longint;
 begin
   inherited Destroy;
-  for plc:=0 to High(PModbusPLC) do begin
-      PModbusPLC[plc].Inputs.Destroy;
-      PModbusPLC[plc].OutPuts.Destroy;
-      PModbusPLC[plc].Registers.Destroy;
-      PModbusPLC[plc].AnalogReg.Destroy;
+  for PLC := 0 to High(PModbusPLC) do
+  begin
+    PModbusPLC[PLC].Inputs.Destroy;
+    PModbusPLC[PLC].OutPuts.Destroy;
+    PModbusPLC[PLC].Registers.Destroy;
+    PModbusPLC[PLC].AnalogReg.Destroy;
   end;
-  SetLength(PModbusPLC,0);
+  SetLength(PModbusPLC, 0);
 end;
 
 procedure TModBusDriver.SetAnalogRegsMaxBlockSize(AValue: TAnalogBlockSize);
 var
-  plc: Integer;
+  PLC: Integer;
 begin
-  if PAnalogRegsMaxBlockSize=AValue then Exit;
-  PAnalogRegsMaxBlockSize:=AValue;
+  if PAnalogRegsMaxBlockSize = AValue then Exit;
+  PAnalogRegsMaxBlockSize := AValue;
 
-  for plc:=0 to High(PModbusPLC) do
-    PModbusPLC[plc].AnalogReg.MaxBlockItems := AValue;
+  for PLC := 0 to High(PModbusPLC) do
+    PModbusPLC[PLC].AnalogReg.MaxBlockItems := AValue;
 end;
 
-procedure TModBusDriver.SetHoldingRegsMaxBlockSize(
-  AValue: THoldingRegistersBlockSize);
+procedure TModBusDriver.SetHoldingRegsMaxBlockSize(AValue: THoldingRegistersBlockSize);
 var
-  plc: Integer;
+  PLC: Integer;
 begin
-  if PHoldingRegsMaxBlockSize=AValue then Exit;
-  PHoldingRegsMaxBlockSize:=AValue;
+  if PHoldingRegsMaxBlockSize = AValue then Exit;
+  PHoldingRegsMaxBlockSize := AValue;
 
-  for plc:=0 to High(PModbusPLC) do
-    PModbusPLC[plc].Registers.MaxBlockItems := AValue;
+  for PLC := 0 to High(PModbusPLC) do
+    PModbusPLC[PLC].Registers.MaxBlockItems := AValue;
 end;
 
 procedure TModBusDriver.SetInputBlockSize(AValue: TInputBlockSize);
 var
-  plc: Integer;
+  PLC: Integer;
 begin
-  if PInputBlockSize=AValue then Exit;
-  PInputBlockSize:=AValue;
+  if PInputBlockSize = AValue then Exit;
+  PInputBlockSize := AValue;
 
-  for plc:=0 to High(PModbusPLC) do
-    PModbusPLC[plc].Inputs.MaxBlockItems := AValue;
+  for PLC := 0 to High(PModbusPLC) do
+    PModbusPLC[PLC].Inputs.MaxBlockItems := AValue;
 end;
 
 procedure TModBusDriver.SetOutputBlockSize(AValue: TOutputBlockSize);
 var
-  plc: Integer;
+  PLC: Integer;
 begin
-  if POutputBlockSize=AValue then Exit;
-  POutputBlockSize:=AValue;
+  if POutputBlockSize = AValue then Exit;
+  POutputBlockSize := AValue;
 
-  for plc:=0 to High(PModbusPLC) do
-    PModbusPLC[plc].OutPuts.MaxBlockItems := AValue;
+  for PLC := 0 to High(PModbusPLC) do
+    PModbusPLC[PLC].OutPuts.MaxBlockItems := AValue;
 end;
 
 function TModBusDriver.AllowBroadCast: Boolean;
 begin
-  Result:=false;
+  Result := False;
 end;
 
-function TModBusDriver.GetTagProperts(TagObj:TTag; var Station, Address, Size, RegType, ScanTime:LongInt):Boolean;
+function TModBusDriver.GetTagProperts(TagObj: TTag; var Station, Address, Size, RegType, ScanTime: Longint): Boolean;
 var
-  found:Boolean;
+  Found: Boolean;
 begin
-  found := false;
-  Result := false;
+  Found := False;
+  Result := False;
   //PLCTagNumber
-  if (not found) and (TagObj is TPLCTagNumber) then begin
-    found := true;
+  if (not Found) and (TagObj is TPLCTagNumber) then
+  begin
+    Found := True;
     Station := TPLCTagNumber(TagObj).PLCStation;
     Address := TPLCTagNumber(TagObj).MemAddress;
-    Size    := TPLCTagNumber(TagObj).TagSizeOnProtocol;
+    Size := TPLCTagNumber(TagObj).TagSizeOnProtocol;
     RegType := TPLCTagNumber(TagObj).MemReadFunction;
-    ScanTime:= TPLCTagNumber(TagObj).RefreshTime;
-    Result  := found;
+    ScanTime := TPLCTagNumber(TagObj).RefreshTime;
+    Result := Found;
   end;
 
   //TPLCBlock and TPLCStruct
-  if (not found) and (TagObj is TPLCBlock) then begin
-    found   := true;
+  if (not Found) and (TagObj is TPLCBlock) then
+  begin
+    Found := True;
     Station := TPLCBlock(TagObj).PLCStation;
     Address := TPLCBlock(TagObj).MemAddress;
-    Size    := TPLCBlock(TagObj).TagSizeOnProtocol;
+    Size := TPLCBlock(TagObj).TagSizeOnProtocol;
     RegType := TPLCBlock(TagObj).MemReadFunction;
-    ScanTime:= TPLCBlock(TagObj).RefreshTime;
-    Result  := found;
+    ScanTime := TPLCBlock(TagObj).RefreshTime;
+    Result := Found;
   end;
 
   //TPLCString
-  if (not found) and (TagObj is TPLCString) then begin
-    found   := true;
+  if (not Found) and (TagObj is TPLCString) then
+  begin
+    Found := True;
     Station := TPLCString(TagObj).PLCStation;
     Address := TPLCString(TagObj).MemAddress;
-    Size    := TPLCString(TagObj).Size;
+    Size := TPLCString(TagObj).Size;
     RegType := TPLCString(TagObj).MemReadFunction;
-    ScanTime:= TPLCString(TagObj).RefreshTime;
-    Result  := found;
+    ScanTime := TPLCString(TagObj).RefreshTime;
+    Result := Found;
   end;
 end;
 
-procedure TModBusDriver.DoAddTag(TagObj:TTag; TagValid:Boolean);
+procedure TModBusDriver.DoAddTag(TagObj: TTag; TagValid: Boolean);
 var
-  station, mem, size, memtype, scantime:LongInt;
-  found, valido:boolean;
-  plc:LongInt;
+  Station: Longint;
+  Mem: Longint;
+  Size: Longint;
+  MemType: Longint;
+  ScanTime: Longint;
+  Found: Boolean;
+  AValue: Boolean;
+  PLC: Longint;
 begin
   //Recupera as informações do tag;
   //retrieve informations of the tag.
-  station:=0;
-  mem:=0;
-  size:=0;
-  memtype:=0;
-  scantime:=0;
-  valido:=false;
+  Station := 0;
+  Mem := 0;
+  Size := 0;
+  MemType := 0;
+  ScanTime := 0;
+  AValue := False;
 
-  found := GetTagProperts(TagObj,station,mem,size,memtype,scantime);
+  Found := GetTagProperts(TagObj, Station, Mem, Size, MemType, ScanTime);
 
-  if found then
-    //se o endereco do plc esta numa faixa válida procura nos blocos de memória.
+  if Found then
+    //se o endereco do PLC esta numa faixa válida procura nos blocos de Memória.
     //check if the address of the slave is valid.
-    if station in [1..255] then begin
-      found := false;
-      for plc:=0 to High(PModbusPLC) do
-        if PModbusPLC[plc].Station = station then begin
-          found := true;
-          break;
+    if Station in [1..255] then
+    begin
+      Found := False;
+      for PLC := 0 to High(PModbusPLC) do
+        if PModbusPLC[PLC].Station = Station then
+        begin
+          Found := True;
+          Break;
         end;
-      //se nao encontrou o plc, adiciona!
-      //if not found the slave, add it.
-      if not found then begin
-        plc:=length(PModbusPLC);
-        SetLength(PModbusPLC,plc+1);
-        PModbusPLC[plc].Station := station;
-        PModbusPLC[plc].Inputs := TPLCMemoryManager.Create();
-        PModbusPLC[plc].Inputs.MaxBlockItems := PInputBlockSize;
-        PModbusPLC[plc].Inputs.MaxHole := PInputMaxHole;
-        PModbusPLC[plc].OutPuts := TPLCMemoryManager.Create();
-        PModbusPLC[plc].OutPuts.MaxBlockItems := POutputBlockSize;
-        PModbusPLC[plc].OutPuts.MaxHole := POutputMaxHole;
-        PModbusPLC[plc].Registers := TPLCMemoryManager.Create();
-        PModbusPLC[plc].Registers.MaxBlockItems := PHoldingRegsMaxBlockSize;
-        PModbusPLC[plc].Registers.MaxHole := PRegistersMaxHole;
-        PModbusPLC[plc].AnalogReg := TPLCMemoryManager.Create();
-        PModbusPLC[plc].AnalogReg.MaxBlockItems := PAnalogRegsMaxBlockSize;
-        PModbusPLC[plc].AnalogReg.MaxHole := PRegistersMaxHole;
+      //se nao encontrou o PLC, adiciona!
+      //if not Found the slave, add it.
+      if not Found then
+      begin
+        PLC := length(PModbusPLC);
+        SetLength(PModbusPLC, PLC + 1);
+        PModbusPLC[PLC].Station := Station;
+        PModbusPLC[PLC].Inputs := TPLCMemoryManager.Create();
+        PModbusPLC[PLC].Inputs.MaxBlockItems := PInputBlockSize;
+        PModbusPLC[PLC].Inputs.MaxHole := PInputMaxHole;
+        PModbusPLC[PLC].OutPuts := TPLCMemoryManager.Create();
+        PModbusPLC[PLC].OutPuts.MaxBlockItems := POutputBlockSize;
+        PModbusPLC[PLC].OutPuts.MaxHole := POutputMaxHole;
+        PModbusPLC[PLC].Registers := TPLCMemoryManager.Create();
+        PModbusPLC[PLC].Registers.MaxBlockItems := PHoldingRegsMaxBlockSize;
+        PModbusPLC[PLC].Registers.MaxHole := PRegistersMaxHole;
+        PModbusPLC[PLC].AnalogReg := TPLCMemoryManager.Create();
+        PModbusPLC[PLC].AnalogReg.MaxBlockItems := PAnalogRegsMaxBlockSize;
+        PModbusPLC[PLC].AnalogReg.MaxHole := PRegistersMaxHole;
       end;
 
-      valido := (memtype in [1..4]);
+      AValue := (MemType in [1..4]);
 
-      case memtype of
-        1:
-          PModbusPLC[plc].OutPuts.AddAddress(mem,size,1,scantime);
-        2:
-          PModbusPLC[plc].Inputs.AddAddress(mem,size,1,scantime);
-        3:
-          PModbusPLC[plc].Registers.AddAddress(mem,size,1,scantime);
-        4:
-          PModbusPLC[plc].AnalogReg.AddAddress(mem,size,1,scantime);
+      case MemType of
+        1: PModbusPLC[PLC].OutPuts.AddAddress(Mem, Size, 1, ScanTime);
+        2: PModbusPLC[PLC].Inputs.AddAddress(Mem, Size, 1, ScanTime);
+        3: PModbusPLC[PLC].Registers.AddAddress(Mem, Size, 1, ScanTime);
+        4: PModbusPLC[PLC].AnalogReg.AddAddress(Mem, Size, 1, ScanTime);
       end;
     end;
-  inherited DoAddTag(TagObj, valido);
+  inherited DoAddTag(TagObj, AValue);
 end;
 
-procedure TModBusDriver.DoDelTag(TagObj:TTag);
+procedure TModBusDriver.DoDelTag(TagObj: TTag);
 var
-  station, mem, size, memtype, scantime:LongInt;
-  found:boolean;
-  plc:LongInt;
+  Station: Longint;
+  Mem: Longint;
+  Size: Longint;
+  MemType: Longint;
+  ScanTime: Longint;
+  Found: Boolean;
+  PLC: Longint;
 begin
   //Recupera as informações do tag;
   //retrieve informations about the tag.
-  station:=0;
-  mem:=0;
-  size:=0;
-  memtype:=0;
-  scantime:=0;
-  found := GetTagProperts(TagObj,station,mem,size,memtype,scantime);
+  Station := 0;
+  Mem := 0;
+  Size := 0;
+  MemType := 0;
+  ScanTime := 0;
+  Found := GetTagProperts(TagObj, Station, Mem, Size, MemType, ScanTime);
 
-  if found then
-    //se o endereco do plc esta numa faixa válida procura nos blocos de memória.
+  if Found then
+    //se o endereco do PLC esta numa faixa válida procura nos blocos de Memória.
     //check if the slave address is valid.
-    if station in [1..255] then begin
-      found := false;
-      for plc:=0 to High(PModbusPLC) do
-        if PModbusPLC[plc].Station = station then begin
-          found := true;
-          break;
+    if Station in [1..255] then
+    begin
+      Found := False;
+      for PLC := 0 to High(PModbusPLC) do
+        if PModbusPLC[PLC].Station = Station then
+        begin
+          Found := True;
+          Break;
         end;
 
-      //se encontrou o plc remove a memoria que estou lendo dele.
-      //if found the slave, removes the tag.
-      if found then begin
-        case memtype of
-          1:
-            PModbusPLC[plc].OutPuts.RemoveAddress(mem,size,1);
-          2:
-            PModbusPLC[plc].Inputs.RemoveAddress(mem,size,1);
-          3:
-            PModbusPLC[plc].Registers.RemoveAddress(mem,size,1);
-          4:
-            PModbusPLC[plc].AnalogReg.RemoveAddress(mem,size,1);
+      //se encontrou o PLC remove a memoria que estou lendo dele.
+      //if Found the slave, removes the tag.
+      if Found then
+      begin
+        case MemType of
+          1: PModbusPLC[PLC].OutPuts.RemoveAddress(Mem, Size, 1);
+          2: PModbusPLC[PLC].Inputs.RemoveAddress(Mem, Size, 1);
+          3: PModbusPLC[PLC].Registers.RemoveAddress(Mem, Size, 1);
+          4: PModbusPLC[PLC].AnalogReg.RemoveAddress(Mem, Size, 1);
         end;
       end;
     end;
@@ -602,395 +614,443 @@ end;
 
 
 
-function  TModBusDriver.SizeOfTag(aTag:TTag; isWrite:Boolean; var ProtocolTagType:TProtocolTagType):BYTE;
+function TModBusDriver.SizeOfTag(ATag: TTag; isWrite: Boolean; var ProtocolTagType: TProtocolTagType): Byte;
 var
-  FunctionCode:Cardinal;
+  FunctionCode: Cardinal;
 begin
   FunctionCode := 0;
-  if (aTag is TPLCTagNumber) then begin
+  if (ATag is TPLCTagNumber) then
+  begin
     if (isWrite) then
-      FunctionCode := TPLCTagNumber(aTag).MemWriteFunction
+      FunctionCode := TPLCTagNumber(ATag).MemWriteFunction
     else
-      FunctionCode := TPLCTagNumber(aTag).MemReadFunction;
+      FunctionCode := TPLCTagNumber(ATag).MemReadFunction;
   end;
 
   //TPLCBlock and TPLCStruct
-  if (aTag is TPLCBlock) then begin
+  if (ATag is TPLCBlock) then
+  begin
     if (isWrite) then
-      FunctionCode := TPLCBlock(aTag).MemWriteFunction
+      FunctionCode := TPLCBlock(ATag).MemWriteFunction
     else
-      FunctionCode := TPLCBlock(aTag).MemReadFunction;
+      FunctionCode := TPLCBlock(ATag).MemReadFunction;
   end;
 
   //TPLCString
-  if (aTag is TPLCString) then begin
+  if (ATag is TPLCString) then
+  begin
     if (isWrite) then
-      FunctionCode := TPLCString(aTag).MemWriteFunction
+      FunctionCode := TPLCString(ATag).MemWriteFunction
     else
-      FunctionCode := TPLCString(aTag).MemReadFunction;
+      FunctionCode := TPLCString(ATag).MemReadFunction;
   end;
-
 
   //retorna o tamanho em bits dos registradores lidos/escritos por
   //cada tipo de função de leitura/escrita
-  //
-  //return the size in bits of the atag
+
+  //return the size in bits of the ATag
   case FunctionCode of
-    $01,$02,$05,$0F: begin
-      Result := 1;
-      ProtocolTagType:=ptBit;
-    end;
-    $03,$04,$06,$10: begin
-      Result := 16;
-      ProtocolTagType:=ptWord;
-    end;
-    $11: begin
-      Result := 8;
-      ProtocolTagType:=ptByte;
-    end
-    else begin
-      Result := 16;
-      ProtocolTagType:=ptWord;
-    end
+    $01,
+    $02,
+    $05,
+    $0F:  begin
+            Result := 1;
+            ProtocolTagType := ptBit;
+          end;
+    $03,
+    $04,
+    $06,
+    $10:  begin
+            Result := 16;
+            ProtocolTagType := ptWord;
+          end;
+    $11:  begin
+            Result := 8;
+            ProtocolTagType := ptByte;
+          end
+    else
+      begin
+        Result := 16;
+        ProtocolTagType := ptWord;
+      end
   end;
 end;
 
-function  TModBusDriver.EncodePkg(TagObj:TTagRec; ToWrite:TArrayOfDouble; var ResultLen:LongInt):BYTES;
+function TModBusDriver.EncodePkg(TagObj: TTagRec; ToWrite: TArrayOfDouble; var ResultLen: Longint): Bytes;
 begin
-  Result:=nil;
+  Result := nil;
 end;
 
-function TModBusDriver.DecodePkg(pkg:TIOPacket; out values:TArrayOfDouble):TProtocolIOResult;
+function TModBusDriver.DecodePkg(pkg: TIOPacket; out values: TArrayOfDouble): TProtocolIOResult;
 begin
-  Result:=ioDriverError
+  Result := ioDriverError;
 end;
 
-function  TModBusDriver.RemainingBytes(buffer:BYTES):LongInt;
+function TModBusDriver.RemainingBytes(buffer: Bytes): Longint;
 begin
-  Result:=0;
+  Result := 0;
 end;
 
-procedure TModBusDriver.DoScanRead(Sender:TObject; var NeedSleep:LongInt);
+procedure TModBusDriver.DoScanRead(Sender: TObject; var NeedSleep: Longint);
 var
-  plc,block:LongInt;
-  tr:TTagRec;
-  values:TArrayOfDouble;
-  EntireTagList:TReqList;
-  c: Integer;
+  PLC: Longint;
+  Block: Longint;
+  ATagRec: TTagRec;
+  Values: TArrayOfDouble;
+  EntireTagList: TReqList;
+  i: Integer;
 
-  procedure AddToTagList(station,func,startaddress,size, UpdateRate:LongInt; LastUpdate:TDateTime; NeedUpdate:Boolean);
+  procedure AddToTagList(Station, Func, StartAddress, Size, UpdateRate: Longint; LastUpdate: TDateTime; NeedUpdate: Boolean);
   var
-    info:TReqItem;
+    Info: TReqItem;
   begin
-    info.station      :=station;
-    info.func         :=func;
-    info.startaddress :=startaddress;
-    info.size         :=size;
-    info.LastUpdate   :=LastUpdate;
-    info.UpdateRate   :=UpdateRate;
-    info.NeedUpdate   :=NeedUpdate;
-    info.Read         :=false;
+    Info.Station := Station;
+    Info.func := Func;
+    Info.startaddress := StartAddress;
+    Info.Size := Size;
+    Info.LastUpdate := LastUpdate;
+    Info.UpdateRate := UpdateRate;
+    Info.NeedUpdate := NeedUpdate;
+    Info.Read := False;
 
-    EntireTagList.add(info);
+    EntireTagList.add(Info);
   end;
+
 begin
   try
-    if ([csDestroying]*ComponentState<>[]) then begin
+    if ([csDestroying] * ComponentState <> []) then
+    begin
       CrossThreadSwitch;
       Exit;
     end;
 
     //avoid high cpu consumption with linked tags and not Assigned communcation port
-    if (not Assigned(PCommPort)) or (PCommPort.ReallyActive=false) then begin
-      NeedSleep:=1;
+    if (not Assigned(PCommPort)) or (PCommPort.ReallyActive = False) then
+    begin
+      NeedSleep := 1;
       Exit;
     end;
 
-    EntireTagList:=TReqList.Create;
+    EntireTagList := TReqList.Create;
 
-    for plc:= 0 to High(PModbusPLC) do begin
-      for block := 0 to High(PModBusPLC[plc].Outputs.Blocks) do begin
-        AddToTagList(PModBusPLC[plc].Station,1,PModBusPLC[plc].Outputs.Blocks[block].AddressStart,PModBusPLC[plc].Outputs.Blocks[block].Size, PModBusPLC[plc].Outputs.Blocks[block].ScanTime, PModBusPLC[plc].Outputs.Blocks[block].LastUpdate,PModBusPLC[plc].Outputs.Blocks[block].NeedRefresh);
+    for PLC := 0 to High(PModbusPLC) do
+    begin
+      for Block := 0 to High(PModbusPLC[PLC].OutPuts.Blocks) do
+      begin
+        AddToTagList(PModbusPLC[PLC].Station, 1, PModbusPLC[PLC].OutPuts.Blocks[Block].AddressStart, PModbusPLC[PLC].OutPuts.Blocks[Block].Size, PModbusPLC[PLC].OutPuts.Blocks[Block].ScanTime, PModbusPLC[PLC].OutPuts.Blocks[Block].LastUpdate, PModbusPLC[PLC].OutPuts.Blocks[Block].NeedRefresh);
       end;
 
-      for block := 0 to High(PModBusPLC[plc].Inputs.Blocks) do begin
-        AddToTagList(PModBusPLC[plc].Station,2,PModBusPLC[plc].Inputs.Blocks[block].AddressStart,PModBusPLC[plc].Inputs.Blocks[block].Size,PModBusPLC[plc].Inputs.Blocks[block].ScanTime,PModBusPLC[plc].Inputs.Blocks[block].LastUpdate,PModBusPLC[plc].Inputs.Blocks[block].NeedRefresh);
+      for Block := 0 to High(PModbusPLC[PLC].Inputs.Blocks) do
+      begin
+        AddToTagList(PModbusPLC[PLC].Station, 2, PModbusPLC[PLC].Inputs.Blocks[Block].AddressStart, PModbusPLC[PLC].Inputs.Blocks[Block].Size, PModbusPLC[PLC].Inputs.Blocks[Block].ScanTime, PModbusPLC[PLC].Inputs.Blocks[Block].LastUpdate, PModbusPLC[PLC].Inputs.Blocks[Block].NeedRefresh);
       end;
 
-      for block := 0 to High(PModBusPLC[plc].Registers.Blocks) do begin
-        AddToTagList(PModBusPLC[plc].Station,3,PModBusPLC[plc].Registers.Blocks[block].AddressStart,PModBusPLC[plc].Registers.Blocks[block].Size,PModBusPLC[plc].Registers.Blocks[block].ScanTime,PModBusPLC[plc].Registers.Blocks[block].LastUpdate,PModBusPLC[plc].Registers.Blocks[block].NeedRefresh);
+      for Block := 0 to High(PModbusPLC[PLC].Registers.Blocks) do
+      begin
+        AddToTagList(PModbusPLC[PLC].Station, 3, PModbusPLC[PLC].Registers.Blocks[Block].AddressStart, PModbusPLC[PLC].Registers.Blocks[Block].Size, PModbusPLC[PLC].Registers.Blocks[Block].ScanTime, PModbusPLC[PLC].Registers.Blocks[Block].LastUpdate, PModbusPLC[PLC].Registers.Blocks[Block].NeedRefresh);
       end;
 
-      for block := 0 to High(PModBusPLC[plc].AnalogReg.Blocks) do begin
-        AddToTagList(PModBusPLC[plc].Station,4,PModBusPLC[plc].AnalogReg.Blocks[block].AddressStart,PModBusPLC[plc].AnalogReg.Blocks[block].Size,PModBusPLC[plc].AnalogReg.Blocks[block].ScanTime,PModBusPLC[plc].AnalogReg.Blocks[block].LastUpdate,PModBusPLC[plc].AnalogReg.Blocks[block].NeedRefresh);
+      for Block := 0 to High(PModbusPLC[PLC].AnalogReg.Blocks) do
+      begin
+        AddToTagList(PModbusPLC[PLC].Station, 4, PModbusPLC[PLC].AnalogReg.Blocks[Block].AddressStart, PModbusPLC[PLC].AnalogReg.Blocks[Block].Size, PModbusPLC[PLC].AnalogReg.Blocks[Block].ScanTime, PModbusPLC[PLC].AnalogReg.Blocks[Block].LastUpdate, PModbusPLC[PLC].AnalogReg.Blocks[Block].NeedRefresh);
       end;
     end;
 
     EntireTagList.Sort(@SortGenericTagList);
 
     //faz a leitura do bloco que mais precisa ser lido
-    //
+
     //update the tag 
-    if (EntireTagList.Count>0) and (EntireTagList.Items[0].NeedUpdate or PReadSomethingAlways) then begin
+    if (EntireTagList.Count > 0) and (EntireTagList.Items[0].NeedUpdate or PReadSomethingAlways) then
+    begin
       //compila o bloco do mais necessitado;
       //build the tagrec record.
-      BuildTagRec(EntireTagList.Items[0].station,
-                  EntireTagList.Items[0].func,
-                  EntireTagList.Items[0].startaddress,
-                  EntireTagList.Items[0].size, tr);
-      FMustReleaseResources:=true;
-      DoRead(tr,values,false);
-      FMustReleaseResources:=false;
-    end else
+      BuildTagRec(EntireTagList.Items[0].Station,
+        EntireTagList.Items[0].func,
+        EntireTagList.Items[0].startaddress,
+        EntireTagList.Items[0].Size, ATagRec);
+      FMustReleaseResources := True;
+      DoRead(ATagRec, Values, False);
+      FMustReleaseResources := False;
+    end
+    else
       NeedSleep := 1;
 
-    for c:=EntireTagList.Count-1 downto 0 do begin
-      EntireTagList.Delete(c);
+    for i := EntireTagList.Count - 1 downto 0 do
+    begin
+      EntireTagList.Delete(i);
     end;
     FreeAndNil(EntireTagList);
   finally
-    FProtocolReady:=true;
-    SetLength(values,0);
+    FProtocolReady := True;
+    SetLength(Values, 0);
   end;
 end;
 
-procedure TModBusDriver.DoGetValue(TagObj:TTagRec; var values:TScanReadRec);
+procedure TModBusDriver.DoGetValue(TagObj: TTagRec; var Values: TScanReadRec);
 var
-  plc,c:LongInt;
-  found:Boolean;
+  PLC: Longint;
+  i: Longint;
+  Found: Boolean;
 begin
-  if Length(values.Values)<TagObj.Size then
-    SetLength(values.Values,TagObj.Size);
+  if length(Values.values) < TagObj.Size then
+    SetLength(Values.values, TagObj.Size);
 
-  for c:=0 to Length(values.Values)-1 do
-    values.Values[c] := 0;
+  for i := 0 to length(Values.values) - 1 do
+    Values.values[i] := 0;
 
-  found := false;
-  for plc:=0 to High(PModbusPLC) do
-    if PModbusPLC[plc].Station = TagObj.Station then begin
-      found := true;
-      break;
+  Found := False;
+  for PLC := 0 to High(PModbusPLC) do
+    if PModbusPLC[PLC].Station = TagObj.Station then
+    begin
+      Found := True;
+      Break;
     end;
 
-  if not found then begin
-    values.ValuesTimestamp := CrossNow;
-    values.ReadsOK := 0;
-    values.ReadFaults := 1;
-    values.LastQueryResult := ioDriverError;
-    SetLength(values.Values,0);
+  if not Found then
+  begin
+    Values.ValuesTimestamp := CrossNow;
+    Values.ReadsOK := 0;
+    Values.ReadFaults := 1;
+    Values.LastQueryResult := ioDriverError;
+    SetLength(Values.values, 0);
     Exit;
   end;
 
   case TagObj.ReadFunction of
-    $01:
-      PModbusPLC[plc].OutPuts.GetValues(TagObj.Address,TagObj.Size,1,values.Values, values.LastQueryResult, values.ValuesTimestamp);
-    $02:
-      PModbusPLC[plc].Inputs.GetValues(TagObj.Address,TagObj.Size,1,values.Values, values.LastQueryResult, values.ValuesTimestamp);
-    $03,$11:
-      PModbusPLC[plc].Registers.GetValues(TagObj.Address,TagObj.Size,1,values.Values, values.LastQueryResult, values.ValuesTimestamp);
-    $04:
-      PModbusPLC[plc].AnalogReg.GetValues(TagObj.Address,TagObj.Size,1,values.Values, values.LastQueryResult, values.ValuesTimestamp);
+    $01: PModbusPLC[PLC].OutPuts.GetValues(TagObj.Address, TagObj.Size, 1, Values.values, Values.LastQueryResult, Values.ValuesTimestamp);
+    $02: PModbusPLC[PLC].Inputs.GetValues(TagObj.Address, TagObj.Size, 1, Values.values, Values.LastQueryResult, Values.ValuesTimestamp);
+    $03,
+    $11: PModbusPLC[PLC].Registers.GetValues(TagObj.Address, TagObj.Size, 1, Values.values, Values.LastQueryResult, Values.ValuesTimestamp);
+    $04: PModbusPLC[PLC].AnalogReg.GetValues(TagObj.Address, TagObj.Size, 1, Values.values, Values.LastQueryResult, Values.ValuesTimestamp);
   end;
 
-  if values.LastQueryResult=ioOk then begin
-    values.ReadsOK := 1;
-    values.ReadFaults := 0;
-  end else begin
-    values.ReadsOK := 0;
-    values.ReadFaults := 1;
+  if Values.LastQueryResult = ioOk then
+  begin
+    Values.ReadsOK := 1;
+    Values.ReadFaults := 0;
+  end
+  else
+  begin
+    Values.ReadsOK := 0;
+    Values.ReadFaults := 1;
   end;
 end;
 
-function  TModBusDriver.DoWrite(const tagrec:TTagRec; const Values:TArrayOfDouble; Sync:Boolean):TProtocolIOResult;
+function TModBusDriver.DoWrite(const ATagRec: TTagRec; const Values: TArrayOfDouble; Sync: Boolean): TProtocolIOResult;
 var
-  IOResult1, IOResult2:TIOPacket;
-  pkg:BYTES;
-  FRemainingBytes:LongInt;
-  rl:LongInt;
-  res:LongInt;
-  tempValues:TArrayOfDouble;
+  IOResult1: TIOPacket;
+  IOResult2: TIOPacket;
+  Pkg: Bytes;
+  FRemainingBytes: Longint;
+  rl: Longint;
+  Res: Longint;
+  TempValues: TArrayOfDouble;
 begin
   try
-    pkg := EncodePkg(tagrec,values,rl);
-    if (PCommPort<>nil) and PCommPort.ReallyActive  then begin
+    Pkg := EncodePkg(ATagRec, Values, rl);
+    if (PCommPort <> nil) and PCommPort.ReallyActive then
+    begin
       PCommPort.Lock(DriverID);
       try
-        if AllowBroadCast and (tagrec.Station=0) then begin
-          res := PCommPort.IOCommandSync(iocWrite,Length(pkg),pkg,0,DriverID,0,@IOResult1);
+        if AllowBroadCast and (ATagRec.Station = 0) then
+        begin
+          Res := PCommPort.IOCommandSync(iocWrite, length(Pkg), Pkg, 0, DriverID, 0, @IOResult1);
           case IOResult1.WriteIOResult of
-            iorOK:        Result:=ioOk;
-            iorTimeOut:   Result:=ioTimeOut;
-            iorNotReady:  Result:=ioDriverError;
-            iorNone:      Result:=ioNone;
-            iorPortError: Result:=ioDriverError;
+            iorOK: Result := ioOk;
+            iorTimeOut: Result := ioTimeOut;
+            iorNotReady: Result := ioDriverError;
+            iorNone: Result := ioNone;
+            iorPortError: Result := ioDriverError;
           end;
           Exit;
-        end else
-          res := PCommPort.IOCommandSync(iocWriteRead,Length(pkg),pkg,PFirstRequestLen,DriverID,PInternalDelayBetweenCmds,@IOResult1);
+        end
+        else
+          Res := PCommPort.IOCommandSync(iocWriteRead, length(Pkg), Pkg, PFirstRequestLen, DriverID, PInternalDelayBetweenCmds, @IOResult1);
 
         //se o resultado de leitura deu ok, le o resto do pacote.
         //if the IO result is OK, reads the remaing packet...
-        if (res<>0) and (IOResult1.ReadIOResult=iorOK) then begin
+        if (Res <> 0) and (IOResult1.ReadIOResult = iorOK) then
+        begin
 
-          //retorna o numero de bytes que está aguardando ser lido no buffer da porta de comunicação.
+          //retorna o numero de Bytes que está aguardando ser lido no buffer da porta de comunicação.
           //calculates the remaining package length at the communication buffer.
-          FRemainingBytes:=RemainingBytes(IOResult1.BufferToRead);
+          FRemainingBytes := RemainingBytes(IOResult1.BufferToRead);
 
           //clear the remaining buffer...
-          if (IOResult1.BufferToRead[PFuncByteOffset-1]<>pkg[PFuncByteOffset-1]) or
-             ((IOResult1.BufferToRead[PFuncByteOffset]<>pkg[PFuncByteOffset]) and
-              (not (IOResult1.BufferToRead[PFuncByteOffset] in [$81..$88])))then begin
-             repeat
-               res := PCommPort.IOCommandSync(iocRead,0,nil,1,DriverID,0,@IOResult2);
-             until IOResult2.ReadIOResult=iorTimeOut;
-             Result:=ioCommError;
-             Exit;
+          if (IOResult1.BufferToRead[PFuncByteOffset - 1] <> Pkg[PFuncByteOffset - 1]) or
+            ((IOResult1.BufferToRead[PFuncByteOffset] <> Pkg[PFuncByteOffset]) and
+            (not (IOResult1.BufferToRead[PFuncByteOffset] in [$81..$88]))) then
+          begin
+            repeat
+              Res := PCommPort.IOCommandSync(iocRead, 0, nil, 1, DriverID, 0, @IOResult2);
+            until IOResult2.ReadIOResult = iorTimeOut;
+            Result := ioCommError;
+            Exit;
           end;
 
-          if FRemainingBytes>0 then begin
-            res := PCommPort.IOCommandSync(iocRead,0,nil,FRemainingBytes,DriverID,0,@IOResult2);
+          if FRemainingBytes > 0 then
+          begin
+            Res := PCommPort.IOCommandSync(iocRead, 0, nil, FRemainingBytes, DriverID, 0, @IOResult2);
 
-            if res<>0 then begin
-              IOResult1.BufferToRead:=ConcatenateBYTES(IOResult1.BufferToRead, IOResult2.BufferToRead);
-              IOResult1.Received:=IOResult1.Received + IOResult2.Received;
-              if IOResult2.ReadIOResult<>iorOK then
-                IOResult1.ReadIOResult:=IOResult2.ReadIOResult;
-            end else
-              Result:=ioDriverError;
+            if Res <> 0 then
+            begin
+              IOResult1.BufferToRead := ConcatenateBYTES(IOResult1.BufferToRead, IOResult2.BufferToRead);
+              IOResult1.Received := IOResult1.Received + IOResult2.Received;
+              if IOResult2.ReadIOResult <> iorOK then
+                IOResult1.ReadIOResult := IOResult2.ReadIOResult;
+            end
+            else
+              Result := ioDriverError;
           end;
-          Result := DecodePkg(IOResult1,tempValues);
-        end else
-          Result:=ioEmptyPacket;
+          Result := DecodePkg(IOResult1, TempValues);
+        end
+        else
+          Result := ioEmptyPacket;
       finally
         PCommPort.Unlock(DriverID);
       end;
-    end else
+    end
+    else
       Result := ioNullDriver;
   finally
-    SetLength(pkg,0);
-    SetLength(tempValues,0);
-    SetLength(IOResult1.BufferToRead,0);
-    SetLength(IOResult1.BufferToWrite,0);
-    SetLength(IOResult2.BufferToRead,0);
-    SetLength(IOResult2.BufferToWrite,0);
+    SetLength(Pkg, 0);
+    SetLength(TempValues, 0);
+    SetLength(IOResult1.BufferToRead, 0);
+    SetLength(IOResult1.BufferToWrite, 0);
+    SetLength(IOResult2.BufferToRead, 0);
+    SetLength(IOResult2.BufferToWrite, 0);
   end;
 end;
 
-function  TModBusDriver.DoRead (const tagrec:TTagRec; out   Values:TArrayOfDouble; Sync:Boolean):TProtocolIOResult;
+function TModBusDriver.DoRead(const ATagRec: TTagRec; out Values: TArrayOfDouble; Sync: Boolean): TProtocolIOResult;
 var
-  IOResult1, IOResult2:TIOPacket;
-  FRemainingBytes:LongInt;
-  pkg:BYTES;
-  rl:LongInt;
-  res:LongInt;
-  starts, ends:TNotifyEvent;
+  IOResult1: TIOPacket;
+  IOResult2: TIOPacket;
+  FRemainingBytes: Longint;
+  Pkg: Bytes;
+  rl: Longint;
+  Res: Longint;
+  Starts: TNotifyEvent;
+  Ends: TNotifyEvent;
 begin
   try
-    if FMustReleaseResources then begin
-      starts:=@HighLatencyOperationWillBegin;
-      ends  :=@HighLatencyOperationWasEnded;
-    end else begin
-      starts:=nil;
-      ends  :=nil;
+    if FMustReleaseResources then
+    begin
+      Starts := @HighLatencyOperationWillBegin;
+      Ends := @HighLatencyOperationWasEnded;
+    end
+    else
+    begin
+      Starts := nil;
+      Ends := nil;
     end;
 
-    pkg := EncodePkg(tagrec,nil,rl);
-    if (PCommPort<>nil) and PCommPort.ReallyActive then begin
+    Pkg := EncodePkg(ATagRec, nil, rl);
+    if (PCommPort <> nil) and PCommPort.ReallyActive then
+    begin
       PCommPort.Lock(DriverID);
-      res := PCommPort.IOCommandSync(iocWriteRead,Length(pkg),pkg,PFirstRequestLen,DriverID,PInternalDelayBetweenCmds,@IOResult1,starts,ends);
+      Res := PCommPort.IOCommandSync(iocWriteRead, length(Pkg), Pkg, PFirstRequestLen, DriverID, PInternalDelayBetweenCmds, @IOResult1, Starts, Ends);
 
       //se o resultado de leitura deu ok, le o resto do pacote.
       //if the IO result is OK, reads the remaing packet...
-      if (res<>0) and (IOResult1.ReadIOResult=iorOK) then begin
-
-        //retorna o numero de bytes que está aguardando ser lido no buffer da porta de comunicação.
+      if (Res <> 0) and (IOResult1.ReadIOResult = iorOK) then
+      begin
+        //retorna o numero de Bytes que está aguardando ser lido no buffer da porta de comunicação.
         //calculates the remaining package length at the communication buffer.
-        FRemainingBytes:=RemainingBytes(IOResult1.BufferToRead);
+        FRemainingBytes := RemainingBytes(IOResult1.BufferToRead);
 
         //clear the remaining buffer...
-        if (IOResult1.BufferToRead[PFuncByteOffset-1]<>pkg[PFuncByteOffset-1]) or
-           ((IOResult1.BufferToRead[PFuncByteOffset]<>pkg[PFuncByteOffset]) and
-            (not (IOResult1.BufferToRead[PFuncByteOffset] in [$81..$88])))then begin
-           repeat
-             res := PCommPort.IOCommandSync(iocRead,0,nil,1,DriverID,0,@IOResult2,starts,ends);
-           until IOResult2.ReadIOResult=iorTimeOut;
-           Result:=ioCommError;
-           Exit;
+        if (IOResult1.BufferToRead[PFuncByteOffset - 1] <> Pkg[PFuncByteOffset - 1]) or
+          ((IOResult1.BufferToRead[PFuncByteOffset] <> Pkg[PFuncByteOffset]) and
+          (not (IOResult1.BufferToRead[PFuncByteOffset] in [$81..$88]))) then
+        begin
+          repeat
+            Res := PCommPort.IOCommandSync(iocRead, 0, nil, 1, DriverID, 0, @IOResult2, Starts, Ends);
+          until IOResult2.ReadIOResult = iorTimeOut;
+          Result := ioCommError;
+          Exit;
         end;
 
-        if FRemainingBytes>0 then begin
-          res := PCommPort.IOCommandSync(iocRead,0,nil,FRemainingBytes,DriverID,0,@IOResult2,starts,ends);
+        if FRemainingBytes > 0 then
+        begin
+          Res := PCommPort.IOCommandSync(iocRead, 0, nil, FRemainingBytes, DriverID, 0, @IOResult2, Starts, Ends);
 
-          if res<>0 then begin
-            IOResult1.BufferToRead:=ConcatenateBYTES(IOResult1.BufferToRead, IOResult2.BufferToRead);
-            IOResult1.Received:=IOResult1.Received + IOResult2.Received;
-            if IOResult2.ReadIOResult<>iorOK then
-              IOResult1.ReadIOResult:=IOResult2.ReadIOResult;
-          end else
-            Result:=ioDriverError;
+          if Res <> 0 then
+          begin
+            IOResult1.BufferToRead := ConcatenateBYTES(IOResult1.BufferToRead, IOResult2.BufferToRead);
+            IOResult1.Received := IOResult1.Received + IOResult2.Received;
+            if IOResult2.ReadIOResult <> iorOK then
+              IOResult1.ReadIOResult := IOResult2.ReadIOResult;
+          end
+          else
+            Result := ioDriverError;
         end;
-        Result := DecodePkg(IOResult1,values);
-      end else begin
-        Result:=DecodePkg(IOResult1, Values);
+        Result := DecodePkg(IOResult1, Values);
+      end
+      else
+      begin
+        Result := DecodePkg(IOResult1, Values);
         //Result:=ioEmptyPacket;
       end;
 
       PCommPort.Unlock(DriverID);
-    end else
+    end
+    else
       Result := ioNullDriver;
   finally
-    SetLength(pkg,0);
-    SetLength(IOResult1.BufferToRead,0);
-    SetLength(IOResult1.BufferToWrite,0);
-    SetLength(IOResult2.BufferToRead,0);
-    SetLength(IOResult2.BufferToWrite,0);
+    SetLength(Pkg, 0);
+    SetLength(IOResult1.BufferToRead, 0);
+    SetLength(IOResult1.BufferToWrite, 0);
+    SetLength(IOResult2.BufferToRead, 0);
+    SetLength(IOResult2.BufferToWrite, 0);
   end;
 end;
 
-procedure TModBusDriver.SetOutputMaxHole(v:Cardinal);
+procedure TModBusDriver.SetOutputMaxHole(AValue: Cardinal);
 var
-  plc:LongInt;
+  PLC: Longint;
 begin
-  if v = POutputMaxHole then Exit;
+  if AValue = POutputMaxHole then Exit;
 
-  POutputMaxHole:=v;
+  POutputMaxHole := AValue;
 
-  for plc:=0 to High(PModbusPLC) do
-    PModbusPLC[plc].OutPuts.MaxHole := v;
+  for PLC := 0 to High(PModbusPLC) do
+    PModbusPLC[PLC].OutPuts.MaxHole := AValue;
 end;
 
-procedure TModBusDriver.SetInputMaxHole(v:Cardinal);
+procedure TModBusDriver.SetInputMaxHole(AValue: Cardinal);
 var
-  plc:LongInt;
+  PLC: Longint;
 begin
-  if v = PInputMaxHole then Exit;
+  if AValue = PInputMaxHole then Exit;
 
-  PInputMaxHole:=v;
+  PInputMaxHole := AValue;
 
-  for plc:=0 to High(PModbusPLC) do
-    PModbusPLC[plc].Inputs.MaxHole := v;
+  for PLC := 0 to High(PModbusPLC) do
+    PModbusPLC[PLC].Inputs.MaxHole := AValue;
 end;
 
-procedure TModBusDriver.SetRegisterMaxHole(v:Cardinal);
+procedure TModBusDriver.SetRegisterMaxHole(AValue: Cardinal);
 var
-  plc:LongInt;
+  PLC: Longint;
 begin
-  if v = PRegistersMaxHole then Exit;
+  if AValue = PRegistersMaxHole then Exit;
 
-  PRegistersMaxHole:=v;
+  PRegistersMaxHole := AValue;
 
-  for plc:=0 to High(PModbusPLC) do
-    PModbusPLC[plc].Registers.MaxHole := v;
+  for PLC := 0 to High(PModbusPLC) do
+    PModbusPLC[PLC].Registers.MaxHole := AValue;
 end;
 
-procedure TModBusDriver.BuildTagRec(plc, func, startaddress, size: LongInt; out
-  tr: TTagRec);
+procedure TModBusDriver.BuildTagRec(PLC, Func, StartAddress, Size: Longint; out ATagRec: TTagRec);
 begin
-  with tr do begin
-    Station := plc;
-    Rack:=0;
-    Address := startaddress;
-    ReadFunction := func;
+  with ATagRec do
+  begin
+    Station := PLC;
+    Rack := 0;
+    Address := StartAddress;
+    ReadFunction := Func;
     OffSet := 0;
     Slot := 0;
     File_DB := 0;
@@ -999,32 +1059,33 @@ begin
     Retries := 0;
     UpdateTime := 0;
   end;
-  tr.Size := size;
+  ATagRec.Size := Size;
 end;
 
-var
-  ModbusTagBuilderEditor:TOpenTagEditor = nil;
 
-procedure TModBusDriver.OpenTagEditor(InsertHook: TAddTagInEditorHook;
-  CreateProc: TCreateTagProc);
+var
+  ModbusTagBuilderEditor: TOpenTagEditor = nil;
+
+
+procedure TModBusDriver.OpenTagEditor(InsertHook: TAddTagInEditorHook; CreateProc: TCreateTagProc);
 begin
   if Assigned(ModbusTagBuilderEditor) then
-    ModbusTagBuilderEditor(Self,Self.Owner,InsertHook,CreateProc)
+    ModbusTagBuilderEditor(Self, Self.Owner, InsertHook, CreateProc)
   else
     inherited;
 end;
 
 function TModBusDriver.HasTabBuilderEditor: Boolean;
 begin
-  Result:=true
+  Result := True;
 end;
 
-procedure SetTagBuilderToolForModBusProtocolFamily(TagBuilderTool:TOpenTagEditor);
+procedure SetTagBuilderToolForModBusProtocolFamily(TagBuilderTool: TOpenTagEditor);
 begin
   if Assigned(ModbusTagBuilderEditor) then
     raise Exception.Create('A Tag Builder editor for Modbus RTU/TCP protocol family was already Assigned.')
   else
-    ModbusTagBuilderEditor:=TagBuilderTool;
+    ModbusTagBuilderEditor := TagBuilderTool;
 end;
 
 end.

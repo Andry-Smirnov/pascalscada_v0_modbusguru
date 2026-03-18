@@ -4,7 +4,8 @@ unit hmifaceplatedsgn;
 
 interface
 
-uses ProjectIntf, PropEdits;
+uses
+  ProjectIntf, PropEdits;
 
 type
 
@@ -18,9 +19,12 @@ type
     function GetLocalizedDescription: string; override;
   end;
 
+
 implementation
 
-uses hmifaceplatecontainer;
+
+uses
+  hmifaceplatecontainer;
 
   { TFaceplateFrame }
 

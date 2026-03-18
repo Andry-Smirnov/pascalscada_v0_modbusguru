@@ -13,6 +13,7 @@ type
   private
     FOnChange: TNotifyEvent;
     FPoint: TPoint;
+
     function GetX: Integer;
     function GetY: Integer;
     procedure SetX(AValue: Integer);
@@ -40,6 +41,7 @@ type
     FInputPoint: TPointPersistent;
     FOutputFlowPolyline: THMIFlowPolyline;
     FOutputPoint: TPointPersistent;
+
     procedure UpdateInOutLines; virtual;
     procedure ChangeBounds(ALeft, ATop, AWidth, AHeight: Integer; KeepBase: Boolean); override;
     procedure SetInputFlowPolyline(AValue: THMIFlowPolyline);
@@ -54,7 +56,9 @@ type
     property OutputFlowPolyline: THMIFlowPolyline read FOutputFlowPolyline write SetOutputFlowPolyline;
   end;
 
+
 implementation
+
 
 { TPointPersistent }
 
@@ -95,13 +99,14 @@ end;
 
 procedure TPointPersistent.Assign(Source: TPersistent);
 var
-  sourceAsTPP: TPointPersistent absolute Source;
+  SourceAsTPP: TPointPersistent absolute Source;
 begin
   if Source is TPointPersistent then
   begin
-    if (sourceAsTPP.FPoint.X <> FPoint.X) or (sourceAsTPP.FPoint.Y <> FPoint.Y) then
+    if (SourceAsTPP.FPoint.X <> FPoint.X)
+      or (SourceAsTPP.FPoint.Y <> FPoint.Y) then
     begin
-      FPoint := sourceAsTPP.FPoint;
+      FPoint := SourceAsTPP.FPoint;
       DoOnChange;
     end;
   end;
@@ -141,18 +146,24 @@ end;
 
 procedure THMIFlowImage.SetInputFlowPolyline(AValue: THMIFlowPolyline);
 begin
-  if FInputFlowPolyline = AValue then Exit;
-  if Assigned(FInputFlowPolyline) then FInputFlowPolyline.RemoveFreeNotification(Self);
-  if Assigned(AValue) then AValue.FreeNotification(Self);
+  if FInputFlowPolyline = AValue then
+    Exit;
+  if Assigned(FInputFlowPolyline) then
+    FInputFlowPolyline.RemoveFreeNotification(Self);
+  if Assigned(AValue) then
+    AValue.FreeNotification(Self);
   FInputFlowPolyline := AValue;
   UpdateInOutLines;
 end;
 
 procedure THMIFlowImage.SetOutputFlowPolyline(AValue: THMIFlowPolyline);
 begin
-  if FOutputFlowPolyline = AValue then Exit;
-  if Assigned(FOutputFlowPolyline) then FOutputFlowPolyline.RemoveFreeNotification(Self);
-  if Assigned(AValue) then AValue.FreeNotification(Self);
+  if FOutputFlowPolyline = AValue then
+    Exit;
+  if Assigned(FOutputFlowPolyline) then
+    FOutputFlowPolyline.RemoveFreeNotification(Self);
+  if Assigned(AValue) then
+    AValue.FreeNotification(Self);
   FOutputFlowPolyline := AValue;
   UpdateInOutLines;
 end;

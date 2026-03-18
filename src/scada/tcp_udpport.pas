@@ -738,7 +738,7 @@ end;
 
 procedure TTCP_UDPPort.CloseMySocket(var closed:Boolean);
 var
-  buffer:BYTES;
+  buffer:Bytes;
   lidos:LongInt;
   ASocket: Tsocket;
 begin

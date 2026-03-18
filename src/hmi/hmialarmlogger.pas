@@ -50,8 +50,8 @@ type
     function Add: TAlarmItem;
   end;
 
-  TIncomingAlarm = procedure(Sender: TObject; aTimeStamp: TDateTime; AlarmMsgItem: TAlarmItem; AlarmIntID: Int64; AlarmGUID: TGuid; var AlarmIncommingSQL: UTF8String) of object;
-  TOutgoingAlarm = procedure(Sender: TObject; aTimeStamp: TDateTime; AlamrIntID: Int64; AlarmGUID: TGuid; var OutgoingAlarmSQL: UTF8String) of object;
+  TIncomingAlarm = procedure(Sender: TObject; ATimeStamp: TDateTime; AlarmMsgItem: TAlarmItem; AlarmIntID: Int64; AlarmGUID: TGuid; var AlarmIncommingSQL: UTF8String) of object;
+  TOutgoingAlarm = procedure(Sender: TObject; ATimeStamp: TDateTime; AlamrIntID: Int64; AlarmGUID: TGuid; var OutgoingAlarmSQL: UTF8String) of object;
   TFinishAllPendingAlarms = procedure(Sender: TObject; var FinishAllPendingAlarmsSQL: UTF8String) of object;
   TGenerateNewAlarmID = function(var AlarmIntID: Int64; var AlarmGUID: TGuid): Boolean of object;
 
@@ -97,9 +97,12 @@ type
     property OnRefreshActiveAlarms: TNotifyEvent read FOnRefreshActiveAlarms write FOnRefreshActiveAlarms;
   end;
 
+
 implementation
 
-uses Math;
+
+uses
+  Math;
 
 
   { TAlarmItem }
@@ -135,13 +138,13 @@ begin
 
   if Collection.Owner is THMIAlarmLogger then
   begin
-    if assigned(FPLCTag) then
+    if Assigned(FPLCTag) then
     begin
       FPLCTag.RemoveAllHandlersFromObject(Collection.Owner as THMIAlarmLogger);
       (Collection.Owner as THMIAlarmLogger).RemoveFreeNotification(FPLCTag);
     end;
 
-    if assigned(AValue) and (((Collection as THMIBasicColletion).GetComponentState * [csReading, csLoading]) = []) then
+    if Assigned(AValue) and (((Collection as THMIBasicColletion).GetComponentState * [csReading, csLoading]) = []) then
     begin
       AValue.AddTagChangeHandler(@THMIAlarmLogger(Collection.Owner).TagFromListChanged);
       (Collection.Owner as THMIAlarmLogger).FreeNotification(AValue);
@@ -159,7 +162,7 @@ end;
 
 function TAlarmItem.AlarmActive: Boolean;
 begin
-  Exit((not IsEqualGUID(FLastAlarmGUID, GUID_NULL)) or (FLastAlarmIntID <> 0) or assigned(FLastAlarmPointerID));
+  Exit((not IsEqualGUID(FLastAlarmGUID, GUID_NULL)) or (FLastAlarmIntID <> 0) or Assigned(FLastAlarmPointerID));
 end;
 
 { TAlarmMessagesCollection }
@@ -173,7 +176,7 @@ end;
 
 procedure THMIAlarmLogger.SetAlarmMessages(AValue: TAlarmMessagesCollection);
 begin
-  if assigned(FAlarmMessages) then
+  if Assigned(FAlarmMessages) then
     FAlarmMessages.Assign(AValue);
 end;
 
@@ -182,7 +185,7 @@ var
   SQL: UTF8String;
 begin
   DoFinishAllPendingAlarms(Self, SQL);
-  if assigned(FAsyncDBConnection) and FAsyncDBConnection.Connected and (UTF8Length(UTF8Trim(SQL)) > 0) then
+  if Assigned(FAsyncDBConnection) and FAsyncDBConnection.Connected and (UTF8Length(UTF8Trim(SQL)) > 0) then
     FAsyncDBConnection.ExecSQL(SQL, nil, False);
 
 end;
@@ -199,7 +202,7 @@ end;
 
 procedure THMIAlarmLogger.RefreshActiveAlarmTablesDelayed;
 begin
-  if assigned(FOnRefreshActiveAlarms) then
+  if Assigned(FOnRefreshActiveAlarms) then
   try
     FOnRefreshActiveAlarms(Self);
   except
@@ -210,12 +213,12 @@ procedure THMIAlarmLogger.SetAsyncDBConnection(AValue: THMIDBConnection);
 begin
   if FAsyncDBConnection = AValue then Exit;
 
-  if assigned(FAsyncDBConnection) then
+  if Assigned(FAsyncDBConnection) then
   begin
     FAsyncDBConnection.RemoveFreeNotification(Self);
   end;
 
-  if assigned(AValue) then
+  if Assigned(AValue) then
     AValue.FreeNotification(Self);
 
   FAsyncDBConnection := AValue;
@@ -223,74 +226,85 @@ end;
 
 procedure THMIAlarmLogger.TagFromListChanged(Sender: TObject);
 var
-  c, i: Integer;
-  auxItem: TAlarmItem;
-  NewIntID, bit, Value, NewAlarmIntID: Int64;
+  i: Integer;
+  j: Integer;
+  AuxItem: TAlarmItem;
+  NewIntID: Int64;
+  Bit: Int64;
+  Value: Int64;
+  NewAlarmIntID: Int64;
   TagValue: Double;
-  NewGUID, NewAlarmeGUID: TGuid;
+  NewGUID: TGuid;
+  NewAlarmeGUID: TGuid;
   SQL: UTF8String;
-  sqlcmds: THMIDBConnectionStatementList;
+  SQLCmds: THMIDBConnectionStatementList;
   EventTimestamp: TDateTime;
   AlarmActive: Boolean;
 begin
   if ([csReading, csLoading] * ComponentState) <> [] then Exit;
   EventTimestamp := Now;
-  if assigned(FAlarmMessages) then
+  if Assigned(FAlarmMessages) then
   begin
-    for c := 0 to FAlarmMessages.Count - 1 do
+    for i := 0 to FAlarmMessages.Count - 1 do
     begin
-      auxItem := TAlarmItem(FAlarmMessages.Items[c]);
-      if assigned(auxItem.PLCTag) and (auxItem.PLCTag = Sender) then
+      AuxItem := TAlarmItem(FAlarmMessages.Items[i]);
+      if Assigned(AuxItem.PLCTag) and (AuxItem.PLCTag = Sender) then
       begin
-        TagValue := (auxItem.PLCTag as ITagNumeric).GetValue;
+        TagValue := (AuxItem.PLCTag as ITagNumeric).GetValue;
         try
-          if auxItem.LastValueInitialized and (TagValue = auxItem.LastTagValue) then
+          if AuxItem.LastValueInitialized and (TagValue = AuxItem.LastTagValue) then
             Exit;
 
-          if auxItem.ZoneType = ztBit then
+          if AuxItem.ZoneType = ztBit then
           begin
-            bit := Trunc(auxItem.Value1);
-            bit := Trunc(Power(2, bit));
+            Bit := Trunc(AuxItem.Value1);
+            Bit := Trunc(Power(2, Bit));
           end;
           Value := Trunc(TagValue);
 
-
-          AlarmActive := ((auxItem.ZoneType = ztEqual) and (TagValue = auxItem.Value1)) or
-            ((auxItem.ZoneType = ztRange) and (((TagValue > auxItem.Value1) or (auxItem.IncludeValue1 and (TagValue >= auxItem.Value1))) and ((TagValue < auxItem.Value2) or (auxItem.IncludeValue2 and (TagValue <= auxItem.Value2))))) or
-            ((auxItem.ZoneType = ztBit) and (((Value and bit) = bit) = auxItem.IncludeValue1)) or
-            ((auxItem.ZoneType = ztNotEqual) and (TagValue <> auxItem.Value1)) or
-            ((auxItem.ZoneType = ztOutOfRange) and (((TagValue < auxItem.Value1) or (auxItem.IncludeValue1 and (TagValue <= auxItem.Value1))) or ((TagValue > auxItem.Value2) or (auxItem.IncludeValue2 and (TagValue >= auxItem.Value2))))) or
-            ((auxItem.ZoneType = ztGreaterThan) and ((TagValue > auxItem.Value1) or (auxItem.IncludeValue1 and (TagValue >= auxItem.Value1)))) or
-            ((auxItem.ZoneType = ztLessThan) and ((TagValue < auxItem.Value1) or (auxItem.IncludeValue1 and (TagValue <= auxItem.Value1))));
+          AlarmActive := ((AuxItem.ZoneType = ztEqual) and (TagValue = AuxItem.Value1))
+            or ((AuxItem.ZoneType = ztRange) and (((TagValue > AuxItem.Value1) or (AuxItem.IncludeValue1 and (TagValue >= AuxItem.Value1)))
+              and ((TagValue < AuxItem.Value2) or (AuxItem.IncludeValue2 and (TagValue <= AuxItem.Value2)))))
+            or ((AuxItem.ZoneType = ztBit) and (((Value and Bit) = Bit) = AuxItem.IncludeValue1))
+            or ((AuxItem.ZoneType = ztNotEqual) and (TagValue <> AuxItem.Value1))
+            or ((AuxItem.ZoneType = ztOutOfRange) and (((TagValue < AuxItem.Value1) or (AuxItem.IncludeValue1 and (TagValue <= AuxItem.Value1)))
+              or ((TagValue > AuxItem.Value2) or (AuxItem.IncludeValue2 and (TagValue >= AuxItem.Value2)))))
+            or ((AuxItem.ZoneType = ztGreaterThan) and ((TagValue > AuxItem.Value1) or (AuxItem.IncludeValue1 and (TagValue >= AuxItem.Value1))))
+            or ((AuxItem.ZoneType = ztLessThan) and ((TagValue < AuxItem.Value1) or (AuxItem.IncludeValue1 and (TagValue <= AuxItem.Value1))));
 
           if AlarmActive then
           begin
             //alarme ativo e nao tenho ID do alarme, registra o alarme.
-            if IsEqualGUID(auxItem.LastAlarmGUID, GUID_NULL) and (auxItem.LastAlarmIntID = 0) and (auxItem.LastAlarmPointerID = nil) and GenerateNewAlarmID(NewAlarmIntID, NewAlarmeGUID) then
+            if IsEqualGUID(AuxItem.LastAlarmGUID, GUID_NULL)
+              and (AuxItem.LastAlarmIntID = 0)
+              and (AuxItem.LastAlarmPointerID = nil)
+              and GenerateNewAlarmID(NewAlarmIntID, NewAlarmeGUID) then
             begin
-              DoIncomingAlarm(auxItem.PLCTag, EventTimestamp, auxItem, NewAlarmIntID, NewAlarmeGUID, SQL);
-              if assigned(FAsyncDBConnection) and FAsyncDBConnection.Connected and (UTF8Length(UTF8Trim(SQL)) > 0) then
+              DoIncomingAlarm(AuxItem.PLCTag, EventTimestamp, AuxItem, NewAlarmIntID, NewAlarmeGUID, SQL);
+              if Assigned(FAsyncDBConnection) and FAsyncDBConnection.Connected and (UTF8Length(UTF8Trim(SQL)) > 0) then
                 FAsyncDBConnection.ExecSQL(SQL, @RefreshActiveAlarmTables, False);
-              auxItem.LastAlarmGUID := NewAlarmeGUID;
-              auxItem.LastAlarmIntID := NewAlarmIntID;
-              auxItem.LastAlarmPointerID := nil;
+              AuxItem.LastAlarmGUID := NewAlarmeGUID;
+              AuxItem.LastAlarmIntID := NewAlarmIntID;
+              AuxItem.LastAlarmPointerID := nil;
             end;
           end
           else
           begin
             //alarme inativo e tenho algum ID do alarme, registra a saida do alarme.
-            if (not IsEqualGUID(auxItem.LastAlarmGUID, GUID_NULL)) or (auxItem.LastAlarmIntID <> 0) or assigned(auxItem.LastAlarmPointerID) then
+            if (not IsEqualGUID(AuxItem.LastAlarmGUID, GUID_NULL))
+              or (AuxItem.LastAlarmIntID <> 0)
+              or Assigned(AuxItem.LastAlarmPointerID) then
             begin
-              DoOutgoingAlarm(auxItem.PLCTag, EventTimestamp, auxItem.LastAlarmIntID, auxItem.LastAlarmGUID, SQL);
-              if assigned(FAsyncDBConnection) and FAsyncDBConnection.Connected and (UTF8Length(UTF8Trim(SQL)) > 0) then
+              DoOutgoingAlarm(AuxItem.PLCTag, EventTimestamp, AuxItem.LastAlarmIntID, AuxItem.LastAlarmGUID, SQL);
+              if Assigned(FAsyncDBConnection) and FAsyncDBConnection.Connected and (UTF8Length(UTF8Trim(SQL)) > 0) then
                 FAsyncDBConnection.ExecSQL(SQL, @RefreshActiveAlarmTables, False);
-              auxItem.LastAlarmGUID := GUID_NULL;
-              auxItem.LastAlarmIntID := 0;
-              auxItem.LastAlarmPointerID := nil;
+              AuxItem.LastAlarmGUID := GUID_NULL;
+              AuxItem.LastAlarmIntID := 0;
+              AuxItem.LastAlarmPointerID := nil;
             end;
           end;
         finally
-          auxItem.LastTagValue := TagValue;
+          AuxItem.LastTagValue := TagValue;
         end;
       end;
     end;
@@ -299,51 +313,50 @@ end;
 
 procedure THMIAlarmLogger.Loaded;
 var
-  c: Integer;
-  auxItem: TAlarmItem;
+  i: Integer;
+  AuxItem: TAlarmItem;
 begin
   inherited Loaded;
 
-  if assigned(FAlarmMessages) then
+  if Assigned(FAlarmMessages) then
   begin
-    for c := 0 to FAlarmMessages.Count - 1 do
+    for i := 0 to FAlarmMessages.Count - 1 do
     begin
-      auxItem := TAlarmItem(FAlarmMessages.Items[c]);
-      if assigned(auxItem.PLCTag) then
+      AuxItem := TAlarmItem(FAlarmMessages.Items[i]);
+      if Assigned(AuxItem.PLCTag) then
       begin
-        auxItem.PLCTag.FreeNotification(Self);
-        auxItem.PLCTag.AddTagChangeHandler(@TagFromListChanged);
+        AuxItem.PLCTag.FreeNotification(Self);
+        AuxItem.PLCTag.AddTagChangeHandler(@TagFromListChanged);
       end;
     end;
     AlarmMessages.Loaded;
   end;
-
 
   TThread.ForceQueue(nil, @FinishAllPendingAlarmsDelayed);
 end;
 
 procedure THMIAlarmLogger.DoIncomingAlarm(Sender: TObject; aTimeStamp: TDateTime; AlarmMsgItem: TAlarmItem; AlarmIntID: Int64; AlarmGUID: TGuid; var AlarmIncommingSQL: UTF8String);
 begin
-  if assigned(FIncomingAlarm) then
+  if Assigned(FIncomingAlarm) then
     FIncomingAlarm(Sender, aTimeStamp, AlarmMsgItem, AlarmIntID, AlarmGUID, AlarmIncommingSQL);
 end;
 
 procedure THMIAlarmLogger.DoOutgoingAlarm(Sender: TObject; aTimeStamp: TDateTime; AlarmIntID: Int64; AlarmGUID: TGuid; var OutgoingAlarmSQL: UTF8String);
 begin
-  if assigned(FOutgoingAlarm) then
+  if Assigned(FOutgoingAlarm) then
     FOutgoingAlarm(Sender, aTimeStamp, AlarmIntID, AlarmGUID, OutgoingAlarmSQL);
 end;
 
 procedure THMIAlarmLogger.DoFinishAllPendingAlarms(Sender: TObject; var FinishAllPendingAlarmsSQL: UTF8String);
 begin
-  if assigned(FFinishAllPendingAlarms) then
+  if Assigned(FFinishAllPendingAlarms) then
     FFinishAllPendingAlarms(Sender, FinishAllPendingAlarmsSQL);
 end;
 
 function THMIAlarmLogger.GenerateNewAlarmID(var AlarmIntID: Int64; var AlarmGUID: TGuid): Boolean;
 begin
   Result := False;
-  if assigned(FGenerateNewAlarmID) then
+  if Assigned(FGenerateNewAlarmID) then
     Result := FGenerateNewAlarmID(AlarmIntID, AlarmGUID)
   else
   begin
@@ -364,19 +377,19 @@ end;
 
 destructor THMIAlarmLogger.Destroy;
 var
-  auxItem: TAlarmItem;
-  c: Integer;
+  AuxItem: TAlarmItem;
+  i: Integer;
 begin
   AsyncDBConnection := nil; //release the connection
 
-  if assigned(FAlarmMessages) then
+  if Assigned(FAlarmMessages) then
   begin
-    for c := FAlarmMessages.Count - 1 downto 0 do
+    for i := FAlarmMessages.Count - 1 downto 0 do
     begin
-      auxItem := TAlarmItem(FAlarmMessages.Items[c]);
-      if assigned(auxItem.PLCTag) then
+      AuxItem := TAlarmItem(FAlarmMessages.Items[i]);
+      if Assigned(AuxItem.PLCTag) then
       begin
-        auxItem.PLCTag.RemoveFreeNotification(Self);
+        AuxItem.PLCTag.RemoveFreeNotification(Self);
       end;
     end;
   end;
@@ -386,13 +399,13 @@ end;
 
 procedure THMIAlarmLogger.Notification(AComponent: TComponent; Operation: TOperation);
 var
-  auxItem: TAlarmItem;
-  c: Integer;
-  aCurrentTimestamp: TDateTime;
+  AuxItem: TAlarmItem;
+  i: Integer;
+  ACurrentTimestamp: TDateTime;
   SQL: UTF8String;
 begin
   inherited Notification(AComponent, Operation);
-  if (Operation = opRemove) and assigned(FAlarmMessages) then
+  if (Operation = opRemove) and Assigned(FAlarmMessages) then
   begin
     if AComponent = FAsyncDBConnection then
     begin
@@ -400,26 +413,26 @@ begin
       Exit;
     end;
 
-    aCurrentTimestamp := Now;
+    ACurrentTimestamp := Now;
 
-    for c := FAlarmMessages.Count - 1 downto 0 do
+    for i := FAlarmMessages.Count - 1 downto 0 do
     begin
-      auxItem := TAlarmItem(FAlarmMessages.Items[c]);
-      if (auxItem.PLCTag = AComponent) and assigned(auxItem.PLCTag) then
+      AuxItem := TAlarmItem(FAlarmMessages.Items[i]);
+      if (AuxItem.PLCTag = AComponent) and Assigned(AuxItem.PLCTag) then
       begin
         //Alarm is pending?
-        if (not IsEqualGUID(auxItem.LastAlarmGUID, GUID_NULL)) or (auxItem.LastAlarmIntID <> 0) or assigned(auxItem.LastAlarmPointerID) then
+        if (not IsEqualGUID(AuxItem.LastAlarmGUID, GUID_NULL)) or (AuxItem.LastAlarmIntID <> 0) or Assigned(AuxItem.LastAlarmPointerID) then
         begin
-          DoOutgoingAlarm(auxItem.PLCTag, aCurrentTimestamp, auxItem.LastAlarmIntID, auxItem.LastAlarmGUID, SQL);
-          if assigned(FAsyncDBConnection) and FAsyncDBConnection.Connected and (UTF8Length(UTF8Trim(SQL)) > 0) then
+          DoOutgoingAlarm(AuxItem.PLCTag, ACurrentTimestamp, AuxItem.LastAlarmIntID, AuxItem.LastAlarmGUID, SQL);
+          if Assigned(FAsyncDBConnection) and FAsyncDBConnection.Connected and (UTF8Length(UTF8Trim(SQL)) > 0) then
             FAsyncDBConnection.ExecSQL(SQL, nil, False);
-          auxItem.LastAlarmGUID := GUID_NULL;
-          auxItem.LastAlarmIntID := 0;
-          auxItem.LastAlarmPointerID := nil;
+          AuxItem.LastAlarmGUID := GUID_NULL;
+          AuxItem.LastAlarmIntID := 0;
+          AuxItem.LastAlarmPointerID := nil;
         end;
 
-        auxItem.FPLCTag := nil;
-        FAlarmMessages.Delete(c);
+        AuxItem.FPLCTag := nil;
+        FAlarmMessages.Delete(i);
       end;
     end;
   end;

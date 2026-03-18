@@ -9,19 +9,22 @@ unit ubitmapper;
 interface
 
 uses
-  {$IFDEF FPC}LCLIntf, LResources,{$ENDIF} SysUtils, Variants, Classes,
+  {$IFDEF FPC}
+LCLIntf, LResources,
+  {$ENDIF}
+  SysUtils, Variants, Classes,
   Graphics, Controls, Forms, Dialogs, Grids, StdCtrls;
 
 type
   TfrmBitMapper = class(TForm)
     StringGrid1: TStringGrid;
     Label1: TLabel;
-    eachbitastag: TCheckBox;
-    edtNamepattern: TEdit;
+    EachBitAsTag: TCheckBox;
+    edtNamePattern: TEdit;
     Label2: TLabel;
-    bitnamestartsfrom1: TCheckBox;
-    bytenamestartsfrom1: TCheckBox;
-    Wordnamestartsfrom1: TCheckBox;
+    BitNameStartsFrom1: TCheckBox;
+    ByteNameStartsFrom1: TCheckBox;
+    WordNameStartsFrom1: TCheckBox;
     Button1: TButton;
     Button2: TButton;
     Label3: TLabel;
@@ -34,15 +37,15 @@ type
     procedure Button1Click(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
   private
-    { Private declarations }
   public
-    { Public declarations }
   end;
 
 var
   frmBitMapper: TfrmBitMapper;
 
+
 implementation
+
 
 {$IFNDEF FPC}
   {$R ../../src/scada/ubitmapper.dfm}
@@ -52,28 +55,29 @@ implementation
   {$IFEND}
 {$ENDIF}
 
+
 procedure TfrmBitMapper.FormShow(Sender: TObject);
 var
-  c:LongInt;
+  i: Longint;
 begin
-  eachbitastag.Checked:=true;
-  for c:=31 downto 0 do
-    StringGrid1.Cols[c].Strings[0]:=IntToStr(31-c);
+  EachBitAsTag.Checked := True;
+  for i := 31 downto 0 do
+    StringGrid1.Cols[i].Strings[0] := IntToStr(31 - i);
 end;
 
 procedure TfrmBitMapper.Button2Click(Sender: TObject);
 begin
-  //
+
 end;
 
 procedure TfrmBitMapper.Button1Click(Sender: TObject);
 begin
-  //
+
 end;
 
 procedure TfrmBitMapper.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 begin
-  //
+
 end;
 
 {$IFDEF FPC }
@@ -82,4 +86,5 @@ initialization
   {$I ubitmapper.lrs}
   {$IFEND}
 {$ENDIF}
+
 end.

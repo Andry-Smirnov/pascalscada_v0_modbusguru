@@ -833,7 +833,7 @@ begin
 
   qlist:=msgList.LockList;
   try
-    new(logEntry);
+    New(logEntry);
     logEntry^.EvtMsg:=aMsg;
     logEntry^.EvtType:=EvtType;
     logEntry^.From:=aFrom;

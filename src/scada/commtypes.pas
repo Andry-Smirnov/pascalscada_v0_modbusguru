@@ -32,7 +32,7 @@ type
   }
   {$ENDIF}
 
-  BYTES = array of Byte;
+  Bytes = array of Byte;
 
   {$IFDEF PORTUGUES}
   {:
@@ -90,7 +90,7 @@ type
   @seealso(TIOPacket)
   }
   {$ENDIF}
-  TIOResult  = (iorOK, iorTimeOut, iorNotReady, iorNone, iorPortError);
+  TIOResult = (iorOK, iorTimeOut, iorNotReady, iorNone, iorPortError);
 
   {$IFDEF PORTUGUES}
   {:
@@ -138,20 +138,20 @@ type
   }
   {$ENDIF}
   TIOPacket = record
-    PacketID:Cardinal;
-    WriteIOResult:TIOResult;
-    ToWrite:Cardinal;
-    Written:Cardinal;
-    WriteRetries:Cardinal;
-    BufferToWrite:BYTES;
-    DelayBetweenCommand:LongInt;
-    ReadIOResult:TIOResult;
-    ToRead:Cardinal;
-    Received:Cardinal;
-    ReadRetries:Cardinal;
-    BufferToRead:BYTES;
-    Res1:TObject;
-    Res2:Pointer;
+    PacketID: Cardinal;
+    WriteIOResult: TIOResult;
+    ToWrite: Cardinal;
+    Written: Cardinal;
+    WriteRetries: Cardinal;
+    BufferToWrite: Bytes;
+    DelayBetweenCommand: Longint;
+    ReadIOResult: TIOResult;
+    ToRead: Cardinal;
+    Received: Cardinal;
+    ReadRetries: Cardinal;
+    BufferToRead: Bytes;
+    Res1: TObject;
+    Res2: Pointer;
   end;
 
   {$IFDEF PORTUGUES}
@@ -190,7 +190,7 @@ type
   @seealso(TCommPortDriver.IOCommandSync)
   }
   {$ENDIF}
-  TDriverCallBack = procedure(var Result:TIOPacket) of object;
+  TDriverCallBack = procedure(var Result: TIOPacket) of object;
 
   //: @exclude
   {$IFDEF FPC}
@@ -204,7 +204,7 @@ type
   {$ELSE}
   //: Defines a method called when a communication error occurs.
   {$ENDIF}
-  TCommPortErrorEvent = procedure(Error:TIOResult) of object;
+  TCommPortErrorEvent = procedure(Error: TIOResult) of object;
   {$IFDEF PORTUGUES}
   //: Aponta para um evento de sinalização de erro.
   {$ELSE}
@@ -275,27 +275,27 @@ type
   }
   {$ENDIF}
   IPortDriverEventNotification = interface
-  ['{26B0F551-5B46-49D9-BCA1-AD621B3775CF}']
+    ['{26B0F551-5B46-49D9-BCA1-AD621B3775CF}']
     {$IFDEF PORTUGUES}
     //: Retorna o evento a ser chamado quando a porta é aberta.
     {$ELSE}
     //: Returns the event to be called when communication port opens.
     {$ENDIF}
-    function  GetPortOpenedEvent:TNotifyEvent;
+    function GetPortOpenedEvent: TNotifyEvent;
 
     {$IFDEF PORTUGUES}
     //: Retorna o evento a ser chamado quando a porta é fechada.
     {$ELSE}
     //: Returns the event to be called when communication port closed.
     {$ENDIF}
-    function  GetPortClosedEvent:TNotifyEvent;
+    function GetPortClosedEvent: TNotifyEvent;
 
     {$IFDEF PORTUGUES}
     //: Retorna o evento a ser chamado quando a porta é disconectada.
     {$ELSE}
     //: Returns the event to be called when communication port is disconnected.
     {$ENDIF}
-    function  GetPortDisconnectedEvent:TNotifyEvent;
+    function GetPortDisconnectedEvent: TNotifyEvent;
 
     {$IFDEF PORTUGUES}
     {:
@@ -311,7 +311,7 @@ type
     @seealso(TNotifyThisEvents)
     }
     {$ENDIF}
-    function  NotifyThisEvents:TNotifyThisEvents;
+    function NotifyThisEvents: TNotifyThisEvents;
 
     {$IFDEF PORTUGUES}
     //: Método que vai ser chamado quando a porta for aberta.
@@ -339,7 +339,7 @@ type
     {$ELSE}
     //: Procedure called when the communication port has been destroied.
     {$ENDIF}
-    procedure DoPortRemoved(Sender:TObject);
+    procedure DoPortRemoved(Sender: TObject);
   end;
 
   IPortDriverEventNotificationArray = array of IPortDriverEventNotification;
@@ -349,40 +349,44 @@ type
   {$ELSE}
   //: Communication error messsage (read or write);
   {$ENDIF}
-  const PSM_COMMERROR        = 4;
+const
+  PSM_COMMERROR = 4;
 
   {$IFDEF PORTUGUES}
   //: Mensagem de erro de porta aberta, fechada ou disconectada.
   {$ELSE}
   //: Message of communication port open, closed or disconnected.
   {$ENDIF}
-  const PSM_PORT_EVENT       = 5;
+const
+  PSM_PORT_EVENT = 5;
 
-  {$IFDEF PORTUGUES}
+{$IFDEF PORTUGUES}
   {:
   Concatena dois buffers de bytes.
   @seealso(BYTES)
   }
-  {$ELSE}
+{$ELSE}
   {:
   Concatenate two @noAutoLink(bytes) buffers.
   @seealso(BYTES)
   }
-  {$ENDIF}
-  function ConcatenateBYTES(const a,b:BYTES):BYTES;
+{$ENDIF}
+function ConcatenateBYTES(const A, B: Bytes): Bytes;
+
 
 implementation
 
-//concatenate two buffers of bytes.
-function ConcatenateBYTES(const a,b:BYTES):BYTES;
+
+//concatenate two buffers of Bytes.
+function ConcatenateBYTES(const A, B: Bytes): Bytes;
 var
-  c:LongInt;
+  i: Longint;
 begin
-  SetLength(Result,Length(a)+Length(b));
-  for c:=0 to High(a) do
-    Result[c]:=a[c];
-  for c:=0 to High(b) do
-    Result[c+Length(a)]:=b[c];
+  SetLength(Result, Length(A) + Length(B));
+  for i := 0 to High(A) do
+    Result[i] := A[i];
+  for i := 0 to High(B) do
+    Result[i + Length(A)] := B[i];
 end;
 
 end.

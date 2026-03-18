@@ -291,7 +291,7 @@ begin
   end;
 
   if (retval=1) then begin  // seems there is something in our receive buffer!!
-    // now we check how many bytes are in receive buffer
+    // now we check how many Bytes are in receive buffer
     retval:=ioctlsocket(FSocket,FIONREAD,@nbytes);
 
     if (retval<>0) then begin  // some error occured

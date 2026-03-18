@@ -27,44 +27,43 @@ unit scadapropeditor;
 interface
 
 uses
-  Classes, SysUtils, SerialPort, PLCBlockElement, PLCStruct, Tag,
-  bitmappertagassistant, blockstructtagassistant, ProtocolDriver,
-  PLCNumber, plcstructstring, comptagedt, fpexprpars,
-
   {$IF defined(WIN32) or defined(WIN64) OR defined(WINCE)}
   Windows,
   {$ELSE}
   Unix,
   {$IFEND}
-  
+  Classes, SysUtils, SerialPort, PLCBlockElement, PLCStruct, Tag,
+  bitmappertagassistant, blockstructtagassistant, ProtocolDriver,
   {$IFDEF FPC}
-    PropEdits, ComponentEditors, typinfo;
+  PropEdits,
+  ComponentEditors,
+  typinfo,
   {$ELSE}
-    Types,
-    //Delphi 6 ou superior
-    {$IF defined(DELPHI6_UP)}
-      DesignIntf, DesignEditors;
-    {$ELSE}
-      //demais versoes do delphi
-      DsgnIntf;
-    {$IFEND}
+  Types,
+  //Delphi 6 ou superior
+  {$IF defined(DELPHI6_UP)}
+  DesignIntf, DesignEditors,
+  {$ELSE}
+    //demais versoes do delphi
+    DsgnIntf,
+  {$IFEND}
   {$ENDIF}
+  PLCNumber,
+  plcstructstring,
+  comptagedt,
+  fpexprpars;
 
 type
-  {$IFDEF PORTUGUES}
-  //: Editor da propriedade TSerialPortDriver.COMPort
-  {$ELSE}
   //: Property editor of TSerialPortDriver.COMPort property.
-  {$ENDIF}
   TPortPropertyEditor = class(TStringProperty)
   public
-    function  GetAttributes: TPropertyAttributes; override;
-    function  GetValue: AnsiString; override;
+    function GetAttributes: TPropertyAttributes; override;
+    function GetValue: AnsiString; override;
     procedure GetValues(Proc: TGetStrProc); override;
     procedure SetValue(const Value: AnsiString); override;
     // somente para windows
     {$IFDEF MSWINDOWS}
-    function  GetPortas: string;
+    function GetPortas: string;
     {$ENDIF}
   end;
 
@@ -78,38 +77,35 @@ type
 
   TIntegerExpressionPropertyEditor = class(TIntegerProperty)
   private
-    procedure SetValue(const index: Integer; const NewValue: Int64);
+    procedure SetValue(const Index: Integer; const NewValue: Int64);
   protected
-    procedure RegisterExpressionVariables(const i:Integer; var parser: TFPExpressionParser); virtual;
+    procedure RegisterExpressionVariables(const AIndex: Integer; var Parser: TFPExpressionParser); virtual;
   public
-    function  GetPropType(Index:Integer): PTypeInfo;
-    procedure SetValue(const NewValue: ansistring); override;
+    function GetPropType(Index: Integer): PTypeInfo;
+    procedure SetValue(const NewValue: AnsiString); override;
   end;
 
   { TElementIndexPropertyEditor }
 
   TElementIndexPropertyEditor = class(TIntegerExpressionPropertyEditor)
   protected
-    procedure RegisterExpressionVariables(const i: Integer;
-  var parser: TFPExpressionParser); override;
+    procedure RegisterExpressionVariables(const i: Integer; var Parser: TFPExpressionParser); override;
   public
     procedure GetValues(Proc: TGetStrProc); override;
-    function  GetAttributes: TPropertyAttributes; override;
+    function GetAttributes: TPropertyAttributes; override;
   end;
 
   { TTagAddressPropertyEditor }
 
   TTagAddressPropertyEditor = class(TIntegerExpressionPropertyEditor)
   protected
-    procedure RegisterExpressionVariables(const i: Integer;
-               var parser: TFPExpressionParser); override;
+    procedure RegisterExpressionVariables(const AIndex: Integer; var Parser: TFPExpressionParser); override;
   end;
 
   { TWinControlBoundsEditor }
 
   TWinControlBoundsEditor = class(TIntegerExpressionPropertyEditor)
-    procedure RegisterExpressionVariables(const i: Integer;
-               var parser: TFPExpressionParser); override;
+    procedure RegisterExpressionVariables(const AIndex: Integer; var Parser: TFPExpressionParser); override;
   end;
 
   {$IFNDEF FPC}
@@ -132,9 +128,9 @@ type
   {$ENDIF}
   TInsertTagsOnFormComponentEditor = class(TDefaultComponentEditor)
   protected
-    procedure AddTagInEditor(Tag:TTag);
-    function  CreateComponent(tagclass:TComponentClass):TComponent;
-    function  GetTheOwner:TComponent; virtual;
+    procedure AddTagInEditor(Tag: TTag);
+    function CreateComponent(tagclass: TComponentClass): TComponent;
+    function GetTheOwner: TComponent; virtual;
   end;
 
   {$IFDEF PORTUGUES}
@@ -156,11 +152,11 @@ type
   protected
     function GetTheOwner: TComponent; override;
   public
-    procedure ExecuteVerb(Index: LongInt); override;
-    function  GetVerb(Index: LongInt): AnsiString; override;
-    function  GetVerbCount: LongInt; override;
+    procedure ExecuteVerb(Index: Longint); override;
+    function GetVerb(Index: Longint): AnsiString; override;
+    function GetVerbCount: Longint; override;
     procedure Edit; override;
-    function  ProtocolDriver: TProtocolDriver; virtual;
+    function ProtocolDriver: TProtocolDriver; virtual;
   end;
 
   {$IFDEF PORTUGUES}
@@ -182,9 +178,9 @@ type
   protected
     function GetTheOwner: TComponent; override;
   public
-    procedure ExecuteVerb(Index: LongInt); override;
-    function GetVerb(Index: LongInt): AnsiString; override;
-    function GetVerbCount: LongInt; override;
+    procedure ExecuteVerb(Index: Longint); override;
+    function GetVerb(Index: Longint): AnsiString; override;
+    function GetVerbCount: Longint; override;
     procedure Edit; override;
   end;
 
@@ -207,73 +203,97 @@ type
   protected
     function GetTheOwner: TComponent; override;
   public
-    procedure ExecuteVerb(Index: LongInt); override;
+    procedure ExecuteVerb(Index: Longint); override;
     {$if declared(has_customhints)}
     function GetCustomHint: AnsiString; override;
     {$ifend}
-    function GetVerb(Index: LongInt): AnsiString; override;
-    function GetVerbCount: LongInt; override;
+    function GetVerb(Index: Longint): AnsiString; override;
+    function GetVerbCount: Longint; override;
     procedure Edit; override;
   end;
 
-  procedure ChangeComponentTag(Sender: TObject);
+
+procedure ChangeComponentTag(Sender: TObject);
+
 
 implementation
 
-uses PLCBlock, PLCTagNumber, PLCString, RtlConsts, FormEditingIntf,
-  Controls {$IFDEF WINDOWS} , Registry{$ENDIF};
+
+uses
+  PLCBlock,
+  PLCTagNumber,
+  PLCString,
+  RtlConsts,
+  FormEditingIntf,
+  Controls
+  {$IFDEF WINDOWS}
+  , Registry
+  {$ENDIF}
+  ;
 
 procedure ChangeComponentTag(Sender: TObject);
 var
-  aSelected: TPersistentSelectionList;
-  frm: TfrmTComponentTagEditor;
+  ASelected: TPersistentSelectionList;
+  AForm: TfrmTComponentTagEditor;
 begin
-  aSelected:=TPersistentSelectionList.Create;
+  ASelected := TPersistentSelectionList.Create;
   try
-    if Assigned(GlobalDesignHook) then begin
-      GlobalDesignHook.GetSelection(aSelected);
-      if (aSelected.Count=1) and (aSelected.Items[0] is TComponent) then begin
-        frm:=TfrmTComponentTagEditor.Create(nil);
+    if Assigned(GlobalDesignHook) then
+    begin
+      GlobalDesignHook.GetSelection(ASelected);
+      if (ASelected.Count = 1) and (ASelected.Items[0] is TComponent) then
+      begin
+        AForm := TfrmTComponentTagEditor.Create(nil);
         try
-          frm.Label1.Caption:=Format('Set new value %s.Tag', [TComponent(aSelected.Items[0]).Name]);
-          frm.Edit1.Text:=IntToStr(TComponent(aSelected.Items[0]).Tag);
-          frm.Edit1.SelectAll;
-          if frm.ShowModal=mrOK then begin
-            TComponent(aSelected.Items[0]).Tag:=frm.Value;
-            GlobalDesignHook.Modified(aSelected.Items[0]);
+          AForm.Label1.Caption := Format('Set new value %s.Tag', [TComponent(ASelected.Items[0]).Name]);
+          AForm.Edit1.Text := IntToStr(TComponent(ASelected.Items[0]).Tag);
+          AForm.Edit1.SelectAll;
+          if AForm.ShowModal = mrOk then
+          begin
+            TComponent(ASelected.Items[0]).Tag := AForm.Value;
+            GlobalDesignHook.Modified(ASelected.Items[0]);
           end;
         finally
-          FreeAndNil(frm);
+          FreeAndNil(AForm);
         end;
       end;
     end;
   finally
-    FreeAndNil(aSelected);
+    FreeAndNil(ASelected);
   end;
 end;
 
-function  TPortPropertyEditor.GetAttributes: TPropertyAttributes;
+function TPortPropertyEditor.GetAttributes: TPropertyAttributes;
 begin
-   if (GetComponent(0) is TSerialPortDriver) and (GetComponent(0) as TSerialPortDriver).AcceptAnyPortName=false then
-     Result := [paValueList{$IFDEF FPC}, paPickList{$ELSE}
-                {$IFDEF DELPHI2005_UP}, paReadOnly,
-                paValueEditable{$ENDIF}{$ENDIF}]
-   else
-     Result:=inherited GetAttributes;
+  if (GetComponent(0) is TSerialPortDriver)
+    and (GetComponent(0) as TSerialPortDriver).AcceptAnyPortName = False then
+    Result := [paValueList
+      {$IFDEF FPC}
+      , paPickList
+      {$ELSE}
+      {$IFDEF DELPHI2005_UP}
+      , paReadOnly,
+      paValueEditable
+      {$ENDIF}
+      {$ENDIF}
+      ]
+  else
+    Result := inherited GetAttributes;
 end;
 
-function  TPortPropertyEditor.GetValue: AnsiString;
+function TPortPropertyEditor.GetValue: AnsiString;
 begin
-   Result := GetStrValue;
+  Result := GetStrValue;
 end;
 
 procedure TPortPropertyEditor.GetValues(Proc: TGetStrProc);
 {$IF defined(WIN32) or defined(WIN64)}
 var
-  c:LongInt;
-  dcbstring, comname:AnsiString;
-  d:DCB;
-  str: Tstringlist;
+  i: LongInt;
+  DcbString: AnsiString;
+  ComName: AnsiString;
+  D: DCB;
+  Str: TStringList;
 begin
 { com essa abordagem é possive listar as portas COM acima de 10 e tambem
   portas Virtuais que tem nomes diferentes " qualquer nome ele lista"}
@@ -281,30 +301,34 @@ begin
   // cria a primeira porta
   Proc('(none)');
   // cria uma lista de portas "ativas" do sistema
-  str:= Tstringlist.Create;
+  Str := Tstringlist.Create;
   // copia as portas da função Get portas
-  str.CommaText:= GetPortas ;
+  Str.CommaText := GetPortas ;
   // faz uma contagem de portas ativas
-  for c:=0 to (str.Count - 1) do begin
-     // transfere os valores para a listagem COMport
-     Proc(str.ValueFromIndex[c]);
+  for i := 0 to Str.Count-1 do
+  begin
+    // transfere os valores para a listagem COMport
+    Proc(Str.ValueFromIndex[i]);
   end;
   // libera a lista
-  str.Free;
+  Str.Free;
   {
   Proc('(none)');
-  for c:=1 to 255 do begin
-     comname := 'COM'+IntToStr(c);
-     dcbstring := comname+': baud=1200 parity=N data=8 stop=1';
-     if BuildCommDCB(PChar(dcbstring),d) then
-        Proc(comname);
+  for i := 1 to 255 do
+  begin
+    ComName := 'COM' + IntToStr(i);
+    DcbString := ComName + ': baud=1200 parity=N data=8 stop=1';
+    if BuildCommDCB(PChar(DcbString),D) then
+      Proc(ComName);
   end;
 }
+end;
 {$IFEND}
 {$IFDEF UNIX}
 var
-   c, d:LongInt;
-   pname:AnsiString;
+   c: LongInt;
+   d: LongInt;
+   PName: AnsiString;
 
    function PortDirPrefix:AnsiString;
    begin
@@ -316,78 +340,85 @@ var
 
 begin
    Proc('(none)');
-   for d:=0 to High(PortPrefix) do
+   for d := 0 to High(PortPrefix) do
       {$IFDEF SunOS}
-      for c:=Ord('a') to ord('z') do begin
-         pname:=PortPrefix[d]+Char(c);
+      for c := Ord('a') to ord('z') do
+      begin
+         PName := PortPrefix[d] + Char(c);
       {$ELSE}
-      for c:=0 to 255 do begin
-         pname:=PortPrefix[d]+IntToStr(c);
+      for c := 0 to 255 do
+      begin
+         PName := PortPrefix[d] + IntToStr(c);
       {$ENDIF}
-         if FileExists(PortDirPrefix+pname) then // Added DevDir property.
-            Proc(pname);
+         if FileExists(PortDirPrefix + PName) then // Added DevDir property.
+            Proc(PName);
       end;
+end;
 {$ENDIF}
 {$IFDEF WINCE}
 begin
   //ToDo
-{$ENDIF}
 end;
+{$ENDIF}
+
 
 procedure TPortPropertyEditor.SetValue(const Value: AnsiString);
 begin
-   SetStrValue(Value);
-   if GetComponent(0) is TSerialPortDriver then
-      TSerialPortDriver(GetComponent(0)).Active := false;
+  SetStrValue(Value);
+  if GetComponent(0) is TSerialPortDriver then
+    TSerialPortDriver(GetComponent(0)).Active := False;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
 //TIntegerExpressionPropertyEditor
 ////////////////////////////////////////////////////////////////////////////////
-procedure TIntegerExpressionPropertyEditor.RegisterExpressionVariables(
-  const i: Integer; var parser: TFPExpressionParser);
+procedure TIntegerExpressionPropertyEditor.RegisterExpressionVariables(const AIndex: Integer; var Parser: TFPExpressionParser);
 begin
   //virtual method.
 end;
 
 function TIntegerExpressionPropertyEditor.GetPropType(Index: Integer): PTypeInfo;
 begin
-  Result:=GetInstProp[Index].PropInfo^.PropType;
+  Result := GetInstProp[Index].PropInfo^.PropType;
 end;
 
-procedure TIntegerExpressionPropertyEditor.SetValue(const NewValue: ansistring);
+procedure TIntegerExpressionPropertyEditor.SetValue(const NewValue: AnsiString);
 var
-  aux: Longint;
-  parser: TFPExpressionParser;
-  rt: TFPExpressionResult;
+  Aux: Longint;
+  Parser: TFPExpressionParser;
+  Rt: TFPExpressionResult;
   i: Integer;
 begin
-  if (not (NewValue[1] in ['+','-','*','/'])) and TryStrToInt(NewValue,aux) then
+  if (not (NewValue[1] in ['+', '-', '*', '/'])) and TryStrToInt(NewValue, Aux) then
     inherited SetValue(NewValue)
-  else begin
-    parser:=TFPExpressionParser.Create(nil);
+  else
+  begin
+    Parser := TFPExpressionParser.Create(nil);
     try
-      parser.BuiltIns:=[bcMath];
-      for i:=0 to PropCount-1 do begin
-        RegisterExpressionVariables(i, parser);
+      Parser.BuiltIns := [bcMath];
+      for i := 0 to PropCount - 1 do
+      begin
+        RegisterExpressionVariables(i, Parser);
 
-        if (NewValue[1]='+') or (NewValue[1]='-') or (NewValue[1]='*') or (NewValue[1]='/')  then begin
-          parser.Expression:=OrdValueToVisualValue(GetOrdValueAt(i))+NewValue
-        end else
-          parser.Expression:=NewValue;
-        rt:=parser.Evaluate;
-        case rt.ResultType of
-          rtInteger: SetValue(i, parser.AsInteger);
-          rtFloat:   SetValue(i, Trunc(parser.AsFloat));
+        if (NewValue[1] = '+') or (NewValue[1] = '-') or (NewValue[1] = '*') or (NewValue[1] = '/') then
+        begin
+          Parser.Expression := OrdValueToVisualValue(GetOrdValueAt(i)) + NewValue;
+        end
+        else
+          Parser.Expression := NewValue;
+        Rt := Parser.Evaluate;
+        case Rt.ResultType of
+          rtInteger: SetValue(i, Parser.AsInteger);
+          rtFloat: SetValue(i, Trunc(Parser.AsFloat));
         end;
       end;
     finally
-      FreeAndNil(rt);
+      FreeAndNil(Rt);
     end;
   end;
 end;
 
-procedure TIntegerExpressionPropertyEditor.SetValue(const index:Integer; const NewValue: Int64);
+procedure TIntegerExpressionPropertyEditor.SetValue(const Index: Integer; const NewValue: Int64);
 
   procedure Error(const Args: array of const);
   begin
@@ -397,61 +428,70 @@ procedure TIntegerExpressionPropertyEditor.SetValue(const index:Integer; const N
 var
   L: Int64;
 begin
-  L:=NewValue;
-  with GetTypeData(GetPropType(index))^ do
-    if OrdType = otULong then begin   // unsigned compare and reporting needed
-      if (L < Cardinal(MinValue)) or (L > Cardinal(MaxValue)) then begin
-        // bump up to Int64 to get past the %d in the format string
-        Error([Int64(Cardinal(MinValue)), Int64(Cardinal(MaxValue))]);
-        Exit;
+  L := NewValue;
+  with GetTypeData(GetPropType(Index))^ do
+    if OrdType = otULong then
+      begin   // unsigned compare and reporting needed
+        if (L < Cardinal(MinValue)) or (L > Cardinal(MaxValue)) then
+        begin
+          // bump up to Int64 to get past the %d in the format string
+          Error([Int64(Cardinal(MinValue)), Int64(Cardinal(MaxValue))]);
+          Exit;
+        end;
       end
-    end else
-      if (L < MinValue) or (L > MaxValue) then begin
+    else if (L < MinValue) or (L > MaxValue) then
+      begin
         Error([MinValue, MaxValue]);
         Exit;
       end;
-  with GetInstProp[index] do SetOrdProp(Instance, PropInfo, NewValue);
+  with GetInstProp[Index] do
+    SetOrdProp(Instance, PropInfo, NewValue);
   Modified;
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
 //TElementIndexPropertyEditor
 ////////////////////////////////////////////////////////////////////////////////
-function  TElementIndexPropertyEditor.GetAttributes: TPropertyAttributes;
+function TElementIndexPropertyEditor.GetAttributes: TPropertyAttributes;
 begin
-   if (GetComponent(0) is TPLCBlockElement) or (GetComponent(0) is TPLCStructString)  then
-      Result := [paValueList, paMultiSelect];
+  if (GetComponent(0) is TPLCBlockElement)
+    or (GetComponent(0) is TPLCStructString) then
+    Result := [paValueList, paMultiSelect];
 end;
 
-procedure TElementIndexPropertyEditor.RegisterExpressionVariables(
-  const i: Integer; var parser: TFPExpressionParser);
+procedure TElementIndexPropertyEditor.RegisterExpressionVariables(const i: Integer; var Parser: TFPExpressionParser);
 begin
-  if Assigned(parser) then begin
+  if Assigned(Parser) then
+  begin
     //unregister all possible registered variables.
-    parser.Identifiers.Clear;
+    Parser.Identifiers.Clear;
 
-    if (GetComponent(i) is TPLCBlockElement) then begin
+    if (GetComponent(i) is TPLCBlockElement) then
+    begin
       //register only if the property is not being edited,
       //to avoid circular references.
-      if (LowerCase(GetPropInfo^.Name)<>'tag') then
-        parser.Identifiers.AddIntegerVariable('Tag', (GetComponent(i) as TPLCBlockElement).Tag);
+      if (LowerCase(GetPropInfo^.Name) <> 'tag') then
+        Parser.Identifiers.AddIntegerVariable('tag', (GetComponent(i) as TPLCBlockElement).Tag);
     end;
 
-    if (GetComponent(i) is TPLCStructString) then begin
+    if (GetComponent(i) is TPLCStructString) then
+    begin
       //register only if the property is not being edited,
       //to avoid circular references.
-      if (LowerCase(GetPropInfo^.Name)<>'tag') then
-        parser.Identifiers.AddIntegerVariable('Tag', (GetComponent(i) as TPLCStructString).Tag);
+      if (LowerCase(GetPropInfo^.Name) <> 'tag') then
+        Parser.Identifiers.AddIntegerVariable('tag', (GetComponent(i) as TPLCStructString).Tag);
     end;
   end;
 end;
 
 procedure TElementIndexPropertyEditor.GetValues(Proc: TGetStrProc);
 var
-   i:LongInt;
+  i: Longint;
 begin
-  if (GetComponent(0) is TPLCBlockElement) and (TPLCBlockElement(GetComponent(0)).PLCBlock <> nil) then
-    for i := 0 to LongInt(TPLCBlockElement(GetComponent(0)).PLCBlock.Size)-1 do begin
+  if (GetComponent(0) is TPLCBlockElement)
+    and (TPLCBlockElement(GetComponent(0)).PLCBlock <> nil) then
+    for i := 0 to Longint(TPLCBlockElement(GetComponent(0)).PLCBlock.Size) - 1 do
+    begin
       Proc(IntToStr(i));
     end;
 end;
@@ -459,142 +499,146 @@ end;
 ////////////////////////////////////////////////////////////////////////////////
 //TTagAddressPropertyEditor
 ////////////////////////////////////////////////////////////////////////////////
-procedure TTagAddressPropertyEditor.RegisterExpressionVariables(
-  const i: Integer; var parser: TFPExpressionParser);
+procedure TTagAddressPropertyEditor.RegisterExpressionVariables(const AIndex: Integer; var Parser: TFPExpressionParser);
 var
-  propertyName: String;
+  PropertyName: string;
 begin
-  if Assigned(parser) then begin
+  if Assigned(Parser) then
+  begin
     //unregister all possible registered variables.
-    parser.Identifiers.Clear;
+    Parser.Identifiers.Clear;
 
-    propertyName:=LowerCase(GetPropInfo^.Name);
+    PropertyName := LowerCase(GetPropInfo^.Name);
 
-    if (GetComponent(i) is TPLCTagNumber) then begin
+    if (GetComponent(AIndex) is TPLCTagNumber) then
+    begin
       //register only if the property is not being edited,
       //to avoid circular references.
-      if (propertyName<>'plcrack') then
-        parser.Identifiers.AddIntegerVariable('plcrack', (GetComponent(i) as TPLCTagNumber).plcrack);
+      if (PropertyName <> 'plcrack') then
+        Parser.Identifiers.AddIntegerVariable('plcrack', (GetComponent(AIndex) as TPLCTagNumber).plcrack);
 
-      if (propertyName<>'plcslot') then
-        parser.Identifiers.AddIntegerVariable('plcslot', (GetComponent(i) as TPLCTagNumber).plcslot);
+      if (PropertyName <> 'plcslot') then
+        Parser.Identifiers.AddIntegerVariable('plcslot', (GetComponent(AIndex) as TPLCTagNumber).plcslot);
 
-      if (propertyName<>'plcstation') then
-        parser.Identifiers.AddIntegerVariable('plcstation', (GetComponent(i) as TPLCTagNumber).plcstation);
+      if (PropertyName <> 'plcstation') then
+        Parser.Identifiers.AddIntegerVariable('plcstation', (GetComponent(AIndex) as TPLCTagNumber).plcstation);
 
-      if (propertyName<>'memfile_db') then
-        parser.Identifiers.AddIntegerVariable('memfile_db', (GetComponent(i) as TPLCTagNumber).memfile_db);
+      if (PropertyName <> 'memfile_db') then
+        Parser.Identifiers.AddIntegerVariable('memfile_db', (GetComponent(AIndex) as TPLCTagNumber).memfile_db);
 
-      if (propertyName<>'memaddress') then
-        parser.Identifiers.AddIntegerVariable('memaddress', (GetComponent(i) as TPLCTagNumber).memaddress);
+      if (PropertyName <> 'memaddress') then
+        Parser.Identifiers.AddIntegerVariable('memaddress', (GetComponent(AIndex) as TPLCTagNumber).memaddress);
 
-      if (propertyName<>'memsubelement') then
-        parser.Identifiers.AddIntegerVariable('memsubelement', (GetComponent(i) as TPLCTagNumber).memsubelement);
+      if (PropertyName <> 'memsubelement') then
+        Parser.Identifiers.AddIntegerVariable('memsubelement', (GetComponent(AIndex) as TPLCTagNumber).memsubelement);
 
-      if (propertyName<>'memreadfunction') then
-        parser.Identifiers.AddIntegerVariable('memreadfunction', (GetComponent(i) as TPLCTagNumber).memreadfunction);
+      if (PropertyName <> 'memreadfunction') then
+        Parser.Identifiers.AddIntegerVariable('memreadfunction', (GetComponent(AIndex) as TPLCTagNumber).memreadfunction);
 
-      if (propertyName<>'memwritefunction') then
-        parser.Identifiers.AddIntegerVariable('memwritefunction', (GetComponent(i) as TPLCTagNumber).memwritefunction);
+      if (PropertyName <> 'memwritefunction') then
+        Parser.Identifiers.AddIntegerVariable('memwritefunction', (GetComponent(AIndex) as TPLCTagNumber).memwritefunction);
 
-      if (propertyName<>'tag') then
-        parser.Identifiers.AddIntegerVariable('Tag', (GetComponent(i) as TPLCTagNumber).Tag);
+      if (PropertyName <> 'tag') then
+        Parser.Identifiers.AddIntegerVariable('tag', (GetComponent(AIndex) as TPLCTagNumber).Tag);
     end;
 
-    if (GetComponent(i) is TPLCBlock) then begin
+    if (GetComponent(AIndex) is TPLCBlock) then
+    begin
       //register only if the property is not being edited,
       //to avoid circular references.
-      if (propertyName<>'plcrack') then
-        parser.Identifiers.AddIntegerVariable('plcrack', (GetComponent(i) as TPLCBlock).plcrack);
+      if (PropertyName <> 'plcrack') then
+        Parser.Identifiers.AddIntegerVariable('plcrack', (GetComponent(AIndex) as TPLCBlock).plcrack);
 
-      if (propertyName<>'plcslot') then
-        parser.Identifiers.AddIntegerVariable('plcslot', (GetComponent(i) as TPLCBlock).plcslot);
+      if (PropertyName <> 'plcslot') then
+        Parser.Identifiers.AddIntegerVariable('plcslot', (GetComponent(AIndex) as TPLCBlock).plcslot);
 
-      if (propertyName<>'plcstation') then
-        parser.Identifiers.AddIntegerVariable('plcstation', (GetComponent(i) as TPLCBlock).plcstation);
+      if (PropertyName <> 'plcstation') then
+        Parser.Identifiers.AddIntegerVariable('plcstation', (GetComponent(AIndex) as TPLCBlock).plcstation);
 
-      if (propertyName<>'memfile_db') then
-        parser.Identifiers.AddIntegerVariable('memfile_db', (GetComponent(i) as TPLCBlock).memfile_db);
+      if (PropertyName <> 'memfile_db') then
+        Parser.Identifiers.AddIntegerVariable('memfile_db', (GetComponent(AIndex) as TPLCBlock).memfile_db);
 
-      if (propertyName<>'memaddress') then
-        parser.Identifiers.AddIntegerVariable('memaddress', (GetComponent(i) as TPLCBlock).memaddress);
+      if (PropertyName <> 'memaddress') then
+        Parser.Identifiers.AddIntegerVariable('memaddress', (GetComponent(AIndex) as TPLCBlock).memaddress);
 
-      if (propertyName<>'memsubelement') then
-        parser.Identifiers.AddIntegerVariable('memsubelement', (GetComponent(i) as TPLCBlock).memsubelement);
+      if (PropertyName <> 'memsubelement') then
+        Parser.Identifiers.AddIntegerVariable('memsubelement', (GetComponent(AIndex) as TPLCBlock).memsubelement);
 
-      if (propertyName<>'memreadfunction') then
-        parser.Identifiers.AddIntegerVariable('memreadfunction', (GetComponent(i) as TPLCBlock).memreadfunction);
+      if (PropertyName <> 'memreadfunction') then
+        Parser.Identifiers.AddIntegerVariable('memreadfunction', (GetComponent(AIndex) as TPLCBlock).memreadfunction);
 
-      if (propertyName<>'memwritefunction') then
-        parser.Identifiers.AddIntegerVariable('memwritefunction', (GetComponent(i) as TPLCBlock).memwritefunction);
+      if (PropertyName <> 'memwritefunction') then
+        Parser.Identifiers.AddIntegerVariable('memwritefunction', (GetComponent(AIndex) as TPLCBlock).memwritefunction);
 
-      if (propertyName<>'tag') then
-        parser.Identifiers.AddIntegerVariable('Tag', (GetComponent(i) as TPLCBlock).Tag);
+      if (PropertyName <> 'tag') then
+        Parser.Identifiers.AddIntegerVariable('tag', (GetComponent(AIndex) as TPLCBlock).Tag);
     end;
 
-    if (GetComponent(i) is TPLCString) then begin
+    if (GetComponent(AIndex) is TPLCString) then
+    begin
       //register only if the property is not being edited,
       //to avoid circular references.
-      if (propertyName<>'plcrack') then
-        parser.Identifiers.AddIntegerVariable('plcrack', (GetComponent(i) as TPLCString).plcrack);
+      if (PropertyName <> 'plcrack') then
+        Parser.Identifiers.AddIntegerVariable('plcrack', (GetComponent(AIndex) as TPLCString).plcrack);
 
-      if (propertyName<>'plcslot') then
-        parser.Identifiers.AddIntegerVariable('plcslot', (GetComponent(i) as TPLCString).plcslot);
+      if (PropertyName <> 'plcslot') then
+        Parser.Identifiers.AddIntegerVariable('plcslot', (GetComponent(AIndex) as TPLCString).plcslot);
 
-      if (propertyName<>'plcstation') then
-        parser.Identifiers.AddIntegerVariable('plcstation', (GetComponent(i) as TPLCString).plcstation);
+      if (PropertyName <> 'plcstation') then
+        Parser.Identifiers.AddIntegerVariable('plcstation', (GetComponent(AIndex) as TPLCString).plcstation);
 
-      if (propertyName<>'memfile_db') then
-        parser.Identifiers.AddIntegerVariable('memfile_db', (GetComponent(i) as TPLCString).memfile_db);
+      if (PropertyName <> 'memfile_db') then
+        Parser.Identifiers.AddIntegerVariable('memfile_db', (GetComponent(AIndex) as TPLCString).memfile_db);
 
-      if (propertyName<>'memaddress') then
-        parser.Identifiers.AddIntegerVariable('memaddress', (GetComponent(i) as TPLCString).memaddress);
+      if (PropertyName <> 'memaddress') then
+        Parser.Identifiers.AddIntegerVariable('memaddress', (GetComponent(AIndex) as TPLCString).memaddress);
 
-      if (propertyName<>'memsubelement') then
-        parser.Identifiers.AddIntegerVariable('memsubelement', (GetComponent(i) as TPLCString).memsubelement);
+      if (PropertyName <> 'memsubelement') then
+        Parser.Identifiers.AddIntegerVariable('memsubelement', (GetComponent(AIndex) as TPLCString).memsubelement);
 
-      if (propertyName<>'memreadfunction') then
-        parser.Identifiers.AddIntegerVariable('memreadfunction', (GetComponent(i) as TPLCString).memreadfunction);
+      if (PropertyName <> 'memreadfunction') then
+        Parser.Identifiers.AddIntegerVariable('memreadfunction', (GetComponent(AIndex) as TPLCString).memreadfunction);
 
-      if (propertyName<>'memwritefunction') then
-        parser.Identifiers.AddIntegerVariable('memwritefunction', (GetComponent(i) as TPLCString).memwritefunction);
+      if (PropertyName <> 'memwritefunction') then
+        Parser.Identifiers.AddIntegerVariable('memwritefunction', (GetComponent(AIndex) as TPLCString).memwritefunction);
 
-      if (propertyName<>'tag') then
-        parser.Identifiers.AddIntegerVariable('Tag', (GetComponent(i) as TPLCString).Tag);
+      if (PropertyName <> 'tag') then
+        Parser.Identifiers.AddIntegerVariable('tag', (GetComponent(AIndex) as TPLCString).Tag);
     end;
   end;
 end;
 
 { TWinControlBoundsEditor }
 
-procedure TWinControlBoundsEditor.RegisterExpressionVariables(const i: Integer;
-  var parser: TFPExpressionParser);
+procedure TWinControlBoundsEditor.RegisterExpressionVariables(const AIndex: Integer; var Parser: TFPExpressionParser);
 var
-  propertyName: String;
+  PropertyName: string;
 begin
-  if Assigned(parser) then begin
+  if Assigned(Parser) then
+  begin
     //unregister all possible registered variables.
-    parser.Identifiers.Clear;
+    Parser.Identifiers.Clear;
 
-    propertyName:=LowerCase(GetPropInfo^.Name);
+    PropertyName := LowerCase(GetPropInfo^.Name);
 
-    if (GetComponent(i) is TWinControl) then begin
+    if (GetComponent(AIndex) is TWinControl) then
+    begin
       //register only if the property is not being edited,
       //to avoid circular references.
-      if (propertyName<>'width') then
-        parser.Identifiers.AddIntegerVariable('width', (GetComponent(i) as TWinControl).Width);
+      if (PropertyName <> 'width') then
+        Parser.Identifiers.AddIntegerVariable('width', (GetComponent(AIndex) as TWinControl).Width);
 
-      if (propertyName<>'height') then
-        parser.Identifiers.AddIntegerVariable('height', (GetComponent(i) as TWinControl).Height);
+      if (PropertyName <> 'height') then
+        Parser.Identifiers.AddIntegerVariable('height', (GetComponent(AIndex) as TWinControl).Height);
 
-      if (propertyName<>'left') then
-        parser.Identifiers.AddIntegerVariable('left', (GetComponent(i) as TWinControl).Left);
+      if (PropertyName <> 'left') then
+        Parser.Identifiers.AddIntegerVariable('left', (GetComponent(AIndex) as TWinControl).Left);
 
-      if (propertyName<>'top') then
-        parser.Identifiers.AddIntegerVariable('top', (GetComponent(i) as TWinControl).Top);
+      if (PropertyName <> 'top') then
+        Parser.Identifiers.AddIntegerVariable('top', (GetComponent(AIndex) as TWinControl).Top);
 
-      if (propertyName<>'tag') then
-              parser.Identifiers.AddIntegerVariable('tag', (GetComponent(i) as TWinControl).Tag);
+      if (PropertyName <> 'tag') then
+        Parser.Identifiers.AddIntegerVariable('tag', (GetComponent(AIndex) as TWinControl).Tag);
     end;
   end;
 end;
@@ -602,43 +646,43 @@ end;
 ///////////////////////////////////////
 //editor base para os demais editores.
 ///////////////////////////////////////
-procedure TInsertTagsOnFormComponentEditor.AddTagInEditor(Tag:TTag);
+procedure TInsertTagsOnFormComponentEditor.AddTagInEditor(Tag: TTag);
 {$IFDEF FPC}
 var
   Hook: TPropertyEditorHook;
 {$ENDIF}
 begin
-{$IFDEF FPC}
+  {$IFDEF FPC}
   Hook:=nil;
   if not GetHook(Hook) then Exit;
   Hook.PersistentAdded(Tag,false);
   Modified;
-{$ELSE}
-  Designer.Modified;
-{$ENDIF}
-end;
-
-function  TInsertTagsOnFormComponentEditor.CreateComponent(tagclass:TComponentClass):TComponent;
-begin
-  {$IFDEF FPC}
-    Result := tagclass.Create(GetTheOwner);
   {$ELSE}
-    Result := Designer.CreateComponent(tagclass,GetTheOwner,0,0,0,0);
+  Designer.Modified;
   {$ENDIF}
 end;
 
-function TInsertTagsOnFormComponentEditor.GetTheOwner:TComponent;
+function TInsertTagsOnFormComponentEditor.CreateComponent(tagclass: TComponentClass): TComponent;
 begin
-  Result:=nil;
+  {$IFDEF FPC}
+  Result := tagclass.Create(GetTheOwner);
+  {$ELSE}
+  Result := Designer.CreateComponent(tagclass, GetTheOwner, 0, 0, 0, 0);
+  {$ENDIF}
+end;
+
+function TInsertTagsOnFormComponentEditor.GetTheOwner: TComponent;
+begin
+  Result := nil;
 end;
 
 ///////////////////////////////////////
 //editor TAG BUILDER
 ///////////////////////////////////////
 
-function  TProtocolDriverComponentEditor.GetTheOwner: TComponent;
+function TProtocolDriverComponentEditor.GetTheOwner: TComponent;
 begin
-  Result:=ProtocolDriver.Owner;
+  Result := ProtocolDriver.Owner;
 end;
 
 procedure TProtocolDriverComponentEditor.OpenTagBuilder;
@@ -646,24 +690,24 @@ begin
   ProtocolDriver.OpenTagEditor(@AddTagInEditor, @CreateComponent);
 end;
 
-procedure TProtocolDriverComponentEditor.ExecuteVerb(Index: LongInt);
+procedure TProtocolDriverComponentEditor.ExecuteVerb(Index: Longint);
 begin
-  if Index=0 then
+  if Index = 0 then
     OpenTagBuilder();
 end;
 
-function TProtocolDriverComponentEditor.GetVerb(Index: LongInt): AnsiString;
+function TProtocolDriverComponentEditor.GetVerb(Index: Longint): AnsiString;
 begin
-  if Index=0 then
-    Result:='Tag Builder';
+  if Index = 0 then
+    Result := 'Tag Builder';
 end;
 
-function TProtocolDriverComponentEditor.GetVerbCount: LongInt;
+function TProtocolDriverComponentEditor.GetVerbCount: Longint;
 begin
   if ProtocolDriver.HasTabBuilderEditor then
-    Result:=1
+    Result := 1
   else
-    Result:=0;
+    Result := 0;
 end;
 
 procedure TProtocolDriverComponentEditor.Edit;
@@ -674,7 +718,7 @@ end;
 
 function TProtocolDriverComponentEditor.ProtocolDriver: TProtocolDriver;
 begin
-  Result:=TProtocolDriver(GetComponent);
+  Result := TProtocolDriver(GetComponent);
 end;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -683,7 +727,7 @@ end;
 
 function TTagBitMapperComponentEditor.GetTheOwner: TComponent;
 begin
-  Result:=GetComponent().Owner;
+  Result := GetComponent().Owner;
 end;
 
 procedure TTagBitMapperComponentEditor.OpenBitMapper;
@@ -692,21 +736,21 @@ begin
     TPLCNumberMappable(GetComponent).OpenBitMapper(@AddTagInEditor, @CreateComponent);
 end;
 
-procedure TTagBitMapperComponentEditor.ExecuteVerb(Index: LongInt);
+procedure TTagBitMapperComponentEditor.ExecuteVerb(Index: Longint);
 begin
-  if Index=0 then
+  if Index = 0 then
     OpenBitMapper();
 end;
 
-function  TTagBitMapperComponentEditor.GetVerb(Index: LongInt): AnsiString;
+function TTagBitMapperComponentEditor.GetVerb(Index: Longint): AnsiString;
 begin
-  if Index=0 then
-    Result:='Map bits';
+  if Index = 0 then
+    Result := 'Map bits';
 end;
 
-function  TTagBitMapperComponentEditor.GetVerbCount: LongInt;
+function TTagBitMapperComponentEditor.GetVerbCount: Longint;
 begin
-  Result:=1;
+  Result := 1;
 end;
 
 procedure TTagBitMapperComponentEditor.Edit;
@@ -727,50 +771,55 @@ end;
 
 function TBlockElementMapperComponentEditor.GetTheOwner: TComponent;
 begin
-  Result:=GetComponent().Owner;
+  Result := GetComponent().Owner;
 end;
 
-procedure TBlockElementMapperComponentEditor.ExecuteVerb(Index: LongInt);
+procedure TBlockElementMapperComponentEditor.ExecuteVerb(Index: Longint);
 begin
-  if Index=0 then
+  if Index = 0 then
     OpenElementMapper();
 end;
 
 {$if declared(has_customhints)}
 function TBlockElementMapperComponentEditor.GetCustomHint: AnsiString;
 begin
-  if GetComponent is TPLCStruct then begin
-    Result:=Result+'Structure size in bytes:'+IntToStr(TPLCStruct(GetComponent).Size);
+  if GetComponent is TPLCStruct then
+  begin
+    Result := Result + 'Structure size in bytes:' + IntToStr(TPLCStruct(GetComponent).Size);
     Exit;
   end;
 
-  if GetComponent is TPLCBlock then begin
-    Result:=Result+'Number of elements: '+IntToStr(TPLCBlock(GetComponent).Size);
+  if GetComponent is TPLCBlock then
+  begin
+    Result := Result + 'Number of elements: ' + IntToStr(TPLCBlock(GetComponent).Size);
     Exit;
   end;
 end;
 {$ifend}
 
-function  TBlockElementMapperComponentEditor.GetVerb(Index: LongInt): AnsiString;
+function TBlockElementMapperComponentEditor.GetVerb(Index: Longint): AnsiString;
 begin
-  Result:='Unknow option...';
-  if Index=0 then begin
-    if GetComponent is TPLCStruct then begin
-      Result:='Map structure items...';
+  Result := 'Unknow option...';
+  if Index = 0 then
+  begin
+    if GetComponent is TPLCStruct then
+    begin
+      Result := 'Map structure items...';
       Exit;
     end;
-    if GetComponent is TPLCBlock then begin
-      Result:='Map block elements...';
+    if GetComponent is TPLCBlock then
+    begin
+      Result := 'Map block elements...';
       Exit;
     end;
   end;
 end;
 
-function  TBlockElementMapperComponentEditor.GetVerbCount: LongInt;
+function TBlockElementMapperComponentEditor.GetVerbCount: Longint;
 begin
-  Result:=0;
+  Result := 0;
   if GetComponent is TPLCBlock then
-   Result:=1;
+    Result := 1;
 end;
 
 procedure TBlockElementMapperComponentEditor.Edit;
@@ -779,45 +828,39 @@ begin
   OpenElementMapper();
 end;
 
-// somente para windows , pega o valor diretamente no registro do windows
-// a vantagem é que é possivel listar portas acimma de COM9 e tambem portas Virtuais
-// que tenha nomes diferentes (qualquer nome)
+// For Windows only, it retrieves the value directly from the Windows registry.
+// The advantage is that it's possible to list ports above COM9 and
+// also virtual ports with different names (any name).
 {$IFDEF MSWINDOWS}
 function TPortPropertyEditor.GetPortas: string;
 var
-  Registro: TRegistry;
-  lista: TStringList;
-  valor: TStringList;
-  numero: integer;
-begin
-  // cria lista de portas
-  lista := TStringList.Create;
-  // cria lista de valores
-  valor := TStringList.Create;
-  // cria os dados de registro a serem lidos
-  Registro := TRegistry.Create;
+  ARegistry: TRegistry;
+  AList: TStringList;
+  AValue: TStringList;
+  i: Integer;
+begin  GetPortas
+  AList := TStringList.Create;
+  AValue := TStringList.Create;
+  ARegistry := TRegistry.Create;
   try
-    // especifica o caminho do registro
-    Registro.RootKey := HKEY_LOCAL_MACHINE;
-    // abre o caminho do registro onde tem as portas seriais
-    Registro.OpenKeyReadOnly('\HARDWARE\DEVICEMAP\SERIALCOMM');
-    // recolhe valores do registro  ( dados no registro)
-    Registro.GetValueNames(Lista);
-    // conforme a quantidade de portas que estavam no registro
-    for numero := 0 to lista.Count - 1 do
-    // adicionar no valor os dados recolhido na string
-    valor.Add(PChar(Registro.ReadString(lista[numero])));
-    // o valor retornado separados em ponto e virgula
-    Result := valor.CommaText;
+    // especifica o caminho do ARegistry
+    ARegistry.RootKey := HKEY_LOCAL_MACHINE;
+    // abre o caminho do ARegistry onde tem as portas seriais
+    ARegistry.OpenKeyReadOnly('\HARDWARE\DEVICEMAP\SERIALCOMM');
+    // recolhe valores do ARegistry  ( dados no ARegistry)
+    ARegistry.GetValueNames(AList);
+    // conforme a quantidade de portas que estavam no ARegistry
+    for i := 0 to AList.Count - 1 do
+      // adicionar no AValue os dados recolhido na string
+      AValue.Add(PChar(ARegistry.ReadString(AList[i])));
+    // the returned AValue separated by semicolons
+    Result := AValue.CommaText;
   finally
-     // finaliza a lista de registro
-     Registro.Free;
-     // finaliza o uso da lista
-     lista.Free;
-     // finaliza o uso da lista de valores
-     valor.Free;
+    ARegistry.Free;
+    AList.Free;
+    AValue.Free;
   end;
 end;
 {$ENDIF}
-end.
 
+end.

@@ -24,49 +24,54 @@ uses
   Classes, SysUtils, westasciidriver, ProtocolTypes, PLCTagNumber,
   uwesttagbuilder, Controls, Dialogs;
 
-procedure OpenTagEditor(aProtocolDriver, aOwnerOfNewTags: TComponent;
-  InsertHook: TAddTagInEditorHook; CreateProc: TCreateTagProc);
+procedure OpenTagEditor(AProtocolDriver, AOwnerOfNewTags: TComponent; InsertHook: TAddTagInEditorHook; CreateProc: TCreateTagProc);
 var
-  tplc:TPLCTagNumber;
-  ctrl, variable:LongInt;
-  frm:TWestTagBuilder;
-  sctrl,
-  formatmask:AnsiString;
+  APLCTag: TPLCTagNumber;
+  Ctrl: Longint;
+  Variable: Longint;
+  AForm: TWestTagBuilder;
+  SCtrl: AnsiString;
+  FormatMask: AnsiString;
 begin
-  frm:=TWestTagBuilder.Create(nil);
+  AForm := TWestTagBuilder.Create(nil);
   try
-    if frm.ShowModal=mrOK then begin
-      if frm.ZeroFill.Checked and (frm.AdrEnd.Value>9) then
-        formatmask:='#00'
+    if AForm.ShowModal = mrOk then
+    begin
+      if AForm.ZeroFill.Checked and (AForm.AdrEnd.Value > 9) then
+        FormatMask := '#00'
       else
-        formatmask:='#0';
+        FormatMask := '#0';
 
-      for ctrl:=frm.AdrStart.Value to frm.AdrEnd.Value do begin
-        sctrl:=FormatFloat(formatmask,ctrl);
-        for variable:=0 to $1b do begin
-          if frm.Variaveis[variable].Enabled.Checked then begin
-            if Pos('%a',frm.Variaveis[variable].TagName.Text)=0 then begin
-              frm.Variaveis[variable].TagName.Text := frm.Variaveis[variable].TagName.Text + '%a';
+      for Ctrl := AForm.AdrStart.Value to AForm.AdrEnd.Value do
+      begin
+        SCtrl := FormatFloat(FormatMask, Ctrl);
+        for Variable := 0 to $1b do
+        begin
+          if AForm.Variaveis[Variable].Enabled.Checked then
+          begin
+            if Pos('%a', AForm.Variaveis[Variable].TagName.Text) = 0 then
+            begin
+              AForm.Variaveis[Variable].TagName.Text := AForm.Variaveis[Variable].TagName.Text + '%a';
             end;
-            tplc := TPLCTagNumber(CreateProc(TPLCTagNumber));
-            tplc.Name:=StringReplace(frm.Variaveis[variable].TagName.Text,'%a',sctrl,[rfReplaceAll]);
-            tplc.MemAddress := variable;
-            tplc.PLCStation:=ctrl;
-            tplc.RefreshTime:=frm.Variaveis[variable].Scan.Value;
-            tplc.ProtocolDriver := TWestASCIIDriver(aProtocolDriver);
-            InsertHook(tplc);
+            APLCTag := TPLCTagNumber(CreateProc(TPLCTagNumber));
+            APLCTag.Name := StringReplace(AForm.Variaveis[Variable].TagName.Text, '%a', SCtrl, [rfReplaceAll]);
+            APLCTag.MemAddress := Variable;
+            APLCTag.PLCStation := Ctrl;
+            APLCTag.RefreshTime := AForm.Variaveis[Variable].Scan.Value;
+            APLCTag.ProtocolDriver := TWestASCIIDriver(AProtocolDriver);
+            InsertHook(APLCTag);
           end;
         end;
       end;
     end;
   finally
-    frm.Destroy;
+    AForm.Destroy;
   end;
 end;
 
-initialization
 
+initialization
   SetTagBuilderToolForWest6100Protocol(@OpenTagEditor);
 
-end.
 
+end.

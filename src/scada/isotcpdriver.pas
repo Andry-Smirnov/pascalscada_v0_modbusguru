@@ -96,11 +96,11 @@ type
     //: seealso(TSiemensProtocolFamily.connectPLC)
     function  connectPLC(var CPU:TS7CPU):Boolean; override;
     //: seealso(TSiemensProtocolFamily.exchange)
-    function  exchange(var CPU:TS7CPU; var msgOut:BYTES; var msgIn:BYTES; IsWrite:Boolean):Boolean; override;
+    function  exchange(var CPU:TS7CPU; var msgOut:Bytes; var msgIn:Bytes; IsWrite:Boolean):Boolean; override;
     //: seealso(TSiemensProtocolFamily.getResponse)
-    function  getResponse(var msgIn:BYTES; var BytesRead:LongInt):TIOResult; override;
+    function  getResponse(var msgIn:Bytes; var BytesRead:LongInt):TIOResult; override;
     //: seealso(TSiemensProtocolFamily.PrepareToSend)
-    procedure PrepareToSend(var msg: BYTES); override;
+    procedure PrepareToSend(var msg: Bytes); override;
     //: @exclude
     procedure Loaded; override;
 
@@ -272,7 +272,7 @@ end;
 function TISOTCPDriver.connectPLC(var CPU: TS7CPU): Boolean;
 var
   IOResult:TIOPacket;
-  msg:BYTES;
+  msg:Bytes;
   res:LongInt;
   len:Cardinal;
   retries:LongInt;
@@ -303,7 +303,7 @@ begin
   msg[18] := ifthen(FConnectionWay=ISOTCP, (CPU.Rack shl 5) or CPU.Slot,    $57);
   msg[19] := $C0;  // $C0,
   msg[20] := 1;    // 1,
-  msg[21] := 11;   // 9 = TPDU 512 bytes, 11=TPDU 2048 bytes;
+  msg[21] := 11;   // 9 = TPDU 512 Bytes, 11=TPDU 2048 Bytes;
   PrepareToSend(msg);
 
   try
@@ -343,7 +343,7 @@ begin
   end;
 end;
 
-function TISOTCPDriver.exchange(var CPU:TS7CPU; var msgOut:BYTES; var msgIn:BYTES; IsWrite:Boolean):Boolean;
+function TISOTCPDriver.exchange(var CPU:TS7CPU; var msgOut:Bytes; var msgIn:Bytes; IsWrite:Boolean):Boolean;
 var
   res:LongInt;
   retries, BytesRead:LongInt;
@@ -391,7 +391,7 @@ begin
   end;
 end;
 
-function  TISOTCPDriver.getResponse(var msgIn:BYTES; var BytesRead:LongInt):TIOResult;
+function  TISOTCPDriver.getResponse(var msgIn:Bytes; var BytesRead:LongInt):TIOResult;
 var
   res, len:LongInt;
   IOResult1, IOResult2:TIOPacket;
@@ -414,11 +414,11 @@ begin
 
     len := IOResult1.BufferToRead[2]*$100 + IOResult1.BufferToRead[3];
     //As vezes o CLP manda um pacote de
-    //7 bytes que não serve para nada
+    //7 Bytes que não serve para nada
     //ou se serve pra algo, eu não sei.
     //
     //Sometimes the PLC sends a useless
-    //packet, with 7 bytes of len.
+    //packet, with 7 Bytes of len.
     while len = 7 do begin
       //le novamente...
       //reads again.
@@ -447,7 +447,7 @@ begin
       Exit;
     end;
     //se resultado nao der ok,
-    //ou não fechar com o numero de bytes a ler
+    //ou não fechar com o numero de Bytes a ler
     //e não ter o comprimento minimo do ISOTCP sai.
     //
     //if the IO result aren't ok or the packet has less bytes than minimum size.
@@ -473,7 +473,7 @@ begin
   end;
 end;
 
-procedure TISOTCPDriver.PrepareToSend(var msg:BYTES);
+procedure TISOTCPDriver.PrepareToSend(var msg:Bytes);
 var
   len:LongInt;
 begin

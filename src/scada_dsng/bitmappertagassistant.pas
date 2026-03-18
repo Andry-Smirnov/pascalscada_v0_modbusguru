@@ -26,94 +26,102 @@ uses
   Classes, SysUtils, ProtocolTypes, plcnumber, ubitmapper, hsstrings, Controls,
   Dialogs, TagBit;
 
-{ TBitMapTagAssistant }
+  { TBitMapTagAssistant }
 
-procedure OpenBitMapper(Target,
-                        OwnerOfNewTags:TComponent;
-                        InsertHook:TAddTagInEditorHook;
-                        CreateProc:TCreateTagProc);
+procedure OpenBitMapper(Target, OwnerOfNewTags: TComponent; InsertHook: TAddTagInEditorHook; CreateProc: TCreateTagProc);
 var
-  dlg:TfrmBitMapper;
-  bitnum,
-  bytenum,
-  wordnum,
-  startbit,
-  endbit,
-  curbit:LongInt;
-  tbit:TTagBit;
-  FNumberTag:TPLCNumberMappable;
+  ADialog: TfrmBitMapper;
+  BitNum: Longint;
+  ByteNum: Longint;
+  WordNum: Longint;
+  StartBit: Longint;
+  EndBit: Longint;
+  CurBit: Longint;
+  ABit: TTagBit;
+  FNumberTag: TPLCNumberMappable;
 
-  procedure updatenumbers;
+  procedure _UpdateNumbers;
   begin
-    bitnum:=curbit;
-    if dlg.bitnamestartsfrom1.Checked then inc(bitnum);
+    BitNum := CurBit;
+    if ADialog.BitNameStartsFrom1.Checked then
+      Inc(BitNum);
 
-    bytenum:=curbit div 8;
-    if dlg.bytenamestartsfrom1.Checked then inc(bytenum);
+    ByteNum := CurBit Div 8;
+    if ADialog.ByteNameStartsFrom1.Checked then
+      Inc(ByteNum);
 
-    wordnum:=curbit div 16;
-    if dlg.Wordnamestartsfrom1.Checked then inc(wordnum);
+    WordNum := CurBit Div 16;
+    if ADialog.WordNameStartsFrom1.Checked then
+      Inc(WordNum);
   end;
 
-  function GetNewTagBitName:AnsiString;
+  function GetNewTagBitName: Ansistring;
   var
-    n:AnsiString;
+    N: Ansistring;
   begin
-    n:=IntToStr(bitnum);
-    Result:=dlg.edtNamepattern.Text;
-    Result := StringReplace(Result,'%b',n,[rfReplaceAll]);
+    N := IntToStr(BitNum);
+    Result := ADialog.edtNamePattern.Text;
+    Result := StringReplace(Result, '%b', N, [rfReplaceAll]);
 
-    n:=IntToStr(bytenum);
-    Result := StringReplace(Result,'%B',n,[rfReplaceAll]);
+    N := IntToStr(ByteNum);
+    Result := StringReplace(Result, '%B', N, [rfReplaceAll]);
 
-    n:=IntToStr(wordnum);
-    Result := StringReplace(Result,'%w',n,[rfReplaceAll]);
+    N := IntToStr(WordNum);
+    Result := StringReplace(Result, '%w', N, [rfReplaceAll]);
 
-    n:=FNumberTag.Name;
-    Result := StringReplace(Result,'%t',n,[rfReplaceAll]);
+    N := FNumberTag.Name;
+    Result := StringReplace(Result, '%t', N, [rfReplaceAll]);
   end;
+
 begin
-  if not Assigned(Target) then begin
+  if not Assigned(Target) then
+  begin
     ShowMessage(SNumberTagRequired);
     Exit;
   end;
 
-  if not (Target is TPLCNumberMappable) then begin
+  if not (Target is TPLCNumberMappable) then
+  begin
     ShowMessage(SNumberTagRequired);
     Exit;
   end;
 
-  FNumberTag:=TPLCNumberMappable(Target);
+  FNumberTag := TPLCNumberMappable(Target);
 
-  dlg:=TfrmBitMapper.Create(nil);
+  ADialog := TfrmBitMapper.Create(nil);
   try
-    if dlg.ShowModal=mrOK then begin
-      startbit:=31-dlg.StringGrid1.Selection.Right;
-      endbit:=31-dlg.StringGrid1.Selection.Left;
-      curbit:=startbit;
-      if dlg.eachbitastag.Checked then begin
-        while curbit<=endbit do begin
-          updatenumbers;
-          tbit:=TTagBit(CreateProc(TTagBit));
-          tbit.Name:=GetNewTagBitName;
-          tbit.PLCTag:=FNumberTag;
-          tbit.EndBit:=curbit;
-          tbit.StartBit:=curbit;
-          InsertHook(tbit);
-          inc(curbit);
+    if ADialog.ShowModal = mrOk then
+    begin
+      StartBit := 31 - ADialog.StringGrid1.Selection.Right;
+      EndBit := 31 - ADialog.StringGrid1.Selection.Left;
+      CurBit := StartBit;
+      if ADialog.EachBitAsTag.Checked then
+      begin
+        while CurBit <= EndBit do
+        begin
+          _UpdateNumbers;
+          ABit := TTagBit(CreateProc(TTagBit));
+          ABit.Name := GetNewTagBitName;
+          ABit.PLCTag := FNumberTag;
+          ABit.endbit := CurBit;
+          ABit.startbit := CurBit;
+          InsertHook(ABit);
+          Inc(CurBit);
         end;
-      end else begin
-        updatenumbers;
-        tbit:=TTagBit(CreateProc(TTagBit));
-        tbit.Name:=GetNewTagBitName;
-        tbit.PLCTag:=FNumberTag;
-        tbit.EndBit:=endbit;
-        tbit.StartBit:=startbit;
-        InsertHook(tbit);
+      end
+      else
+      begin
+        _UpdateNumbers;
+        ABit := TTagBit(CreateProc(TTagBit));
+        ABit.Name := GetNewTagBitName;
+        ABit.PLCTag := FNumberTag;
+        ABit.endbit := EndBit;
+        ABit.startbit := StartBit;
+        InsertHook(ABit);
       end;
     end;
   finally
-    dlg.Destroy;
+    ADialog.Destroy;
   end;
 end;
 
@@ -122,4 +130,3 @@ initialization
   SetTagBitMapper(@OpenBitMapper);
 
 end.
-

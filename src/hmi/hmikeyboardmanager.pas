@@ -67,17 +67,21 @@ type
     property OnFocusChange: THMIFocusChangeEvent read FOnFocusChange write FOnFocusChange;
   end;
 
+
 implementation
 
+
 {$IFDEF DEBUG}
-uses LCLProc;
+uses
+  LCLProc;
 {$ENDIF}
+
 
 { THMIKeyboardManager }
 
 procedure THMIKeyboardManager.ControlFocusChanged(Sender: TObject; LastControl: TControl);
 var
-  fLastControl: TWinControl;
+  ALastControl: TWinControl;
 begin
   {$IFDEF DEBUG}
   DebugLn('=====================================================================');
@@ -119,37 +123,40 @@ begin
   if Assigned(LastControl) and (LastControl is TWinControl) then
   begin
     {$IFDEF DEBUG}
-DebugLn('Cur focused control is TWinControl');
+    DebugLn('Cur focused control is TWinControl');
     {$ENDIF}
     if (not SameMethod(TWinControl(LastControl).OnClick, @ClickEvent)) or
       (not SameMethod(TWinControl(LastControl).OnEnter, @EnterEvent)) or
       (not SameMethod(TWinControl(LastControl).OnExit, @ExitEvent)) then
     begin
-      fLastControl := TWinControl(LastControl);
+      ALastControl := TWinControl(LastControl);
       {$IFDEF DEBUG}
-DebugLn('fLastControl:=TWinControl(LastControl)');
+      DebugLn('fLastControl:=TWinControl(LastControl)');
       {$ENDIF}
     end
     else
     begin
       {$IFDEF DEBUG}
       DebugLn('Cur focused control has all events Assigned to current handler?!?');
-      if not SameMethod(TWinControl(LastControl).OnClick,ClickEvent) then DebugLn('TWinControl(LastControl).OnClick<>ClickEvent');
-      if not SameMethod(TWinControl(LastControl).OnEnter,EnterEvent) then DebugLn('TWinControl(LastControl).OnEnter<>EnterEvent');
-      if not SameMethod(TWinControl(LastControl).OnExit, ExitEvent)  then DebugLn('TWinControl(LastControl).OnExit<>ExitEvent');
+      if not SameMethod(TWinControl(LastControl).OnClick,ClickEvent) then
+        DebugLn('TWinControl(LastControl).OnClick<>ClickEvent');
+      if not SameMethod(TWinControl(LastControl).OnEnter,EnterEvent) then
+        DebugLn('TWinControl(LastControl).OnEnter<>EnterEvent');
+      if not SameMethod(TWinControl(LastControl).OnExit, ExitEvent)  then
+        DebugLn('TWinControl(LastControl).OnExit<>ExitEvent');
       {$ENDIF}
       Exit;
     end;
   end
   else
   begin
-    fLastControl := nil;
+    ALastControl := nil;
     {$IFDEF DEBUG}
     DebugLn('Cur focused control IS NOT a TWinControl');
     {$ENDIF}
   end;
 
-  if (fLastControl <> FLastFocusedControl) and (fLastControl <> FNumericKeyBoard) and (fLastControl <> FAlphaNumericKeyboard) then
+  if (ALastControl <> FLastFocusedControl) and (ALastControl <> FNumericKeyBoard) and (ALastControl <> FAlphaNumericKeyboard) then
   begin
     {$IFDEF DEBUG}
     DebugLn('Closing all keyboards...');
@@ -162,12 +169,12 @@ DebugLn('fLastControl:=TWinControl(LastControl)');
   begin
     FLastFocusedControl.RemoveFreeNotification(Self);
     {$IFDEF DEBUG}
-DebugLn('Restoring the default event handles for control ',FLastFocusedControl.Name);
+    DebugLn('Restoring the default event handles for control ',FLastFocusedControl.Name);
     {$ENDIF}
     if SameMethod(FLastFocusedControl.OnClick, @ClickEvent) then
     begin
       {$IFDEF DEBUG}
-DebugLn('Restoring OnClick');
+      DebugLn('Restoring OnClick');
       {$ENDIF}
       FLastFocusedControl.OnClick := FOldOnClickEvent;
     end;
@@ -175,7 +182,7 @@ DebugLn('Restoring OnClick');
     if SameMethod(FLastFocusedControl.OnEnter, @EnterEvent) then
     begin
       {$IFDEF DEBUG}
-DebugLn('Restoring OnEnter');
+      DebugLn('Restoring OnEnter');
       {$ENDIF}
       FLastFocusedControl.OnEnter := FOldOnEnterEvent;
     end;
@@ -183,79 +190,79 @@ DebugLn('Restoring OnEnter');
     if SameMethod(FLastFocusedControl.OnExit, @ExitEvent) then
     begin
       {$IFDEF DEBUG}
-DebugLn('Restoring OnEnter');
+      DebugLn('Restoring OnEnter');
       {$ENDIF}
       FLastFocusedControl.OnExit := FOldOnExitEvent;
     end;
   end;
 
   try
-    if fLastControl <> nil then
+    if ALastControl <> nil then
     begin
       {$IFDEF DEBUG}
-DebugLn('Backup of event handlers of the new focused control ',fLastControl.Name);
+      DebugLn('Backup of event handlers of the new focused control ',fLastControl.Name);
       {$ENDIF}
-      FOldOnClickEvent := fLastControl.OnClick;
-      FOldOnEnterEvent := fLastControl.OnEnter;
-      FOldOnExitEvent := fLastControl.OnExit;
+      FOldOnClickEvent := ALastControl.OnClick;
+      FOldOnEnterEvent := ALastControl.OnEnter;
+      FOldOnExitEvent := ALastControl.OnExit;
 
       FKeyboarTypeForControl := oskNone;
       if Assigned(FOnFocusChange) then
       begin
-        OnFocusChange(fLastControl,
+        OnFocusChange(ALastControl,
           FKeyboarTypeForControl,
           FNumericKBOptions,
           FAlphaNumKBOptions,
           FShowKeyBoardNow);
         {$IFDEF DEBUG}
-DebugLn('OnFocusChange fired');
+        DebugLn('OnFocusChange fired');
         {$ENDIF}
       end
       else
       begin
         {$IFDEF DEBUG}
-DebugLn('FOnFocusChange event is NULL');
+        DebugLn('FOnFocusChange event is NULL');
         {$ENDIF}
       end;
 
       if FKeyboarTypeForControl = oskNone then
       begin
         {$IFDEF DEBUG}
-DebugLn('FKeyboarTypeForControl=oskNone');
+        DebugLn('FKeyboarTypeForControl=oskNone');
         {$ENDIF}
-        fLastControl := nil;
+        ALastControl := nil;
         FLastFocusedControl := nil;
       end
       else
       begin
         {$IFDEF DEBUG}
-DebugLn('FKeyboarTypeForControl<>oskNone');
+        DebugLn('FKeyboarTypeForControl<>oskNone');
         {$ENDIF}
-        fLastControl.OnClick := @ClickEvent;
-        fLastControl.OnEnter := @EnterEvent;
-        fLastControl.OnExit := @ExitEvent;
-        fLastControl.FreeNotification(Self);
+        ALastControl.OnClick := @ClickEvent;
+        ALastControl.OnEnter := @EnterEvent;
+        ALastControl.OnExit := @ExitEvent;
+        ALastControl.FreeNotification(Self);
         {$IFDEF DEBUG}
-DebugLn('setup up of new event handlers...');
+        DebugLn('setup up of new event handlers...');
         {$ENDIF}
       end;
     end
     else
     begin
       {$IFDEF DEBUG}
-DebugLn('fLastControl=nil');
+      DebugLn('fLastControl=nil');
       {$ENDIF}
     end;
   finally
-    if ((fLastControl <> FNumericKeyBoard) and (fLastControl <> FAlphaNumericKeyboard)) or (fLastControl = nil) then
+    if ((ALastControl <> FNumericKeyBoard) and (ALastControl <> FAlphaNumericKeyboard)) or (ALastControl = nil) then
     begin
       {$IFDEF DEBUG}
-      if fLastControl=nil then
+      if fLastControl = nil then
         DebugLn('FLastFocusedControl:=fLastControl(NULL)')
       else
         DebugLn('FLastFocusedControl:=fLastControl');
       {$ENDIF}
-      FLastFocusedControl := fLastControl;
+      FLastFocusedControl := ALastControl;
     end;
   end;
 end;
@@ -278,35 +285,34 @@ end;
 procedure THMIKeyboardManager.ShowKeyboard(Sender: TObject);
 begin
   case FKeyboarTypeForControl of
-    oskNone:
-      ExitEvent(nil);
+    oskNone: ExitEvent(nil);
     oskNumeric: begin
-      CloseAlphaKB;
-      FNumericKeyBoard := TpsHMIfrmNumericKeyBoard.CreateOrGetLast(Self,
-        FLastFocusedControl,
-        nskoShowMinus in FNumericKBOptions,
-        nskoShowDecimalPoint in FNumericKBOptions);
-      FNumericKeyBoard.OnClose := @NumKBClosed;
-      FNumericKeyBoard.ShowAlongsideOfTheTarget;
-    end;
-    oskAlphaNumeric: begin
-      CloseNumKB;
-      FAlphaNumericKeyboard := TpsHMIfrmAlphaKeyboard.CreateOrGetLast(Self,
-        FLastFocusedControl,
-        askoShowFxxKeys in FAlphaNumKBOptions,
-        askoShowTab in FAlphaNumKBOptions,
-        askoShowCaps in FAlphaNumKBOptions,
-        askoShowShift in FAlphaNumKBOptions,
-        askoShowCtrl in FAlphaNumKBOptions,
-        askoShowAlt in FAlphaNumKBOptions,
-        askoShowSymbols in FAlphaNumKBOptions,
-        askoShowNumbers in FAlphaNumKBOptions,
-        askoShowFastNavigation in FAlphaNumKBOptions,
-        askoShowNavigation in FAlphaNumKBOptions,
-        askoCloseOnPressEnter in FAlphaNumKBOptions);
-      FAlphaNumericKeyboard.OnClose := @AlphaKBClosed;
-      FAlphaNumericKeyboard.ShowAlongsideOfTheTarget;
-    end;
+                  CloseAlphaKB;
+                  FNumericKeyBoard := TpsHMIfrmNumericKeyBoard.CreateOrGetLast(Self,
+                    FLastFocusedControl,
+                    nskoShowMinus in FNumericKBOptions,
+                    nskoShowDecimalPoint in FNumericKBOptions);
+                  FNumericKeyBoard.OnClose := @NumKBClosed;
+                  FNumericKeyBoard.ShowAlongsideOfTheTarget;
+                end;
+    oskAlphaNumeric:  begin
+                        CloseNumKB;
+                        FAlphaNumericKeyboard := TpsHMIfrmAlphaKeyboard.CreateOrGetLast(Self,
+                          FLastFocusedControl,
+                          askoShowFxxKeys in FAlphaNumKBOptions,
+                          askoShowTab in FAlphaNumKBOptions,
+                          askoShowCaps in FAlphaNumKBOptions,
+                          askoShowShift in FAlphaNumKBOptions,
+                          askoShowCtrl in FAlphaNumKBOptions,
+                          askoShowAlt in FAlphaNumKBOptions,
+                          askoShowSymbols in FAlphaNumKBOptions,
+                          askoShowNumbers in FAlphaNumKBOptions,
+                          askoShowFastNavigation in FAlphaNumKBOptions,
+                          askoShowNavigation in FAlphaNumKBOptions,
+                          askoCloseOnPressEnter in FAlphaNumKBOptions);
+                        FAlphaNumericKeyboard.OnClose := @AlphaKBClosed;
+                        FAlphaNumericKeyboard.ShowAlongsideOfTheTarget;
+                      end;
   end;
 end;
 

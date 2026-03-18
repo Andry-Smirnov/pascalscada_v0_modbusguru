@@ -37,9 +37,12 @@ type
 
   TFaceplateFormClass = class of TFaceplateFrame;
 
+
 implementation
 
-uses StdCtrls, LazRegions, LCLIntf, Math;
+
+uses
+  StdCtrls, LazRegions, LCLIntf, Math;
 
   { TFaceplate }
 
@@ -62,19 +65,19 @@ end;
 
 procedure TFaceplateFrame.setfaceplateTag(AValue: TPLCStruct);
 var
-  c: Integer;
+  i: Integer;
 begin
-  for c := 0 to ComponentCount - 1 do
+  for i := 0 to ComponentCount - 1 do
   begin
     //TODO mudar somente tags de faceplate. Change only faceplate tags
-    if (Components[c] is TPLCStructItem) {and Tag.Faceplate} then
+    if (Components[i] is TPLCStructItem) {and Tag.Faceplate} then
     begin
-      (Components[c] as TPLCStructItem).PLCBlock := AValue;
+      (Components[i] as TPLCStructItem).PLCBlock := AValue;
       Continue;
     end;
-    if (Components[c] is TPLCStructString) {and Tag.Faceplate} then
+    if (Components[i] is TPLCStructString) {and Tag.Faceplate} then
     begin
-      (Components[c] as TPLCStructString).PLCBlock := AValue;
+      (Components[i] as TPLCStructString).PLCBlock := AValue;
       Continue;
     end;
   end;
@@ -82,29 +85,30 @@ end;
 
 procedure TFaceplateFrame.Loaded;
 var
-  c: Integer;
-  rgn, rgn2: HRGN;
+  i: Integer;
+  Rgn: HRGN;
+  Rgn2: HRGN;
 begin
   inherited Loaded;
-  rgn := CreateRectRgn(0, 0, 0, 0);
+  Rgn := CreateRectRgn(0, 0, 0, 0);
   try
-    for c := 0 to ControlCount - 1 do
+    for i := 0 to ControlCount - 1 do
     begin
       try
-        rgn2 := CreateRectRgn(
-          Controls[c].Left,
-          Controls[c].Top,
-          Controls[c].Left + Controls[c].Width,
-          Controls[c].Top + Controls[c].Height);
-        CombineRgn(rgn, rgn, rgn2, RGN_OR);
-        Controls[c].ControlStyle := Controls[c].ControlStyle + [csNoDesignSelectable];
+        Rgn2 := CreateRectRgn(
+          Controls[i].Left,
+          Controls[i].Top,
+          Controls[i].Left + Controls[i].Width,
+          Controls[i].Top + Controls[i].Height);
+        CombineRgn(Rgn, Rgn, Rgn2, RGN_OR);
+        Controls[i].ControlStyle := Controls[i].ControlStyle + [csNoDesignSelectable];
       finally
-        DeleteObject(rgn2);
+        DeleteObject(Rgn2);
       end;
     end;
-    SetWindowRgn(Handle, rgn, True);
+    SetWindowRgn(Handle, Rgn, True);
   finally
-    DeleteObject(rgn);
+    DeleteObject(Rgn);
   end;
 
   if Assigned(FOnLoaded) then

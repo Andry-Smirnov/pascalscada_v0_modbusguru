@@ -160,9 +160,13 @@ type
     property PLCTag: TPLCTag read FTag write SetHMITag;
   end;
 
+
 implementation
 
-uses typinfo, rttiutils, hsstrings;
+
+uses
+  typinfo, rttiutils, hsstrings;
+
 
   { THMIBooleanPropertyConnector }
 
@@ -256,16 +260,16 @@ end;
 
 procedure THMIBooleanPropertyConnector.RecalculateObjectsProperties;
 var
-  Bz: TBooleanZone;
+  AZone: TBooleanZone;
   i: Integer;
 begin
   if [csReading, csLoading, csDesigning, csDestroying] * ComponentState <> [] then Exit;
   if Assigned(FTag) and Supports(FTag, ITagNumeric) then
   begin
-    Bz := TBooleanZone(FConditionZones.GetZoneFromValue((FTag as ITagNumeric).Value));
-    if Bz = nil then Exit;
+    AZone := TBooleanZone(FConditionZones.GetZoneFromValue((FTag as ITagNumeric).Value));
+    if AZone = nil then Exit;
     for i := 0 to AffectedObjects.Count - 1 do
-      TObjectWithBooleanPropetiesColletionItem(AffectedObjects.Items[i]).ApplyResult(Bz.ZoneResult);
+      TObjectWithBooleanPropetiesColletionItem(AffectedObjects.Items[i]).ApplyResult(AZone.ZoneResult);
   end;
 end;
 
@@ -343,8 +347,8 @@ end;
 constructor TObjectWithBooleanPropetiesColletionItem.Create(ACollection: TCollection);
 begin
   inherited Create(ACollection);
-  fRequiredTypeName := PTypeInfo(TypeInfo(Boolean))^.Name;
-  fRequiredTypeKind := PTypeInfo(TypeInfo(Boolean))^.Kind;
+  FRequiredTypeName := PTypeInfo(TypeInfo(Boolean))^.Name;
+  FRequiredTypeKind := PTypeInfo(TypeInfo(Boolean))^.Kind;
 end;
 
 procedure TObjectWithBooleanPropetiesColletionItem.ApplyResult(Result: Boolean);

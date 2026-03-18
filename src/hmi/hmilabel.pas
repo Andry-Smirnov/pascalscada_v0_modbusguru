@@ -41,16 +41,19 @@ type
     FRegInSecMan: Boolean;
     FFormatDateTimeOptions: TFormatDateTimeOptions;
     FNumberFormat: Ansistring;
-    FPrefix, FSufix: TCaption;
-    FIsEnabled, FIsEnabledBySecurity: Boolean;
+    FPrefix: TCaption;
+    FSufix: TCaption;
+    FIsEnabled: Boolean;
+    FIsEnabledBySecurity: Boolean;
 
     FSecurityCode: UTF8String;
-    procedure SetFormatDateTimeOptions(AValue: TFormatDateTimeOptions);
-    procedure SetSecurityCode(sc: UTF8String);
 
-    procedure SetFormat(f: Ansistring);
-    procedure SetPrefix(s: TCaption);
-    procedure SetSufix(s: TCaption);
+    procedure SetFormatDateTimeOptions(AValue: TFormatDateTimeOptions);
+    procedure SetSecurityCode(ASecurityCode: UTF8String);
+
+    procedure SetFormat(AValue: Ansistring);
+    procedure SetPrefix(AValue: TCaption);
+    procedure SetSufix(AValue: TCaption);
     function GetCaption: TCaption;
 
     //: @seealso(IHMIInterface.GetHMITag)
@@ -67,9 +70,9 @@ type
     //: @exclude
     FTag: TPLCTag;
     //: @exclude
-    procedure SetEnabled(e: Boolean); override;
+    procedure SetEnabled(AValue: Boolean); override;
     //: @exclude
-    procedure SetHMITag(t: TPLCTag); virtual;
+    procedure SetHMITag(AValue: TPLCTag); virtual;
     //: @exclude
     procedure RefreshTagValue; virtual;
 
@@ -182,9 +185,13 @@ type
     property FormatDateTimeOptions: TFormatDateTimeOptions read FFormatDateTimeOptions write SetFormatDateTimeOptions;
   end;
 
+
 implementation
 
-uses hsstrings, ControlSecurityManager, Forms;
+
+uses
+  hsstrings, ControlSecurityManager, Forms;
+
 
 constructor THMILabel.Create(AOwner: TComponent);
 begin
@@ -193,7 +200,7 @@ begin
   if not FRegInSecMan then
   begin
     {$IFNDEF WINDOWS}
-    writeln('FIX-ME: Failed to register class ', ClassName, ' instace with name="', Name, '" in the ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
+    WriteLn('FIX-ME: Failed to register class ', ClassName, ' instace with name="', Name, '" in the ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
     {$ENDIF}
   end;
 
@@ -211,7 +218,7 @@ begin
   else
   begin
     {$IFNDEF WINDOWS}
-    writeln('FIX-ME: Why class ', ClassName, ', instace name="', Name, '" ins''t registered in ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
+    WriteLn('FIX-ME: Why class ', ClassName, ', instace name="', Name, '" ins''t registered in ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
     {$ENDIF}
   end;
 
@@ -226,21 +233,21 @@ begin
   RefreshTagValue;
 end;
 
-procedure THMILabel.SetSecurityCode(sc: UTF8String);
+procedure THMILabel.SetSecurityCode(ASecurityCode: UTF8String);
 begin
-  if Trim(sc) = '' then
+  if Trim(ASecurityCode) = '' then
     Self.CanBeAccessed(True)
   else
     with GetControlSecurityManager do
     begin
-      ValidateSecurityCode(sc);
-      if not SecurityCodeExists(sc) then
-        RegisterSecurityCode(sc);
+      ValidateSecurityCode(ASecurityCode);
+      if not SecurityCodeExists(ASecurityCode) then
+        RegisterSecurityCode(ASecurityCode);
 
-      Self.CanBeAccessed(CanAccess(sc));
+      Self.CanBeAccessed(CanAccess(ASecurityCode));
     end;
 
-  FSecurityCode := sc;
+  FSecurityCode := ASecurityCode;
 end;
 
 procedure THMILabel.SetFormatDateTimeOptions(AValue: TFormatDateTimeOptions);
@@ -250,9 +257,9 @@ begin
   RefreshTagValue;
 end;
 
-procedure THMILabel.SetFormat(f: Ansistring);
+procedure THMILabel.SetFormat(AValue: Ansistring);
 begin
-  FNumberFormat := f;
+  FNumberFormat := AValue;
   RefreshTagValue;
 end;
 
@@ -261,12 +268,12 @@ begin
   Result := FTag;
 end;
 
-procedure THMILabel.SetHMITag(t: TPLCTag);
+procedure THMILabel.SetHMITag(AValue: TPLCTag);
 begin
   //se o tag esta entre um dos aceitos.
 
   //check if the tag is valid.
-  if (t <> nil) and (not Supports(t, ITagInterface)) then
+  if (AValue <> nil) and (not Supports(AValue, ITagInterface)) then
     raise Exception.Create(SinvalidTag);
 
   //se ja estou associado a um tag, remove
@@ -279,29 +286,29 @@ begin
 
   //adiona o callback para o novo tag
   //link with the new tag.
-  if t <> nil then
+  if AValue <> nil then
   begin
-    t.AddTagChangeHandler(@TagChangeCallBack);
-    t.AddWriteFaultHandler(@WriteFaultCallBack);
-    t.AddRemoveTagHandler(@RemoveTagCallBack);
-    FTag := t;
+    AValue.AddTagChangeHandler(@TagChangeCallBack);
+    AValue.AddWriteFaultHandler(@WriteFaultCallBack);
+    AValue.AddRemoveTagHandler(@RemoveTagCallBack);
+    FTag := AValue;
     RefreshTagValue;
   end;
-  FTag := t;
+  FTag := AValue;
 
   if (FTag = nil) and (csDesigning in ComponentState) then
     inherited Caption := SWithoutTag;
 end;
 
-procedure THMILabel.SetPrefix(s: TCaption);
+procedure THMILabel.SetPrefix(AValue: TCaption);
 begin
-  FPrefix := s;
+  FPrefix := AValue;
   RefreshTagValue;
 end;
 
-procedure THMILabel.SetSufix(s: TCaption);
+procedure THMILabel.SetSufix(AValue: TCaption);
 begin
-  FSufix := s;
+  FSufix := AValue;
   RefreshTagValue;
 end;
 
@@ -350,9 +357,9 @@ begin
   CanBeAccessed(True);
 end;
 
-procedure THMILabel.SetEnabled(e: Boolean);
+procedure THMILabel.SetEnabled(AValue: Boolean);
 begin
-  FIsEnabled := e;
+  FIsEnabled := AValue;
   inherited SetEnabled(FIsEnabled and FIsEnabledBySecurity);
 end;
 

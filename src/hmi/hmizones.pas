@@ -53,8 +53,10 @@ type
   {$ENDIF}
   TZone = class(THMIBasicColletionItem)
   private
-    FValue1, FValue2: Double;
-    FIncludeV1, FIncludeV2: Boolean;
+    FValue1: Double;
+    FValue2: Double;
+    FIncludeV1: Boolean;
+    FIncludeV2: Boolean;
     FDefaultZone: Boolean;
     FZoneType: TZoneTypes;
 
@@ -63,7 +65,7 @@ type
     procedure SetIncV1(v: Boolean);
     procedure SetIncV2(v: Boolean);
     procedure SetAsDefaultZone(v: Boolean);
-    procedure SetZoneType(zt: TZoneTypes);
+    procedure SetZoneType(AZoneTypes: TZoneTypes);
 
   protected
     {: @exclude }
@@ -260,7 +262,7 @@ type
   protected
     procedure Loaded; override;
   public
-    constructor Create(aCollection: TCollection); override;
+    constructor Create(ACollection: TCollection); override;
     destructor Destroy; override;
     procedure AssignTo(Dest: TPersistent); override;
   published
@@ -316,7 +318,7 @@ type
   TZones = class(THMIBasicColletion)
   public
     //: @exclude
-    constructor Create(aOwner: TPersistent; aItemClass: TCollectionItemClass); override;
+    constructor Create(AOwner: TPersistent; AItemClass: TCollectionItemClass); override;
 
     {$IFDEF PORTUGUES}
      {:
@@ -372,6 +374,7 @@ type
     FFont: TFont;
     FHorAlignment: TAlignment;
     FVerAlignment: TTextLayout;
+
     procedure FontChanges(Sender: TObject);
     procedure SetText(t: TCaption);
     procedure SetColor(c: TColor);
@@ -583,6 +586,7 @@ type
     FImageIndex: Longint;
     FColor: TColor;
     FTransparent: Boolean;
+
     procedure SetILAsDefault(b: Boolean);
     procedure SetFileName(fn: Ansistring);
     procedure SetImageList(il: TImageList);
@@ -591,7 +595,7 @@ type
     procedure SetTransparent(b: Boolean);
   public
     //: @exclude
-    constructor Create(aCollection: TCollection); override;
+    constructor Create(ACollection: TCollection); override;
     procedure Assign(Source: TPersistent); override;
   published
 
@@ -714,7 +718,7 @@ type
   TGraphicZones = class(TZones)
   public
     //: @exclude
-    constructor Create(aOwner: TPersistent);
+    constructor Create(AOwner: TPersistent);
 
     {$IFDEF PORTUGUES}
     //: Adiciona uma nova zona gráfica a coleção.
@@ -745,7 +749,7 @@ type
   TColorZones = class(TZones)
   public
     //: @exclude
-    constructor Create(aOwner: TPersistent);
+    constructor Create(AOwner: TPersistent);
 
     {$IFDEF PORTUGUES}
     //: Adiciona uma nova zona de cor a coleção.
@@ -853,7 +857,8 @@ end;
 
 procedure TAnimationZone.AddReference(RefBy: TAnimationZone);
 var
-  h, i: Longint;
+  h: Longint;
+  i: Longint;
 begin
   for i := 0 to High(FReferencedBy) do
     if FReferencedBy[i] = RefBy then Exit;
@@ -864,17 +869,19 @@ end;
 
 procedure TAnimationZone.RemReference(RefBy: TAnimationZone);
 var
-  h, i, p: Longint;
-  found: Boolean;
+  h: Longint;
+  i: Longint;
+  p: Longint;
+  Found: Boolean;
 begin
-  found := False;
+  Found := False;
   for i := 0 to High(FReferencedBy) do
     if FReferencedBy[i] = RefBy then
     begin
       p := i;
-      found := True;
+      Found := True;
     end;
-  if not found then Exit;
+  if not Found then Exit;
   h := High(FReferencedBy);
   FReferencedBy[p] := FReferencedBy[h];
   SetLength(FReferencedBy, h);
@@ -886,9 +893,9 @@ begin
   SetBlinkWithZoneNumber(FBlinkWithIndex);
 end;
 
-constructor TAnimationZone.Create(aCollection: TCollection);
+constructor TAnimationZone.Create(ACollection: TCollection);
 begin
-  inherited Create(aCollection);
+  inherited Create(ACollection);
   FBlinkWithIndex := -1;
   if (([csDesigning] * (Collection.Owner as TComponent).ComponentState) = []) or (([csReading, csLoading] * (Collection.Owner as TComponent).ComponentState) <> []) then
   begin
@@ -920,16 +927,16 @@ end;
 
 procedure TAnimationZone.AssignTo(Dest: TPersistent);
 var
-  aDest: TAnimationZone;
+  ADest: TAnimationZone;
 begin
   if Dest is TAnimationZone then
   begin
-    aDest := Dest as TAnimationZone;
+    ADest := Dest as TAnimationZone;
 
     inherited AssignTo(Dest);
 
-    aDest.BlinkTime := FBlinkTime;
-    aDest.BlinkWith := FBlinkWithIndex;
+    ADest.BlinkTime := FBlinkTime;
+    ADest.BlinkWith := FBlinkWithIndex;
   end
   else
     inherited AssignTo(Dest);
@@ -937,9 +944,9 @@ end;
 
 { TColorZones }
 
-constructor TColorZones.Create(aOwner: TPersistent);
+constructor TColorZones.Create(AOwner: TPersistent);
 begin
-  inherited Create(aOwner, TColorZone);
+  inherited Create(AOwner, TColorZone);
 end;
 
 function TColorZones.Add: TColorZone;
@@ -1021,7 +1028,7 @@ end;
 
 procedure TZone.SetAsDefaultZone(v: Boolean);
 var
-  c: Longint;
+  i: Longint;
 begin
   if [csReading] * THMIBasicColletion(Collection).CollectionState <> [] then
   begin
@@ -1034,27 +1041,27 @@ begin
   if v then
     with Collection as TZones do
     begin
-      for c := 0 to Count - 1 do
-        if (Items[c] <> Self) and (Items[c] is TZone) then
-          TZone(Items[c]).DefaultZone := False;
+      for i := 0 to Count - 1 do
+        if (Items[i] <> Self) and (Items[i] is TZone) then
+          TZone(Items[i]).DefaultZone := False;
     end;
   FDefaultZone := v;
   NotifyChange;
 end;
 
-procedure TZone.SetZoneType(zt: TZoneTypes);
+procedure TZone.SetZoneType(AZoneTypes: TZoneTypes);
 begin
   if [csReading] * THMIBasicColletion(Collection).CollectionState <> [] then
   begin
-    FZoneType := zt;
+    FZoneType := AZoneTypes;
     Exit;
   end;
 
-  if zt = FZoneType then Exit;
+  if AZoneTypes = FZoneType then Exit;
 
-  if (zt = ztBit) and ((FValue1 > 31) or (FValue1 < 0)) then
+  if (AZoneTypes = ztBit) and ((FValue1 > 31) or (FValue1 < 0)) then
     raise Exception.Create(SztBitcomparationValue1MustBeBetween0And31);
-  FZoneType := zt;
+  FZoneType := AZoneTypes;
   NotifyChange;
 end;
 
@@ -1067,76 +1074,65 @@ begin
   end;
 
   case FZoneType of
-    ztEqual:
-      Result := 'Value=' + FloatToStr(Value1);
+    ztEqual: Result := 'Value=' + FloatToStr(Value1);
+    ztRange:  begin
+                if FIncludeV1 then
+                  Result := '(Value>=' + FloatToStr(Value1)
+                else
+                  Result := '(Value>' + FloatToStr(Value1);
 
-    ztRange:
-    begin
-      if FIncludeV1 then
-        Result := '(Value>=' + FloatToStr(Value1)
-      else
-        Result := '(Value>' + FloatToStr(Value1);
+                if FIncludeV2 then
+                  Result := Result + ') AND (Value<=' + FloatToStr(Value2) + ')'
+                else
+                  Result := Result + ') AND (Value<' + FloatToStr(Value2) + ')';
+              end;
+    ztBit:    begin
+                if FIncludeV1 then
+                  Result := 'Value.Bit' + FormatFloat('00', FValue1) + '=ON'
+                else
+                  Result := 'Value.Bit' + FormatFloat('00', FValue1) + '=OFF';
+              end;
+    ztNotEqual:   Result := 'Value<>' + FloatToStr(Value1);
+    ztOutOfRange: begin
+                    if FIncludeV1 then
+                      Result := '(Value<=' + FloatToStr(Value1)
+                    else
+                      Result := '(Value<' + FloatToStr(Value1);
 
-      if FIncludeV2 then
-        Result := Result + ') AND (Value<=' + FloatToStr(Value2) + ')'
-      else
-        Result := Result + ') AND (Value<' + FloatToStr(Value2) + ')';
-    end;
-
-    ztBit:
-    begin
-      if FIncludeV1 then
-        Result := 'Value.Bit' + FormatFloat('00', FValue1) + '=ON'
-      else
-        Result := 'Value.Bit' + FormatFloat('00', FValue1) + '=OFF';
-    end;
-
-    ztNotEqual:
-      Result := 'Value<>' + FloatToStr(Value1);
-
-    ztOutOfRange:
-    begin
-      if FIncludeV1 then
-        Result := '(Value<=' + FloatToStr(Value1)
-      else
-        Result := '(Value<' + FloatToStr(Value1);
-
-      if FIncludeV2 then
-        Result := Result + ') OR (Value>=' + FloatToStr(Value2) + ')'
-      else
-        Result := Result + ') OR (Value>' + FloatToStr(Value2) + ')';
-    end;
-    ztGreaterThan:
-    begin
-      if FIncludeV1 then
-        Result := '(Value>=' + FloatToStr(Value1) + ')'
-      else
-        Result := '(Value>' + FloatToStr(Value1) + ')';
-    end;
-    ztLessThan:
-    begin
-      if FIncludeV1 then
-        Result := '(Value<=' + FloatToStr(Value1) + ')'
-      else
-        Result := '(Value<' + FloatToStr(Value1) + ')';
-    end;
+                    if FIncludeV2 then
+                      Result := Result + ') OR (Value>=' + FloatToStr(Value2) + ')'
+                    else
+                      Result := Result + ') OR (Value>' + FloatToStr(Value2) + ')';
+                  end;
+    ztGreaterThan:  begin
+                      if FIncludeV1 then
+                        Result := '(Value>=' + FloatToStr(Value1) + ')'
+                      else
+                        Result := '(Value>' + FloatToStr(Value1) + ')';
+                    end;
+    ztLessThan: begin
+                  if FIncludeV1 then
+                    Result := '(Value<=' + FloatToStr(Value1) + ')'
+                  else
+                    Result := '(Value<' + FloatToStr(Value1) + ')';
+                end;
   end;
 end;
 
 procedure TZone.AssignTo(Dest: TPersistent);
 var
-  aDest: TZone;
+  ADest: TZone;
 begin
   if Dest is TZone then
   begin
-    aDest := Dest as TZone;
+    ADest := Dest as TZone;
 
-    aDest.FValue1 := FValue1;
-    aDest.FValue2 := FValue2;
-    aDest.FIncludeV1 := FIncludeV1;
-    aDest.FIncludeV2 := FIncludeV2;
-    aDest.FDefaultZone := FDefaultZone;
-    aDest.FZoneType := FZoneType;
+    ADest.FValue1 := FValue1;
+    ADest.FValue2 := FValue2;
+    ADest.FIncludeV1 := FIncludeV1;
+    ADest.FIncludeV2 := FIncludeV2;
+    ADest.FDefaultZone := FDefaultZone;
+    ADest.FZoneType := FZoneType;
   end
   else
     inherited AssignTo(Dest);
@@ -1146,9 +1142,9 @@ end;
 // TZones implementation
 //############################################################
 
-constructor TZones.Create(aOwner: TPersistent; aItemClass: TCollectionItemClass);
+constructor TZones.Create(AOwner: TPersistent; AItemClass: TCollectionItemClass);
 begin
-  inherited Create(aOwner, aItemClass);
+  inherited Create(AOwner, AItemClass);
 end;
 
 //seleciona a zona de acordo com seu critério de seleção
@@ -1158,86 +1154,83 @@ end;
 //Selects a animation zone depending of their select criteria.
 function TZones.GetZoneFromValue(v: Double): TZone;
 var
-  c, Value, bit: Longint;
+  i: Longint;
+  Value: Longint;
+  Bit: Longint;
   found: Boolean;
 begin
   Result := nil;
   found := False;
-  for c := 0 to Count - 1 do
+  for i := 0 to Count - 1 do
   begin
 
-    if (not found) and TZone(Items[c]).DefaultZone then
+    if (not found) and TZone(Items[i]).DefaultZone then
     begin
-      Result := TZone(Items[c]);
+      Result := TZone(Items[i]);
       found := True;
       Continue;
     end;
 
-    with Items[c] as TZone do
+    with Items[i] as TZone do
       case ZoneType of
-        ztEqual:
-          if v = Value1 then
-          begin
-            Result := Self.Items[c] as TZone;
-            Break;
-          end;
-        ztRange:
-          if ((v > FValue1) or (FIncludeV1 and (v >= FValue1))) and ((v < FValue2) or (FIncludeV2 and (v <= FValue2))) then
-          begin
-            Result := Self.Items[c] as TZone;
-            Break;
-          end;
-        ztBit:
-        begin
-          bit := Trunc(Value1);
-          Value := Trunc(v);
-          bit := Power(2, bit);
-          if ((Value and bit) = bit) = FIncludeV1 then
-          begin
-            Result := Self.Items[c] as TZone;
-            Break;
-          end;
-        end;
-        ztNotEqual:
-          if v <> Value1 then
-          begin
-            Result := Self.Items[c] as TZone;
-            Break;
-          end;
-        ztOutOfRange:
-          if ((v < FValue1) or (FIncludeV1 and (v <= FValue1))) or ((v > FValue2) or (FIncludeV2 and (v >= FValue2))) then
-          begin
-            Result := Self.Items[c] as TZone;
-            Break;
-          end;
-        ztGreaterThan:
-          if ((v > FValue1) or (FIncludeV1 and (v >= FValue1))) then
-          begin
-            Result := Self.Items[c] as TZone;
-            Break;
-          end;
-        ztLessThan:
-          if ((v < FValue1) or (FIncludeV1 and (v <= FValue1))) then
-          begin
-            Result := Self.Items[c] as TZone;
-            Break;
-          end;
+        ztEqual:  if v = Value1 then
+                    begin
+                      Result := Self.Items[i] as TZone;
+                      Break;
+                    end;
+        ztRange:  if ((v > FValue1) or (FIncludeV1 and (v >= FValue1))) and ((v < FValue2) or (FIncludeV2 and (v <= FValue2))) then
+                    begin
+                      Result := Self.Items[i] as TZone;
+                      Break;
+                    end;
+        ztBit:  begin
+                  Bit := Trunc(Value1);
+                  Value := Trunc(v);
+                  Bit := Power(2, Bit);
+                  if ((Value and Bit) = Bit) = FIncludeV1 then
+                  begin
+                    Result := Self.Items[i] as TZone;
+                    Break;
+                  end;
+                end;
+        ztNotEqual: if v <> Value1 then
+                      begin
+                        Result := Self.Items[i] as TZone;
+                        Break;
+                      end;
+        ztOutOfRange: if ((v < FValue1) or (FIncludeV1 and (v <= FValue1))) or ((v > FValue2) or (FIncludeV2 and (v >= FValue2))) then
+                        begin
+                          Result := Self.Items[i] as TZone;
+                          Break;
+                        end;
+        ztGreaterThan:  if ((v > FValue1) or (FIncludeV1 and (v >= FValue1))) then
+                          begin
+                            Result := Self.Items[i] as TZone;
+                            Break;
+                          end;
+        ztLessThan: if ((v < FValue1) or (FIncludeV1 and (v <= FValue1))) then
+                      begin
+                        Result := Self.Items[i] as TZone;
+                        Break;
+                      end;
       end; //end do case
   end; //end do for
 end;
 
 function TZones.GetDefaultZone: TZone;
 var
-  c, Value, bit: Longint;
-  found: Boolean;
+  i,
+  Value,
+  Bit: Longint;
+  Found: Boolean;
 begin
   Result := nil;
-  found := False;
-  for c := 0 to Count - 1 do
+  Found := False;
+  for i := 0 to Count - 1 do
   begin
-    if (not found) and TZone(Items[c]).DefaultZone then
+    if (not Found) and TZone(Items[i]).DefaultZone then
     begin
-      Result := TZone(Items[c]);
+      Result := TZone(Items[i]);
       Exit;
     end;
   end;
@@ -1264,20 +1257,20 @@ end;
 
 procedure TTextZone.AssignTo(Dest: TPersistent);
 var
-  aDest: TTextZone;
+  ADest: TTextZone;
 begin
   if Dest is TTextZone then
   begin
-    aDest := Dest as TTextZone;
+    ADest := Dest as TTextZone;
 
     inherited AssignTo(Dest);
 
-    aDest.FText := FText;
-    aDest.FColor := FColor;
-    aDest.FTransparent := FTransparent;
-    aDest.FHorAlignment := FHorAlignment;
-    aDest.FVerAlignment := FVerAlignment;
-    aDest.FFont.Assign(FFont);
+    ADest.FText := FText;
+    ADest.FColor := FColor;
+    ADest.FTransparent := FTransparent;
+    ADest.FHorAlignment := FHorAlignment;
+    ADest.FVerAlignment := FVerAlignment;
+    ADest.FFont.Assign(FFont);
   end
   else
     inherited AssignTo(Dest);
@@ -1341,9 +1334,9 @@ end;
 // TGraphicZone implementation
 //############################################################
 
-constructor TGraphicZone.Create(aCollection: TCollection);
+constructor TGraphicZone.Create(ACollection: TCollection);
 begin
-  inherited Create(aCollection);
+  inherited Create(ACollection);
   FILIsDefault := True;
   FTransparent := True;
   FImageList := nil;
@@ -1376,24 +1369,24 @@ end;
 
 procedure TGraphicZone.SetILAsDefault(b: Boolean);
 var
-  notify: Boolean;
+  Notify: Boolean;
 begin
-  notify := (FILIsDefault <> b);
+  Notify := (FILIsDefault <> b);
   FILIsDefault := b;
-  if notify then
+  if Notify then
     NotifyChange;
 end;
 
 procedure TGraphicZone.SetFileName(fn: Ansistring);
 var
-  notify: Boolean;
+  Notify: Boolean;
 begin
   if (Trim(fn) <> '') and (not FileExists(fn)) then
     raise Exception.Create(SfileNotFound);
 
-  notify := (fn <> FFileName);
+  Notify := (fn <> FFileName);
   FFileName := fn;
-  if notify then
+  if Notify then
     NotifyChange;
 end;
 
@@ -1414,8 +1407,7 @@ begin
 
   if il = nil then
     SetImageIndex(-1)
-  else
-  if FImageIndex >= il.Count then
+  else if FImageIndex >= il.Count then
     SetImageIndex(-1);
 
   NotifyChange;
@@ -1423,7 +1415,7 @@ end;
 
 procedure TGraphicZone.SetImageIndex(aIndex: Longint);
 var
-  notify: Boolean;
+  Notify: Boolean;
 begin
   if [csReading, csLoading] * THMIBasicColletion(Collection).CollectionState <> [] then
   begin
@@ -1435,51 +1427,51 @@ begin
   begin
     if (aIndex >= 0) and (aIndex <= (FImageList.Count - 1)) then
     begin
-      notify := (FImageIndex <> aIndex);
+      Notify := (FImageIndex <> aIndex);
       FImageIndex := aIndex;
     end
     else
     begin
-      notify := FImageIndex <> -1;
+      Notify := FImageIndex <> -1;
       FImageIndex := -1;
     end;
   end
   else
   begin
-    notify := FImageIndex <> -1;
+    Notify := FImageIndex <> -1;
     FImageIndex := -1;
   end;
 
-  if notify then
+  if Notify then
     NotifyChange;
 end;
 
 procedure TGraphicZone.SetColor(c: TColor);
 var
-  notify: Boolean;
+  Notify: Boolean;
 begin
-  notify := (FColor <> c);
+  Notify := (FColor <> c);
   FColor := c;
-  if notify then
+  if Notify then
     NotifyChange;
 end;
 
 procedure TGraphicZone.SetTransparent(b: Boolean);
 var
-  notify: Boolean;
+  Notify: Boolean;
 begin
-  notify := (FTransparent <> b);
+  Notify := (FTransparent <> b);
   FTransparent := b;
-  if notify then
+  if Notify then
     NotifyChange;
 end;
 
 //############################################################
 // TGraphicZones implementation
 //############################################################
-constructor TGraphicZones.Create(aOwner: TPersistent);
+constructor TGraphicZones.Create(AOwner: TPersistent);
 begin
-  inherited Create(aOwner, TGraphicZone);
+  inherited Create(AOwner, TGraphicZone);
 end;
 
 function TGraphicZones.Add: TGraphicZone;

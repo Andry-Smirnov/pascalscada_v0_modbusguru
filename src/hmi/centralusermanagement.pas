@@ -10,7 +10,7 @@ uses
 
 type
   TCheckUserChanges = function(out ChangeData: UTF8String): Integer of object;
-  TRemoteUserChanged = procedure(aUID: Integer; aUserName: string; AuthData: TJSONObject) of object;
+  TRemoteUserChanged = procedure(AUID: Integer; AUserName: string; AuthData: TJSONObject) of object;
 
   TSyncRec = record
     UID: Integer;
@@ -40,14 +40,15 @@ type
     FRaiseExceptOnConnFailure: Boolean;
     FUseCachedAuthorizations: Boolean;
     FUseCentralUserAsLocalUser: Boolean;
-    FWait, FUseSSL: Boolean;
+    FWait: Boolean;
+    FUseSSL: Boolean;
     FCacheUpdateCount: Integer;
     FCheckUserChangedThread: TCheckUserChangeThread;
     function CheckServerUserChanged(out ChangeData: UTF8String): Integer;
     function GetCacheUptCount: Integer;
-    function PostMethod(aAPIEndpoint: string; aJsonData: TJSONData; var ReturnData: UTF8String): Boolean;
-    function PostMethodInt(aAPIEndpoint: string; aJsonData: TJSONData; var ReturnData: UTF8String): Integer;
-    procedure RemoteUserChanged(aUID: Integer; aUserName: string; AuthData: TJSONObject);
+    function PostMethod(AAPIEndpoint: string; AJsonData: TJSONData; var ReturnData: UTF8String): Boolean;
+    function PostMethodInt(AAPIEndpoint: string; AJsonData: TJSONData; var ReturnData: UTF8String): Integer;
+    procedure RemoteUserChanged(AUID: Integer; AUserName: string; AuthData: TJSONObject);
     procedure RemoteUserChangedRemotely(Data: PtrInt);
     procedure setAuthServer(AValue: string);
     procedure SetAuthServerPort(AValue: Word);
@@ -61,7 +62,7 @@ type
     FValidatedSC: TStringList;
     FRegisteredSCLastQuery: TDateTime;
     function CheckUserAndPassword(User, Pass: UTF8String; out UserID: Integer; LoginAction: Boolean): Boolean; override;
-    function CanAccess(sc: UTF8String; aUID: Integer): Boolean; override; overload;
+    function CanAccess(ASecurityCode: UTF8String; AUID: Integer): Boolean; override; overload;
     procedure Loaded; override;
   public
     constructor Create(AOwner: TComponent); override;
@@ -71,11 +72,11 @@ type
     procedure Logout; override;
 
     //Security codes management
-    procedure ValidateSecurityCode(sc: UTF8String); override;
-    procedure RegisterSecurityCode(sc: UTF8String); override;
+    procedure ValidateSecurityCode(ASecurityCode: UTF8String); override;
+    procedure RegisterSecurityCode(ASecurityCode: UTF8String); override;
     function SecurityCodeExists(sc: UTF8String): Boolean; override;
 
-    function CanAccess(sc: UTF8String): Boolean; override;
+    function CanAccess(ASecurityCode: UTF8String): Boolean; override;
   published
     property UID;
     property ChipCardReader;
@@ -99,47 +100,51 @@ type
     property CachedUpdateCount: Integer read GetCacheUptCount;
   end;
 
+
 const
-  _User = 'user';
-  _Password = 'password';
-  _checkuserpwd = 'checkuserpwd';
-  _enumsecuritycodes = 'enumsecuritycodes';
-  _ManagementNotAvailable = 'User management not available, check the user management on the server!';
-  _ManagementValidateSC = 'User can not access Security Code';
-  _ManagementValidateRSC = 'Security Code is not found';
-  _CannotConnectOnSecServer = 'Conneciton to security server failed';
-  _SecurityServerRejectedSC = 'Security server has been rejected this security code';
-  _SecurityServerCannotRegisterSC = 'Security server cannot register this security code';
-  _uidcanaccess = 'uidcanaccess';
-  _securitycode = 'securitycode';
-  _uid = 'uid';
-  _login = 'login';
-  _registersecuritycode = 'registersecuritycode';
-  _validadesecuritycode = 'validadesecuritycode';
-  _FUseCentralUserAsLocalUser = 'UseCentralUserAsLocalUser';
-  _authorizations = 'authorizations';
-  _userchanged = 'userchanged';
-  _username = 'username';
+  _S_USER = 'user';
+  _S_PASSWORD = 'password';
+  _S_CHECK_USER_PASSWORD = 'checkuserpwd';
+  _S_ENUM_SECURITY_CODES = 'enumsecuritycodes';
+  _S_MANAGEMENT_NOT_AVAILABLE = 'User management not available, check the user management on the server!';
+  _S_MANAGEMENT_VALIDATE_SC = 'User can not access Security Code';
+  _S_MANAGEMENT_VALIDATE_RSC = 'Security Code is not found';
+  _S_CANNOT_CONNECT_ON_SEC_SERVER = 'Conneciton to security server failed';
+  _S_SECURITY_SERVER_REJECTED_SC = 'Security server has been rejected this security code';
+  _S_SECURITY_SERVER_CANNOT_REGISTER_SC = 'Security server cannot register this security code';
+  _S_UID_CAN_ACCESS = 'uidcanaccess';
+  _S_SECURITY_CODE = 'securitycode';
+  _S_UID = 'uid';
+  _S_LOGIN = 'login';
+  _S_REGISTER_SECURITY_CODE = 'registersecuritycode';
+  _S_VALIDADE_SECURITY_CODE = 'validadesecuritycode';
+  _S_F_USE_CENTRAL_USER_AS_LOCAL_USER = 'UseCentralUserAsLocalUser';
+  _S_AUTHORIZATIONS = 'authorizations';
+  _S_USER_CHANGED = 'userchanged';
+  _S_USER_NAME = 'username';
+
 
 implementation
 
-uses DateUtils, Dialogs;
+
+uses
+  DateUtils, Dialogs;
 
   { TCheckUserChangeThread }
 
 procedure TCheckUserChangeThread.Execute;
 var
-  aux: Integer;
+  Aux: Integer;
   JsonData: UTF8String;
   UserData: TJSONData;
-  jAux: TJSONObject;
-  jNumber: TJSONNumber;
-  jStr: TJSONString;
+  JAux: TJSONObject;
+  JNumber: TJSONNumber;
+  JStr: TJSONString;
 
-  procedure DoUserChange(aUID2: Integer; aUserName: string; aData2: TJSONObject);
+  procedure DoUserChange(AUID2: Integer; AUserName: string; AData2: TJSONObject);
   begin
-    if (not Terminated) and (aux = 200) and Assigned(FOnUserChanged) then
-      FOnUserChanged(aUID2, aUserName, aData2);
+    if (not Terminated) and (Aux = 200) and Assigned(FOnUserChanged) then
+      FOnUserChanged(AUID2, AUserName, AData2);
   end;
 
 begin
@@ -148,8 +153,8 @@ begin
     try
       if Assigned(FCheckUserChanged) then
       begin
-        aux := FCheckUserChanged(JsonData);
-        if aux = 0 then
+        Aux := FCheckUserChanged(JsonData);
+        if Aux = 0 then
         begin
           Sleep(100);
           Continue;
@@ -157,9 +162,9 @@ begin
         try
           UserData := GetJSON(JsonData);
           try
-            if (UserData is TJSONObject) and TJSONObject(UserData).Find(_authorizations, jAux) and TJSONObject(UserData).Find(_uid, jNumber) and TJSONObject(UserData).Find(_username, jStr) then
+            if (UserData is TJSONObject) and TJSONObject(UserData).Find(_S_AUTHORIZATIONS, JAux) and TJSONObject(UserData).Find(_S_UID, JNumber) and TJSONObject(UserData).Find(_S_USER_NAME, JStr) then
             begin
-              DoUserChange(jNumber.AsInteger, jStr.AsString, jAux.Clone as TJSONObject);
+              DoUserChange(JNumber.AsInteger, JStr.AsString, JAux.Clone as TJSONObject);
             end
             else
             begin
@@ -184,23 +189,23 @@ end;
 
 { TCentralUserManagement }
 
-function TCentralUserManagement.PostMethod(aAPIEndpoint: string; aJsonData: TJSONData; var ReturnData: UTF8String): Boolean;
+function TCentralUserManagement.PostMethod(AAPIEndpoint: string; AJsonData: TJSONData; var ReturnData: UTF8String): Boolean;
 begin
-  Exit(PostMethodInt(aAPIEndpoint, aJsonData, ReturnData) = 200);
+  Exit(PostMethodInt(AAPIEndpoint, AJsonData, ReturnData) = 200);
 end;
 
 function TCentralUserManagement.CheckServerUserChanged(out ChangeData: UTF8String): Integer;
 var
-  jobj: TJSONObject;
-  aux: UTF8String;
+  JObj: TJSONObject;
+  Aux: UTF8String;
 begin
-  jobj := TJSONObject.Create;
+  JObj := TJSONObject.Create;
   try
-    jobj.Add('wait', FWait); //fist cycle dont have to wait.
-    Result := PostMethodInt(_userchanged, jobj, ChangeData);
+    JObj.Add('wait', FWait); //fist cycle dont have to wait.
+    Result := PostMethodInt(_S_USER_CHANGED, JObj, ChangeData);
     FWait := Result = 200;
   finally
-    FreeAndNil(jobj);
+    FreeAndNil(JObj);
   end;
 end;
 
@@ -209,84 +214,85 @@ begin
   Exit(FCacheUpdateCount);
 end;
 
-function TCentralUserManagement.PostMethodInt(aAPIEndpoint: string; aJsonData: TJSONData; var ReturnData: UTF8String): Integer;
+function TCentralUserManagement.PostMethodInt(AAPIEndpoint: string; AJsonData: TJSONData; var ReturnData: UTF8String): Integer;
 var
-  wc: TFPHTTPClient;
-  ms, sl: TStringStream;
+  AClient: TFPHTTPClient;
+  MStream: TStringStream;
+  SStream: TStringStream;
 begin
-  wc := TFPHTTPClient.Create(Self);
+  AClient := TFPHTTPClient.Create(Self);
   try
-    ms := TStringStream.Create(aJsonData.AsJSON);
+    MStream := TStringStream.Create(AJsonData.AsJSON);
     try
-      ms.Position := 0;
-      wc.RequestBody := ms;
-      sl := TStringStream.Create;
+      MStream.Position := 0;
+      AClient.RequestBody := MStream;
+      SStream := TStringStream.Create;
       try
         try
-          wc.Post(ifthen(FUseSSL, 'https', 'http') + '://' + FAuthServer + ':' + FAuthServerPort.ToString + '/' + aAPIEndpoint, sl);
+          AClient.Post(ifthen(FUseSSL, 'https', 'http') + '://' + FAuthServer
+            + ':' + FAuthServerPort.ToString + '/' + AAPIEndpoint, SStream);
         except
         end;
-        sl.Position := 0;
-        ReturnData := sl.DataString;
+        SStream.Position := 0;
+        ReturnData := SStream.DataString;
         //Clipboard.AsText:=ReturnData
       finally
-        FreeAndNil(sl)
+        FreeAndNil(SStream)
       end;
-      Exit(wc.ResponseStatusCode);
+      Exit(AClient.ResponseStatusCode);
     finally
-      FreeAndNil(ms);
+      FreeAndNil(MStream);
     end;
   finally
-    FreeAndNil(wc);
+    FreeAndNil(AClient);
   end;
 end;
 
-procedure TCentralUserManagement.RemoteUserChanged(aUID: Integer; aUserName: string; AuthData: TJSONObject);
+procedure TCentralUserManagement.RemoteUserChanged(AUID: Integer; AUserName: string; AuthData: TJSONObject);
 var
-  aux: PSyncRec;
+  Aux: PSyncRec;
 begin
-  new(aux);
-  aux^.UserName := aUserName;
-  aux^.UID := aUID;
-  aux^.AuthData := AuthData;
+  New(Aux);
+  Aux^.UserName := AUserName;
+  Aux^.UID := AUID;
+  Aux^.AuthData := AuthData;
   if Application.Flags * [AppDoNotCallAsyncQueue] = [] then
   begin
-    Application.QueueAsyncCall(@RemoteUserChangedRemotely, PtrInt(aux));
+    Application.QueueAsyncCall(@RemoteUserChangedRemotely, PtrInt(Aux));
   end;
 end;
 
 procedure TCentralUserManagement.RemoteUserChangedRemotely(Data: PtrInt);
 var
-  aux: PSyncRec;
+  Aux: PSyncRec;
   Sender: TObject;
-  updateCtrls: Boolean = False;
+  UpdateCtrls: Boolean = False;
 begin
   //Sender:=TObject(Data);
-  aux := PSyncRec(Data);
+  Aux := PSyncRec(Data);
   try
-    if (Data <> 0) and Assigned(aux^.AuthData) and (aux^.AuthData is TJSONObject) then
+    if (Data <> 0) and Assigned(Aux^.AuthData)
+      and (Aux^.AuthData is TJSONObject) then
     begin
       if Assigned(FCachedAuthorizations) then
         FreeAndNil(FCachedAuthorizations);
 
-      FCachedAuthorizations := aux^.AuthData;
-      updateCtrls := FUID <> aux^.UID;
-      FUID := aux^.UID;
-      FCurrentUserLogin := aux^.UserName;
-      FCurrentUserName := aux^.UserName;
+      FCachedAuthorizations := Aux^.AuthData;
+      UpdateCtrls := FUID <> Aux^.UID;
+      FUID := Aux^.UID;
+      FCurrentUserLogin := Aux^.UserName;
+      FCurrentUserName := Aux^.UserName;
       Inc(FCacheUpdateCount);
       //end else begin
       //  FCachedAuthorizations.Clear;
     end;
   finally
-    if Assigned(aux) then
-      Dispose(aux);
+    if Assigned(Aux) then
+      Dispose(Aux);
   end;
 
-  if updateCtrls then
+  if UpdateCtrls then
     GetControlSecurityManager.UpdateControls;
-  ;
-
 end;
 
 procedure TCentralUserManagement.setAuthServer(AValue: string);
@@ -305,7 +311,8 @@ end;
 
 procedure TCentralUserManagement.SetUseCentralUserAsLocalUser(AValue: Boolean);
 begin
-  if FUseCentralUserAsLocalUser = AValue then Exit;
+  if FUseCentralUserAsLocalUser = AValue then
+    Exit;
   if [csReading, csLoading] * ComponentState <> [] then
   begin
     FUseCentralUserAsLocalUserLoading := AValue;
@@ -338,16 +345,16 @@ end;
 
 function TCentralUserManagement.CheckUserAndPassword(User, Pass: UTF8String; out UserID: Integer; LoginAction: Boolean): Boolean;
 var
-  jobj: TJSONObject;
+  JObj: TJSONObject;
   UserInfo: UTF8String;
   UserData: TJSONData;
-  aUID: TJSONNumber;
+  JUID: TJSONNumber;
 begin
-  jobj := TJSONObject.Create;
+  JObj := TJSONObject.Create;
   try
-    jobj.Add(_User, User);
-    jobj.Add(_Password, Pass);
-    if PostMethod(_checkuserpwd, jobj, UserInfo) then
+    JObj.Add(_S_USER, User);
+    JObj.Add(_S_PASSWORD, Pass);
+    if PostMethod(_S_CHECK_USER_PASSWORD, JObj, UserInfo) then
     begin
       try
         UserData := GetJSON(UserInfo);
@@ -358,10 +365,10 @@ begin
         if LoginAction and Assigned(FCachedAuthorizations) then
           FreeAndNil(FCachedAuthorizations);
 
-        if (UserData is TJSONObject) and TJSONObject(UserData).Find(_uid, aUID) then
+        if (UserData is TJSONObject) and TJSONObject(UserData).Find(_S_UID, JUID) then
         begin
-          UserID := aUID.AsInteger;
-          if LoginAction and TJSONObject(UserData).Find(_authorizations, FCachedAuthorizations) then
+          UserID := JUID.AsInteger;
+          if LoginAction and TJSONObject(UserData).Find(_S_AUTHORIZATIONS, FCachedAuthorizations) then
             FCachedAuthorizations := TJSONObject(FCachedAuthorizations.Clone);
           Exit(True);
         end
@@ -375,73 +382,74 @@ begin
     else
       Exit(False);
   finally
-    FreeAndNil(jobj);
+    FreeAndNil(JObj);
   end;
 end;
 
-function TCentralUserManagement.CanAccess(sc: UTF8String; aUID: Integer): Boolean;
+function TCentralUserManagement.CanAccess(ASecurityCode: UTF8String; AUID: Integer): Boolean;
 var
-  jobj, jAux: TJSONObject;
-  aux: UTF8String;
+  JObj: TJSONObject;
+  JAux: TJSONObject;
+  Aux: UTF8String;
   CentralData: TJSONData;
-  jUID: TJSONNumber;
-  jLogin: TJSONString;
-  aBoolVar: TJSONBoolean;
+  JUID: TJSONNumber;
+  JLogin: TJSONString;
+  ABoolVar: TJSONBoolean;
 begin
-  if (aUID < 0) and (FUID < 0) then
+  if (AUID < 0) and (FUID < 0) then
     Exit(False);
 
-  if (FUID > 0) and (aUID = FUID) and FUseCachedAuthorizations and Assigned(FCachedAuthorizations) then
+  if (FUID > 0) and (AUID = FUID) and FUseCachedAuthorizations and Assigned(FCachedAuthorizations) then
   begin
-    Result := FCachedAuthorizations.Find(sc, aBoolVar) or FCachedAuthorizations.Find(Utf8ToAnsi(sc), aBoolVar); //TODO Check
+    Result := FCachedAuthorizations.Find(ASecurityCode, ABoolVar) or FCachedAuthorizations.Find(Utf8ToAnsi(ASecurityCode), ABoolVar); //TODO Check
     Exit;
   end;
 
-  jobj := TJSONObject.Create;
+  JObj := TJSONObject.Create;
   try
-    jobj.Add(_uid, aUID);
-    jobj.Add(_securitycode, sc);
-    jobj.Add(_FUseCentralUserAsLocalUser, FUseCentralUserAsLocalUser);
-    Result := PostMethod(_uidcanaccess, jobj, aux);
+    JObj.Add(_S_UID, AUID);
+    JObj.Add(_S_SECURITY_CODE, ASecurityCode);
+    JObj.Add(_S_F_USE_CENTRAL_USER_AS_LOCAL_USER, FUseCentralUserAsLocalUser);
+    Result := PostMethod(_S_UID_CAN_ACCESS, JObj, Aux);
     if FUseCentralUserAsLocalUser then
     begin
       try
-        CentralData := GetJSON(aux);
+        CentralData := GetJSON(Aux);
       except
         Exit;
       end;
 
       if (CentralData is TJSONObject) then
       begin
-        if TJSONObject(CentralData).Find(_uid, jUID) then
+        if TJSONObject(CentralData).Find(_S_UID, JUID) then
         begin
-          if FUID <> jUID.AsInteger then
+          if FUID <> JUID.AsInteger then
           begin
-            if TJSONObject(CentralData).Find(_authorizations, jAux) then
+            if TJSONObject(CentralData).Find(_S_AUTHORIZATIONS, JAux) then
             begin
               if Assigned(FCachedAuthorizations) then
                 FreeAndNil(FCachedAuthorizations);
-              FCachedAuthorizations := TJSONObject(jAux.Clone);
+              FCachedAuthorizations := TJSONObject(JAux.Clone);
             end;
 
             //delay a Control security refresh
             if Application.Flags * [AppDoNotCallAsyncQueue] = [] then
               Application.QueueAsyncCall(@UpdateControlSecureState, 0);
           end;
-          Result := FCachedAuthorizations.Find(sc, aBoolVar);
-          FUID := jUID.AsInteger;
+          Result := FCachedAuthorizations.Find(ASecurityCode, ABoolVar);
+          FUID := JUID.AsInteger;
         end;
 
-        if TJSONObject(CentralData).Find(_login, jLogin) then
+        if TJSONObject(CentralData).Find(_S_LOGIN, JLogin) then
         begin
-          FCurrentUserLogin := jLogin.AsString;
+          FCurrentUserLogin := JLogin.AsString;
         end;
 
         Exit;
       end;
     end;
   finally
-    FreeAndNil(jobj);
+    FreeAndNil(JObj);
   end;
 end;
 
@@ -475,21 +483,21 @@ function TCentralUserManagement.GetRegisteredAccessCodes: TStringList;
 var
   SecurityCodeList: UTF8String;
   SecCodeJArr: TJSONData;
-  jobj: TJSONObject;
+  JObj: TJSONObject;
   i: Integer;
-  aux: TJSONParser;
+  Aux: TJSONParser;
 begin
   Result := TStringList.Create;
-  jobj := TJSONObject.Create;
+  JObj := TJSONObject.Create;
   try
-    if PostMethod(_enumsecuritycodes, jobj, SecurityCodeList) then
+    if PostMethod(_S_ENUM_SECURITY_CODES, JObj, SecurityCodeList) then
     begin
       try
-        aux := TJSONParser.Create(SecurityCodeList);
+        Aux := TJSONParser.Create(SecurityCodeList);
         try
-          SecCodeJArr := aux.Parse;
+          SecCodeJArr := Aux.Parse;
         finally
-          FreeAndNil(aux);
+          FreeAndNil(Aux);
         end;
       except
         Exit;
@@ -498,7 +506,6 @@ begin
       try
         if (SecCodeJArr is TJSONArray) then
         begin
-
           for i := 0 to SecCodeJArr.Count - 1 do
             Result.Add(SecCodeJArr.Items[i].AsString);
         end
@@ -512,13 +519,13 @@ begin
     else
       Exit;
   finally
-    FreeAndNil(jobj);
+    FreeAndNil(JObj);
   end;
 end;
 
 procedure TCentralUserManagement.Manage;
 begin
-  raise Exception.Create(_ManagementNotAvailable);
+  raise Exception.Create(_S_MANAGEMENT_NOT_AVAILABLE);
 end;
 
 procedure TCentralUserManagement.Logout;
@@ -531,64 +538,59 @@ begin
   inherited Logout;
 end;
 
-procedure TCentralUserManagement.ValidateSecurityCode(sc: UTF8String);
+procedure TCentralUserManagement.ValidateSecurityCode(ASecurityCode: UTF8String);
 var
-  jobj: TJSONObject;
-  aux: UTF8String;
+  JObj: TJSONObject;
+  Aux: UTF8String;
 begin
-  if Assigned(FValidatedSC) and (FValidatedSC.IndexOf(sc) >= 0) then Exit;
-
-  jobj := TJSONObject.Create;
+  if Assigned(FValidatedSC) and (FValidatedSC.IndexOf(ASecurityCode) >= 0) then
+    Exit;
+  JObj := TJSONObject.Create;
   try
-    jobj.Add(_securitycode, sc);
-    case PostMethodInt(_validadesecuritycode, jobj, aux) of
-      0: if FRaiseExceptOnConnFailure then
-          raise Exception.Create(_CannotConnectOnSecServer);
-      200: FValidatedSC.Add(sc);
+    JObj.Add(_S_SECURITY_CODE, ASecurityCode);
+    case PostMethodInt(_S_VALIDADE_SECURITY_CODE, JObj, Aux) of
+      0:  if FRaiseExceptOnConnFailure then
+            raise Exception.Create(_S_CANNOT_CONNECT_ON_SEC_SERVER);
+      200: FValidatedSC.Add(ASecurityCode);
       404: ;
-      405:
-        raise Exception.Create(_SecurityServerRejectedSC);
+      405: raise Exception.Create(_S_SECURITY_SERVER_REJECTED_SC);
       else
-      begin
-
-      end;
+        begin
+        end;
     end;
   finally
-    FreeAndNil(jobj);
+    FreeAndNil(JObj);
   end;
 end;
 
-procedure TCentralUserManagement.RegisterSecurityCode(sc: UTF8String);
+procedure TCentralUserManagement.RegisterSecurityCode(ASecurityCode: UTF8String);
 var
-  jobj: TJSONObject;
-  aux: UTF8String;
+  JObj: TJSONObject;
+  Aux: UTF8String;
 begin
-  if SecurityCodeExists(sc) then
+  if SecurityCodeExists(ASecurityCode) then
     Exit;
-  jobj := TJSONObject.Create;
+  JObj := TJSONObject.Create;
   try
-    jobj.Add(_securitycode, sc);
-    case PostMethodInt(_registersecuritycode, jobj, aux) of
-      0:
-        if FRaiseExceptOnConnFailure then
-          raise Exception.Create(_CannotConnectOnSecServer);
+    JObj.Add(_S_SECURITY_CODE, ASecurityCode);
+    case PostMethodInt(_S_REGISTER_SECURITY_CODE, JObj, Aux) of
+      0:  if FRaiseExceptOnConnFailure then
+            raise Exception.Create(_S_CANNOT_CONNECT_ON_SEC_SERVER);
       200: ;
       404: ;
-      405:
-        raise Exception.Create(_SecurityServerCannotRegisterSC);
+      405: raise Exception.Create(_S_SECURITY_SERVER_CANNOT_REGISTER_SC);
       else
-      begin
-
-      end;
+        begin
+        end;
     end;
   finally
-    FreeAndNil(jobj);
+    FreeAndNil(JObj);
   end;
 end;
 
 function TCentralUserManagement.SecurityCodeExists(sc: UTF8String): Boolean;
 var
-  c: Longint;
+  i: Longint;
 begin
   if SecondsBetween(Now, FRegisteredSCLastQuery) > 300 then
   begin
@@ -601,9 +603,9 @@ begin
   Result := Assigned(FRegisteredSC) and (FRegisteredSC.IndexOf(sc) >= 0);
 end;
 
-function TCentralUserManagement.CanAccess(sc: UTF8String): Boolean;
+function TCentralUserManagement.CanAccess(ASecurityCode: UTF8String): Boolean;
 begin
-  Result := CanAccess(sc, FUID);
+  Result := CanAccess(ASecurityCode, FUID);
 end;
 
 end.

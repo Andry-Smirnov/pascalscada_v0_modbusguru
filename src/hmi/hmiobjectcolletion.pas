@@ -30,14 +30,18 @@ type
   private
     FTag: PtrUInt;
   protected
-    FTargetObject, FTargetObjectLoaded: TComponent;
-    FTargetObjectProperty, FTargetObjectPropertyLoaded: Ansistring;
+    FTargetObject: TComponent;
+    FTargetObjectLoaded: TComponent;
+    FTargetObjectProperty: Ansistring;
+    FTargetObjectPropertyLoaded: Ansistring;
+
     procedure SetTargetObject(AValue: TComponent);
     procedure SetTargetObjectProperty(AValue: Ansistring);
   protected
-    fRequiredTypeName: Ansistring;
-    fRequiredTypeKind: TTypeKind;
-    function AcceptObject(obj: TComponent): Boolean; virtual;
+    FRequiredTypeName: Ansistring;
+    FRequiredTypeKind: TTypeKind;
+
+    function AcceptObject(Obj: TComponent): Boolean; virtual;
     function AcceptObjectProperty(PropertyName: Ansistring): Boolean; virtual;
   published
     property Tag: PtrUInt read FTag write FTag;
@@ -50,7 +54,9 @@ type
 
   TObjectColletionItemClass = class of TObjectColletionItem;
 
+
 implementation
+
 
 { TObjectColletionItem }
 
@@ -103,17 +109,17 @@ begin
   FTargetObjectProperty := AValue;
 end;
 
-function TObjectColletionItem.AcceptObject(obj: TComponent): Boolean;
+function TObjectColletionItem.AcceptObject(Obj: TComponent): Boolean;
 var
   helper: TPropInfoList;
   pidx: Integer;
 begin
   Result := False;
-  helper := TPropInfoList.Create(obj, [fRequiredTypeKind]);
+  helper := TPropInfoList.Create(Obj, [FRequiredTypeKind]);
   try
     for pidx := 0 to helper.Count - 1 do
     begin
-      if helper.Items[pidx]^.PropType^.Name = fRequiredTypeName then
+      if helper.Items[pidx]^.PropType^.Name = FRequiredTypeName then
       begin
         Result := True;
         Exit;
@@ -126,24 +132,24 @@ end;
 
 function TObjectColletionItem.AcceptObjectProperty(PropertyName: Ansistring): Boolean;
 var
-  helper: TPropInfoList;
-  pidx: Integer;
+  Helper: TPropInfoList;
+  i: Integer;
 begin
   Result := False;
   if FTargetObject = nil then Exit;
-  helper := TPropInfoList.Create(FTargetObject, [fRequiredTypeKind]);
+  Helper := TPropInfoList.Create(FTargetObject, [FRequiredTypeKind]);
   try
-    for pidx := 0 to helper.Count - 1 do
+    for i := 0 to Helper.Count - 1 do
     begin
-      if (LowerCase(helper.Items[pidx]^.Name) = LowerCase(PropertyName)) and
-        (helper.Items[pidx]^.PropType^.Name = fRequiredTypeName) then
+      if (LowerCase(Helper.Items[i]^.Name) = LowerCase(PropertyName)) and
+        (Helper.Items[i]^.PropType^.Name = FRequiredTypeName) then
       begin
         Result := True;
         Exit;
       end;
     end;
   finally
-    helper.Free;
+    Helper.Free;
   end;
 end;
 
@@ -157,7 +163,7 @@ end;
 constructor TObjectColletionItem.Create(ACollection: TCollection);
 begin
   inherited Create(ACollection);
-  fRequiredTypeName := '';
+  FRequiredTypeName := '';
 end;
 
 end.

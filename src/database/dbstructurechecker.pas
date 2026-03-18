@@ -150,7 +150,9 @@ type
 
 function SortTableList(Item1, Item2: Pointer): Longint;
 
+
 implementation
+
 
 { TDatabaseMetadata }
 

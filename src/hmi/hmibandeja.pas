@@ -9,7 +9,7 @@ uses
   PLCNumber, plcstructstring;
 
 type
-  TOnConvertDintToColor = function(Sender: TObject; const aColorDint: Longint; out Lum: Longint): TColor of object;
+  TOnConvertDintToColor = function(Sender: TObject; const AColorDint: Longint; out Lum: Longint): TColor of object;
 
   { THMIBandeja }
 
@@ -23,7 +23,7 @@ type
     FBackgroundColorPLCTag: TPLCNumber;
     FBandejaTextPLCTag: TPLCStructString;
     FBorderColorPLCTag: TPLCNumber;
-    function DIntToColor(aDInt: Longint; out Lumin: Longint): TColor;
+    function DIntToColor(ADInt: Longint; out Lumin: Longint): TColor;
     procedure SetBackgroundColorPLCTag(AValue: TPLCNumber); virtual;
     procedure SetBandejaTextPLCTag(AValue: TPLCStructString); virtual;
     procedure SetBorderColorPLCTag(AValue: TPLCNumber); virtual;
@@ -190,24 +190,26 @@ end;
 
 procedure THMIBandeja.TagBorderColorChanged(Sender: TObject);
 var
-  aux: Longint;
+  Aux: Longint;
 begin
   if Assigned(FBorderColorPLCTag) then
   begin
     if Assigned(fOnConvertDintToColor) then
-      Color := fOnConvertDintToColor(Self, Trunc(FBorderColorPLCTag.Value), aux)
+      Color := fOnConvertDintToColor(Self, Trunc(FBorderColorPLCTag.Value), Aux)
     else
-      BevelColor := DIntToColor(Trunc(FBorderColorPLCTag.Value), aux);
+      BevelColor := DIntToColor(Trunc(FBorderColorPLCTag.Value), Aux);
   end;
 end;
 
-function THMIBandeja.DIntToColor(aDInt: Longint; out Lumin: Longint): TColor;
+function THMIBandeja.DIntToColor(ADInt: Longint; out Lumin: Longint): TColor;
 var
-  R, G, B: Longint;
+  R: Longint;
+  G: Longint;
+  B: Longint;
 begin
-  R := (aDInt and $00ff0000) Div $10000;
-  G := (aDInt and $0000ff00) Div $100;
-  B := (aDInt and $000000ff);
+  R := (ADInt and $00ff0000) Div $10000;
+  G := (ADInt and $0000ff00) Div $100;
+  B := (ADInt and $000000ff);
   Lumin := Trunc((R * 0.3) + (G * 0.59) + (B * 0.11));
   Result := RGBToColor(R, G, B);
 end;

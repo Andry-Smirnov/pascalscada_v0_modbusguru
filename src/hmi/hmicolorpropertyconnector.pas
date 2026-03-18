@@ -139,6 +139,7 @@ type
     FTag: TPLCTag;
     FConditionZones: TColorZones;
     FObjects: TObjectWithColorPropetiesColletion;
+
     procedure ConditionItemChanged(Sender: TObject);
     procedure CollectionNeedsComponentState(var CurState: TComponentState);
     procedure ObjectItemChanged(Sender: TObject);
@@ -165,10 +166,13 @@ type
     property PLCTag: TPLCTag read FTag write SetHMITag;
   end;
 
+
 implementation
+
 
 uses
   typinfo, rttiutils, hsstrings, hmibasiccolletion;
+
 
   { THMIBooleanPropertyConnector }
 
@@ -431,8 +435,8 @@ end;
 constructor TObjectWithColorPropetiesColletionItem.Create(ACollection: TCollection);
 begin
   inherited Create(ACollection);
-  fRequiredTypeName := PTypeInfo(TypeInfo(TColor))^.Name;
-  fRequiredTypeKind := PTypeInfo(TypeInfo(TColor))^.Kind;
+  FRequiredTypeName := PTypeInfo(TypeInfo(TColor))^.Name;
+  FRequiredTypeKind := PTypeInfo(TypeInfo(TColor))^.Kind;
   FirstReadOk := True;
 end;
 

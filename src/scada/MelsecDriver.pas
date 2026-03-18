@@ -114,10 +114,10 @@ type
 
 
     procedure BuildTagRec(plc,func,startaddress,size:LongInt; var tr:TTagRec);
-    function  EncodePkg(TagObj:TTagRec; ToWrite:TArrayOfDouble; var ResultLen:LongInt):BYTES; virtual;
+    function  EncodePkg(TagObj:TTagRec; ToWrite:TArrayOfDouble; var ResultLen:LongInt):Bytes; virtual;
     function  DecodePkg(pkg:TIOPacket; out values:TArrayOfDouble):TProtocolIOResult; virtual;
-    function RemainingBytesWrite(buffer:BYTES):LongInt; virtual;
-    function RemainingBytesRead(buffer:BYTES; TagObj:TTagRec):LongInt; virtual;
+    function RemainingBytesWrite(buffer:Bytes):LongInt; virtual;
+    function RemainingBytesRead(buffer:Bytes; TagObj:TTagRec):LongInt; virtual;
     procedure DoAddTag(TagObj:TTag; TagValid:Boolean); override;
     procedure DoDelTag(TagObj:TTag); override;
     procedure DoScanRead(Sender:TObject; var NeedSleep:LongInt); override;
@@ -453,7 +453,7 @@ function TMelsecDriver.DoRead(const tagrec: TTagRec; out Values: TArrayOfDouble;
 var
   IOResult1, IOResult2:TIOPacket;
   FRemainingBytes:LongInt;
-  pkg:BYTES;
+  pkg:Bytes;
   rl:LongInt;
   res:LongInt;
   starts, ends:TNotifyEvent;
@@ -479,7 +479,7 @@ begin
       if (res<>0) and (IOResult1.ReadIOResult=iorOK) then
       begin
 
-        //retorna o numero de bytes que est� aguardando ser lido no buffer da porta de comunica��o.
+        //retorna o numero de Bytes que est� aguardando ser lido no buffer da porta de comunica��o.
         //calculates the remaining package length at the communication buffer.
         FRemainingBytes := RemainingBytesRead(IOResult1.BufferToRead, tagrec);
 
@@ -846,7 +846,7 @@ function TMelsecDriver.DoWrite(const tagrec: TTagRec;
   const Values: TArrayOfDouble; Sync: Boolean): TProtocolIOResult;
 var
   IOResult1, IOResult2:TIOPacket;
-  pkg:BYTES;
+  pkg:Bytes;
   FRemainingBytes:LongInt;
   rl:LongInt;
   res:LongInt;
@@ -862,7 +862,7 @@ begin
       //if the IO result is OK, reads the remaing packet...
       if (res<>0) and (IOResult1.ReadIOResult=iorOK) then begin
 
-        //retorna o numero de bytes que est� aguardando ser lido no buffer da porta de comunica��o.
+        //retorna o numero de Bytes que est� aguardando ser lido no buffer da porta de comunica��o.
         //calculates the remaining package length at the communication buffer.
         FRemainingBytes:=RemainingBytesWrite(IOResult1.BufferToRead);
 
@@ -895,7 +895,7 @@ begin
 end;
 
 function TMelsecDriver.EncodePkg(TagObj: TTagRec; ToWrite: TArrayOfDouble;
-  var ResultLen: LongInt): BYTES;
+  var ResultLen: LongInt): Bytes;
 begin
   Result:=nil;
 end;
@@ -963,12 +963,12 @@ begin
   Result := 0;
 end;
 
-function TMelsecDriver.RemainingBytesWrite(buffer: BYTES): LongInt;
+function TMelsecDriver.RemainingBytesWrite(buffer: Bytes): LongInt;
 begin
   Result:=0;
 end;
 
-function TMelsecDriver.RemainingBytesRead(buffer: BYTES;
+function TMelsecDriver.RemainingBytesRead(buffer: Bytes;
   TagObj: TTagRec): LongInt;
 begin
   Result:=0;

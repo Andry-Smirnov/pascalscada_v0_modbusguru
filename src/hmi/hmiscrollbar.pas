@@ -19,7 +19,7 @@ interface
 uses
   Classes, SysUtils,
   {$IFDEF FPC}
-LResources,
+  LResources,
   {$ENDIF}
   Controls, Graphics,
   Dialogs, StdCtrls, HMITypes, PLCTag, ProtocolTypes, Tag;
@@ -48,10 +48,11 @@ type
     FLastPosition: Longint;
 
     FSecurityCode: UTF8String;
-    procedure SetSecurityCode(sc: UTF8String);
+
+    procedure SetSecurityCode(ASecurityCode: UTF8String);
 
     //: @seealso(IHMIInterface.SetHMITag)
-    procedure SetHMITag(t: TPLCTag);                    //seta um tag
+    procedure SetHMITag(APLCTag: TPLCTag);                    //seta um tag
     //: @seealso(IHMIInterface.GetHMITag)
     function GetHMITag: TPLCTag;
 
@@ -126,9 +127,13 @@ type
     property SecurityCode: UTF8String read FSecurityCode write SetSecurityCode;
   end;
 
+
 implementation
 
-uses hsstrings, ControlSecurityManager, Forms;
+
+uses
+  hsstrings, ControlSecurityManager, Forms;
+
 
 constructor THMIScrollBar.Create(AOwner: TComponent);
 begin
@@ -172,29 +177,29 @@ begin
   end;
 end;
 
-procedure THMIScrollBar.SetSecurityCode(sc: UTF8String);
+procedure THMIScrollBar.SetSecurityCode(ASecurityCode: UTF8String);
 begin
-  if Trim(sc) = '' then
+  if Trim(ASecurityCode) = '' then
     Self.CanBeAccessed(True)
   else
     with GetControlSecurityManager do
     begin
-      ValidateSecurityCode(sc);
-      if not SecurityCodeExists(sc) then
-        RegisterSecurityCode(sc);
+      ValidateSecurityCode(ASecurityCode);
+      if not SecurityCodeExists(ASecurityCode) then
+        RegisterSecurityCode(ASecurityCode);
 
-      Self.CanBeAccessed(CanAccess(sc));
+      Self.CanBeAccessed(CanAccess(ASecurityCode));
     end;
 
-  FSecurityCode := sc;
+  FSecurityCode := ASecurityCode;
 end;
 
-procedure THMIScrollBar.SetHMITag(t: TPLCTag);
+procedure THMIScrollBar.SetHMITag(APLCTag: TPLCTag);
 begin
   //se o tag esta entre um dos aceitos.
 
   //check if the tag is valid (only numeric tags);
-  if (t <> nil) and (not Supports(t, ITagNumeric)) then
+  if (APLCTag <> nil) and (not Supports(APLCTag, ITagNumeric)) then
     raise Exception.Create(SonlyNumericTags);
 
   //se ja estou associado a um tag, remove
@@ -206,15 +211,15 @@ begin
 
   //adiona o callback para o novo tag
   //link with the new tag.
-  if t <> nil then
+  if APLCTag <> nil then
   begin
-    t.AddWriteFaultHandler(@WriteFaultCallBack);
-    t.AddTagChangeHandler(@TagChangeCallBack);
-    t.AddRemoveTagHandler(@RemoveTagCallBack);
-    FTag := t;
+    APLCTag.AddWriteFaultHandler(@WriteFaultCallBack);
+    APLCTag.AddTagChangeHandler(@TagChangeCallBack);
+    APLCTag.AddRemoveTagHandler(@RemoveTagCallBack);
+    FTag := APLCTag;
     RefreshScrollBar(0);
   end;
-  FTag := t;
+  FTag := APLCTag;
 end;
 
 function THMIScrollBar.GetHMITag: TPLCTag;
@@ -273,7 +278,6 @@ begin
     end;
     if WriteFlag then
       WriteValue(ScrollPos);
-
   finally
     inherited Scroll(ScrollCode, ScrollPos);
   end;

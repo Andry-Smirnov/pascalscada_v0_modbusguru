@@ -61,25 +61,30 @@ type
     property Target: TWinControl read FTarget;
   end;
 
+
 var
   psHMIfrmNumericKeyBoard: TpsHMIfrmNumericKeyBoard;
 
+
 implementation
+
 
 uses
   dateutils, InterfaceBase;
 
-  {$IFNDEF FPC}
-  {$R *.dfm}
 
-  {$ELSE}
+{$IFNDEF FPC}
+  {$R *.dfm}
+{$ELSE}
   {$IF defined(FPC) AND (FPC_FULLVERSION >= 20400) }
     {$R unumerickeyboard.lfm}
   {$IFEND}
-  {$ENDIF}
+{$ENDIF}
+
 
 var
   LastNumericKeyBoard: TpsHMIfrmNumericKeyBoard;
+
 
 constructor TpsHMIfrmNumericKeyBoard.Create(TheOwner: TComponent; Target: TWinControl; ShowMinus, ShowDecimal: Boolean);
 begin
@@ -145,8 +150,8 @@ end;
 
 procedure TpsHMIfrmNumericKeyBoard.GotoBetterPosition;
 var
-  sw: Integer;
-  sh: Integer;
+  ScreenWidth: Integer;
+  ScreenHeight: Integer;
   NumKeyRect: TRect;
   TargetRect: TRect;
 begin
@@ -154,10 +159,10 @@ begin
   //t_point:=FTarget.ClientOrigin;
   WidgetSet.GetWindowRect(Target.Handle, TargetRect);
   WidgetSet.GetWindowRect(Self.Handle, NumKeyRect);
-  sw := Screen.Width;
-  sh := Screen.Height;
+  ScreenWidth := Screen.Width;
+  ScreenHeight := Screen.Height;
 
-  if (TargetRect.Top + (NumKeyRect.Bottom - NumKeyRect.Top) + FTarget.Height) <= sh then
+  if (TargetRect.Top + (NumKeyRect.Bottom - NumKeyRect.Top) + FTarget.Height) <= ScreenHeight then
     Top := TargetRect.Top + FTarget.Height   //borda superior do form com borda inferior do target
   else if (TargetRect.Top - (NumKeyRect.Bottom - NumKeyRect.Top) - 30) >= 0 then
     Top := TargetRect.Top - (NumKeyRect.Bottom - NumKeyRect.Top) - 30  //borda inferior do form com borda superior do target
@@ -173,7 +178,7 @@ begin
   if ((TargetRect.Left + FTarget.Width) - (NumKeyRect.Right - NumKeyRect.Left)) >= 0 then
     Left := ((TargetRect.Left + FTarget.Width) - (NumKeyRect.Right - NumKeyRect.Left))  //borda direita do form com
   //borda direita do target
-  else if (TargetRect.Left + (NumKeyRect.Right - NumKeyRect.Left)) <= sw then
+  else if (TargetRect.Left + (NumKeyRect.Right - NumKeyRect.Left)) <= ScreenWidth then
     Left := TargetRect.Left   //borda esquerda do form com borda esquerda do target
   else
   begin

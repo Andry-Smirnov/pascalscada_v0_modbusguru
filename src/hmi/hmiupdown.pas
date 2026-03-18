@@ -18,7 +18,7 @@ interface
 uses
   Classes, SysUtils,
   {$IFDEF FPC}
-LResources,
+  LResources,
   {$ENDIF}
   Controls, Graphics,
   Dialogs, ExtCtrls, HMITypes, PLCTag, ProtocolTypes, ComCtrls, Tag;
@@ -43,12 +43,17 @@ type
     FAfterSendValueToTag: TAfterSendNumericValueToTagEvent;
     FBeforeSendValueToTag: TBeforeSendNumericValueToTagEvent;
     FTag: TPLCTag;
-    FIsEnabled, FIsEnabledBySecurity: Boolean;
-    FPosition, FIncrement: Double;
-    FMax, FMin: Double;
-    FEnableMax, FEnableMin: Boolean;
+    FIsEnabled: Boolean;
+    FIsEnabledBySecurity: Boolean;
+    FPosition: Double;
+    FIncrement: Double;
+    FMax: Double;
+    FMin: Double;
+    FEnableMax: Boolean;
+    FEnableMin: Boolean;
 
     FSecurityCode: UTF8String;
+
     procedure SetSecurityCode(sc: UTF8String);
 
     //implements the IHMIInterface interface
@@ -204,7 +209,6 @@ begin
   inherited Position := 50;
   FEnableMin := False;
   FEnableMax := False;
-
 end;
 
 destructor THMIUpDown.Destroy;
@@ -226,7 +230,8 @@ end;
 
 procedure THMIUpDown.RefreshUpDown(Data: PtrInt);
 begin
-  if [csReading, csLoading, csDestroying] * ComponentState <> [] then Exit;
+  if [csReading, csLoading, csDestroying] * ComponentState <> [] then
+    Exit;
   if (FTag <> nil) and Supports(FTag, ITagNumeric) then
     FPosition := (FTag as ITagNumeric).Value;
 
@@ -317,7 +322,7 @@ end;
 
 procedure THMIUpDown.Click(Button: TUDBtnType);
 var
-  aValue: Double;
+  AValue: Double;
 
   procedure DoAfterSendValue(ivalue: Double);
   begin
@@ -339,22 +344,21 @@ begin
   inherited Position := 50;
 
   case Button of
-    btNext:
-      aValue := Position + FIncrement;
+    btNext: AValue := Position + FIncrement;
     else
-      aValue := Position - FIncrement;
+      AValue := Position - FIncrement;
   end;
 
-  if (FEnableMax and (aValue > FMax)) then
-    aValue := FMax;
+  if (FEnableMax and (AValue > FMax)) then
+    AValue := FMax;
 
-  if (FEnableMin and (aValue < FMin)) then
-    aValue := FMin;
+  if (FEnableMin and (AValue < FMin)) then
+    AValue := FMin;
 
-  if Supports(FTag, ITagNumeric) and SendIt(aValue) then
+  if Supports(FTag, ITagNumeric) and SendIt(AValue) then
   begin
-    (FTag as ITagNumeric).Value := aValue;
-    DoAfterSendValue(aValue);
+    (FTag as ITagNumeric).Value := AValue;
+    DoAfterSendValue(AValue);
   end;
 
   inherited Click(Button);

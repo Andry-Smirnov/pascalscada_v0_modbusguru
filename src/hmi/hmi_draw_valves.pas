@@ -44,9 +44,13 @@ type
     property Action;
   end;
 
+
 implementation
 
-uses Math;
+
+uses
+  Math;
+
 
 procedure THMICustomBasicValve.SetMirrored(AValue: Boolean);
 begin
@@ -73,10 +77,10 @@ end;
 
 procedure THMICustomBasicValve.DrawControl;
 var
-  p: array of TPointF;
-  alturaideal: Real;
-  larguraideal: Real;
-  larguradoquadrado: Real;
+  Points: array of TPointF;
+  IdealHeight: Real;
+  IdealWidth: Real;
+  SquareWidth: Real;
 begin
   inherited DrawControl;
 
@@ -84,40 +88,40 @@ begin
   FControlArea.CanvasBGRA.Pen.Color := FBorderColor;
   FControlArea.CanvasBGRA.Pen.Width := FBorderWidth;
 
-  SetLength(p, 4);
+  SetLength(Points, 4);
   if Width >= Height then
   begin
     if ValveType = vtPneumaticDrawer then
     begin
-      p[0].x := 0 + (FBorderWidth Mod 2);
-      p[0].y := 0 + (FBorderWidth Mod 2);
+      Points[0].x := 0 + (FBorderWidth Mod 2);
+      Points[0].y := 0 + (FBorderWidth Mod 2);
 
-      p[1].x := Width - (FBorderWidth Mod 2);
-      p[1].y := 0 + (FBorderWidth Mod 2);
+      Points[1].x := Width - (FBorderWidth Mod 2);
+      Points[1].y := 0 + (FBorderWidth Mod 2);
 
-      p[2].x := Width - (FBorderWidth Mod 2);
-      p[2].y := Height - (FBorderWidth Mod 2);
+      Points[2].x := Width - (FBorderWidth Mod 2);
+      Points[2].y := Height - (FBorderWidth Mod 2);
 
-      p[3].x := 0 + (FBorderWidth Mod 2);
-      p[3].y := Height - (FBorderWidth Mod 2);
+      Points[3].x := 0 + (FBorderWidth Mod 2);
+      Points[3].y := Height - (FBorderWidth Mod 2);
 
-      FControlArea.CanvasBGRA.PolygonF(p);
+      FControlArea.CanvasBGRA.PolygonF(Points);
     end
     else
     begin
-      p[0].x := FBorderWidth Div 2 + FBorderWidth Mod 2;
-      p[0].y := (1 - FValveBodyPercent) * Height;
+      Points[0].x := FBorderWidth Div 2 + FBorderWidth Mod 2;
+      Points[0].y := (1 - FValveBodyPercent) * Height;
 
-      p[1].x := Width - (FBorderWidth Div 2) - (FBorderWidth Mod 2);
-      p[1].y := Height - (FBorderWidth / 2);
+      Points[1].x := Width - (FBorderWidth Div 2) - (FBorderWidth Mod 2);
+      Points[1].y := Height - (FBorderWidth / 2);
 
-      p[2].x := Width - (FBorderWidth Div 2) - (FBorderWidth Mod 2);
-      p[2].y := (1 - FValveBodyPercent) * Height;
+      Points[2].x := Width - (FBorderWidth Div 2) - (FBorderWidth Mod 2);
+      Points[2].y := (1 - FValveBodyPercent) * Height;
 
-      p[3].x := FBorderWidth Div 2 + FBorderWidth Mod 2;
-      p[3].y := Height - (FBorderWidth / 2);
+      Points[3].x := FBorderWidth Div 2 + FBorderWidth Mod 2;
+      Points[3].y := Height - (FBorderWidth / 2);
 
-      FControlArea.CanvasBGRA.PolygonF(p);
+      FControlArea.CanvasBGRA.PolygonF(Points);
 
       //risco
       case FValveType of
@@ -132,27 +136,27 @@ begin
 
       case FValveType of
         vtPneumaticProportional, vtMotorisedProportional: begin
-          larguraideal := Width / 2 - FBorderWidth;
-          alturaideal := (Width / 4) * (FValveBodyPercent * Height) / Width + ((1 - FValveBodyPercent) * Height) - FBorderWidth;
-          larguradoquadrado := min(larguraideal, alturaideal);
-          p[0].x := (Width - larguradoquadrado) / 2;
-          p[0].y := FBorderWidth Div 2 + FBorderWidth Mod 2;
+          IdealWidth := Width / 2 - FBorderWidth;
+          IdealHeight := (Width / 4) * (FValveBodyPercent * Height) / Width + ((1 - FValveBodyPercent) * Height) - FBorderWidth;
+          SquareWidth := min(IdealWidth, IdealHeight);
+          Points[0].x := (Width - SquareWidth) / 2;
+          Points[0].y := FBorderWidth Div 2 + FBorderWidth Mod 2;
 
-          p[1].x := Width - ((Width - larguradoquadrado) / 2);
-          p[1].y := p[0].y;
+          Points[1].x := Width - ((Width - SquareWidth) / 2);
+          Points[1].y := Points[0].y;
 
-          p[2].x := p[1].x;
-          p[2].y := larguradoquadrado + (FBorderWidth Div 2 + FBorderWidth Mod 2);
+          Points[2].x := Points[1].x;
+          Points[2].y := SquareWidth + (FBorderWidth Div 2 + FBorderWidth Mod 2);
 
-          p[3].x := p[0].x;
-          p[3].y := p[2].y;
-          FControlArea.CanvasBGRA.PolygonF(p);
+          Points[3].x := Points[0].x;
+          Points[3].y := Points[2].y;
+          FControlArea.CanvasBGRA.PolygonF(Points);
 
           if FValveType = vtMotorisedProportional then
           begin
-            FControlArea.FontHeight := trunc(larguradoquadrado * 0.9 - 2 * FBorderWidth);
+            FControlArea.FontHeight := trunc(SquareWidth * 0.9 - 2 * FBorderWidth);
             FControlArea.FontOrientation := 0;
-            FControlArea.TextOut(Width / 2, trunc((larguradoquadrado - FControlArea.FontHeight) / 2), 'M', colortobgra(FBorderColor), taCenter);
+            FControlArea.TextOut(Width / 2, trunc((SquareWidth - FControlArea.FontHeight) / 2), 'M', colortobgra(FBorderColor), taCenter);
 
           end;
         end;
@@ -174,35 +178,35 @@ begin
   begin
     if ValveType = vtPneumaticDrawer then
     begin
-      p[0].x := 0 + (FBorderWidth Mod 2);
-      p[0].y := 0 + (FBorderWidth Mod 2);
+      Points[0].x := 0 + (FBorderWidth Mod 2);
+      Points[0].y := 0 + (FBorderWidth Mod 2);
 
-      p[1].x := Width - (FBorderWidth Mod 2);
-      p[1].y := 0 + (FBorderWidth Mod 2);
+      Points[1].x := Width - (FBorderWidth Mod 2);
+      Points[1].y := 0 + (FBorderWidth Mod 2);
 
-      p[2].x := Width - (FBorderWidth Mod 2);
-      p[2].y := Height - (FBorderWidth Mod 2);
+      Points[2].x := Width - (FBorderWidth Mod 2);
+      Points[2].y := Height - (FBorderWidth Mod 2);
 
-      p[3].x := 0 + (FBorderWidth Mod 2);
-      p[3].y := Height - (FBorderWidth Mod 2);
+      Points[3].x := 0 + (FBorderWidth Mod 2);
+      Points[3].y := Height - (FBorderWidth Mod 2);
 
-      FControlArea.CanvasBGRA.PolygonF(p);
+      FControlArea.CanvasBGRA.PolygonF(Points);
     end
     else
     begin
-      p[0].x := (1 - FValveBodyPercent) * Width;
-      p[0].y := FBorderWidth Div 2 + FBorderWidth Mod 2;
+      Points[0].x := (1 - FValveBodyPercent) * Width;
+      Points[0].y := FBorderWidth Div 2 + FBorderWidth Mod 2;
 
-      p[1].x := Width - (FBorderWidth / 2);
-      p[1].y := Height - (FBorderWidth Div 2) - (FBorderWidth Mod 2);
+      Points[1].x := Width - (FBorderWidth / 2);
+      Points[1].y := Height - (FBorderWidth Div 2) - (FBorderWidth Mod 2);
 
-      p[2].x := (1 - FValveBodyPercent) * Width;
-      p[2].y := Height - (FBorderWidth Div 2) - (FBorderWidth Mod 2);
+      Points[2].x := (1 - FValveBodyPercent) * Width;
+      Points[2].y := Height - (FBorderWidth Div 2) - (FBorderWidth Mod 2);
 
-      p[3].x := Width - (FBorderWidth / 2);
-      p[3].y := FBorderWidth Div 2 + FBorderWidth Mod 2;
+      Points[3].x := Width - (FBorderWidth / 2);
+      Points[3].y := FBorderWidth Div 2 + FBorderWidth Mod 2;
 
-      FControlArea.CanvasBGRA.PolygonF(p);
+      FControlArea.CanvasBGRA.PolygonF(Points);
 
       //risco
       case FValveType of
@@ -215,27 +219,27 @@ begin
 
       case FValveType of
         vtPneumaticProportional, vtMotorisedProportional: begin
-          larguraideal := Height / 2 - FBorderWidth;
-          alturaideal := (Height / 4) * (FValveBodyPercent * Width) / Height + ((1 - FValveBodyPercent) * Width) - FBorderWidth;
-          larguradoquadrado := min(larguraideal, alturaideal);
-          p[0].x := FBorderWidth Div 2 + FBorderWidth Mod 2;
-          p[0].y := (Height - larguradoquadrado) / 2;
+          IdealWidth := Height / 2 - FBorderWidth;
+          IdealHeight := (Height / 4) * (FValveBodyPercent * Width) / Height + ((1 - FValveBodyPercent) * Width) - FBorderWidth;
+          SquareWidth := min(IdealWidth, IdealHeight);
+          Points[0].x := FBorderWidth Div 2 + FBorderWidth Mod 2;
+          Points[0].y := (Height - SquareWidth) / 2;
 
-          p[1].x := larguradoquadrado + (FBorderWidth Div 2 + FBorderWidth Mod 2);
-          p[1].y := p[0].y;
+          Points[1].x := SquareWidth + (FBorderWidth Div 2 + FBorderWidth Mod 2);
+          Points[1].y := Points[0].y;
 
-          p[2].x := p[1].x;
-          p[2].y := Height - ((Height - larguradoquadrado) / 2);
+          Points[2].x := Points[1].x;
+          Points[2].y := Height - ((Height - SquareWidth) / 2);
 
-          p[3].x := p[0].x;
-          p[3].y := p[2].y;
-          FControlArea.CanvasBGRA.PolygonF(p);
+          Points[3].x := Points[0].x;
+          Points[3].y := Points[2].y;
+          FControlArea.CanvasBGRA.PolygonF(Points);
 
           if FValveType = vtMotorisedProportional then
           begin
-            FControlArea.FontHeight := trunc(larguradoquadrado * 0.9 - FBorderWidth);
+            FControlArea.FontHeight := trunc(SquareWidth * 0.9 - FBorderWidth);
             FControlArea.FontOrientation := 900;
-            FControlArea.TextOut(trunc((larguradoquadrado - FControlArea.FontHeight) / 2), Height / 2, 'M', colortobgra(FBorderColor), taCenter);
+            FControlArea.TextOut(trunc((SquareWidth - FControlArea.FontHeight) / 2), Height / 2, 'M', colortobgra(FBorderColor), taCenter);
 
           end;
         end;

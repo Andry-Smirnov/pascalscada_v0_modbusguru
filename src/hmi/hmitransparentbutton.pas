@@ -21,7 +21,9 @@ type
     //property on
   end;
 
+
 implementation
+
 
 { THMITransparentButton }
 

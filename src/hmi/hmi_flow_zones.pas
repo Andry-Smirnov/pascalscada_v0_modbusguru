@@ -23,7 +23,7 @@ type
 
   THMIFlowZones = class(TZones)
     //: @exclude
-    constructor Create(aOwner: TPersistent);
+    constructor Create(AOwner: TPersistent);
 
     {$IFDEF PORTUGUES}
     //: Adiciona uma nova zona de cor.
@@ -39,9 +39,9 @@ uses strutils;
 
   { THMIFlowZones }
 
-constructor THMIFlowZones.Create(aOwner: TPersistent);
+constructor THMIFlowZones.Create(AOwner: TPersistent);
 begin
-  inherited Create(aOwner, THMIFlowZone);
+  inherited Create(AOwner, THMIFlowZone);
 end;
 
 function THMIFlowZones.Add: THMIFlowZone;

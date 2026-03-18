@@ -34,6 +34,7 @@ type
     FFocusControl: TFocusedControl;
   public
     ChipCardCode: UTF8String;
+
     procedure EnableEntry;
     procedure DisableEntry;
   published
@@ -43,16 +44,18 @@ type
 var
   psHMIfrmUserAuthentication: TpsHMIfrmUserAuthentication;
 
+
 implementation
+
 
 {$IFDEF FPC}
   {$IF defined(FPC_FULLVERSION) AND (FPC_FULLVERSION >= 20400) }
     {$R usrmgnt_login.lfm}
   {$IFEND}
 {$ELSE}
-{$R *.dfm}
-
+  {$R *.dfm}
 {$ENDIF}
+
 
 { TpsHMIfrmUserAuthentication }
 
@@ -81,11 +84,13 @@ begin
   btnOk.Enabled := False;
 end;
 
+
 {$IFDEF FPC}
   {$IF defined(FPC_FULLVERSION) AND (FPC_FULLVERSION < 20400) }
   initialization
   {$i usrmgnt_login.lrs}
   {$IFEND}
 {$ENDIF}
+
 
 end.

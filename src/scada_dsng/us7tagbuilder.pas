@@ -16,7 +16,11 @@ interface
 
 uses
   SysUtils, Classes, Graphics, Controls, Forms, Dialogs, StdCtrls,
-  ExtCtrls, ComCtrls, Spin, tag {$IFDEF FPC}, LCLIntf, LResources{$ENDIF};
+  ExtCtrls, ComCtrls, Spin, tag
+  {$IFDEF FPC}
+  , LCLIntf, LResources
+  {$ENDIF}
+  ;
 
 type
   {$IFDEF PORTUGUES}
@@ -24,7 +28,7 @@ type
   {$ELSE}
   //: Name check routine.
   {$ENDIF}
-  TCheckNames = procedure (Sender:TObject; NewName:AnsiString; var AcceptNewName:Boolean) of object;
+  TCheckNames = procedure(Sender: TObject; NewName: Ansistring; var AcceptNewName: Boolean) of object;
 
   {$IFDEF PORTUGUES}
   {:
@@ -41,33 +45,33 @@ type
   {$ENDIF}
   TTagBitItemEditor = class(TPanel)
   private
-    FTagName:AnsiString;
-    FStartBit,
-    FEndBit:LongInt;
-    FCheckNames:TCheckNames;
-    fedtItemName:TEdit;
-    lblStart,
-    lblEnd:TLabel;
-    spinStart,
-    spinEnd:TSpinEdit;
-    btnDel:TButton;
-    fondelclick:TNotifyEvent;
-    procedure SetTagName(newname:AnsiString);
-    procedure SetStartBit(bitindex:LongInt);
-    procedure SetEndBit(bitindex:LongInt);
+    FTagName: Ansistring;
+    FStartBit: Longint;
+    FEndBit: Longint;
+    FCheckNames: TCheckNames;
+    fedtItemName: TEdit;
+    lblStart: TLabel;
+    lblEnd: TLabel;
+    spinStart: TSpinEdit;
+    spinEnd: TSpinEdit;
+    btnDel: TButton;
+    FOnDelClick: TNotifyEvent;
+    procedure SetTagName(NewName: Ansistring);
+    procedure SetStartBit(BitIndex: Longint);
+    procedure SetEndBit(BitIndex: Longint);
   private
-    procedure SpinEditChanges(Sender:TObject);
-    procedure edtItemNameExit(Sender:TObject);
-    procedure btnDelClick(Sender:TObject);
+    procedure SpinEditChanges(Sender: TObject);
+    procedure edtItemNameExit(Sender: TObject);
+    procedure btnDelClick(Sender: TObject);
   public
-    constructor Create(AOwner:TComponent); override;
+    constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
   published
-    property TagName:AnsiString read FTagName write SetTagName;
-    property StartBit:LongInt read FStartBit write SetStartBit;
-    property EndBit:LongInt read FEndBit write SetEndBit;
-    property OnCheckNames:TCheckNames read FCheckNames write FCheckNames;
-    property OnDelClick:TNotifyEvent read fondelclick write fondelclick;
+    property TagName: Ansistring read FTagName write SetTagName;
+    property StartBit: Longint read FStartBit write SetStartBit;
+    property EndBit: Longint read FEndBit write SetEndBit;
+    property OnCheckNames: TCheckNames read FCheckNames write FCheckNames;
+    property OnDelClick: TNotifyEvent read FOnDelClick write FOnDelClick;
   end;
 
   {$IFDEF PORTUGUES}
@@ -85,83 +89,83 @@ type
   {$ENDIF}
   TS7TagItemEditor = class(TPanel)
   private
-    FTagName:AnsiString;
-    FTagType:TTagType;
-    FTagScan:TRefreshTime;
-    FSwapWords,
-    FSwapBytes,
-    FSkip:Boolean;
-    edtItemName:TEdit;
-    cmbItemType:TComboBox;
-    spinScan:TSpinEdit;
-    optSwapBytes,
-    optSwapWords,
-    optSkip:TCheckBox;
-    btnUp,
-    btnDown,
-    btnDel,
-    btnBits:TButton;
-    TagArea,
-    BitArea:TPanel;
-    FCheckNames:TCheckNames;
-    FUpClickEvent,
-    FDownClickEvent,
-    FDelClickEvent,
-    FBitsClickEvent:TNotifyEvent;
-    BitList:TList;
-    DelTimer:TTimer;
-    DelList:TList;
-    FOnTypeChange,
-    FOnSkipChange,
-    FOnDelBitItem:TNotifyEvent;
-    procedure SetTagName(newName:AnsiString);
-    procedure SetTagType(newType:TTagType);
-    procedure SetTagScan(newScan:TRefreshTime);
-    procedure SetSwapBytes(swap:Boolean);
-    procedure SetSwapWords(swap:Boolean);
-    procedure SetSkipTag(Skip:Boolean);
+    FTagName: Ansistring;
+    FTagType: TTagType;
+    FTagScan: TRefreshTime;
+    FSwapWords: Boolean;
+    FSwapBytes: Boolean;
+    FSkip: Boolean;
+    edtItemName: TEdit;
+    cmbItemType: TComboBox;
+    spinScan: TSpinEdit;
+    optSwapBytes: TCheckBox;
+    optSwapWords: TCheckBox;
+    optSkip: TCheckBox;
+    btnUp: TButton;
+    btnDown: TButton;
+    btnDel: TButton;
+    btnBits: TButton;
+    TagArea: TPanel;
+    BitArea: TPanel;
+    FCheckNames: TCheckNames;
+    FUpClickEvent: TNotifyEvent;
+    FDownClickEvent: TNotifyEvent;
+    FDelClickEvent: TNotifyEvent;
+    FBitsClickEvent: TNotifyEvent;
+    BitList: TList;
+    DelTimer: TTimer;
+    DelList: TList;
+    FOnTypeChange: TNotifyEvent;
+    FOnSkipChange: TNotifyEvent;
+    FOnDelBitItem: TNotifyEvent;
+    procedure SetTagName(NewName: Ansistring);
+    procedure SetTagType(NewType: TTagType);
+    procedure SetTagScan(NewScan: TRefreshTime);
+    procedure SetSwapBytes(Swap: Boolean);
+    procedure SetSwapWords(Swap: Boolean);
+    procedure SetSkipTag(Skip: Boolean);
   private
-    procedure CheckNames(Sender:TObject; NewName:AnsiString; var AcceptNewName:Boolean);
-    procedure btnClick(Sender:TObject);
-    procedure optChange(Sender:TObject);
-    procedure edtItemNameExit(Sender:TObject);
-    procedure DelBitItem(Sender:TObject);
+    procedure CheckNames(Sender: TObject; NewName: Ansistring; var AcceptNewName: Boolean);
+    procedure btnClick(Sender: TObject);
+    procedure optChange(Sender: TObject);
+    procedure edtItemNameExit(Sender: TObject);
+    procedure DelBitItem(Sender: TObject);
   private
-    function GetBitCount:LongInt;
-    function GetBit(Index:LongInt):TTagBitItemEditor;
-    procedure OnDelTimer(Sender:TObject);
+    function GetBitCount: Longint;
+    function GetBit(Index: Longint): TTagBitItemEditor;
+    procedure OnDelTimer(Sender: TObject);
   public
-    constructor Create(AOwner:TComponent); override;
+    constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure PopulateCombo;
 
-    procedure EnableTagType(ToEnable:Boolean);
-    procedure EnableScanRate(ToEnable:Boolean);
-    procedure EnableSwapBytes(ToEnable:Boolean);
-    procedure EnableSwapWords(ToEnable:Boolean);
+    procedure EnableTagType(ToEnable: Boolean);
+    procedure EnableScanRate(ToEnable: Boolean);
+    procedure EnableSwapBytes(ToEnable: Boolean);
+    procedure EnableSwapWords(ToEnable: Boolean);
 
-    property  Bit[index:LongInt]:TTagBitItemEditor read GetBit;
+    property Bit[Index: Longint]: TTagBitItemEditor read GetBit;
   published
-    property  BitCount:LongInt read GetBitCount;
-    function  AddBit:TTagBitItemEditor;
-    procedure DelBit(index:LongInt);
-    function  GetIndex(tbitEditor:TTagBitItemEditor):LongInt;
-    function  AcceptName(TheName:AnsiString):Boolean;
+    property BitCount: Longint read GetBitCount;
+    function AddBit: TTagBitItemEditor;
+    procedure DelBit(Index: Longint);
+    function GetIndex(TagBitEditor: TTagBitItemEditor): Longint;
+    function AcceptName(TheName: Ansistring): Boolean;
   published
-    property TagName:AnsiString Read FTagName write SetTagName;
-    property TagType:TTagType read FTagType write SetTagType;
-    property TagScan:TRefreshTime read FTagScan write SetTagScan;
-    property SwapBytes:Boolean read FSwapBytes write SetSwapBytes;
-    property SwapWords:Boolean read FSwapWords write SetSwapWords;
-    property SkipTag:Boolean read FSkip write SetSkipTag;
-    property OnCheckNames:TCheckNames read FCheckNames write FCheckNames;
-    property OnUpClick:TNotifyEvent read FUpClickEvent write FUpClickEvent;
-    property OnDownClickEvent:TNotifyEvent read FDownClickEvent write FDownClickEvent;
-    property OnDelClickEvent:TNotifyEvent read FDelClickEvent write FDelClickEvent;
-    property OnBitsClickEvent:TNotifyEvent read FBitsClickEvent write FBitsClickEvent;
-    property OnTypeChange:TNotifyEvent read FOnTypeChange write FOnTypeChange;
-    property OnSkipChange:TNotifyEvent read FOnSkipChange write FOnSkipChange;
-    property OnDelBitItem:TNotifyEvent read FOnDelBitItem write FOnDelBitItem;
+    property TagName: Ansistring read FTagName write SetTagName;
+    property TagType: TTagType read FTagType write SetTagType;
+    property TagScan: TRefreshTime read FTagScan write SetTagScan;
+    property SwapBytes: Boolean read FSwapBytes write SetSwapBytes;
+    property SwapWords: Boolean read FSwapWords write SetSwapWords;
+    property SkipTag: Boolean read FSkip write SetSkipTag;
+    property OnCheckNames: TCheckNames read FCheckNames write FCheckNames;
+    property OnUpClick: TNotifyEvent read FUpClickEvent write FUpClickEvent;
+    property OnDownClickEvent: TNotifyEvent read FDownClickEvent write FDownClickEvent;
+    property OnDelClickEvent: TNotifyEvent read FDelClickEvent write FDelClickEvent;
+    property OnBitsClickEvent: TNotifyEvent read FBitsClickEvent write FBitsClickEvent;
+    property OnTypeChange: TNotifyEvent read FOnTypeChange write FOnTypeChange;
+    property OnSkipChange: TNotifyEvent read FOnSkipChange write FOnSkipChange;
+    property OnDelBitItem: TNotifyEvent read FOnDelBitItem write FOnDelBitItem;
   end;
 
   {$IFDEF PORTUGUES}
@@ -199,8 +203,8 @@ type
     PLCSlot: TSpinEdit;
     PLCRack: TSpinEdit;
     grptagtype: TGroupBox;
-    optplctagnumber: TRadioButton;
-    optplcblock: TRadioButton;
+    optPLCTagNumber: TRadioButton;
+    optPLCBlock: TRadioButton;
     optplcStruct: TRadioButton;
     TabSheet4: TTabSheet;
     Panel5: TPanel;
@@ -235,7 +239,7 @@ type
     procedure MemoryAreaClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure FormClose(Sender: TObject; var aAction: TCloseAction);
+    procedure FormClose(Sender: TObject; var AAction: TCloseAction);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure Button1Click(Sender: TObject);
     procedure btnUpClick(Sender: TObject);
@@ -249,52 +253,55 @@ type
     procedure BlockTypeChange(Sender: TObject);
     procedure btnNextClick(Sender: TObject);
     procedure btnBackClick(Sender: TObject);
-    procedure PageControl1Changing(Sender: TObject;
-      var AllowChange: Boolean);
+    procedure PageControl1Changing(Sender: TObject; var AllowChange: Boolean);
     procedure TabSheet4Show(Sender: TObject);
-    procedure optplcblockClick(Sender: TObject);
+    procedure optPLCBlockClick(Sender: TObject);
     procedure spinStartAddressChange(Sender: TObject);
   private
-    OldPage:TTabSheet;
-    FItemId:LongInt;
-    FStructureModified:Boolean;
-    TagList,
-    ItemsToDel:TList;
+    OldPage: TTabSheet;
+    FItemId: Longint;
+    FStructureModified: Boolean;
+    TagList: TList;
+    ItemsToDel: TList;
     procedure UpdateStatusAndBlockName;
     procedure UpdateStructItems;
-    procedure SkipChanged(Sender:TObject);
-    procedure StructItemTypeChanged(Sender:TObject);
-    procedure CheckNames(Sender:TObject; NewName:AnsiString; var AcceptNewName:Boolean);
-    function GetStructItemsCount:LongInt;
-    function GetStructItem(index:LongInt):TS7TagItemEditor;
-    function GetStructureSizeInBytes:LongInt;
-    function GetRealStartOffset:LongInt;
-    function GetRealEndOffset:LongInt;
-    function GetStartOffset:LongInt;
-    function GetEndOffset:LongInt;
-    function AtLeastOneItemIsValid:Boolean;
-    procedure BitItemDeleted(Sender:TObject);
+    procedure SkipChanged(Sender: TObject);
+    procedure StructItemTypeChanged(Sender: TObject);
+    procedure CheckNames(Sender: TObject; NewName: Ansistring; var AcceptNewName: Boolean);
+    function GetStructItemsCount: Longint;
+    function GetStructItem(Index: Longint): TS7TagItemEditor;
+    function GetStructureSizeInBytes: Longint;
+    function GetRealStartOffset: Longint;
+    function GetRealEndOffset: Longint;
+    function GetStartOffset: Longint;
+    function GetEndOffset: Longint;
+    function AtLeastOneItemIsValid: Boolean;
+    procedure BitItemDeleted(Sender: TObject);
     procedure UpdateFlagDBandVStrucItemName;
   public
     destructor Destroy; override;
-    function GetTagType:LongInt;
-    function CurBlockType:TTagType;
-    function GetTheLastItemOffset:LongInt;
-    property StructItemsCount:LongInt read GetStructItemsCount;
-    property StructItem[index:LongInt]:TS7TagItemEditor read GetStructItem;
-    property StructureSizeInBytes:LongInt read GetStructureSizeInBytes;
-    property RealStartOffset:LongInt read GetRealStartOffset;
-    property RealEndOffset:LongInt read GetRealEndOffset;
-    property StartOffset:LongInt read GetStartOffset;
-    property EndOffset:LongInt read GetEndOffset;
+    function GetTagType: Longint;
+    function CurBlockType: TTagType;
+    function GetTheLastItemOffset: Longint;
+    property StructItemsCount: Longint read GetStructItemsCount;
+    property StructItem[Index: Longint]: TS7TagItemEditor read GetStructItem;
+    property StructureSizeInBytes: Longint read GetStructureSizeInBytes;
+    property RealStartOffset: Longint read GetRealStartOffset;
+    property RealEndOffset: Longint read GetRealEndOffset;
+    property StartOffset: Longint read GetStartOffset;
+    property EndOffset: Longint read GetEndOffset;
   end;
 
 var
   frmS7TagBuilder: TfrmS7TagBuilder;
 
+
 implementation
 
-uses ubitmapper, hsstrings;
+
+uses
+  ubitmapper, hsstrings;
+
 
 {$IFDEF FPC }
   {$IF defined(FPC) AND (FPC_FULLVERSION >= 20400) }
@@ -302,91 +309,98 @@ uses ubitmapper, hsstrings;
   {$IFEND}
 {$ELSE}
   {$R *.dfm}
+
 {$ENDIF}
 
 ///////////////////////////////////////////////////////////////////////////////
 //TagBitEditor
 ///////////////////////////////////////////////////////////////////////////////
-constructor TTagBitItemEditor.Create(AOwner:TComponent);
+constructor TTagBitItemEditor.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  Align:=alTop;
-  BevelOuter:=bvNone;
-  Height:=25;
-  Caption:='';
+  Align := alTop;
+  BevelOuter := bvNone;
+  Height := 25;
+  Caption := '';
 
-  fedtItemName:=TEdit.Create(Self);
-  with fedtItemName do begin
-    Parent:=Self;
-    Left :=16;
-    Top  := 2;
-    Width:=137;
-    OnExit:=@edtItemNameExit;
+  fedtItemName := TEdit.Create(Self);
+  with fedtItemName do
+  begin
+    Parent := Self;
+    Left := 16;
+    Top := 2;
+    Width := 137;
+    OnExit := @edtItemNameExit;
   end;
 
-  lblStart:=TLabel.Create(Self);
-  with lblStart do begin
-    Parent:=Self;
-    AutoSize:=false;
-    Alignment:=taRightJustify;
-    Layout:=tlCenter;
-    Caption:='Start Bit';
-    Height:=21;
-    Width:=49;
-    Left:=168;
-    Top:=2;
+  lblStart := TLabel.Create(Self);
+  with lblStart do
+  begin
+    Parent := Self;
+    AutoSize := False;
+    Alignment := taRightJustify;
+    Layout := tlCenter;
+    Caption := 'Start Bit';
+    Height := 21;
+    Width := 49;
+    Left := 168;
+    Top := 2;
   end;
 
-  lblEnd:=TLabel.Create(Self);
-  with lblEnd do begin
-    Parent:=Self;
-    AutoSize:=false;
-    Alignment:=taRightJustify;
-    Layout:=tlCenter;
-    Caption:='End Bit';
-    Height:=21;
-    Width:=49;
-    Left:=272;
-    Top:=2;
+  lblEnd := TLabel.Create(Self);
+  with lblEnd do
+  begin
+    Parent := Self;
+    AutoSize := False;
+    Alignment := taRightJustify;
+    Layout := tlCenter;
+    Caption := 'End Bit';
+    Height := 21;
+    Width := 49;
+    Left := 272;
+    Top := 2;
   end;
 
-  spinStart:=TSpinEdit.Create(Self);
-  with spinStart do begin
-    Parent:=Self;
-    Height:=22;
-    Left:=224;
-    MaxValue:=31;
-    MinValue:=0;
-    Top:=2;
-    Width:=41;
+  spinStart := TSpinEdit.Create(Self);
+  with spinStart do
+  begin
+    Parent := Self;
+    Height := 22;
+    Left := 224;
+    MaxValue := 31;
+    MinValue := 0;
+    Top := 2;
+    Width := 41;
     OnChange := @SpinEditChanges;
   end;
 
-  spinEnd:=TSpinEdit.Create(Self);
-  with spinEnd do begin
-    Parent:=Self;
-    Height:=22;
-    Left:=328;
-    MaxValue:=31;
-    MinValue:=0;
-    Top:=2;
-    Width:=41;
+  spinEnd := TSpinEdit.Create(Self);
+  with spinEnd do
+  begin
+    Parent := Self;
+    Height := 22;
+    Left := 328;
+    MaxValue := 31;
+    MinValue := 0;
+    Top := 2;
+    Width := 41;
     OnChange := @SpinEditChanges;
   end;
 
-  btnDel:=TButton.Create(Self);
-  with btnDel do begin
-    Parent:=Self;
-    Caption:='Del';
-    Height:=22;
-    Left:=503;
-    Top:=3;
-    Width:=33;
-    OnClick:=@btnDelClick;
+  btnDel := TButton.Create(Self);
+  with btnDel do
+  begin
+    Parent := Self;
+    Caption := 'Del';
+    Height := 22;
+    Left := 503;
+    Top := 3;
+    Width := 33;
+    OnClick := @btnDelClick;
   end;
 end;
 
-destructor  TTagBitItemEditor.Destroy;
+destructor TTagBitItemEditor.Destroy;
 begin
   fedtItemName.Destroy;
   lblStart.Destroy;
@@ -397,279 +411,303 @@ begin
   inherited Destroy;
 end;
 
-procedure TTagBitItemEditor.SetTagName(newname:AnsiString);
+procedure TTagBitItemEditor.SetTagName(NewName: Ansistring);
 var
-  accept:Boolean;
+  Accept: Boolean;
 begin
-  accept:=true;
+  Accept := True;
   if Assigned(FCheckNames) then
-    FCheckNames(Self,newname,accept);
+    FCheckNames(Self, NewName, Accept);
 
-  if accept then begin
-    FTagName:=newname;
-    fedtItemName.Text:=newname;
-    fedtItemName.Modified:=false;
+  if Accept then
+  begin
+    FTagName := NewName;
+    fedtItemName.Text := NewName;
+    fedtItemName.Modified := False;
   end;
 end;
 
-procedure TTagBitItemEditor.SetStartBit(bitindex:LongInt);
+procedure TTagBitItemEditor.SetStartBit(BitIndex: Longint);
 begin
-  FStartBit:=bitindex;
-  spinStart.Value:=bitindex;
+  FStartBit := BitIndex;
+  spinStart.Value := BitIndex;
 
-  if FStartBit>FEndBit then begin
-    FEndBit:=bitindex;
-    spinEnd.Value:=FEndBit;
+  if FStartBit > FEndBit then
+  begin
+    FEndBit := BitIndex;
+    spinEnd.Value := FEndBit;
   end;
 end;
 
-procedure TTagBitItemEditor.SetEndBit(bitindex:LongInt);
+procedure TTagBitItemEditor.SetEndBit(BitIndex: Longint);
 begin
-  FEndBit:=bitindex;
-  spinEnd.Value:=bitindex;
+  FEndBit := BitIndex;
+  spinEnd.Value := BitIndex;
 
-  if FStartBit>FEndBit then begin
-    FStartBit:=bitindex;
-    spinStart.Value:=FStartBit;
+  if FStartBit > FEndBit then
+  begin
+    FStartBit := BitIndex;
+    spinStart.Value := FStartBit;
   end;
 end;
 
-procedure TTagBitItemEditor.SpinEditChanges(Sender:TObject);
+procedure TTagBitItemEditor.SpinEditChanges(Sender: TObject);
 begin
-  if (Sender=spinStart) then begin
-    FStartBit:=spinStart.Value;
-    if (spinStart.Value>spinEnd.Value) then begin
+  if (Sender = spinStart) then
+  begin
+    FStartBit := spinStart.Value;
+    if (spinStart.Value > spinEnd.Value) then
+    begin
       spinEnd.Value := spinStart.Value;
-      FEndBit:=spinEnd.Value;
+      FEndBit := spinEnd.Value;
     end;
   end;
 
-  if (Sender=spinEnd) then begin
-    FEndBit:=spinEnd.Value;
-    if (spinStart.Value>spinEnd.Value) then begin
+  if (Sender = spinEnd) then
+  begin
+    FEndBit := spinEnd.Value;
+    if (spinStart.Value > spinEnd.Value) then
+    begin
       spinStart.Value := spinEnd.Value;
-      FStartBit:=spinStart.Value;
+      FStartBit := spinStart.Value;
     end;
   end;
 end;
 
-procedure TTagBitItemEditor.edtItemNameExit(Sender:TObject);
+procedure TTagBitItemEditor.edtItemNameExit(Sender: TObject);
 var
-  accept:Boolean;
+  Accept: Boolean;
 begin
   if not fedtItemName.Modified then Exit;
-  accept:=true;
+  Accept := True;
   if Assigned(FCheckNames) then
-    FCheckNames(Self,fedtItemName.Text,accept);
+    FCheckNames(Self, fedtItemName.Text, Accept);
 
-  if accept then begin
-    fedtItemName.Modified:=false;
-    FTagName:=fedtItemName.Text;
-  end else begin
-    fedtItemName.Text:=FTagName;
-    fedtItemName.Modified:=false;
+  if Accept then
+  begin
+    fedtItemName.Modified := False;
+    FTagName := fedtItemName.Text;
+  end
+  else
+  begin
+    fedtItemName.Text := FTagName;
+    fedtItemName.Modified := False;
   end;
 end;
 
-procedure TTagBitItemEditor.btnDelClick(Sender:TObject);
+procedure TTagBitItemEditor.btnDelClick(Sender: TObject);
 begin
-  if Assigned(fondelclick) then
-    fondelclick(Self);
+  if Assigned(FOnDelClick) then
+    FOnDelClick(Self);
 end;
 
 ///////////////////////////////////////////////////////////////////////////////
 //S7TagEditor
 ///////////////////////////////////////////////////////////////////////////////
 
-constructor TS7TagItemEditor.Create(AOwner:TComponent);
+constructor TS7TagItemEditor.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  Align:=altop;
-  BevelOuter:=bvNone;
-  Height:=30;
-  Caption:='';
-  Top:=$0FFFFFFF;
+  Align := alTop;
+  BevelOuter := bvNone;
+  Height := 30;
+  Caption := '';
+  Top := $0FFFFFFF;
 
-  BitList:=TList.Create;
-  DelList:=TList.Create;
-  DelTimer:=TTimer.Create(Self);  
-  DelTimer.Enabled:=false;
-  DelTimer.Interval:=10;
-  DelTimer.OnTimer:=@OnDelTimer;
+  BitList := TList.Create;
+  DelList := TList.Create;
+  DelTimer := TTimer.Create(Self);
+  DelTimer.Enabled := False;
+  DelTimer.Interval := 10;
+  DelTimer.OnTimer := @OnDelTimer;
 
-  FSkip:=false;
-  FSwapWords:=false;
-  FSwapBytes:=false;
-  FTagType:=pttDefault;
+  FSkip := False;
+  FSwapWords := False;
+  FSwapBytes := False;
+  FTagType := pttDefault;
 
-  TagArea:=TPanel.Create(Self);
-  with TagArea do begin
-    Parent:=Self;
-    Align:=alTop;
-    BevelOuter:=bvNone;
-    Height:=25;
-    Caption:='';
+  TagArea := TPanel.Create(Self);
+  with TagArea do
+  begin
+    Parent := Self;
+    Align := alTop;
+    BevelOuter := bvNone;
+    Height := 25;
+    Caption := '';
   end;
 
-  BitArea:=TPanel.Create(Self);
-  with BitArea do begin
-    Parent:=Self;
-    Align:=alClient;
-    BevelOuter:=bvNone;
-    Top:=31;
-    Height:=0;
-    Caption:='';
+  BitArea := TPanel.Create(Self);
+  with BitArea do
+  begin
+    Parent := Self;
+    Align := alClient;
+    BevelOuter := bvNone;
+    Top := 31;
+    Height := 0;
+    Caption := '';
   end;
 
-  edtItemName:=TEdit.Create(Self);
-  with edtItemName do begin
+  edtItemName := TEdit.Create(Self);
+  with edtItemName do
+  begin
     Parent := TagArea;
-    Height:=21;
-    Width:=152;
-    Left:=2;
-    Top:=2;
-    OnExit:=@edtItemNameExit;
+    Height := 21;
+    Width := 152;
+    Left := 2;
+    Top := 2;
+    OnExit := @edtItemNameExit;
   end;
 
   //corre��o
   //desenha um bot�o que n�o faz nada
   //para forcar a perda de foco por tab do
   //edit anterior
-  //
+
   //FIX
   //draw a button that does nothing
   //to force the focus lost using of the previos edit
-  btnUp:=TButton.Create(Self);
-  with btnUp do begin
-    Parent:=TagArea;
-    Height:=22;
-    Left:=155;
-    Top:=3;
-    Width:=4;
+  btnUp := TButton.Create(Self);
+  with btnUp do
+  begin
+    Parent := TagArea;
+    Height := 22;
+    Left := 155;
+    Top := 3;
+    Width := 4;
   end;
 
-  cmbItemType:=TComboBox.Create(Self);
-  with cmbItemType do begin
-    Parent:=TagArea;
-    Left:=160;
-    top:=2;
-    Style:=csDropDownList;
-    Width:=78;
-    OnChange:=@optChange;
-    OnEnter:=@edtItemNameExit;
-    OnClick:=@edtItemNameExit;
-    OnDropDown:=@edtItemNameExit;
+  cmbItemType := TComboBox.Create(Self);
+  with cmbItemType do
+  begin
+    Parent := TagArea;
+    Left := 160;
+    Top := 2;
+    Style := csDropDownList;
+    Width := 78;
+    OnChange := @optChange;
+    OnEnter := @edtItemNameExit;
+    OnClick := @edtItemNameExit;
+    OnDropDown := @edtItemNameExit;
   end;
 
-  spinScan:=TSpinEdit.Create(Self);
-  with spinScan do begin
-    Parent:=TagArea;
-    Height:=22;
-    Left:=238;
-    MaxValue:=$7FFFFFFF;
-    MinValue:=0;
-    Value:=1000;
-    Top:=2;
-    Width:=55;
-    OnChange:=@optChange;
+  spinScan := TSpinEdit.Create(Self);
+  with spinScan do
+  begin
+    Parent := TagArea;
+    Height := 22;
+    Left := 238;
+    MaxValue := $7FFFFFFF;
+    MinValue := 0;
+    Value := 1000;
+    Top := 2;
+    Width := 55;
+    OnChange := @optChange;
   end;
 
-  optSwapBytes:=TCheckBox.Create(Self);
-  with optSwapBytes do begin
-    Parent:=TagArea;
-    Caption:='Bytes';
-    Height:=17;
-    Left:=297;
-    Top:=4;
-    Width:=50;
-    Checked:=FSwapBytes;
-    Enabled:=false;
-    OnClick:=@optChange;
+  optSwapBytes := TCheckBox.Create(Self);
+  with optSwapBytes do
+  begin
+    Parent := TagArea;
+    Caption := 'Bytes';
+    Height := 17;
+    Left := 297;
+    Top := 4;
+    Width := 50;
+    Checked := FSwapBytes;
+    Enabled := False;
+    OnClick := @optChange;
   end;
 
-  optSwapWords:=TCheckBox.Create(Self);
-  with optSwapWords do begin
-    Parent:=TagArea;
-    Caption:='Words';
-    Height:=17;
-    Left:=347;
-    Top:=4;
-    Width:=51;
-    Checked:=FSwapWords;
-    Enabled:=false;
-    OnClick:=@optChange;
+  optSwapWords := TCheckBox.Create(Self);
+  with optSwapWords do
+  begin
+    Parent := TagArea;
+    Caption := 'Words';
+    Height := 17;
+    Left := 347;
+    Top := 4;
+    Width := 51;
+    Checked := FSwapWords;
+    Enabled := False;
+    OnClick := @optChange;
   end;
 
-  optSkip:=TCheckBox.Create(Self);
-  with optSkip do begin
-    Parent:=TagArea;
-    Caption:='';
-    Height:=17;
-    Left:=409;
-    Top:=4;
-    Width:=15;
-    Checked:=FSkip;
-    OnClick:=@optChange;
+  optSkip := TCheckBox.Create(Self);
+  with optSkip do
+  begin
+    Parent := TagArea;
+    Caption := '';
+    Height := 17;
+    Left := 409;
+    Top := 4;
+    Width := 15;
+    Checked := FSkip;
+    OnClick := @optChange;
   end;
 
-  btnUp:=TButton.Create(Self);
-  with btnUp do begin
-    Parent:=TagArea;
-    Caption:='UP';
-    Height:=22;
-    Left:=437;
-    Top:=3;
-    Width:=33;
-    OnClick:=@btnClick;
+  btnUp := TButton.Create(Self);
+  with btnUp do
+  begin
+    Parent := TagArea;
+    Caption := 'UP';
+    Height := 22;
+    Left := 437;
+    Top := 3;
+    Width := 33;
+    OnClick := @btnClick;
   end;
 
-  btnDown:=TButton.Create(Self);
-  with btnDown do begin
-    Parent:=TagArea;
-    Caption:='Down';
-    Height:=22;
-    Left:=470;
-    Top:=3;
-    Width:=33;
-    OnClick:=@btnClick;
+  btnDown := TButton.Create(Self);
+  with btnDown do
+  begin
+    Parent := TagArea;
+    Caption := 'Down';
+    Height := 22;
+    Left := 470;
+    Top := 3;
+    Width := 33;
+    OnClick := @btnClick;
   end;
 
-  btnDel:=TButton.Create(Self);
-  with btnDel do begin
-    Parent:=TagArea;
-    Caption:='Del';
-    Height:=22;
-    Left:=503;
-    Top:=3;
-    Width:=33;
-    OnClick:=@btnClick;
+  btnDel := TButton.Create(Self);
+  with btnDel do
+  begin
+    Parent := TagArea;
+    Caption := 'Del';
+    Height := 22;
+    Left := 503;
+    Top := 3;
+    Width := 33;
+    OnClick := @btnClick;
   end;
 
-  btnBits:=TButton.Create(Self);
-  with btnBits do begin
-    Parent:=TagArea;
-    Caption:='Bits';
-    Height:=22;
-    Left:=536;
-    Top:=3;
-    Width:=28;
-    OnClick:=@btnClick;
+  btnBits := TButton.Create(Self);
+  with btnBits do
+  begin
+    Parent := TagArea;
+    Caption := 'Bits';
+    Height := 22;
+    Left := 536;
+    Top := 3;
+    Width := 28;
+    OnClick := @btnClick;
   end;
 end;
 
 destructor TS7TagItemEditor.Destroy;
 var
-  c:LongInt;
+  i: Longint;
 begin
-  for c:=GetBitCount-1 downto 0 do
-    DelBit(c);
+  for i := GetBitCount - 1 downto 0 do
+    DelBit(i);
   BitList.Destroy;
   inherited Destroy;
 end;
 
 procedure TS7TagItemEditor.PopulateCombo;
 begin
-  with cmbItemType do begin
+  with cmbItemType do
+  begin
     Items.Clear;
     Items.Clear;
     Items.Add('pttDefault');
@@ -680,272 +718,272 @@ begin
     Items.Add('pttLongInt');
     Items.Add('pttDWord');
     Items.Add('pttFloat');
-    ItemIndex:=0;
+    ItemIndex := 0;
   end;
 end;
 
-procedure TS7TagItemEditor.EnableTagType(ToEnable:Boolean);
+procedure TS7TagItemEditor.EnableTagType(ToEnable: Boolean);
 begin
-  cmbItemType.Enabled:=ToEnable;
+  cmbItemType.Enabled := ToEnable;
 end;
 
-procedure TS7TagItemEditor.EnableScanRate(ToEnable:Boolean);
+procedure TS7TagItemEditor.EnableScanRate(ToEnable: Boolean);
 begin
-  spinScan.Enabled:=ToEnable;
+  spinScan.Enabled := ToEnable;
 end;
 
-procedure TS7TagItemEditor.EnableSwapBytes(ToEnable:Boolean);
+procedure TS7TagItemEditor.EnableSwapBytes(ToEnable: Boolean);
 begin
-  optSwapBytes.Enabled:=ToEnable;
-  optSwapBytes.Checked:=ToEnable;
+  optSwapBytes.Enabled := ToEnable;
+  optSwapBytes.Checked := ToEnable;
 end;
 
-procedure TS7TagItemEditor.EnableSwapWords(ToEnable:Boolean);
+procedure TS7TagItemEditor.EnableSwapWords(ToEnable: Boolean);
 begin
-  optSwapWords.Enabled:=ToEnable;
-  optSwapWords.Checked:=ToEnable;
+  optSwapWords.Enabled := ToEnable;
+  optSwapWords.Checked := ToEnable;
 end;
 
-function TS7TagItemEditor.GetBitCount:LongInt;
+function TS7TagItemEditor.GetBitCount: Longint;
 begin
-  Result:=BitList.Count;
+  Result := BitList.Count;
 end;
 
-function TS7TagItemEditor.GetBit(Index:LongInt):TTagBitItemEditor;
+function TS7TagItemEditor.GetBit(Index: Longint): TTagBitItemEditor;
 begin
-  Result:=TTagBitItemEditor(BitList.Items[index])
+  Result := TTagBitItemEditor(BitList.Items[Index]);
 end;
 
-function  TS7TagItemEditor.AddBit:TTagBitItemEditor;
+function TS7TagItemEditor.AddBit: TTagBitItemEditor;
 var
-  tb:TTagBitItemEditor;
+  ATagBitEditor: TTagBitItemEditor;
 begin
-  tb:=TTagBitItemEditor.Create(Self);
-  tb.Parent:=BitArea;
-  tb.OnDelClick:=@DelBitItem;
-  tb.OnCheckNames:=@CheckNames;
-  tb.Top:=BitList.Count*tb.Height+1;
-  BitList.Add(tb);
-  Self.Height:=TagArea.Height+(tb.Height*BitList.Count)+3;
-  Result:=tb;
+  ATagBitEditor := TTagBitItemEditor.Create(Self);
+  ATagBitEditor.Parent := BitArea;
+  ATagBitEditor.OnDelClick := @DelBitItem;
+  ATagBitEditor.OnCheckNames := @CheckNames;
+  ATagBitEditor.Top := BitList.Count * ATagBitEditor.Height + 1;
+  BitList.Add(ATagBitEditor);
+  Self.Height := TagArea.Height + (ATagBitEditor.Height * BitList.Count) + 3;
+  Result := ATagBitEditor;
 end;
 
-procedure TS7TagItemEditor.OnDelTimer(Sender:TObject);
+procedure TS7TagItemEditor.OnDelTimer(Sender: TObject);
 var
-  c, i:LongInt;
+  c: Longint;
+  i: Longint;
 begin
-  for c:=DelList.Count-1 downto 0 do begin
-    i:=GetIndex(TTagBitItemEditor(DelList.Items[c]));
+  for c := DelList.Count - 1 downto 0 do
+  begin
+    i := GetIndex(TTagBitItemEditor(DelList.Items[c]));
     DelBit(i);
     DelList.Delete(c);
   end;
-  DelTimer.Enabled:=false;
+  DelTimer.Enabled := False;
 
   if Assigned(FOnDelBitItem) then
     FOnDelBitItem(Self);
 end;
 
-procedure TS7TagItemEditor.DelBit(index:LongInt);
+procedure TS7TagItemEditor.DelBit(Index: Longint);
 var
-  tb:TTagBitItemEditor;
+  ATagBitEditor: TTagBitItemEditor;
 begin
-  tb:=TTagBitItemEditor(BitList.Items[index]);
-  BitList.Remove(tb);
-  self.Height:=TagArea.Height+(tb.Height*BitList.Count);
-  tb.Destroy;
+  ATagBitEditor := TTagBitItemEditor(BitList.Items[Index]);
+  BitList.Remove(ATagBitEditor);
+  Self.Height := TagArea.Height + (ATagBitEditor.Height * BitList.Count);
+  ATagBitEditor.Destroy;
 end;
 
-function  TS7TagItemEditor.GetIndex(tbitEditor:TTagBitItemEditor):LongInt;
+function TS7TagItemEditor.GetIndex(TagBitEditor: TTagBitItemEditor): Longint;
 begin
-  Result:=BitList.IndexOf(tbitEditor);
+  Result := BitList.IndexOf(TagBitEditor);
 end;
 
-function  TS7TagItemEditor.AcceptName(TheName:AnsiString):Boolean;
+function TS7TagItemEditor.AcceptName(TheName: Ansistring): Boolean;
 var
-  accept1, accept2 :Boolean;
+  Accept1: Boolean;
+  Accept2: Boolean;
 begin
-  accept1:=true;
-  accept2:=true;
+  Accept1 := True;
+  Accept2 := True;
 
   //checa o nome com os bits...
   //check the new name with bit names.
-  CheckNames(Self, TheName, accept1);
+  CheckNames(Self, TheName, Accept1);
 
   //checa o nome com os demais itens...
   //check the new name with other struct item names.
-  if accept1 and Assigned(FCheckNames) then
-    FCheckNames(Self,TheName,accept2);
+  if Accept1 and Assigned(FCheckNames) then
+    FCheckNames(Self, TheName, Accept2);
 
   //Ok caso passe nos dois testes...
   //Ok if everything is ok.
-  Result:=accept1 and accept2;
+  Result := Accept1 and Accept2;
 end;
 
-procedure TS7TagItemEditor.SetTagName(newName:AnsiString);
+procedure TS7TagItemEditor.SetTagName(NewName: Ansistring);
 var
-  accept:Boolean;
+  Accept: Boolean;
 begin
-  accept:=true;
+  Accept := True;
   if Assigned(FCheckNames) then
-    FCheckNames(Self,newname,accept);
+    FCheckNames(Self, NewName, Accept);
 
-  if accept then begin
-    FTagName:=newname;
-    edtItemName.Text:=newname;
-    edtItemName.Modified:=false;
+  if Accept then
+  begin
+    FTagName := NewName;
+    edtItemName.Text := NewName;
+    edtItemName.Modified := False;
   end;
 end;
 
-procedure TS7TagItemEditor.SetTagType(newType:TTagType);
+procedure TS7TagItemEditor.SetTagType(NewType: TTagType);
 begin
-  FTagType:=newType;
-  case newType of
-    pttDefault:
-      cmbItemType.ItemIndex:=0;
-    pttShortInt:
-      cmbItemType.ItemIndex:=1;
-    pttByte:
-      cmbItemType.ItemIndex:=2;
-    pttSmallInt:
-      cmbItemType.ItemIndex:=3;
-    pttWord:
-      cmbItemType.ItemIndex:=4;
-    pttLongInt:
-      cmbItemType.ItemIndex:=5;
-    pttDWord:
-      cmbItemType.ItemIndex:=6;
-    pttFloat:
-      cmbItemType.ItemIndex:=7;
+  FTagType := NewType;
+  case NewType of
+    pttDefault: cmbItemType.ItemIndex := 0;
+    pttShortInt: cmbItemType.ItemIndex := 1;
+    pttByte: cmbItemType.ItemIndex := 2;
+    pttSmallInt: cmbItemType.ItemIndex := 3;
+    pttWord: cmbItemType.ItemIndex := 4;
+    pttLongInt: cmbItemType.ItemIndex := 5;
+    pttDWord: cmbItemType.ItemIndex := 6;
+    pttFloat: cmbItemType.ItemIndex := 7;
   end;
   optChange(cmbItemType);
 end;
 
-procedure TS7TagItemEditor.SetTagScan(newScan:TRefreshTime);
+procedure TS7TagItemEditor.SetTagScan(NewScan: TRefreshTime);
 begin
-  FTagScan:=newScan;
-  spinScan.Value:=FTagScan;
+  FTagScan := NewScan;
+  spinScan.Value := FTagScan;
 end;
 
-procedure TS7TagItemEditor.SetSwapBytes(swap:Boolean);
+procedure TS7TagItemEditor.SetSwapBytes(Swap: Boolean);
 begin
-  FSwapBytes:=swap;
-  optSwapBytes.Checked:=FSwapBytes;
+  FSwapBytes := Swap;
+  optSwapBytes.Checked := FSwapBytes;
 end;
 
-procedure TS7TagItemEditor.SetSwapWords(swap:Boolean);
+procedure TS7TagItemEditor.SetSwapWords(Swap: Boolean);
 begin
-  FSwapWords:=swap;
-  optSwapWords.Checked:=FSwapWords;
+  FSwapWords := Swap;
+  optSwapWords.Checked := FSwapWords;
 end;
 
-procedure TS7TagItemEditor.SetSkipTag(Skip:Boolean);
+procedure TS7TagItemEditor.SetSkipTag(Skip: Boolean);
 begin
-  FSkip:=Skip;
-  optSkip.Checked:=FSkip;
-  edtItemName.Enabled:=not FSkip;
+  FSkip := Skip;
+  optSkip.Checked := FSkip;
+  edtItemName.Enabled := not FSkip;
 end;
 
-procedure TS7TagItemEditor.edtItemNameExit(Sender:TObject);
+procedure TS7TagItemEditor.edtItemNameExit(Sender: TObject);
 var
-  accept1, accept2 :Boolean;
-  b:LongInt;
-  oldname:AnsiString;
+  Accept1: Boolean;
+  Accept2: Boolean;
+  i: Longint;
+  OldName: Ansistring;
 begin
   if not edtItemName.Modified then Exit;
 
-  accept1:=true;
-  accept2:=true;
+  Accept1 := True;
+  Accept2 := True;
 
   //checa o nome com os bits...
   //check the new name with bits names.
-  CheckNames(Sender,edtItemName.Text,accept1);
+  CheckNames(Sender, edtItemName.Text, Accept1);
 
   //checa o nome com os demais itens...
   //check the new name with other struct names.
-  if accept1 and Assigned(FCheckNames) then
-    FCheckNames(Self,edtItemName.Text,accept2);
+  if Accept1 and Assigned(FCheckNames) then
+    FCheckNames(Self, edtItemName.Text, Accept2);
 
   //se pelo menos um falhou, volta o nome anterior...
   //to accept the new name, everything must be ok.
-  if (accept1=true) and (accept2=true) then begin
-    edtItemName.Modified:=false;
-    oldname:=FTagName;
-    FTagName:=edtItemName.Text;
+  if (Accept1 = True) and (Accept2 = True) then
+  begin
+    edtItemName.Modified := False;
+    OldName := FTagName;
+    FTagName := edtItemName.Text;
 
     //atualiza nome dos bits
     //update the name of the bits.
-    for b:=0 to BitCount-1 do
-      TTagBitItemEditor(Bit[b]).TagName := StringReplace(TTagBitItemEditor(Bit[b]).TagName,oldname,FTagName,[rfReplaceAll, rfIgnoreCase]);
-      
-  end else begin
-    edtItemName.Text:=FTagName;
-    edtItemName.Modified:=false;
+    for i := 0 to BitCount - 1 do
+      TTagBitItemEditor(Bit[i]).TagName := StringReplace(TTagBitItemEditor(Bit[i]).TagName, OldName, FTagName, [rfReplaceAll, rfIgnoreCase]);
+  end
+  else
+  begin
+    edtItemName.Text := FTagName;
+    edtItemName.Modified := False;
   end;
 end;
 
-procedure TS7TagItemEditor.DelBitItem(Sender:TObject);
+procedure TS7TagItemEditor.DelBitItem(Sender: TObject);
 begin
-  if not (Sender is TTagBitItemEditor) then Exit;
+  if not (Sender is TTagBitItemEditor) then
+    Exit;
 
-  if MessageDlg(SDeleteTheItem+(Sender as TTagBitItemEditor).TagName+'"?',mtConfirmation,[mbyes,mbNo],0)=mrno then Exit;
+  if MessageDlg(SDeleteTheItem + (Sender as TTagBitItemEditor).TagName + '"?', mtConfirmation, [mbYes, mbNo], 0) = mrNo then
+    Exit;
 
   DelList.Add(Sender);
-  DelTimer.Enabled:=true;
+  DelTimer.Enabled := True;
 end;
 
-procedure TS7TagItemEditor.optChange(Sender:TObject);
+procedure TS7TagItemEditor.optChange(Sender: TObject);
 begin
-  if Sender=optSwapBytes then
-    FSwapBytes:=optSwapBytes.Checked;
+  if Sender = optSwapBytes then
+    FSwapBytes := optSwapBytes.Checked;
 
-  if Sender=optSwapWords then
-    FSwapWords:=optSwapWords.Checked;
+  if Sender = optSwapWords then
+    FSwapWords := optSwapWords.Checked;
 
-  if Sender=optSkip then begin
-    FSkip:=optSkip.Checked;
-    edtItemName.Enabled:=not FSkip;
+  if Sender = optSkip then
+  begin
+    FSkip := optSkip.Checked;
+    edtItemName.Enabled := not FSkip;
     if Assigned(FOnSkipChange) then
       FOnSkipChange(optSkip);
   end;
 
-  if Sender=spinScan then
-    FTagScan:=spinScan.Value;
+  if Sender = spinScan then
+    FTagScan := spinScan.Value;
 
-  if Sender=cmbItemType then begin
+  if Sender = cmbItemType then
+  begin
     case cmbItemType.ItemIndex of
-      0:
-        FTagType:=pttDefault;
-      1:
-        FTagType:=pttShortInt;
-      2:
-        FTagType:=pttByte;
-      3:
-        FTagType:=pttSmallInt;
-      4:
-        FTagType:=pttWord;
-      5:
-        FTagType:=pttLongInt;
-      6:
-        FTagType:=pttDWord;
-      7:
-        FTagType:=pttFloat;
+      0: FTagType := pttDefault;
+      1: FTagType := pttShortInt;
+      2: FTagType := pttByte;
+      3: FTagType := pttSmallInt;
+      4: FTagType := pttWord;
+      5: FTagType := pttLongInt;
+      6: FTagType := pttDWord;
+      7: FTagType := pttFloat;
     end;
     case cmbItemType.ItemIndex of
-      0,1,2: begin
-        optSwapBytes.Checked:=false;
-        optSwapBytes.Enabled:=false;
-        optSwapWords.Checked:=false;
-        optSwapWords.Enabled:=false;
+      0,
+      1,
+      2: begin
+        optSwapBytes.Checked := False;
+        optSwapBytes.Enabled := False;
+        optSwapWords.Checked := False;
+        optSwapWords.Enabled := False;
       end;
-      3,4: begin
-        optSwapBytes.Checked:=True;
-        optSwapBytes.Enabled:=True;
+      3,
+      4: begin
+        optSwapBytes.Checked := True;
+        optSwapBytes.Enabled := True;
       end;
-      5,6,7: begin
-        optSwapBytes.Checked:=True;
-        optSwapBytes.Enabled:=True;
-        optSwapWords.Checked:=True;
-        optSwapWords.Enabled:=True;
+      5,
+      6,
+      7: begin
+        optSwapBytes.Checked := True;
+        optSwapBytes.Enabled := True;
+        optSwapWords.Checked := True;
+        optSwapWords.Enabled := True;
       end;
     end;
     if Assigned(FOnTypeChange) then
@@ -955,38 +993,42 @@ end;
 
 //evento chamado pelos bits do tag para verificar seu nome...
 //event called by bit itens to check theirs names.
-procedure TS7TagItemEditor.CheckNames(Sender:TObject; NewName:AnsiString; var AcceptNewName:Boolean);
+procedure TS7TagItemEditor.CheckNames(Sender: TObject; NewName: Ansistring; var AcceptNewName: Boolean);
 var
-  b:LongInt;
+  i: Longint;
 begin
-  if (Sender<>Self) and (NewName=TagName) then begin
-    AcceptNewName:=false
-  end else begin
-    for b:=0 to GetBitCount-1 do
-      if (Sender<>Bit[b]) and (Bit[b].TagName=NewName) then begin
-        AcceptNewName:=false ;
+  if (Sender <> Self) and (NewName = TagName) then
+  begin
+    AcceptNewName := False;
+  end
+  else
+  begin
+    for i := 0 to GetBitCount - 1 do
+      if (Sender <> Bit[i]) and (Bit[i].TagName = NewName) then
+      begin
+        AcceptNewName := False;
         Exit;
       end;
 
     if Assigned(FCheckNames) then
-      FCheckNames(sender,NewName, AcceptNewName);
+      FCheckNames(Sender, NewName, AcceptNewName);
   end;
 end;
 
-procedure TS7TagItemEditor.btnClick(Sender:TObject);
+procedure TS7TagItemEditor.btnClick(Sender: TObject);
 begin
-  if (Sender=btnUp) and Assigned(FUpClickEvent) then
+  if (Sender = btnUp) and Assigned(FUpClickEvent) then
     FUpClickEvent(Self);
 
-  if (Sender=btnDown) and Assigned(FDownClickEvent) then
+  if (Sender = btnDown) and Assigned(FDownClickEvent) then
     FDownClickEvent(Self);
 
-  if (Sender=btnBits) and Assigned(FBitsClickEvent) then
+  if (Sender = btnBits) and Assigned(FBitsClickEvent) then
     FBitsClickEvent(Self);
 
   //esta linha tem q ficar por ultimo sempre!!!
   //this condition must be the last ALWAYS!
-  if (Sender=btnDel) and Assigned(FDelClickEvent) then
+  if (Sender = btnDel) and Assigned(FDelClickEvent) then
     FDelClickEvent(Self);
 end;
 
@@ -1004,65 +1046,68 @@ end;
 
 procedure TfrmS7TagBuilder.MemoryAreaClick(Sender: TObject);
 begin
-  lblDBNumber.Enabled:=false;
-  lblDBNumber1.Enabled:=false;
-  spinDBNumber.Enabled:=false;
-  spinFinalDBNumber.Enabled:=false;
-  BlockType.Enabled:=false;
+  lblDBNumber.Enabled := False;
+  lblDBNumber1.Enabled := False;
+  spinDBNumber.Enabled := False;
+  spinFinalDBNumber.Enabled := False;
+  BlockType.Enabled := False;
   case MemoryArea.ItemIndex of
     0: begin
-     lblStartAddress.Caption:=SDigitalInputInitialByte;
-     BlockType.ItemIndex:=2;
+      lblStartAddress.Caption := SDigitalInputInitialByte;
+      BlockType.ItemIndex := 2;
     end;
     1: begin
-     lblStartAddress.Caption:=SDigitalOutputInitialByte;
-     BlockType.ItemIndex:=2;
+      lblStartAddress.Caption := SDigitalOutputInitialByte;
+      BlockType.ItemIndex := 2;
     end;
     2: begin
-     lblStartAddress.Caption:=SFlagInitialAddress;
-     BlockType.Enabled:=optplcblock.Checked;
+      lblStartAddress.Caption := SFlagInitialAddress;
+      BlockType.Enabled := optPLCBlock.Checked;
     end;
     3: begin
-     lblStartAddress.Caption:=SInitialAddressInsideDB;
-     lblDBNumber.Enabled:=true;
-     spinDBNumber.Enabled:=true;
-     lblDBNumber1.Enabled:=true;
-     spinFinalDBNumber.Enabled:=true;
-     BlockType.Enabled:=optplcblock.Checked;
+      lblStartAddress.Caption := SInitialAddressInsideDB;
+      lblDBNumber.Enabled := True;
+      spinDBNumber.Enabled := True;
+      lblDBNumber1.Enabled := True;
+      spinFinalDBNumber.Enabled := True;
+      BlockType.Enabled := optPLCBlock.Checked;
     end;
-    4,9: begin
-     lblStartAddress.Caption:=SCounterInitialAddress;
-     BlockType.ItemIndex:=4;
+    4,
+    9: begin
+      lblStartAddress.Caption := SCounterInitialAddress;
+      BlockType.ItemIndex := 4;
     end;
-    5,10: begin
-     lblStartAddress.Caption:=STimerInitialAddress;
-     BlockType.ItemIndex:=4;
+    5,
+    10: begin
+      lblStartAddress.Caption := STimerInitialAddress;
+      BlockType.ItemIndex := 4;
     end;
     6: begin
-     lblStartAddress.Caption:=SSMInitialByte;
-     BlockType.ItemIndex:=2;
+      lblStartAddress.Caption := SSMInitialByte;
+      BlockType.ItemIndex := 2;
     end;
     7: begin
-     lblStartAddress.Caption:=SAIWInitialAddress;
-     BlockType.ItemIndex:=4;
+      lblStartAddress.Caption := SAIWInitialAddress;
+      BlockType.ItemIndex := 4;
     end;
     8: begin
-     lblStartAddress.Caption:=SAQWInitialAddress;
-     BlockType.ItemIndex:=4;
+      lblStartAddress.Caption := SAQWInitialAddress;
+      BlockType.ItemIndex := 4;
     end;
     11: begin
-     lblStartAddress.Caption:=SPIWInitialAddress;
-     BlockType.ItemIndex:=4;
+      lblStartAddress.Caption := SPIWInitialAddress;
+      BlockType.ItemIndex := 4;
     end;
     12: begin
-     lblStartAddress.Caption:=SVInitialAddress;
-     BlockType.Enabled:=optplcblock.Checked;
+      lblStartAddress.Caption := SVInitialAddress;
+      BlockType.Enabled := optPLCBlock.Checked;
     end;
   end;
 
-  if MemoryArea.ItemIndex<>3 then begin
-    spinDBNumber.Value:=1;
-    spinFinalDBNumber.Value:=1;
+  if MemoryArea.ItemIndex <> 3 then
+  begin
+    spinDBNumber.Value := 1;
+    spinFinalDBNumber.Value := 1;
   end;
 
   BlockTypeChange(Sender);
@@ -1071,276 +1116,299 @@ end;
 
 procedure TfrmS7TagBuilder.btnFinishClick(Sender: TObject);
 begin
-  if (TagList.Count=0) or (not AtLeastOneItemIsValid) then
+  if (TagList.Count = 0) or (not AtLeastOneItemIsValid) then
     raise Exception.Create(SYouMustHaveAtLeastOneStructureItem);
-  if Trim(BlockName.Text)='' then
+  if Trim(BlockName.Text) = '' then
     raise Exception.Create(SInvalidBlockName);
 end;
 
 procedure TfrmS7TagBuilder.FormCreate(Sender: TObject);
 begin
-  PageControl1.ActivePageIndex:=0;
-  TagList:=TList.Create;
-  ItemsToDel:=TList.Create;
-  FStructureModified:=false;
+  PageControl1.ActivePageIndex := 0;
+  TagList := TList.Create;
+  ItemsToDel := TList.Create;
+  FStructureModified := False;
 
+  // translated captions
+  TabSheet1.Caption := us7tb_tabsheet1_caption;
+  PLCAddress.Caption := us7tb_plcaddres_caption;
+  MemoryArea.Caption := us7tb_memoryarea_caption;
+  grptagtype.Caption := us7tb_grptagtype_caption;
+  optPLCTagNumber.Caption := us7tb_optplctagnumber_caption;
+  optPLCBlock.Caption := us7tb_optplcblock_caption;
+  optplcStruct.Caption := us7tb_optplcstruct_caption;
+  lblBlockType.Caption := us7tb_lblblocktype_caption;
+  BlockSwapBytes.Caption := us7tb_blockswapbytes_caption;
+  BlockSwapWords.Caption := us7tb_blockswapwords_caption;
+  lblBlockScan.Caption := us7tb_blockscan_caption;
+  lblStructScan.Caption := us7tb_structscan_caption;
 
-  //translated captions.
-  TabSheet1.Caption      :=us7tb_tabsheet1_caption;
-  PLCAddress.Caption     :=us7tb_plcaddres_caption;
-  MemoryArea.Caption     :=us7tb_memoryarea_caption;
-  grptagtype.Caption     :=us7tb_grptagtype_caption;
-  optplctagnumber.Caption:=us7tb_optplctagnumber_caption;
-  optplcblock.Caption    :=us7tb_optplcblock_caption;
-  optplcStruct.Caption   :=us7tb_optplcstruct_caption;
-  lblBlockType.Caption   :=us7tb_lblblocktype_caption;
-  BlockSwapBytes.Caption :=us7tb_blockswapbytes_caption;
-  BlockSwapWords.Caption :=us7tb_blockswapwords_caption;
-  lblBlockScan.Caption   :=us7tb_blockscan_caption;
-  lblStructScan.Caption  :=us7tb_structscan_caption;
-
-  TabSheet4.Caption      :=us7tb_tabsheet4_caption;
-  lblNumItems.Caption    :=us7tb_lblnumitems_caption;
-  lblStartAddress.Caption:=us7tb_startaddress_caption;
-  lblBlockName.Caption   :=us7tb_lblblockname_caption;
-  lblDBNumber.Caption    :=us7tb_lblDBNumber_caption;
-  lblDBNumber1.Caption   :=us7tb_lblDBNumber1_caption;
-  Label28.Caption        :=us7tb_label28_caption;
-  Label29.Caption        :=us7tb_label29_caption;
-  Label30.Caption        :=us7tb_label30_caption;
-  Label32.Caption        :=us7tb_label31_caption;
-  Label32.Caption        :=us7tb_label32_caption;
+  TabSheet4.Caption := us7tb_tabsheet4_caption;
+  lblNumItems.Caption := us7tb_lblnumitems_caption;
+  lblStartAddress.Caption := us7tb_startaddress_caption;
+  lblBlockName.Caption := us7tb_lblblockname_caption;
+  lblDBNumber.Caption := us7tb_lblDBNumber_caption;
+  lblDBNumber1.Caption := us7tb_lblDBNumber1_caption;
+  Label28.Caption := us7tb_label28_caption;
+  Label29.Caption := us7tb_label29_caption;
+  Label30.Caption := us7tb_label30_caption;
+  Label32.Caption := us7tb_label31_caption;
+  Label32.Caption := us7tb_label32_caption;
 end;
 
 procedure TfrmS7TagBuilder.FormShow(Sender: TObject);
 begin
   MemoryAreaClick(Sender);
-  optplcblockClick(Sender);
+  optPLCBlockClick(Sender);
 end;
 
-procedure TfrmS7TagBuilder.FormClose(Sender: TObject;
-  var aAction: TCloseAction);
+procedure TfrmS7TagBuilder.FormClose(Sender: TObject; var AAction: TCloseAction);
 begin
-  //
+
 end;
 
-procedure TfrmS7TagBuilder.FormCloseQuery(Sender: TObject;
-  var CanClose: Boolean);
+procedure TfrmS7TagBuilder.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 begin
   //onclose query
 end;
 
 procedure TfrmS7TagBuilder.Button1Click(Sender: TObject);
 var
-  aTag, lastitem:TS7TagItemEditor;
+  ATag: TS7TagItemEditor;
+  LastItem: TS7TagItemEditor;
 begin
-  inc(FItemId);
+  Inc(FItemId);
 
-  aTag:=TS7TagItemEditor.Create(Self);
-  aTag.Parent := ScrollBox1;
-  aTag.PopulateCombo;
-  aTag.OnCheckNames:=@CheckNames;
-  aTag.OnUpClick:=@btnUpClick;
-  aTag.OnDownClickEvent:=@btnDownClick;
-  aTag.OnDelClickEvent:=@btnDelClick;
-  aTag.OnBitsClickEvent:=@btnBitsClick;
-  aTag.OnTypeChange:=@StructItemTypeChanged;
-  aTag.OnSkipChange:=@SkipChanged;
-  aTag.OnDelBitItem:=@BitItemDeleted;
-  aTag.TagScan:=1000;
-  aTag.TagType:=pttDefault;
-  aTag.SwapBytes:=false;
-  aTag.SwapWords:=false;
-  if TagList.Count>0 then begin
-    lastitem:=TS7TagItemEditor(taglist.Items[TagList.Count-1]);
-    aTag.Top:=lastitem.Top+lastitem.Height;
-  end else begin
-    aTag.Top:=0;
+  ATag := TS7TagItemEditor.Create(Self);
+  ATag.Parent := ScrollBox1;
+  ATag.PopulateCombo;
+  ATag.OnCheckNames := @CheckNames;
+  ATag.OnUpClick := @btnUpClick;
+  ATag.OnDownClickEvent := @btnDownClick;
+  ATag.OnDelClickEvent := @btnDelClick;
+  ATag.OnBitsClickEvent := @btnBitsClick;
+  ATag.OnTypeChange := @StructItemTypeChanged;
+  ATag.OnSkipChange := @SkipChanged;
+  ATag.OnDelBitItem := @BitItemDeleted;
+  ATag.TagScan := 1000;
+  ATag.TagType := pttDefault;
+  ATag.SwapBytes := False;
+  ATag.SwapWords := False;
+  if TagList.Count > 0 then
+  begin
+    LastItem := TS7TagItemEditor(TagList.Items[TagList.Count - 1]);
+    ATag.Top := LastItem.Top + LastItem.Height;
+  end
+  else
+  begin
+    ATag.Top := 0;
   end;
 
-  aTag.EnableScanRate(optplctagnumber.Checked);
+  ATag.EnableScanRate(optPLCTagNumber.Checked);
   case MemoryArea.ItemIndex of
-    0,1,6: begin
-      aTag.TagType:=pttByte;
+    0,
+    1,
+    6: begin
+      ATag.TagType := pttByte;
     end;
-    4,5,7..11: begin
-      aTag.TagType:=pttWord;
+    4,
+    5,
+    7..11: begin
+      ATag.TagType := pttWord;
     end;
-    2,3,12: begin
-      //does nothing...
+    2,
+    3,
+    12: begin
+      // does nothing...
     end;
   end;
-  
-  aTag.EnableTagType((not optplcblock.Checked) and (MemoryArea.ItemIndex in [2,3,12]));
 
-  TagList.Add(aTag);
+  ATag.EnableTagType((not optPLCBlock.Checked) and (MemoryArea.ItemIndex in [2, 3, 12]));
 
-  while not aTag.AcceptName('StructItem'+IntToStr(FItemId)) do
-    inc(FItemId);
-  aTag.TagName:='StructItem'+IntToStr(FItemId);
+  TagList.Add(ATag);
+
+  while not ATag.AcceptName('StructItem' + IntToStr(FItemId)) do
+    Inc(FItemId);
+  ATag.TagName := 'StructItem' + IntToStr(FItemId);
   UpdateStatusAndBlockName;
-  FStructureModified:=true;
+  FStructureModified := True;
 end;
 
 procedure TfrmS7TagBuilder.btnUpClick(Sender: TObject);
 var
-  idx:LongInt;
-  priortop, actualTop:LongInt;
-  prior:TS7TagItemEditor;
+  Idx: Longint;
+  PriorTop: Longint;
+  ActualTop: Longint;
+  Prior: TS7TagItemEditor;
 begin
   if not (Sender is TS7TagItemEditor) then Exit;
 
-  idx := TagList.IndexOf(Sender);
-  if idx>0 then begin
-    FStructureModified:=true;
-    prior:=TS7TagItemEditor(TagList.Items[idx-1]);
+  Idx := TagList.IndexOf(Sender);
+  if Idx > 0 then
+  begin
+    FStructureModified := True;
+    Prior := TS7TagItemEditor(TagList.Items[Idx - 1]);
 
-    priortop:=prior.Top;
-    actualTop:=(Sender as TS7TagItemEditor).Top;
+    PriorTop := Prior.Top;
+    ActualTop := (Sender as TS7TagItemEditor).Top;
 
-    TagList.Exchange(idx-1, idx);
+    TagList.Exchange(Idx - 1, Idx);
 
-    (Sender as TS7TagItemEditor).Top:=priortop;
-    (Sender as TS7TagItemEditor).TabOrder:=prior.TabOrder;
-    prior.Top:=actualTop;
+    (Sender as TS7TagItemEditor).Top := PriorTop;
+    (Sender as TS7TagItemEditor).TabOrder := Prior.TabOrder;
+    Prior.Top := ActualTop;
   end;
   UpdateStatusAndBlockName;
 end;
 
 procedure TfrmS7TagBuilder.btnDownClick(Sender: TObject);
 var
-  idx:LongInt;
-  nexttop, actualTop:LongInt;
-  aNext:TS7TagItemEditor;
+  Idx: Longint;
+  NextTop: Longint;
+  ActualTop: Longint;
+  ANext: TS7TagItemEditor;
 begin
   if not (Sender is TS7TagItemEditor) then Exit;
 
-  idx := TagList.IndexOf(Sender);
-  if (idx<>-1) and (idx<(TagList.Count-1)) then begin
-    FStructureModified:=true;  
-    aNext:=TS7TagItemEditor(TagList.Items[idx+1]);
+  Idx := TagList.IndexOf(Sender);
+  if (Idx <> -1) and (Idx < (TagList.Count - 1)) then
+  begin
+    FStructureModified := True;
+    ANext := TS7TagItemEditor(TagList.Items[Idx + 1]);
 
-    nexttop:=aNext.Top;
-    actualTop:=(Sender as TS7TagItemEditor).Top;
+    NextTop := ANext.Top;
+    ActualTop := (Sender as TS7TagItemEditor).Top;
 
-    TagList.Exchange(idx+1, idx);
+    TagList.Exchange(Idx + 1, Idx);
 
-    (Sender as TS7TagItemEditor).Top:=nexttop;
-    aNext.TabOrder:=(Sender as TS7TagItemEditor).TabOrder;
-    aNext.Top:=actualTop;
+    (Sender as TS7TagItemEditor).Top := NextTop;
+    ANext.TabOrder := (Sender as TS7TagItemEditor).TabOrder;
+    ANext.Top := ActualTop;
   end;
   UpdateStatusAndBlockName;
 end;
 
 procedure TfrmS7TagBuilder.btnDelClick(Sender: TObject);
 begin
-  if ItemsToDel.IndexOf(Sender)=-1 then
-    if MessageDlg(SRemoveaStructItemCalled+TS7TagItemEditor(Sender).TagName+'"?', mtConfirmation,[mbYes,mbNo],0)=mrYes then begin
-      FStructureModified:=true;
+  if ItemsToDel.IndexOf(Sender) = -1 then
+    if MessageDlg(SRemoveaStructItemCalled + TS7TagItemEditor(Sender).TagName + '"?', mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+    begin
+      FStructureModified := True;
       ItemsToDel.Add(Sender);
-      Timer1.Enabled:=true;
+      Timer1.Enabled := True;
     end;
 end;
 
 procedure TfrmS7TagBuilder.btnBitsClick(Sender: TObject);
 var
-  frmbit:TfrmBitMapper;
-  ti:TTagBitItemEditor;
-  s7tageditor:TS7TagItemEditor;
-  bitnum,
-  bytenum,
-  wordnum,
-  startbit,
-  endbit,
-  curbit:LongInt;
+  BitForm: TfrmBitMapper;
+  ATagBitEditor: TTagBitItemEditor;
+  S7TagEditor: TS7TagItemEditor;
+  BitNum: Longint;
+  ByteNum: Longint;
+  WordNum: Longint;
+  StartBit: Longint;
+  EndBit: Longint;
+  CurBit: Longint;
 
-  procedure updatenumbers;
+  procedure UpdateNumbers;
   begin
-    bitnum:=curbit;
-    if frmbit.bitnamestartsfrom1.Checked then inc(bitnum);
+    BitNum := CurBit;
+    if BitForm.BitNameStartsFrom1.Checked then
+      Inc(BitNum);
 
-    bytenum:=curbit div 8;
-    if frmbit.bytenamestartsfrom1.Checked then inc(bytenum);
+    ByteNum := CurBit Div 8;
+    if BitForm.ByteNameStartsFrom1.Checked then
+      Inc(ByteNum);
 
-    wordnum:=curbit div 16;
-    if frmbit.Wordnamestartsfrom1.Checked then inc(wordnum);
+    WordNum := CurBit Div 16;
+    if BitForm.WordNameStartsFrom1.Checked then
+      Inc(WordNum);
   end;
 
-  function GetNewTagBitName:AnsiString;
+  function GetNewTagBitName: Ansistring;
   var
-    n:AnsiString;
+    N: Ansistring;
   begin
-    n:=IntToStr(bitnum);
-    Result:=frmbit.edtNamepattern.Text;
-    Result := StringReplace(Result,'%b',n,[rfReplaceAll]);
+    N := IntToStr(BitNum);
+    Result := BitForm.edtNamePattern.Text;
+    Result := StringReplace(Result, '%b', N, [rfReplaceAll]);
 
-    n:=IntToStr(bytenum);
-    Result := StringReplace(Result,'%B',n,[rfReplaceAll]);
+    N := IntToStr(ByteNum);
+    Result := StringReplace(Result, '%B', N, [rfReplaceAll]);
 
-    n:=IntToStr(wordnum);
-    Result := StringReplace(Result,'%w',n,[rfReplaceAll]);
+    N := IntToStr(WordNum);
+    Result := StringReplace(Result, '%w', N, [rfReplaceAll]);
 
-    n:=(Sender as TS7TagItemEditor).TagName;
-    Result := StringReplace(Result,'%t',n,[rfReplaceAll]);
+    N := (Sender as TS7TagItemEditor).TagName;
+    Result := StringReplace(Result, '%t', N, [rfReplaceAll]);
   end;
+
 begin
   if not (Sender is TS7TagItemEditor) then Exit;
 
-  s7tageditor := (Sender as TS7TagItemEditor);
+  S7TagEditor := (Sender as TS7TagItemEditor);
 
-  frmbit:=TfrmBitMapper.Create(Self);
+  BitForm := TfrmBitMapper.Create(Self);
   try
-    if frmbit.ShowModal=mrOk then begin
-      FStructureModified:=true;
-      startbit:=31-frmbit.StringGrid1.Selection.Right;
-      endbit:=31-frmbit.StringGrid1.Selection.Left;
-      curbit:=startbit;
-      if frmbit.eachbitastag.Checked then begin
-        while curbit<=endbit do begin
-          updatenumbers;
-          ti:=s7tageditor.AddBit;
-          ti.TagName:=GetNewTagBitName;
-          ti.EndBit:=curbit;
-          ti.StartBit:=curbit;
-          inc(curbit);
+    if BitForm.ShowModal = mrOk then
+    begin
+      FStructureModified := True;
+      StartBit := 31 - BitForm.StringGrid1.Selection.Right;
+      EndBit := 31 - BitForm.StringGrid1.Selection.Left;
+      CurBit := StartBit;
+      if BitForm.EachBitAsTag.Checked then
+      begin
+        while CurBit <= EndBit do
+        begin
+          UpdateNumbers;
+          ATagBitEditor := S7TagEditor.AddBit;
+          ATagBitEditor.TagName := GetNewTagBitName;
+          ATagBitEditor.EndBit := CurBit;
+          ATagBitEditor.StartBit := CurBit;
+          Inc(CurBit);
         end;
-      end else begin
-        updatenumbers;
-        ti:=s7tageditor.AddBit;
-        ti.TagName:=GetNewTagBitName;
-        ti.EndBit:=endbit;
-        ti.StartBit:=startbit;
+      end
+      else
+      begin
+        UpdateNumbers;
+        ATagBitEditor := S7TagEditor.AddBit;
+        ATagBitEditor.TagName := GetNewTagBitName;
+        ATagBitEditor.EndBit := EndBit;
+        ATagBitEditor.StartBit := StartBit;
       end;
     end;
   finally
-    frmbit.Destroy;
+    BitForm.Destroy;
   end;
 end;
 
 procedure TfrmS7TagBuilder.spinDBNumberChange(Sender: TObject);
 begin
-  if spinDBNumber.Value>spinFinalDBNumber.Value then
-    spinFinalDBNumber.Value:=spinDBNumber.Value
+  if spinDBNumber.Value > spinFinalDBNumber.Value then
+    spinFinalDBNumber.Value := spinDBNumber.Value;
 end;
 
 procedure TfrmS7TagBuilder.spinFinalDBNumberChange(Sender: TObject);
 begin
-  if spinDBNumber.Value>spinFinalDBNumber.Value then
+  if spinDBNumber.Value > spinFinalDBNumber.Value then
     spinDBNumber.Value := spinFinalDBNumber.Value;
 end;
 
-procedure TfrmS7TagBuilder.SkipChanged(Sender:TObject);
+procedure TfrmS7TagBuilder.SkipChanged(Sender: TObject);
 begin
-  FStructureModified:=true;
+  FStructureModified := True;
   UpdateStatusAndBlockName;
 end;
 
-procedure TfrmS7TagBuilder.StructItemTypeChanged(Sender:TObject);
+procedure TfrmS7TagBuilder.StructItemTypeChanged(Sender: TObject);
 begin
-  if MemoryArea.ItemIndex in [2,3,12] then begin
-    if not FStructureModified then begin
+  if MemoryArea.ItemIndex in [2, 3, 12] then
+  begin
+    if not FStructureModified then
+    begin
       UpdateFlagDBandVStrucItemName;
-      FStructureModified:=false;
+      FStructureModified := False;
     end;
     UpdateStatusAndBlockName;
   end;
@@ -1348,21 +1416,24 @@ end;
 
 destructor TfrmS7TagBuilder.Destroy;
 var
-  t,b:LongInt;
+  i: Longint;
+  j: Longint;
 begin
-  for t:=TagList.Count-1 downto 0 do begin
-    for b:=TS7TagItemEditor(TagList.Items[t]).BitCount-1 downto 0 do begin
-      TS7TagItemEditor(TagList.Items[t]).DelBit(b);
+  for i := TagList.Count - 1 downto 0 do
+  begin
+    for j := TS7TagItemEditor(TagList.Items[i]).BitCount - 1 downto 0 do
+    begin
+      TS7TagItemEditor(TagList.Items[i]).DelBit(j);
     end;
-    TS7TagItemEditor(TagList.Items[t]).Destroy;
-    TagList.Delete(t);
+    TS7TagItemEditor(TagList.Items[i]).Destroy;
+    TagList.Delete(i);
   end;
   TagList.Destroy;
   ItemsToDel.Destroy;
   inherited Destroy;
 end;
 
-function TfrmS7TagBuilder.GetTagType:LongInt;
+function TfrmS7TagBuilder.GetTagType: Longint;
 begin
 {
 0  Digital Inputs, S7 200/300/400/1200        Inputs, Entradas)        @cell( 1
@@ -1379,551 +1450,619 @@ begin
 11 Analog Input (PIW), S7-300/400/1200        PIW, S7 300/400)         @cell(12
 12 VB, VW, VD, S7-200
 }
-  Result:=0;
+  Result := 0;
   if MemoryArea.ItemIndex in [0..11] then
-    Result:=MemoryArea.ItemIndex+1
-  else begin
-    if MemoryArea.ItemIndex=12 then Result:=4;
-  end;
+    Result := MemoryArea.ItemIndex + 1
+  else if MemoryArea.ItemIndex = 12 then
+    Result := 4;
 end;
 
-procedure TfrmS7TagBuilder.CheckNames(Sender:TObject; NewName:AnsiString; var AcceptNewName:Boolean);
+procedure TfrmS7TagBuilder.CheckNames(Sender: TObject; NewName: Ansistring; var AcceptNewName: Boolean);
 var
-  t,b:LongInt;
+  i: Longint;
+  j: Longint;
 begin
-  for t:=0 to TagList.Count-1 do begin
-    if TObject(TagList.Items[t])=Sender then continue;
-    if TS7TagItemEditor(TagList.Items[t]).TagName=NewName then begin
-      AcceptNewName:=false;
+  for i := 0 to TagList.Count - 1 do
+  begin
+    if TObject(TagList.Items[i]) = Sender then
+      Continue;
+    if TS7TagItemEditor(TagList.Items[i]).TagName = NewName then
+    begin
+      AcceptNewName := False;
       Exit;
     end;
-    for b:=0 to TS7TagItemEditor(TagList.Items[t]).BitCount-1 do begin
-      if TS7TagItemEditor(TagList.Items[t]).Bit[b]=Sender then continue;
-      if TTagBitItemEditor(TS7TagItemEditor(TagList.Items[t]).Bit[b]).TagName=NewName then begin
-        AcceptNewName:=false;
+    for j := 0 to TS7TagItemEditor(TagList.Items[i]).BitCount - 1 do
+    begin
+      if TS7TagItemEditor(TagList.Items[i]).Bit[j] = Sender then
+        Continue;
+      if TTagBitItemEditor(TS7TagItemEditor(TagList.Items[i]).Bit[j]).TagName = NewName then
+      begin
+        AcceptNewName := False;
         Exit;
       end;
     end;
   end;
-  FStructureModified:=true;
+  FStructureModified := True;
 end;
 
-function TfrmS7TagBuilder.GetStructItemsCount:LongInt;
+function TfrmS7TagBuilder.GetStructItemsCount: Longint;
 begin
-  Result:=TagList.Count;
+  Result := TagList.Count;
 end;
 
-function TfrmS7TagBuilder.GetStructItem(index:LongInt):TS7TagItemEditor;
+function TfrmS7TagBuilder.GetStructItem(Index: Longint): TS7TagItemEditor;
 begin
-  Result:=TS7TagItemEditor(TagList.Items[index]);
+  Result := TS7TagItemEditor(TagList.Items[Index]);
 end;
 
-function TfrmS7TagBuilder.GetStructureSizeInBytes:LongInt;
+function TfrmS7TagBuilder.GetStructureSizeInBytes: Longint;
 var
-  typesize, curitem:LongInt;
+  TypeSize: Longint;
+  CurItem: Longint;
 begin
-  if optplcblock.Checked then begin
+  if optPLCBlock.Checked then
+  begin
     case BlockType.ItemIndex of
       3..4: begin
-        typesize:=2;
+        TypeSize := 2;
       end;
       5..7: begin
-        typesize:=4;
+        TypeSize := 4;
       end;
-      else begin
-        typesize:=1;
+      else
+      begin
+        TypeSize := 1;
       end;
     end;
-    Result:=TagList.Count*typesize
-  end else begin
-    Result:=0;
-    for curitem:=0 to TagList.Count-1 do begin
-      with TS7TagItemEditor(TagList.Items[curitem]) do begin
+    Result := TagList.Count * TypeSize;
+  end
+  else
+  begin
+    Result := 0;
+    for CurItem := 0 to TagList.Count - 1 do
+    begin
+      with TS7TagItemEditor(TagList.Items[CurItem]) do
+      begin
         case TagType of
-          pttSmallInt, pttWord:
-            typesize:=2;
-          pttLongInt, pttDWord, pttFloat:
-            typesize:=4;
+          pttSmallInt,
+          pttWord: TypeSize := 2;
+          pttLongInt,
+          pttDWord,
+          pttFloat: TypeSize := 4;
           else
-            typesize:=1
+            TypeSize := 1
         end;
       end;
-      Inc(Result,typesize);
+      Inc(Result, TypeSize);
     end;
   end;
 end;
 
-function TfrmS7TagBuilder.GetRealStartOffset:LongInt;
+function TfrmS7TagBuilder.GetRealStartOffset: Longint;
 var
-  curitem:LongInt;
-  curTagType:TTagType;
+  CurItem: Longint;
+  CurTagType: TTagType;
 begin
-  if AtLeastOneItemIsValid then begin
-  
-    if MemoryArea.ItemIndex in [4,5,9,10] then
-      Result:=spinStartAddress.Value*2
+  if AtLeastOneItemIsValid then
+  begin
+    if MemoryArea.ItemIndex in [4, 5, 9, 10] then
+      Result := spinStartAddress.Value * 2
     else
-      Result:=spinStartAddress.Value;
+      Result := spinStartAddress.Value;
 
-    for curitem:=0 to TagList.Count-1 do
-      with TS7TagItemEditor(TagList.Items[curitem]) do begin
-        if optplcblock.Checked then begin
-          curTagType := CurBlockType;
-        end else
-          curTagType := TagType;
+    for CurItem := 0 to TagList.Count - 1 do
+      with TS7TagItemEditor(TagList.Items[CurItem]) do
+      begin
+        if optPLCBlock.Checked then
+        begin
+          CurTagType := CurBlockType;
+        end
+        else
+          CurTagType := TagType;
 
         if not SkipTag then
-          break
-        else begin
-          case curTagType of
-            pttDefault, pttShortInt, pttByte:
-              inc(Result, 1);
-            pttSmallInt, pttWord:
-              inc(Result, 2);
-            pttLongInt, pttDWord, pttFloat:
-              inc(Result, 4);
+          Break
+        else
+        begin
+          case CurTagType of
+            pttDefault,
+            pttShortInt,
+            pttByte:    Inc(Result, 1);
+            pttSmallInt,
+            pttWord:    Inc(Result, 2);
+            pttLongInt,
+            pttDWord,
+            pttFloat:   Inc(Result, 4);
           end;
         end;
       end;
-  end else
-    Result:=-1;
+  end
+  else
+    Result := -1;
 end;
 
-function TfrmS7TagBuilder.GetRealEndOffset:LongInt;
+function TfrmS7TagBuilder.GetRealEndOffset: Longint;
 var
-  curitem:LongInt;
-  curTagType:TTagType;
+  CurItem: Longint;
+  CurTagType: TTagType;
 begin
-  if AtLeastOneItemIsValid then begin
-    Result:=EndOffset;
-    for curitem:=TagList.Count-1 downto 0 do
-      with TS7TagItemEditor(TagList.Items[curitem]) do begin
-
-        if optplcblock.Checked then begin
-          curTagType := CurBlockType;
-        end else
-          curTagType := TagType;
+  if AtLeastOneItemIsValid then
+  begin
+    Result := EndOffset;
+    for CurItem := TagList.Count - 1 downto 0 do
+      with TS7TagItemEditor(TagList.Items[CurItem]) do
+      begin
+        if optPLCBlock.Checked then
+        begin
+          CurTagType := CurBlockType;
+        end
+        else
+          CurTagType := TagType;
 
         if not SkipTag then
-          break
-        else begin
-          case curTagType of
-            pttDefault, pttShortInt, pttByte:
-              Dec(Result, 1);
-            pttSmallInt, pttWord:
-              Dec(Result, 2);
-            pttLongInt, pttDWord, pttFloat:
-              Dec(Result, 4);
+          Break
+        else
+        begin
+          case CurTagType of
+            pttDefault,
+            pttShortInt,
+            pttByte:     Dec(Result, 1);
+            pttSmallInt,
+            pttWord:     Dec(Result, 2);
+            pttLongInt,
+            pttDWord,
+            pttFloat:    Dec(Result, 4);
           end;
         end;
       end;
-  end else
-    Result:=-1;
+  end
+  else
+    Result := -1;
 end;
 
-function TfrmS7TagBuilder.GetTheLastItemOffset:LongInt;
+function TfrmS7TagBuilder.GetTheLastItemOffset: Longint;
 var
-  curitem:LongInt;
-  curTagType:TTagType;
+  CurItem: Longint;
+  CurTagType: TTagType;
 begin
-  if AtLeastOneItemIsValid then begin
-    Result:=EndOffset;
-    for curitem:=TagList.Count-1 downto 0 do
-      with TS7TagItemEditor(TagList.Items[curitem]) do begin
+  if AtLeastOneItemIsValid then
+  begin
+    Result := EndOffset;
+    for CurItem := TagList.Count - 1 downto 0 do
+      with TS7TagItemEditor(TagList.Items[CurItem]) do
+      begin
+        if optPLCBlock.Checked then
+        begin
+          CurTagType := CurBlockType;
+        end
+        else
+          CurTagType := TagType;
 
-        if optplcblock.Checked then begin
-          curTagType := CurBlockType;
-        end else
-          curTagType := TagType;
-
-        case curTagType of
-          pttSmallInt, pttWord:
-            Dec(Result, 1);
-          pttLongInt, pttDWord, pttFloat:
-            Dec(Result, 3);
+        case CurTagType of
+          pttSmallInt,
+          pttWord:   Dec(Result, 1);
+          pttLongInt,
+          pttDWord,
+          pttFloat:  Dec(Result, 3);
         end;
         if not SkipTag then
-          break;
+          Break;
       end;
-  end else
-    Result:=-1;
-end;
-
-function TfrmS7TagBuilder.GetStartOffset:LongInt;
-begin
-  if MemoryArea.ItemIndex in [4,5,9,10] then
-    Result:=(spinStartAddress.Value*2)
+  end
   else
-    Result:=spinStartAddress.Value;
+    Result := -1;
 end;
 
-function TfrmS7TagBuilder.GetEndOffset:LongInt;
+function TfrmS7TagBuilder.GetStartOffset: Longint;
 begin
-  if MemoryArea.ItemIndex in [4,5,9,10] then
-    Result:=(spinStartAddress.Value*2)+(spinNumItens.Value*StructureSizeInBytes)-1
+  if MemoryArea.ItemIndex in [4, 5, 9, 10] then
+    Result := (spinStartAddress.Value * 2)
   else
-    Result:=spinStartAddress.Value+(spinNumItens.Value*StructureSizeInBytes)-1;
+    Result := spinStartAddress.Value;
 end;
 
-function TfrmS7TagBuilder.AtLeastOneItemIsValid:Boolean;
+function TfrmS7TagBuilder.GetEndOffset: Longint;
+begin
+  if MemoryArea.ItemIndex in [4, 5, 9, 10] then
+    Result := (spinStartAddress.Value * 2) + (spinNumItens.Value * StructureSizeInBytes) - 1
+  else
+    Result := spinStartAddress.Value + (spinNumItens.Value * StructureSizeInBytes) - 1;
+end;
+
+function TfrmS7TagBuilder.AtLeastOneItemIsValid: Boolean;
 var
-  curitem:LongInt;
+  CurItem: Longint;
 begin
-  Result:=false;
-  for curitem:=0 to TagList.Count-1 do
-    with TS7TagItemEditor(TagList.Items[curitem]) do
-      if not SkipTag then begin
-        Result:=true;
-        break;
+  Result := False;
+  for CurItem := 0 to TagList.Count - 1 do
+    with TS7TagItemEditor(TagList.Items[CurItem]) do
+      if not SkipTag then
+      begin
+        Result := True;
+        Break;
       end;
 end;
 
-function TfrmS7TagBuilder.CurBlockType:TTagType;
+function TfrmS7TagBuilder.CurBlockType: TTagType;
 begin
   case BlockType.ItemIndex of
-    1:
-      Result:=pttShortInt;
-    2:
-      Result:=pttByte;
-    3:
-      Result:=pttSmallInt;
-    4:
-      Result:=pttWord;
-    5:
-      Result:=pttLongInt;
-    6:
-      Result:=pttDWord;
-    7:
-      Result:=pttFloat;
+    1: Result := pttShortInt;
+    2: Result := pttByte;
+    3: Result := pttSmallInt;
+    4: Result := pttWord;
+    5: Result := pttLongInt;
+    6: Result := pttDWord;
+    7: Result := pttFloat;
     else
-      Result:=pttDefault;
+      Result := pttDefault;
   end;
 end;
 
-procedure TfrmS7TagBuilder.BitItemDeleted(Sender:TObject);
+procedure TfrmS7TagBuilder.BitItemDeleted(Sender: TObject);
 begin
-  FStructureModified:=true;
+  FStructureModified := True;
 end;
 
 procedure TfrmS7TagBuilder.UpdateFlagDBandVStrucItemName;
 var
-  nome, nome2:AnsiString;
-  curtype:TTagType;
+  AName: Ansistring;
+  AName2: Ansistring;
+  CurType: TTagType;
 begin
-  if TagList.Count<=0 then Exit;
-   
-  if MemoryArea.ItemIndex=2 then
-    nome:='M%s'
-  else begin
-    if MemoryArea.ItemIndex=3 then
-      nome:='DB%d_DB%s'
-    else
-      nome:='V%s'
+  if TagList.Count <= 0 then Exit;
+
+  if MemoryArea.ItemIndex = 2 then
+    AName := 'M%s'
+  else if MemoryArea.ItemIndex = 3 then
+    AName := 'DB%d_DB%s'
+  else
+    AName := 'V%s';
+
+  if optPLCBlock.Checked then
+    CurType := CurBlockType
+  else
+    CurType := TS7TagItemEditor(TagList.Items[0]).TagType;
+
+  case CurType of
+    pttDefault,
+    pttShortInt,
+    pttByte:  AName2 := 'B';
+    pttSmallInt,
+    pttWord:  AName2 := 'W';
+    pttLongInt,
+    pttDWord,
+    pttFloat: AName2 := 'D';
   end;
 
-  if optplcblock.Checked then
-    curtype:=CurBlockType
+  if MemoryArea.ItemIndex = 3 then
+    AName := Format(AName, [spinDBNumber.Value, AName2])
   else
-    curtype:=TS7TagItemEditor(TagList.Items[0]).TagType;
+    AName := Format(AName, [AName2]) + '%a';
 
-  case curtype of
-    pttDefault, pttShortInt, pttByte:
-      nome2:='B';
-    pttSmallInt, pttWord:
-      nome2:='W';
-    pttLongInt, pttDWord, pttFloat:
-      nome2:='D';
-  end;
-
-  if MemoryArea.ItemIndex=3 then
-    nome:=Format(nome,[spinDBNumber.Value,nome2])
-  else
-    nome:=Format(nome,[nome2])+'%a';
-
-  with TS7TagItemEditor(TagList.Items[0]) do begin
-    TagName:=nome;
+  with TS7TagItemEditor(TagList.Items[0]) do
+  begin
+    TagName := AName;
   end;
 end;
 
 procedure TfrmS7TagBuilder.Timer1Timer(Sender: TObject);
 var
-  c:LongInt;
+  i: Longint;
 begin
-  for c:=ItemsToDel.Count-1 downto 0 do begin
-    TagList.Remove(ItemsToDel.Items[c]);
-    TS7TagItemEditor(ItemsToDel.Items[c]).Destroy;
-    ItemsToDel.Delete(c);
+  for i := ItemsToDel.Count - 1 downto 0 do
+  begin
+    TagList.Remove(ItemsToDel.Items[i]);
+    TS7TagItemEditor(ItemsToDel.Items[i]).Destroy;
+    ItemsToDel.Delete(i);
   end;
-  Timer1.Enabled:=false;
+  Timer1.Enabled := False;
   UpdateStatusAndBlockName;
-  FStructureModified:=(TagList.Count<>0);
+  FStructureModified := (TagList.Count <> 0);
 end;
 
 procedure TfrmS7TagBuilder.TabSheet1Show(Sender: TObject);
 begin
-  btnBack.Enabled:=false;
-  btnFinish.Enabled:=false;
-  btnNext.Enabled:=true;
+  btnBack.Enabled := False;
+  btnFinish.Enabled := False;
+  btnNext.Enabled := True;
 end;
 
 procedure TfrmS7TagBuilder.BlockTypeChange(Sender: TObject);
 begin
-  if BlockType.ItemIndex in [0..2] then begin
-    BlockSwapBytes.Checked:=false;
-    BlockSwapWords.Checked:=false;
-    BlockSwapBytes.Enabled:=false;
-    BlockSwapWords.Enabled:=false;
+  if BlockType.ItemIndex in [0..2] then
+  begin
+    BlockSwapBytes.Checked := False;
+    BlockSwapWords.Checked := False;
+    BlockSwapBytes.Enabled := False;
+    BlockSwapWords.Enabled := False;
   end;
-  if BlockType.ItemIndex in [3..4] then begin
-    BlockSwapBytes.Checked:=optplcblock.Checked;
-    BlockSwapWords.Checked:=false;
-    BlockSwapBytes.Enabled:=optplcblock.Checked;
-    BlockSwapWords.Enabled:=false;
+  if BlockType.ItemIndex in [3..4] then
+  begin
+    BlockSwapBytes.Checked := optPLCBlock.Checked;
+    BlockSwapWords.Checked := False;
+    BlockSwapBytes.Enabled := optPLCBlock.Checked;
+    BlockSwapWords.Enabled := False;
   end;
-  if BlockType.ItemIndex in [5..7] then begin
-    BlockSwapBytes.Checked:=optplcblock.Checked;
-    BlockSwapWords.Checked:=optplcblock.Checked;
-    BlockSwapBytes.Enabled:=optplcblock.Checked;
-    BlockSwapWords.Enabled:=optplcblock.Checked;
+  if BlockType.ItemIndex in [5..7] then
+  begin
+    BlockSwapBytes.Checked := optPLCBlock.Checked;
+    BlockSwapWords.Checked := optPLCBlock.Checked;
+    BlockSwapBytes.Enabled := optPLCBlock.Checked;
+    BlockSwapWords.Enabled := optPLCBlock.Checked;
   end;
   UpdateStatusAndBlockName;
 end;
 
 procedure TfrmS7TagBuilder.UpdateStructItems;
 var
-  c:LongInt;
-  toenablescan, toenabletype, toenableSwap:Boolean;
+  i: Longint;
+  toEnableScan: Boolean;
+  toEnableType: Boolean;
+  toEnableSwap: Boolean;
 begin
-  toenablescan := optplctagnumber.Checked;
-  toenabletype:=(not optplcblock.Checked) and (MemoryArea.ItemIndex in [2,3,12]);
-  toenableSwap:=(not optplcblock.Checked);
+  toEnableScan := optPLCTagNumber.Checked;
+  toEnableType := (not optPLCBlock.Checked) and (MemoryArea.ItemIndex in [2, 3, 12]);
+  toEnableSwap := (not optPLCBlock.Checked);
 
-  for c:=0 to TagList.Count-1 do
-    with TS7TagItemEditor(TagList.Items[c]) do begin
-      EnableScanRate(toenablescan);
-      EnableSwapBytes(toenableSwap);
-      EnableSwapWords(toenableSwap);      
+  for i := 0 to TagList.Count - 1 do
+    with TS7TagItemEditor(TagList.Items[i]) do
+    begin
+      EnableScanRate(toEnableScan);
+      EnableSwapBytes(toEnableSwap);
+      EnableSwapWords(toEnableSwap);
       case MemoryArea.ItemIndex of
-        0,1,6: begin
-          TagType:=pttByte;
+        0,
+        1,
+        6: begin
+          TagType := pttByte;
         end;
-        4,5,7..11: begin
-          TagType:=pttWord;
+        4,
+        5,
+        7..11: begin
+          TagType := pttWord;
         end;
       end;
-      EnableTagType(toenabletype);
+      EnableTagType(toEnableType);
     end;
 end;
 
 
 procedure TfrmS7TagBuilder.btnNextClick(Sender: TObject);
 var
-  curitem:LongInt;
-  nome,nome2:AnsiString;
+  CurItem: Longint;
+  Nome: Ansistring;
+  Nome2: Ansistring;
 begin
-  if (FStructureModified=false) and
-     (MessageDlg('Do you want initialize the structure?', mtConfirmation, [mbYes,mbNo],0)=mrYes) then begin
-
-    for curitem:=TagList.Count-1 downto 0 do
-      TS7TagItemEditor(TagList.Items[curitem]).Destroy;
+  if (FStructureModified = False) and
+    (MessageDlg('Do you want initialize the structure?', mtConfirmation, [mbYes, mbNo], 0) = mrYes) then
+  begin
+    for CurItem := TagList.Count - 1 downto 0 do
+      TS7TagItemEditor(TagList.Items[CurItem]).Destroy;
 
     TagList.Clear;
 
     Button1Click(Sender);
 
     case MemoryArea.ItemIndex of
-      0, 1: begin
-        if MemoryArea.ItemIndex=0 then begin
-          nome:='IB%a';
-          nome2:='I%a_';
-        end else begin
-          nome:='QB%a';
-          nome2:='Q%a_';
+      0,
+      1: begin
+        if MemoryArea.ItemIndex = 0 then
+        begin
+          Nome := 'IB%a';
+          Nome2 := 'I%a_';
+        end
+        else
+        begin
+          Nome := 'QB%a';
+          Nome2 := 'Q%a_';
         end;
 
-        with TS7TagItemEditor(TagList.Items[0]) do begin
-          TagName:=nome;
-          for curitem:=0 to 7 do
-            with AddBit do begin
-              TagName:=nome2+IntToStr(curitem);
-              StartBit:=curitem;
-              EndBit:=curitem;
+        with TS7TagItemEditor(TagList.Items[0]) do
+        begin
+          TagName := Nome;
+          for CurItem := 0 to 7 do
+            with AddBit do
+            begin
+              TagName := Nome2 + IntToStr(CurItem);
+              StartBit := CurItem;
+              EndBit := CurItem;
             end;
         end;
       end;
-      2,3,12:
-        UpdateFlagDBandVStrucItemName;
+      2,
+      3,
+      12: UpdateFlagDBandVStrucItemName;
 
-      4,9, 5,10: begin
-        if MemoryArea.ItemIndex in [4,9] then
-          nome:='C%a'
+      4,
+      9,
+      5,
+      10: begin
+        if MemoryArea.ItemIndex in [4, 9] then
+          Nome := 'C%a'
         else
-          nome:='T%a';
+          Nome := 'T%a';
 
-        with TS7TagItemEditor(TagList.Items[0]) do begin
-          TagName:=nome;
+        with TS7TagItemEditor(TagList.Items[0]) do
+        begin
+          TagName := Nome;
         end;
       end;
       6: begin
-        with TS7TagItemEditor(TagList.Items[0]) do begin
-          TagName:='SMB%a';
+        with TS7TagItemEditor(TagList.Items[0]) do
+        begin
+          TagName := 'SMB%a';
         end;
       end;
-      7,8,11: begin
-        if MemoryArea.ItemIndex=7 then
-          nome:='AIW%a'
-        else begin
-          if MemoryArea.ItemIndex=8 then
-            nome:='AQW%a'
-          else
-            nome:='PIW%a';
-        end;
+      7,
+      8,
+      11: begin
+        if MemoryArea.ItemIndex = 7 then
+          Nome := 'AIW%a'
+        else if MemoryArea.ItemIndex = 8 then
+          Nome := 'AQW%a'
+        else
+          Nome := 'PIW%a';
 
-        with TS7TagItemEditor(TagList.Items[0]) do begin
-          TagName:=nome;
+        with TS7TagItemEditor(TagList.Items[0]) do
+        begin
+          TagName := Nome;
         end;
       end;
     end;
 
-    FStructureModified:=false;
-
+    FStructureModified := False;
   end;
-  PageControl1.ActivePage:=TabSheet4;
+  PageControl1.ActivePage := TabSheet4;
 end;
 
 procedure TfrmS7TagBuilder.btnBackClick(Sender: TObject);
 begin
-  PageControl1.ActivePage:=TabSheet1;
+  PageControl1.ActivePage := TabSheet1;
 end;
 
-procedure TfrmS7TagBuilder.PageControl1Changing(Sender: TObject;
-  var AllowChange: Boolean);
+procedure TfrmS7TagBuilder.PageControl1Changing(Sender: TObject; var AllowChange: Boolean);
 begin
-  OldPage:=PageControl1.ActivePage;
+  OldPage := PageControl1.ActivePage;
 end;
 
 procedure TfrmS7TagBuilder.TabSheet4Show(Sender: TObject);
 begin
-  btnBack.Enabled:=true;
-  btnFinish.Enabled:=true;
-  btnNext.Enabled:=false;
+  btnBack.Enabled := True;
+  btnFinish.Enabled := True;
+  btnNext.Enabled := False;
 end;
 
-procedure TfrmS7TagBuilder.optplcblockClick(Sender: TObject);
+procedure TfrmS7TagBuilder.optPLCBlockClick(Sender: TObject);
 begin
-  lblBlockType.Enabled   :=optplcblock.Checked;
-  BlockType.Enabled      :=optplcblock.Checked;
-  lblBlockScan.Enabled   :=optplcblock.Checked;
-  BlockScan.Enabled      :=optplcblock.Checked;
-  BlockSwapBytes.Enabled :=optplcblock.Checked;
-  BlockSwapWords.Enabled :=optplcblock.Checked;
+  lblBlockType.Enabled := optPLCBlock.Checked;
+  BlockType.Enabled := optPLCBlock.Checked;
+  lblBlockScan.Enabled := optPLCBlock.Checked;
+  BlockScan.Enabled := optPLCBlock.Checked;
+  BlockSwapBytes.Enabled := optPLCBlock.Checked;
+  BlockSwapWords.Enabled := optPLCBlock.Checked;
 
-  lblStructScan.Enabled:=optplcStruct.Checked;
-  StructScan.Enabled:=optplcStruct.Checked;
+  lblStructScan.Enabled := optplcStruct.Checked;
+  StructScan.Enabled := optplcStruct.Checked;
 
-  lblBlockName.Enabled:=optplcStruct.Checked or optplcblock.Checked;
-  BlockName.Enabled:=optplcStruct.Checked or optplcblock.Checked;
+  lblBlockName.Enabled := optplcStruct.Checked or optPLCBlock.Checked;
+  BlockName.Enabled := optplcStruct.Checked or optPLCBlock.Checked;
 
   MemoryAreaClick(Sender);
 end;
 
 procedure TfrmS7TagBuilder.UpdateStatusAndBlockName;
 var
-  strblockname, starttype, endtype:AnsiString;
-  curitem:LongInt;
+  StrBlockName: Ansistring;
+  StartType: Ansistring;
+  EndType: Ansistring;
+  CurItem: Longint;
 begin
-  if BlockName.Modified then Exit;
+  if BlockName.Modified then
+    Exit;
   case MemoryArea.ItemIndex of
     0: begin
-     strblockname:='InputBytes_From_IB%d_to_IB%d';
+      StrBlockName := 'InputBytes_From_IB%d_to_IB%d';
     end;
     1: begin
-     strblockname:='OutputBytes_From_QB%d_to_QB%d';
+      StrBlockName := 'OutputBytes_From_QB%d_to_QB%d';
     end;
     2: begin
-     strblockname:='Flags_From_M%s%d_to_M%s%d';
+      StrBlockName := 'Flags_From_M%s%d_to_M%s%d';
     end;
     3: begin
-     strblockname:='DB%d_From_DB%s%d_to_DB%s%d'
+      StrBlockName := 'DB%d_From_DB%s%d_to_DB%s%d';
     end;
-    4,9: begin
-     strblockname:='Counters_From_C%d_to_C%d'
+    4,
+    9: begin
+      StrBlockName := 'Counters_From_C%d_to_C%d';
     end;
-    5,10: begin
-     strblockname:='Timers_From_T%d_to_T%d'
+    5,
+    10: begin
+      StrBlockName := 'Timers_From_T%d_to_T%d';
     end;
     6: begin
-     strblockname:='SM_From_SMB%d_to_SMB%d'
+      StrBlockName := 'SM_From_SMB%d_to_SMB%d';
     end;
     7: begin
-     strblockname:='AnalogInput_From_AIW%d_to_AIW%d';
+      StrBlockName := 'AnalogInput_From_AIW%d_to_AIW%d';
     end;
     8: begin
-     strblockname:='AnalogOutput_From_AQW%d_to_AQW%d';
+      StrBlockName := 'AnalogOutput_From_AQW%d_to_AQW%d';
     end;
     11: begin
-     strblockname:='AnalogIW_From_PIW%d_to_PIW%d';
+      StrBlockName := 'AnalogIW_From_PIW%d_to_PIW%d';
     end;
     12: begin
-     strblockname:='Vs_From_V%s%d_to_V%s%d';
+      StrBlockName := 'Vs_From_V%s%d_to_V%s%d';
     end;
   end;
 
-  if optplcblock.Checked then begin
+  if optPLCBlock.Checked then
+  begin
     case BlockType.ItemIndex of
       0..2: begin
-        starttype:='B';
+        StartType := 'B';
       end;
       3..4: begin
-        starttype:='W';
+        StartType := 'W';
       end;
       5..7: begin
-        starttype:='D';
+        StartType := 'D';
       end;
     end;
-    endtype:=starttype;
-  end else begin
-    starttype:='';
-    endtype:='';
+    EndType := StartType;
+  end
+  else
+  begin
+    StartType := '';
+    EndType := '';
     if AtLeastOneItemIsValid then
-      for curitem:=0 to TagList.Count-1 do begin
-        with TS7TagItemEditor(TagList.Items[curitem]) do
-          if (starttype='') and (not SkipTag) then begin
+      for CurItem := 0 to TagList.Count - 1 do
+      begin
+        with TS7TagItemEditor(TagList.Items[CurItem]) do
+          if (StartType = '') and (not SkipTag) then
+          begin
             case TagType of
-              pttDefault, pttShortInt, pttByte:
-                starttype:='B';
-              pttSmallInt, pttWord:
-                starttype:='W';
-              pttLongInt, pttDWord, pttFloat:
-                starttype:='D';
+              pttDefault,
+              pttShortInt,
+              pttByte: StartType := 'B';
+              pttSmallInt,
+              pttWord: StartType := 'W';
+              pttLongInt,
+              pttDWord,
+              pttFloat: StartType := 'D';
             end;
           end;
 
-        with TS7TagItemEditor(TagList.Items[(TagList.Count-1)-curitem]) do
-          if (endtype='') and (not SkipTag) then begin
+        with TS7TagItemEditor(TagList.Items[(TagList.Count - 1) - CurItem]) do
+          if (EndType = '') and (not SkipTag) then
+          begin
             case TagType of
-              pttDefault, pttShortInt, pttByte:
-                endtype:='B';
-              pttSmallInt, pttWord:
-                endtype:='W';
-              pttLongInt, pttDWord, pttFloat:
-                endtype:='D';
+              pttDefault,
+              pttShortInt,
+              pttByte: EndType := 'B';
+              pttSmallInt,
+              pttWord: EndType := 'W';
+              pttLongInt,
+              pttDWord,
+              pttFloat: EndType := 'D';
             end;
           end;
       end;
   end;
 
   case MemoryArea.ItemIndex of
-    2,12:
-      BlockName.Text:=Format(strblockname,[starttype,GetRealStartOffset,endtype,GetTheLastItemOffset]);
-    3:
-      BlockName.Text:=Format(strblockname,[spinDBNumber.Value, starttype,GetRealStartOffset,endtype,GetTheLastItemOffset]);
-    4,5,9,10:
-      BlockName.Text:=Format(strblockname,[GetRealStartOffset div 2, GetTheLastItemOffset div 2]);
+    2,
+    12: BlockName.Text := Format(StrBlockName, [StartType, GetRealStartOffset, EndType, GetTheLastItemOffset]);
+    3: BlockName.Text := Format(StrBlockName, [spinDBNumber.Value, StartType, GetRealStartOffset, EndType, GetTheLastItemOffset]);
+    4,
+    5,
+    9,
+    10: BlockName.Text := Format(StrBlockName, [GetRealStartOffset Div 2, GetTheLastItemOffset Div 2]);
     else
-      BlockName.Text:=Format(strblockname,[GetRealStartOffset, GetTheLastItemOffset]);
+      BlockName.Text := Format(StrBlockName, [GetRealStartOffset, GetTheLastItemOffset]);
   end;
-  BlockName.Modified:=false;
+  BlockName.Modified := False;
 end;
 
 procedure TfrmS7TagBuilder.spinStartAddressChange(Sender: TObject);

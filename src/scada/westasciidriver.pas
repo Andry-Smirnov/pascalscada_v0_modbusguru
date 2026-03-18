@@ -254,7 +254,7 @@ type
     FWestDevices:TWestDevices;
 {d} procedure AssignScanTableToReg(const stablereg:TScanTableReg; var WestReg:TWestRegister);
 {d} function  IOResultToProtocolResult(IORes:TIOResult):TProtocolIOResult;
-{d} procedure AddressToChar(Addr:TWestAddressRange; var ret:BYTES);
+{d} procedure AddressToChar(Addr:TWestAddressRange; var ret:Bytes);
 {d} function  WestToDouble(const buffer:Array of byte; var Value:Double):TProtocolIOResult; overload;
 {d} function  WestToDouble(const buffer:Array of byte; var Value:Double; var dec:Byte):TProtocolIOResult; overload;
 {d} function  DoubleToWestAuto(var buffer:Array of Byte; const Value:Double):TProtocolIOResult;
@@ -676,7 +676,7 @@ end;
 
 function TWestASCIIDriver.DeviceActive(DeviceID:TWestAddressRange):TProtocolIOResult;
 var
-  buffer, No:BYTES;
+  buffer, No:Bytes;
   pkg:TIOPacket;
 begin
   try
@@ -730,7 +730,7 @@ begin
   end;
 end;
 
-procedure TWestASCIIDriver.AddressToChar(Addr:TWestAddressRange; var ret:BYTES);
+procedure TWestASCIIDriver.AddressToChar(Addr:TWestAddressRange; var ret:Bytes);
 var
    Dezenas, Unidades:BYTE;
 begin
@@ -946,7 +946,7 @@ function  TWestASCIIDriver.ParameterValue(const DeviceID:TWestAddressRange;
                                           var   Value:Double;
                                           var   dec:BYTE):TProtocolIOResult;
 var
-  buffer, No:BYTES;
+  buffer, No:Bytes;
   b1, b2:Boolean;
   pkg:TIOPacket;
 begin
@@ -1012,7 +1012,7 @@ end;
 
 function  TWestASCIIDriver.ModifyParameter(const DeviceID:TWestAddressRange; const Parameter:BYTE; const Value:Double; const dec:BYTE):TProtocolIOResult;
 var
-  buffer, respprog, No:BYTES;
+  buffer, respprog, No:Bytes;
   flag:Boolean;
   pkg:TIOPacket;
   i:LongInt;
@@ -1110,7 +1110,7 @@ end;
 
 function  TWestASCIIDriver.ScanTable(DeviceID:TWestAddressRange; var ScanTableValues:TScanTable):TProtocolIOResult;
 var
-   buffer, No:BYTES;
+   buffer, No:Bytes;
    b1, b2:Boolean;
    pkg:TIOPacket;
    OffsetSpace, OffsetNo, OffsetSize, res:LongInt;
@@ -1162,7 +1162,7 @@ begin
 
     //se respondeu o endereco com dois byte, incrementa offset da array.
     //
-    //if the response has two bytes to device addres, increments the offset of the array.
+    //if the response has two Bytes to device addres, increments the offset of the array.
     OffsetNo:=0;
     if b2 then
       OffsetNo:=1;

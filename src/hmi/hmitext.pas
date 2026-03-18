@@ -19,10 +19,13 @@ interface
 uses
   Classes, SysUtils,
   {$IFDEF FPC}
-LResources,
+  LResources,
   {$ENDIF}
   Controls, Graphics,
-  Dialogs, HMILabel, PLCTag, HMIZones, ProtocolTypes, StdCtrls, ExtCtrls;
+  Dialogs, HMILabel,
+  PLCTag, HMIZones,
+  ProtocolTypes, StdCtrls,
+  ExtCtrls;
 
 type
   {$IFDEF PORTUGUES}
@@ -47,6 +50,7 @@ type
     FTestValue: Double;
     FCurrentZone: TTextZone;
     FOwnerZoneShowed: Boolean;
+
     function GetTextZones: TTextZones;
     procedure SetTextZones(zt: TTextZones);
     procedure ZoneChange(Sender: TObject);
@@ -96,7 +100,7 @@ type
     //: @exclude
     procedure RefreshTagValue; override;
     //: @exclude
-    procedure SetHMITag(t: TPLCTag); override;
+    procedure SetHMITag(APLCTag: TPLCTag); override;
     //: @exclude
     procedure WriteFaultCallBack(Sender: TObject); override;
     //: @exclude
@@ -145,9 +149,13 @@ type
     property Zones: TTextZones read GetTextZones write SetTextZones nodefault;
   end;
 
+
 implementation
 
-uses hsstrings, Forms, hmi_animation_timers;
+
+uses
+  hsstrings, Forms, hmi_animation_timers;
+
 
 constructor THMIText.Create(AOwner: TComponent);
 begin
@@ -193,15 +201,15 @@ begin
   CurState := ComponentState;
 end;
 
-procedure THMIText.SetHMITag(t: TPLCTag);
+procedure THMIText.SetHMITag(APLCTag: TPLCTag);
 begin
   //se o tag esta entre um dos aceitos.
 
   //check if the tag is valid (only numeric tags)
-  if (t <> nil) and (not Supports(t, ITagNumeric)) then
+  if (APLCTag <> nil) and (not Supports(APLCTag, ITagNumeric)) then
     raise Exception.Create(SonlyNumericTags);
 
-  inherited SetHMITag(t);
+  inherited SetHMITag(APLCTag);
 end;
 
 procedure THMIText.WriteFaultCallBack(Sender: TObject);
@@ -221,7 +229,9 @@ begin
   GetAnimationTimer.RemoveCallback(@BlinkTimer);
   ShowZone(FCurrentZone);
   FOwnerZoneShowed := True;
-  if (FCurrentZone <> nil) and (FCurrentZone.BlinkWith <> (-1)) and (FCurrentZone.BlinkTime > 0) then
+  if (FCurrentZone <> nil)
+    and (FCurrentZone.BlinkWith <> (-1))
+    and (FCurrentZone.BlinkTime > 0) then
   begin
     GetAnimationTimer.AddTimerCallback(FCurrentZone.BlinkTime, @BlinkTimer);
   end;
@@ -233,7 +243,9 @@ begin
   GetAnimationTimer.RemoveCallback(@BlinkTimer);
   ShowZone(FCurrentZone);
   FOwnerZoneShowed := True;
-  if (FCurrentZone <> nil) and (FCurrentZone.BlinkWith <> (-1)) and (FCurrentZone.BlinkTime > 0) then
+  if (FCurrentZone <> nil)
+    and (FCurrentZone.BlinkWith <> (-1))
+    and (FCurrentZone.BlinkTime > 0) then
   begin
     GetAnimationTimer.AddTimerCallback(FCurrentZone.BlinkTime, @BlinkTimer);
   end;

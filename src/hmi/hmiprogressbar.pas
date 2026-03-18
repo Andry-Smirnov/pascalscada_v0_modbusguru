@@ -63,7 +63,7 @@ type
     function Progress: Double;
     //: @exclude
     function GetHMITag: TPLCTag; override;
-    procedure SetHMITag(t: TPLCTag); override;
+    procedure SetHMITag(APLCTag: TPLCTag); override;
     //: @exclude
     procedure Loaded; override;
     procedure UpdateShape; override;
@@ -110,10 +110,14 @@ type
     property BorderColor;
   end;
 
+
 implementation
 
-uses hsstrings, ControlSecurityManager, Math, BGRABitmap, BGRABitmapTypes,
+
+uses
+  hsstrings, ControlSecurityManager, Math, BGRABitmap, BGRABitmapTypes,
   Forms;
+
 
 constructor THMIProgressBar.Create(AOwner: TComponent);
 begin
@@ -122,7 +126,7 @@ begin
   if not FRegInSecMan then
   begin
     {$IFNDEF WINDOWS}
-    writeln('FIX-ME: Failed to register class ', ClassName, ' instace with name="', Name, '" in the ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
+    WriteLn('FIX-ME: Failed to register class ', ClassName, ' instace with name="', Name, '" in the ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
     {$ENDIF}
   end;
   FIsEnabled := True;
@@ -137,7 +141,7 @@ begin
   else
   begin
     {$IFNDEF WINDOWS}
-    writeln('FIX-ME: Why class ', ClassName, ', instace name="', Name, '" ins''t registered in ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
+    WriteLn('FIX-ME: Why class ', ClassName, ', instace name="', Name, '" ins''t registered in ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
     {$ENDIF}
   end;
 
@@ -172,13 +176,15 @@ end;
 
 procedure THMIProgressBar.DrawControl;
 var
-  aux: Double;
+  Aux: Double;
 
   function ProgressNormalized: Double;
   begin
     Result := ((Progress - FMin) / ifthen((FMax - FMin) = 0, 1, (FMax - FMin)));
-    if Result < 0 then Result := 0;
-    if Result > 1 then Result := 1;
+    if Result < 0 then
+      Result := 0;
+    if Result > 1 then
+      Result := 1;
   end;
 
 begin
@@ -190,56 +196,50 @@ begin
 
   case Orientation of
     pbVertical: begin
-      FControlArea.CanvasBGRA.Pen.Width := 0;
-      FControlArea.CanvasBGRA.Brush.Color := FBodyColor;
-      aux := Height * ((FMax - Progress) / ifthen((FMax - FMin) = 0, 1, (FMax - FMin)));
-      FControlArea.RectangleAntialias(FBorderWidth,
-        Height - (Height * ProgressNormalized),
-        Width - (FBorderWidth * 2),
-        Height - FBorderWidth,
-        ColorToBGRA(FBorderColor),
-        0,
-        ColorToBGRA(FBodyColor));
-
-    end;
-
+                  FControlArea.CanvasBGRA.Pen.Width := 0;
+                  FControlArea.CanvasBGRA.Brush.Color := FBodyColor;
+                  Aux := Height * ((FMax - Progress) / ifthen((FMax - FMin) = 0, 1, (FMax - FMin)));
+                  FControlArea.RectangleAntialias(FBorderWidth,
+                    Height - (Height * ProgressNormalized),
+                    Width - (FBorderWidth * 2),
+                    Height - FBorderWidth,
+                    ColorToBGRA(FBorderColor),
+                    0,
+                    ColorToBGRA(FBodyColor));
+                end;
     pbHorizontal: begin
-      FControlArea.CanvasBGRA.Pen.Width := 0;
-      FControlArea.RectangleAntialias(FBorderWidth,
-        FBorderWidth,
-        Width * ProgressNormalized,
-        Height - (FBorderWidth * 2),
-        ColorToBGRA(FBorderColor),
-        0,
-        ColorToBGRA(FBodyColor));
-
-    end;
-
-    pbRightToLeft: begin
-      FControlArea.CanvasBGRA.Pen.Width := 0;
-      FControlArea.CanvasBGRA.Brush.Color := clDefault;
-      FControlArea.RectangleAntialias(Width - (Width * ProgressNormalized),
-        FBorderWidth,
-        Width - FBorderWidth,
-        Height - (FBorderWidth * 2),
-        ColorToBGRA(FBorderColor),
-        0,
-        ColorToBGRA(FBodyColor));
-
-    end;
-    pbTopDown: begin
-      FControlArea.CanvasBGRA.Pen.Width := 0;
-      FControlArea.CanvasBGRA.Brush.Color := FBodyColor;
-      aux := Height * ((FMax - Progress) / ifthen((FMax - FMin) = 0, 1, (FMax - FMin)));
-      FControlArea.RectangleAntialias(FBorderWidth,
-        FBorderWidth,
-        Width - (FBorderWidth * 2),
-        Height * ProgressNormalized,
-        ColorToBGRA(FBorderColor),
-        0,
-        ColorToBGRA(FBodyColor));
-
-    end;
+                    FControlArea.CanvasBGRA.Pen.Width := 0;
+                    FControlArea.RectangleAntialias(FBorderWidth,
+                      FBorderWidth,
+                      Width * ProgressNormalized,
+                      Height - (FBorderWidth * 2),
+                      ColorToBGRA(FBorderColor),
+                      0,
+                      ColorToBGRA(FBodyColor));
+                  end;
+    pbRightToLeft:  begin
+                      FControlArea.CanvasBGRA.Pen.Width := 0;
+                      FControlArea.CanvasBGRA.Brush.Color := clDefault;
+                      FControlArea.RectangleAntialias(Width - (Width * ProgressNormalized),
+                        FBorderWidth,
+                        Width - FBorderWidth,
+                        Height - (FBorderWidth * 2),
+                        ColorToBGRA(FBorderColor),
+                        0,
+                        ColorToBGRA(FBodyColor));
+                    end;
+    pbTopDown:  begin
+                  FControlArea.CanvasBGRA.Pen.Width := 0;
+                  FControlArea.CanvasBGRA.Brush.Color := FBodyColor;
+                  Aux := Height * ((FMax - Progress) / ifthen((FMax - FMin) = 0, 1, (FMax - FMin)));
+                  FControlArea.RectangleAntialias(FBorderWidth,
+                    FBorderWidth,
+                    Width - (FBorderWidth * 2),
+                    Height * ProgressNormalized,
+                    ColorToBGRA(FBorderColor),
+                    0,
+                    ColorToBGRA(FBodyColor));
+                end;
   end;
 end;
 
@@ -273,11 +273,11 @@ begin
     InvalidateDraw;
 end;
 
-procedure THMIProgressBar.SetHMITag(t: TPLCTag);
+procedure THMIProgressBar.SetHMITag(APLCTag: TPLCTag);
 begin
   //se o tag esta entre um dos aceitos.
   //check if the tag is valid.
-  if (t <> nil) and (not Supports(t, ITagNumeric)) then
+  if (APLCTag <> nil) and (not Supports(APLCTag, ITagNumeric)) then
     raise Exception.Create(SonlyNumericTags);
 
   //se ja estou associado a um tag, remove
@@ -289,15 +289,15 @@ begin
 
   //adiona o callback para o novo tag
   //link with the new tag.
-  if t <> nil then
+  if APLCTag <> nil then
   begin
-    t.AddWriteFaultHandler(@WriteFaultCallBack);
-    t.AddTagChangeHandler(@TagChangeCallBack);
-    t.AddRemoveTagHandler(@RemoveTagCallBack);
-    FTag := t;
+    APLCTag.AddWriteFaultHandler(@WriteFaultCallBack);
+    APLCTag.AddTagChangeHandler(@TagChangeCallBack);
+    APLCTag.AddRemoveTagHandler(@RemoveTagCallBack);
+    FTag := APLCTag;
     RefreshProgress(0);
   end;
-  FTag := t;
+  FTag := APLCTag;
   InvalidateDraw;
 end;
 

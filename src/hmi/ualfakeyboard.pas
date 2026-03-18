@@ -96,11 +96,9 @@ type
     Timer1: TTimer;
     Timer2: TTimer;
     procedure FormCreate(Sender: TObject);
-    procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: LongInt);
-    procedure FormMouseMove(Sender: TObject; Shift: TShiftState; X, Y: LongInt);
-    procedure FormMouseUp(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: LongInt);
+    procedure FormMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Longint);
+    procedure FormMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Longint);
+    procedure FormMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Longint);
     procedure FormPaint(Sender: TObject);
     procedure ModifierPress(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
@@ -108,75 +106,66 @@ type
     procedure Timer2Timer(Sender: TObject);
   private
     //move operations
-    OffsetX, OffsetY:LongInt;
-    CurX,CurY:LongInt;
-    MoveOperation:Boolean;
+    OffsetX: Longint;
+    OffsetY: Longint;
+    CurX: Longint;
+    CurY: Longint;
+    MoveOperation: Boolean;
 
-    FTarget:TWinControl;
-    FFormOwner:TCustomForm;
-    FKeyboard:TCrossKeyEvents;
+    FTarget: TWinControl;
+    FFormOwner: TCustomForm;
+    FKeyboard: TCrossKeyEvents;
 
-    CurrentState:TShiftState;
+    CurrentState: TShiftState;
+
     //procedure BringToFrontWithoutActivate;
     procedure GotoBetterPosition;
     procedure ModifierRelease();
     procedure ReturnFocusToTarget;
   protected
-    FFxxKeyGroup,
-    FNumbersKeyGroup,
-    FSymbolsKeyGroup,
-    FNavigationKeyGroup,
-    FFastNavigationKeyGroup:TList;
-    FReturnCloseKeyBoard:Boolean;
-    fStartedAt:TDateTime;
+    FFxxKeyGroup: TList;
+    FNumbersKeyGroup: TList;
+    FSymbolsKeyGroup: TList;
+    FNavigationKeyGroup: TList;
+    FFastNavigationKeyGroup: TList;
+    FReturnCloseKeyBoard: Boolean;
+    fStartedAt: TDateTime;
+
     procedure DoClose(var CloseAction: TCloseAction); override;
     procedure GotoBetterPositionDelayed(Data: PtrInt);
   public
-    constructor Create(TheOwner: TComponent;
-                       Target:TWinControl;
-                       ShowFxxKeys,
-                       ShowTab,
-                       ShowCaps,
-                       ShowShift,
-                       ShowCtrl,
-                       ShowAlt,
-                       ShowSymbols,
-                       ShowNumbers,
-                       ShowFastNavigation,
-                       ShowNavigation,
-
-                       CloseOnPressEnter:Boolean); overload;
+    constructor Create(TheOwner: TComponent; Target: TWinControl; ShowFxxKeys, ShowTab, ShowCaps, ShowShift, ShowCtrl, ShowAlt, ShowSymbols, ShowNumbers, ShowFastNavigation, ShowNavigation, CloseOnPressEnter: Boolean); overload;
     destructor Destroy; override;
-    class function CreateOrGetLast(TheOwner: TComponent;
-                       Target:TWinControl;
-                       ShowFxxKeys,
-                       ShowTab,
-                       ShowCaps,
-                       ShowShift,
-                       ShowCtrl,
-                       ShowAlt,
-                       ShowSymbols,
-                       ShowNumbers,
-                       ShowFastNavigation,
-                       ShowNavigation,
-
-                       CloseOnPressEnter:Boolean):TpsHMIfrmAlphaKeyboard;
+    class function CreateOrGetLast(TheOwner: TComponent; Target: TWinControl; ShowFxxKeys, ShowTab, ShowCaps, ShowShift, ShowCtrl, ShowAlt, ShowSymbols, ShowNumbers, ShowFastNavigation, ShowNavigation, CloseOnPressEnter: Boolean): TpsHMIfrmAlphaKeyboard;
     procedure ShowAlongsideOfTheTarget;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   published
-    property Target:TWinControl read FTarget;
-  end; 
+    property Target: TWinControl read FTarget;
+  end;
+
 
 var
   psHMIfrmAlphaKeyboard: TpsHMIfrmAlphaKeyboard;
 
+
 implementation
 
-uses strutils, dateutils,
-     {$IFDEF FPC}InterfaceBase, keyboard, LResources, LCLIntf, LCLType{$ENDIF}
-     {$IF defined(WINDOWS) or defined(WIN32) or defined(WIN64) or defined(MSWINDOWS)}
-     , windows
-     {$IFEND};
+
+uses
+  strutils,
+  dateutils
+{$IFDEF FPC}
+  , InterfaceBase,
+  keyboard,
+  LResources,
+  LCLIntf,
+  LCLType
+{$ENDIF}
+{$IF defined(WINDOWS) or defined(WIN32) or defined(WIN64) or defined(MSWINDOWS)}
+  , Windows
+{$IFEND}
+  ;
+
 
 {$IFNDEF FPC}
   {$R *.dfm}
@@ -186,56 +175,57 @@ uses strutils, dateutils,
   {$IFEND}
 {$ENDIF}
 
-{ TpsHMIfrmAlphaKeyboard }
+  { TpsHMIfrmAlphaKeyboard }
 
 var
-  LastAlphaKeyboard:TpsHMIfrmAlphaKeyboard;
+  LastAlphaKeyboard: TpsHMIfrmAlphaKeyboard;
 
-procedure EnableGroup(Group:TList; EnableGroup:Boolean);
+
+procedure EnableGroup(Group: TList; EnableGroup: Boolean);
 var
   i: Integer;
 begin
-  for i:=0 to Group.Count-1 do begin
-    TSpeedButton(Group.Items[i]).Enabled:=TSpeedButton(Group.Items[i]).Enabled and EnableGroup;
+  for i := 0 to Group.Count - 1 do
+  begin
+    TSpeedButton(Group.Items[i]).Enabled := TSpeedButton(Group.Items[i]).Enabled and EnableGroup;
   end;
 end;
 
-constructor TpsHMIfrmAlphaKeyboard.Create(TheOwner: TComponent;
-  Target: TWinControl; ShowFxxKeys, ShowTab, ShowCaps, ShowShift, ShowCtrl,
-  ShowAlt, ShowSymbols, ShowNumbers, ShowFastNavigation, ShowNavigation,
-  CloseOnPressEnter: Boolean);
+constructor TpsHMIfrmAlphaKeyboard.Create(TheOwner: TComponent; Target: TWinControl;
+  ShowFxxKeys, ShowTab, ShowCaps, ShowShift, ShowCtrl, ShowAlt, ShowSymbols,
+  ShowNumbers, ShowFastNavigation, ShowNavigation, CloseOnPressEnter: Boolean);
 var
-  k: TKeyEvent;
-
+  K: TKeyEvent;
 begin
   inherited Create(TheOwner);
 
   if not Assigned(Target) then
     raise Exception.Create('Nil target!');
 
-  if Assigned(LastAlphaKeyboard) then begin
+  if Assigned(LastAlphaKeyboard) then
+  begin
     FreeAndNil(LastAlphaKeyboard);
   end;
 
-  FTarget:=Target;
-  FKeyboard:=CreateCrossKeyEvents(Target);
+  FTarget := Target;
+  FKeyboard := CreateCrossKeyEvents(Target);
   {$IFDEF LCL}
-  FormStyle:=fsSystemStayOnTop;
+  FormStyle := fsSystemStayOnTop;
   {$ENDIF}
 
   FTarget.FreeNotification(Self);
 
-  FFormOwner:=GetParentForm(Target);
-  ControlStyle:=ControlStyle+[csNoFocus];
-  LastAlphaKeyboard:=Self;
+  FFormOwner := GetParentForm(Target);
+  ControlStyle := ControlStyle + [csNoFocus];
+  LastAlphaKeyboard := Self;
 
-  CurrentState:=[ssCtrl, ssAlt, ssShift];
+  CurrentState := [ssCtrl, ssAlt, ssShift];
   FKeyboard.Apply([]);
-  CurrentState:=[];
+  CurrentState := [];
 
-  FReturnCloseKeyBoard:=CloseOnPressEnter;
+  FReturnCloseKeyBoard := CloseOnPressEnter;
 
-  FFxxKeyGroup:=TList.Create;
+  FFxxKeyGroup := TList.Create;
   FFxxKeyGroup.Add(Btn_F1);
   FFxxKeyGroup.Add(Btn_F2);
   FFxxKeyGroup.Add(Btn_F3);
@@ -249,7 +239,7 @@ begin
   FFxxKeyGroup.Add(Btn_F11);
   FFxxKeyGroup.Add(Btn_F12);
 
-  FNumbersKeyGroup:=TList.Create;
+  FNumbersKeyGroup := TList.Create;
   FNumbersKeyGroup.Add(Btn_0);
   FNumbersKeyGroup.Add(Btn_1);
   FNumbersKeyGroup.Add(Btn_2);
@@ -261,7 +251,7 @@ begin
   FNumbersKeyGroup.Add(Btn_8);
   FNumbersKeyGroup.Add(Btn_9);
 
-  FSymbolsKeyGroup:=TList.Create;
+  FSymbolsKeyGroup := TList.Create;
   FSymbolsKeyGroup.Add(Btn_Quote);
   FSymbolsKeyGroup.Add(Btn_BackSlash);
   FSymbolsKeyGroup.Add(Btn_Hyphen);
@@ -275,23 +265,23 @@ begin
   FSymbolsKeyGroup.Add(Btn_Semicolon);
   FSymbolsKeyGroup.Add(Btn_Slash);
 
-  FFastNavigationKeyGroup:=TList.Create;
+  FFastNavigationKeyGroup := TList.Create;
   FFastNavigationKeyGroup.Add(Btn_PgUp);
   FFastNavigationKeyGroup.Add(Btn_PgDown);
   FFastNavigationKeyGroup.Add(Btn_End);
   FFastNavigationKeyGroup.Add(Btn_Home);
 
-  FNavigationKeyGroup:=TList.Create;
+  FNavigationKeyGroup := TList.Create;
   FNavigationKeyGroup.Add(Btn_Up);
   FNavigationKeyGroup.Add(Btn_Down);
   FNavigationKeyGroup.Add(Btn_Left);
   FNavigationKeyGroup.Add(Btn_Rigth);
 
-  Btn_Caps.Enabled:=Btn_Caps.Enabled and ShowCaps;
-  Btn_Tab.Enabled:=Btn_Tab.Enabled and ShowTab;
-  Btn_Shift.Enabled:=Btn_Shift.Enabled and ShowShift and ShowSymbols;
-  Btn_Ctrl.Enabled:=Btn_Ctrl.Enabled and ShowCtrl;
-  Btn_Alt.Enabled:=Btn_Alt.Enabled and ShowAlt;
+  Btn_Caps.Enabled := Btn_Caps.Enabled and ShowCaps;
+  Btn_Tab.Enabled := Btn_Tab.Enabled and ShowTab;
+  Btn_Shift.Enabled := Btn_Shift.Enabled and ShowShift and ShowSymbols;
+  Btn_Ctrl.Enabled := Btn_Ctrl.Enabled and ShowCtrl;
+  Btn_Alt.Enabled := Btn_Alt.Enabled and ShowAlt;
 
   EnableGroup(FNavigationKeyGroup, ShowNavigation);
   EnableGroup(FFastNavigationKeyGroup, ShowFastNavigation);
@@ -305,41 +295,44 @@ class function TpsHMIfrmAlphaKeyboard.CreateOrGetLast(TheOwner: TComponent;
   ShowAlt, ShowSymbols, ShowNumbers, ShowFastNavigation, ShowNavigation,
   CloseOnPressEnter: Boolean): TpsHMIfrmAlphaKeyboard;
 begin
-  if Assigned(LastAlphaKeyboard) and (LastAlphaKeyboard.FTarget=Target) then begin
-    LastAlphaKeyboard.FormStyle:=fsSystemStayOnTop;
+  if Assigned(LastAlphaKeyboard) and (LastAlphaKeyboard.FTarget = Target) then
+  begin
+    LastAlphaKeyboard.FormStyle := fsSystemStayOnTop;
 
-    LastAlphaKeyboard.ControlStyle:=LastAlphaKeyboard.ControlStyle+[csNoFocus];
-    LastAlphaKeyboard.FFormOwner:=GetParentForm(Target);
+    LastAlphaKeyboard.ControlStyle := LastAlphaKeyboard.ControlStyle + [csNoFocus];
+    LastAlphaKeyboard.FFormOwner := GetParentForm(Target);
 
-    LastAlphaKeyboard.Btn_Caps.Enabled :=LastAlphaKeyboard.Btn_Caps.Enabled and ShowCaps;
-    LastAlphaKeyboard.Btn_Tab.Enabled  :=LastAlphaKeyboard.Btn_Tab.Enabled and ShowTab;
-    LastAlphaKeyboard.Btn_Shift.Enabled:=LastAlphaKeyboard.Btn_Shift.Enabled and ShowShift and ShowSymbols;
-    LastAlphaKeyboard.Btn_Ctrl.Enabled :=LastAlphaKeyboard.Btn_Ctrl.Enabled and ShowCtrl;
-    LastAlphaKeyboard.Btn_Alt.Enabled  :=LastAlphaKeyboard.Btn_Alt.Enabled and ShowAlt;
+    LastAlphaKeyboard.Btn_Caps.Enabled := LastAlphaKeyboard.Btn_Caps.Enabled and ShowCaps;
+    LastAlphaKeyboard.Btn_Tab.Enabled := LastAlphaKeyboard.Btn_Tab.Enabled and ShowTab;
+    LastAlphaKeyboard.Btn_Shift.Enabled := LastAlphaKeyboard.Btn_Shift.Enabled and ShowShift and ShowSymbols;
+    LastAlphaKeyboard.Btn_Ctrl.Enabled := LastAlphaKeyboard.Btn_Ctrl.Enabled and ShowCtrl;
+    LastAlphaKeyboard.Btn_Alt.Enabled := LastAlphaKeyboard.Btn_Alt.Enabled and ShowAlt;
 
-    EnableGroup(LastAlphaKeyboard.FNavigationKeyGroup,     ShowNavigation);
+    EnableGroup(LastAlphaKeyboard.FNavigationKeyGroup, ShowNavigation);
     EnableGroup(LastAlphaKeyboard.FFastNavigationKeyGroup, ShowFastNavigation);
-    EnableGroup(LastAlphaKeyboard.FFxxKeyGroup,            ShowFxxKeys);
-    EnableGroup(LastAlphaKeyboard.FSymbolsKeyGroup,        ShowSymbols);
-    EnableGroup(LastAlphaKeyboard.FNumbersKeyGroup,        ShowNumbers);
+    EnableGroup(LastAlphaKeyboard.FFxxKeyGroup, ShowFxxKeys);
+    EnableGroup(LastAlphaKeyboard.FSymbolsKeyGroup, ShowSymbols);
+    EnableGroup(LastAlphaKeyboard.FNumbersKeyGroup, ShowNumbers);
 
-    Exit(LastAlphaKeyboard)
-  end else begin
+    Exit(LastAlphaKeyboard);
+  end
+  else
+  begin
     FreeAndNil(LastAlphaKeyboard);
     Exit(TpsHMIfrmAlphaKeyboard.Create(TheOwner, Target, ShowFxxKeys, ShowTab,
-                                       ShowCaps, ShowShift, ShowCtrl, ShowAlt,
-                                       ShowSymbols, ShowNumbers,
-                                       ShowFastNavigation, ShowNavigation,
-                                       CloseOnPressEnter));
+      ShowCaps, ShowShift, ShowCtrl, ShowAlt,
+      ShowSymbols, ShowNumbers,
+      ShowFastNavigation, ShowNavigation,
+      CloseOnPressEnter));
   end;
 end;
 
 destructor TpsHMIfrmAlphaKeyboard.Destroy;
 begin
   ModifierRelease;
-  Fkeyboard.destroy;
-  if LastAlphaKeyboard=Self then
-    LastAlphaKeyboard:=nil;
+  FKeyboard.Destroy;
+  if LastAlphaKeyboard = Self then
+    LastAlphaKeyboard := nil;
 
   if Assigned(FTarget) then
     FTarget.RemoveFreeNotification(Self);
@@ -350,7 +343,6 @@ begin
   FreeAndNil(FNavigationKeyGroup);
   FreeAndNil(FFastNavigationKeyGroup);
   inherited Destroy;
-
 end;
 
 procedure TpsHMIfrmAlphaKeyboard.ShowAlongsideOfTheTarget;
@@ -359,219 +351,229 @@ begin
   ShowOnTop;
 end;
 
-procedure TpsHMIfrmAlphaKeyboard.Notification(AComponent: TComponent;
-  Operation: TOperation);
+procedure TpsHMIfrmAlphaKeyboard.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
-  if (Operation=opRemove) and (AComponent = FTarget) then begin
-    FTarget:=nil;
-    FFormOwner:=nil;
-    Timer2.Enabled:=false;
+  if (Operation = opRemove) and (AComponent = FTarget) then
+  begin
+    FTarget := nil;
+    FFormOwner := nil;
+    Timer2.Enabled := False;
     Close;
   end;
 end;
 
 procedure TpsHMIfrmAlphaKeyboard.FormCreate(Sender: TObject);
 var
-  c:LongInt;
+  i: Longint;
 begin
-  Timer1.Enabled:=false;
-  MoveOperation:=False;
-  for c:=0 to ControlCount-1 do
-    if Controls[c] is TSpeedButton then begin
-      TSpeedButton(Controls[c]).Caption:=StringReplace(TSpeedButton(Controls[c]).Caption,' ',''+LineEnding+'',[rfReplaceAll]);
+  Timer1.Enabled := False;
+  MoveOperation := False;
+  for i := 0 to ControlCount - 1 do
+    if Controls[i] is TSpeedButton then
+    begin
+      TSpeedButton(Controls[i]).Caption := StringReplace(TSpeedButton(Controls[i]).Caption,
+        ' ', '' + LineEnding + '', [rfReplaceAll]);
     end;
 
-  Btn_0.Tag:=VK_0;
-  Btn_1.Tag:=VK_1;
-  Btn_2.Tag:=VK_2;
-  Btn_3.Tag:=VK_3;
-  Btn_4.Tag:=VK_4;
-  Btn_5.Tag:=VK_5;
-  Btn_6.Tag:=VK_6;
-  Btn_7.Tag:=VK_7;
-  Btn_8.Tag:=VK_8;
-  Btn_9.Tag:=VK_9;
-  Btn_A.Tag:=VK_A;
-  //Btn_Alt.Tag:=VK_MENU;
-  //Btn_AltGR.Tag:=VK_RMENU;
-  Btn_B.Tag:=VK_B;
-  Btn_Back.Tag:=VK_BACK;
-  Btn_BackSlash.Tag:=VK_OEM_102;
-  Btn_BracketClose.Tag:=VK_OEM_5;
-  Btn_BracketOpen.Tag:=VK_OEM_6;
-  Btn_C.Tag:=VK_C;
-  //Btn_Caps.Tag:=VK_CAPITAL;
-  Btn_Cedilla.Tag:=VK_OEM_1;
-  Btn_Comma.Tag:=VK_OEM_COMMA;
-  //Btn_Ctrl.Tag:=VK_CONTROL;
-  //Btn_CtrlR.Tag:=VK_RCONTROL;
-  Btn_D.Tag:=VK_D;
-  Btn_Del.Tag:=VK_DELETE;
-  Btn_Dot.Tag:=VK_OEM_PERIOD;
-  Btn_Down.Tag:=VK_DOWN;
-  Btn_E.Tag:=VK_E;
-  Btn_End.Tag:=VK_END;
-  Btn_Equal.Tag:=VK_OEM_PLUS;
-  Btn_Esc.Tag:=VK_ESCAPE;
-  Btn_F.Tag:=VK_F;
-  Btn_F1.Tag:=VK_F1;
-  Btn_F10.Tag:=VK_F10;
-  Btn_F11.Tag:=VK_F11;
-  Btn_F12.Tag:=VK_F12;
-  Btn_F2.Tag:=VK_F2;
-  Btn_F3.Tag:=VK_F3;
-  Btn_F4.Tag:=VK_F4;
-  Btn_F5.Tag:=VK_F5;
-  Btn_F6.Tag:=VK_F6;
-  Btn_F7.Tag:=VK_F7;
-  Btn_F8.Tag:=VK_F8;
-  Btn_F9.Tag:=VK_F9;
-  Btn_G.Tag:=VK_G;
-  Btn_H.Tag:=VK_H;
-  Btn_Home.Tag:=VK_HOME;
-  Btn_Hyphen.Tag:=VK_OEM_MINUS;
-  Btn_I.Tag:=VK_I;
-  Btn_Ins.Tag:=VK_INSERT;
-  Btn_J.Tag:=VK_J;
-  Btn_K.Tag:=VK_K;
-  Btn_L.Tag:=VK_L;
-  Btn_Left.Tag:=VK_LEFT;
-  Btn_M.Tag:=VK_M;
-  Btn_N.Tag:=VK_N;
-  Btn_O.Tag:=VK_O;
-  Btn_Ok.Tag:=VK_RETURN;
-  Btn_P.Tag:=VK_P;
-  Btn_PgDown.Tag:=VK_NEXT;
-  Btn_PgUp.Tag:=VK_PRIOR;
-  Btn_Q.Tag:=VK_Q;
-  Btn_Quote.Tag:=VK_OEM_3;
-  Btn_R.Tag:=VK_R;
-  Btn_Rigth.Tag:=VK_RIGHT;
-  Btn_S.Tag:=VK_S;
-  Btn_Semicolon.Tag:=VK_OEM_2;
-  //Btn_Shift.Tag:=VK_SHIFT;
-  Btn_SingleQuote.Tag:=VK_OEM_4;
-  //Btn_Slash.Tag:=VK_UNKNOWN;
-  Btn_Space.Tag:=VK_SPACE;
-  Btn_T.Tag:=VK_T;
-  Btn_Tab.Tag:=VK_TAB;
-  Btn_Tilde.Tag:=VK_OEM_7;
-  Btn_U.Tag:=VK_U;
-  Btn_Up.Tag:=VK_UP;
-  Btn_V.Tag:=VK_V;
-  Btn_W.Tag:=VK_W;
-  Btn_X.Tag:=VK_X;
-  Btn_Y.Tag:=VK_Y;
-  Btn_Z.Tag:=VK_Z;
+  Btn_0.Tag := VK_0;
+  Btn_1.Tag := VK_1;
+  Btn_2.Tag := VK_2;
+  Btn_3.Tag := VK_3;
+  Btn_4.Tag := VK_4;
+  Btn_5.Tag := VK_5;
+  Btn_6.Tag := VK_6;
+  Btn_7.Tag := VK_7;
+  Btn_8.Tag := VK_8;
+  Btn_9.Tag := VK_9;
+  Btn_A.Tag := VK_A;
+  //Btn_Alt.Tag := VK_MENU;
+  //Btn_AltGR.Tag := VK_RMENU;
+  Btn_B.Tag := VK_B;
+  Btn_Back.Tag := VK_BACK;
+  Btn_BackSlash.Tag := VK_OEM_102;
+  Btn_BracketClose.Tag := VK_OEM_5;
+  Btn_BracketOpen.Tag := VK_OEM_6;
+  Btn_C.Tag := VK_C;
+  //Btn_Caps.Tag := VK_CAPITAL;
+  Btn_Cedilla.Tag := VK_OEM_1;
+  Btn_Comma.Tag := VK_OEM_COMMA;
+  //Btn_Ctrl.Tag := VK_CONTROL;
+  //Btn_CtrlR.Tag := VK_RCONTROL;
+  Btn_D.Tag := VK_D;
+  Btn_Del.Tag := VK_DELETE;
+  Btn_Dot.Tag := VK_OEM_PERIOD;
+  Btn_Down.Tag := VK_DOWN;
+  Btn_E.Tag := VK_E;
+  Btn_End.Tag := VK_END;
+  Btn_Equal.Tag := VK_OEM_PLUS;
+  Btn_Esc.Tag := VK_ESCAPE;
+  Btn_F.Tag := VK_F;
+  Btn_F1.Tag := VK_F1;
+  Btn_F10.Tag := VK_F10;
+  Btn_F11.Tag := VK_F11;
+  Btn_F12.Tag := VK_F12;
+  Btn_F2.Tag := VK_F2;
+  Btn_F3.Tag := VK_F3;
+  Btn_F4.Tag := VK_F4;
+  Btn_F5.Tag := VK_F5;
+  Btn_F6.Tag := VK_F6;
+  Btn_F7.Tag := VK_F7;
+  Btn_F8.Tag := VK_F8;
+  Btn_F9.Tag := VK_F9;
+  Btn_G.Tag := VK_G;
+  Btn_H.Tag := VK_H;
+  Btn_Home.Tag := VK_HOME;
+  Btn_Hyphen.Tag := VK_OEM_MINUS;
+  Btn_I.Tag := VK_I;
+  Btn_Ins.Tag := VK_INSERT;
+  Btn_J.Tag := VK_J;
+  Btn_K.Tag := VK_K;
+  Btn_L.Tag := VK_L;
+  Btn_Left.Tag := VK_LEFT;
+  Btn_M.Tag := VK_M;
+  Btn_N.Tag := VK_N;
+  Btn_O.Tag := VK_O;
+  Btn_Ok.Tag := VK_RETURN;
+  Btn_P.Tag := VK_P;
+  Btn_PgDown.Tag := VK_NEXT;
+  Btn_PgUp.Tag := VK_PRIOR;
+  Btn_Q.Tag := VK_Q;
+  Btn_Quote.Tag := VK_OEM_3;
+  Btn_R.Tag := VK_R;
+  Btn_Rigth.Tag := VK_RIGHT;
+  Btn_S.Tag := VK_S;
+  Btn_Semicolon.Tag := VK_OEM_2;
+  //Btn_Shift.Tag := VK_SHIFT;
+  Btn_SingleQuote.Tag := VK_OEM_4;
+  //Btn_Slash.Tag := VK_UNKNOWN;
+  Btn_Space.Tag := VK_SPACE;
+  Btn_T.Tag := VK_T;
+  Btn_Tab.Tag := VK_TAB;
+  Btn_Tilde.Tag := VK_OEM_7;
+  Btn_U.Tag := VK_U;
+  Btn_Up.Tag := VK_UP;
+  Btn_V.Tag := VK_V;
+  Btn_W.Tag := VK_W;
+  Btn_X.Tag := VK_X;
+  Btn_Y.Tag := VK_Y;
+  Btn_Z.Tag := VK_Z;
 end;
 
 procedure TpsHMIfrmAlphaKeyboard.FormMouseDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: LongInt);
+  Shift: TShiftState; X, Y: Longint);
 begin
-  OffsetX:=X;
-  OffsetY:=Y;
-  Timer1.Enabled:=true;
+  OffsetX := X;
+  OffsetY := Y;
+  Timer1.Enabled := True;
 end;
 
-procedure TpsHMIfrmAlphaKeyboard.FormMouseMove(Sender: TObject; Shift: TShiftState; X,
-  Y: LongInt);
+procedure TpsHMIfrmAlphaKeyboard.FormMouseMove(Sender: TObject; Shift: TShiftState;
+  X, Y: Longint);
 begin
-  CurX:=X;
-  CurY:=Y;
-  MoveOperation:=True;
+  CurX := X;
+  CurY := Y;
+  MoveOperation := True;
 end;
 
 procedure TpsHMIfrmAlphaKeyboard.FormMouseUp(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: LongInt);
+  Shift: TShiftState; X, Y: Longint);
 begin
-  Timer1.Enabled:=false;
-  MoveOperation:=False;
+  Timer1.Enabled := False;
+  MoveOperation := False;
 end;
 
 procedure TpsHMIfrmAlphaKeyboard.FormPaint(Sender: TObject);
 begin
-  Canvas.Font.Size:=8;
-  Canvas.Font.Style:=[fsBold];
+  Canvas.Font.Size := 8;
+  Canvas.Font.Style := [fsBold];
 
-  canvas.TextOut(62,233,'Click here');
-  canvas.TextOut(62,245,'to move');
-  canvas.TextOut(62,257,'the keyboard');
+  Canvas.TextOut(62, 233, 'Click here');
+  Canvas.TextOut(62, 245, 'to move');
+  Canvas.TextOut(62, 257, 'the keyboard');
 end;
 
 procedure TpsHMIfrmAlphaKeyboard.ModifierPress(Sender: TObject);
 var
-  x:TSpeedButton;
+  ASpeedButton: TSpeedButton;
 begin
   if not (Sender is TSpeedButton) then Exit;
 
-  x:=TSpeedButton.Create(Self);
-  x.GroupIndex:=TSpeedButton(Sender).GroupIndex;
-  x.Parent:=TSpeedButton(Sender).Parent;
-  x.Left:=-1000;
-  x.Top :=-1000;
+  ASpeedButton := TSpeedButton.Create(Self);
+  ASpeedButton.GroupIndex := TSpeedButton(Sender).GroupIndex;
+  ASpeedButton.Parent := TSpeedButton(Sender).Parent;
+  ASpeedButton.Left := -1000;
+  ASpeedButton.Top := -1000;
 
   FKeyboard.Unapply(CurrentState);
 
   case TSpeedButton(Sender).Tag of
-    1:
-      if ssShift in CurrentState then begin
-        CurrentState:=CurrentState-[ssShift];
-        //TSpeedButton(Sender).Down:=false;
-        x.Down:=true;
-        TSpeedButton(Sender).Down:=false;
-      end else begin
-        CurrentState:=CurrentState+[ssShift];
-        TSpeedButton(Sender).Down:=true;
-      end;
-    2:
-      if ssAlt in CurrentState then begin
-        CurrentState:=CurrentState-[ssAlt];
-        //TSpeedButton(Sender).Down:=false;
-        x.Down:=true;
-        TSpeedButton(Sender).Down:=false;
-      end else begin
-        CurrentState:=CurrentState+[ssAlt];
-        TSpeedButton(Sender).Down:=true;
-      end;
-    3:
-      if ssCtrl in CurrentState then begin
-        CurrentState:=CurrentState-[ssCtrl];
-        //TSpeedButton(Sender).Down:=false;
-        x.Down:=true;
-        TSpeedButton(Sender).Down:=false;
-      end else begin
-        CurrentState:=CurrentState+[ssCtrl];
-        TSpeedButton(Sender).Down:=true;
-      end;
+    1:  if ssShift in CurrentState then
+        begin
+          CurrentState := CurrentState - [ssShift];
+          //TSpeedButton(Sender).Down := False;
+          ASpeedButton.Down := True;
+          TSpeedButton(Sender).Down := False;
+        end
+        else
+        begin
+          CurrentState := CurrentState + [ssShift];
+          TSpeedButton(Sender).Down := True;
+        end;
+    2:  if ssAlt in CurrentState then
+        begin
+          CurrentState := CurrentState - [ssAlt];
+          //TSpeedButton(Sender).Down := False;
+          ASpeedButton.Down := True;
+          TSpeedButton(Sender).Down := False;
+        end
+        else
+        begin
+          CurrentState := CurrentState + [ssAlt];
+          TSpeedButton(Sender).Down := True;
+        end;
+    3:  if ssCtrl in CurrentState then
+        begin
+          CurrentState := CurrentState - [ssCtrl];
+          //TSpeedButton(Sender).Down := False;
+          ASpeedButton.Down := True;
+          TSpeedButton(Sender).Down := False;
+        end
+        else
+        begin
+          CurrentState := CurrentState + [ssCtrl];
+          TSpeedButton(Sender).Down := True;
+        end;
     {$IFDEF FPC}
-    4:
-      if ssAltGr in CurrentState then begin
-        CurrentState:=CurrentState-[ssAltGr];
-        //TSpeedButton(Sender).Down:=false;
-        x.Down:=true;
-        TSpeedButton(Sender).Down:=false;
-      end else begin
-        CurrentState:=CurrentState+[ssAltGr];
-        TSpeedButton(Sender).Down:=true;
-      end;
+    4:  if ssAltGr in CurrentState then
+        begin
+          CurrentState := CurrentState - [ssAltGr];
+          //TSpeedButton(Sender).Down := False;
+          ASpeedButton.Down := True;
+          TSpeedButton(Sender).Down := False;
+        end
+        else
+        begin
+          CurrentState := CurrentState + [ssAltGr];
+          TSpeedButton(Sender).Down := True;
+        end;
     {$ENDIF}
   end;
-  Fkeyboard.Apply(CurrentState);
+  FKeyboard.Apply(CurrentState);
   Application.ProcessMessages;
-  x.Destroy;
+  ASpeedButton.Destroy;
 end;
 
 procedure TpsHMIfrmAlphaKeyboard.ModifierRelease();
 begin
-  Fkeyboard.Unapply(CurrentState);
+  FKeyboard.Unapply(CurrentState);
   Application.ProcessMessages;
 end;
 
 procedure TpsHMIfrmAlphaKeyboard.DoClose(var CloseAction: TCloseAction);
 begin
   inherited DoClose(CloseAction);
-  CloseAction:=caFree;
+  CloseAction := caFree;
 end;
 
 procedure TpsHMIfrmAlphaKeyboard.GotoBetterPositionDelayed(Data: PtrInt);
@@ -582,26 +584,27 @@ end;
 procedure TpsHMIfrmAlphaKeyboard.Timer1Timer(Sender: TObject);
 begin
   if not MoveOperation then Exit;
-  MoveOperation:=False;
+  MoveOperation := False;
 
-  if CurX>OffsetX then
-    Left:=Left+(CurX-OffsetX)
+  if CurX > OffsetX then
+    Left := Left + (CurX - OffsetX)
   else
-    Left:=Left-(OffsetX-CurX);
+    Left := Left - (OffsetX - CurX);
 
-  if CurY>OffsetY then
-    Top:=Top+(CurY-OffsetY)
+  if CurY > OffsetY then
+    Top := Top + (CurY - OffsetY)
   else
-    Top:=Top-(OffsetY-CurY);
+    Top := Top - (OffsetY - CurY);
 end;
 
 procedure TpsHMIfrmAlphaKeyboard.BtnPress(Sender: TObject);
 begin
-  if FTarget=nil then Exit;
+  if FTarget = nil then Exit;
 
-  with Sender as TSpeedButton do begin
+  with Sender as TSpeedButton do
+  begin
     FKeyboard.Press(Tag);
-    if (tag=VK_ESCAPE) or (FReturnCloseKeyBoard and (tag=VK_RETURN)) then
+    if (Tag = VK_ESCAPE) or (FReturnCloseKeyBoard and (Tag = VK_RETURN)) then
       Close
     else
       ReturnFocusToTarget;
@@ -615,7 +618,8 @@ end;
 
 procedure TpsHMIfrmAlphaKeyboard.ReturnFocusToTarget;
 begin
-  if Assigned(FFormOwner) then begin
+  if Assigned(FFormOwner) then
+  begin
     FFormOwner.Show;
     FFormOwner.BringToFront;
     Application.ProcessMessages;
@@ -624,45 +628,53 @@ end;
 
 procedure TpsHMIfrmAlphaKeyboard.GotoBetterPosition;
 var
-  sw, sh:Integer;
-  frect, t_rect: TRect;
+  AScreenWidth: Integer;
+  AScreenHeight: Integer;
+  ARect: TRect;
+  ATRect: TRect;
 begin
-  if Assigned(FTarget) and Assigned(FTarget.Parent) and (FTarget.Parent.Name = 'psHMIfrmUserAuthentication') and (TForm(FTarget.Parent).Top>0) then begin
-    TForm(FTarget.Parent).Top:=0;
-    if Application.Flags*[AppDoNotCallAsyncQueue]=[] then
+  if Assigned(FTarget)
+    and Assigned(FTarget.Parent)
+    and (FTarget.Parent.Name = 'psHMIfrmUserAuthentication')
+    and (TForm(FTarget.Parent).Top > 0) then
+  begin
+    TForm(FTarget.Parent).Top := 0;
+    if Application.Flags * [AppDoNotCallAsyncQueue] = [] then
       Application.QueueAsyncCall(@GotoBetterPositionDelayed, 0);
     Exit;
   end;
   //auto posicionamento do popup.
   //t_point:=FTarget.ClientOrigin;
-  WidgetSet.GetWindowRect(FTarget.Handle,t_rect);
-  WidgetSet.GetWindowRect(Self.Handle,frect);
-  sw:=Screen.Width;
-  sh:=Screen.Height;
+  WidgetSet.GetWindowRect(FTarget.Handle, ATRect);
+  WidgetSet.GetWindowRect(Self.Handle, ARect);
+  AScreenWidth := Screen.Width;
+  AScreenHeight := Screen.Height;
 
-  if (t_rect.Top+(frect.Bottom-frect.Top)+FTarget.Height)<=sh then
-    Top:=t_rect.Top+FTarget.Height   //borda superior do form com borda inferior do target
-  else begin
-    if (t_rect.Top - (frect.Bottom - frect.Top) - 30)>=0 then  //30px is the window title
-      Top:=t_rect.Top - (frect.Bottom - frect.Top) - 30  //borda inferior do form com borda superior do target
-    else begin
-      Top:= (t_rect.Top+((t_rect.Bottom-t_rect.Top) div 2) - ((frect.Bottom-frect.Top) div 2)); //meio
-      if Top<0 then Top:=0;
-      if (Top+(frect.Bottom - frect.Top))>Screen.Height then Top:=Screen.Height - (frect.Bottom - frect.Top);
-    end;
+  if (ATRect.Top + (ARect.Bottom - ARect.Top) + FTarget.Height) <= AScreenHeight then
+    Top := ATRect.Top + FTarget.Height   //borda superior do form com borda inferior do target
+  else if (ATRect.Top - (ARect.Bottom - ARect.Top) - 30) >= 0 then  //30px is the window title
+    Top := ATRect.Top - (ARect.Bottom - ARect.Top) - 30  //borda inferior do form com borda superior do target
+  else
+  begin
+    Top := (ATRect.Top + ((ATRect.Bottom - ATRect.Top) Div 2) - ((ARect.Bottom - ARect.Top) Div 2)); //meio
+    if Top < 0 then
+      Top := 0;
+    if (Top + (ARect.Bottom - ARect.Top)) > Screen.Height then
+      Top := Screen.Height - (ARect.Bottom - ARect.Top);
   end;
 
-  if ((t_rect.Left+FTarget.Width)-(frect.Right-frect.Left))>=0 then
-    Left:=((t_rect.Left+FTarget.Width)-(frect.Right-frect.Left))  //borda direita do form com
-                                                                //borda direita do target
-  else begin
-    if (t_rect.Left+(frect.Right-frect.Left))<=sw then
-      Left:=t_rect.Left   //borda esquerda do form com borda esquerda do target
-    else begin
-      Left:= (t_rect.Left+((t_rect.Right-t_rect.Left) div 2) - ((frect.Right-frect.Left) div 2)); //meio
-      if Left<0 then Left:=0;
-      if (Left+(frect.Right - frect.Left))>Screen.Width then Left:=Screen.Width - (frect.Right - frect.Left);
-    end;
+  if ((ATRect.Left + FTarget.Width) - (ARect.Right - ARect.Left)) >= 0 then
+    Left := ((ATRect.Left + FTarget.Width) - (ARect.Right - ARect.Left))  //borda direita do form com
+  //borda direita do target
+  else if (ATRect.Left + (ARect.Right - ARect.Left)) <= AScreenWidth then
+    Left := ATRect.Left   //borda esquerda do form com borda esquerda do target
+  else
+  begin
+    Left := (ATRect.Left + ((ATRect.Right - ATRect.Left) Div 2) - ((ARect.Right - ARect.Left) Div 2)); //meio
+    if Left < 0 then
+      Left := 0;
+    if (Left + (ARect.Right - ARect.Left)) > Screen.Width then
+      Left := Screen.Width - (ARect.Right - ARect.Left);
   end;
 end;
 

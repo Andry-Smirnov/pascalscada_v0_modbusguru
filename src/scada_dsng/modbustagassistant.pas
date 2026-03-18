@@ -28,314 +28,332 @@ type
   TModBusTagAssistant = class
   private
     FDriver: TModBusDriver;
-    function SelectedReadFuntion(dlg:TfrmModbusTagBuilder):LongInt;
-    function SelectedWriteFuntion(dlg:TfrmModbusTagBuilder):LongInt;
-    function SeekFirstItem(LastItem:TTagNamesItemEditor):TTagNamesItemEditor;
-    function BuildItemName(nameprefix:AnsiString; ZeroFill:Boolean; index, NumZeros:LongInt):AnsiString;
-    public
-      //: Opens the Tag Builder of the ModBus protocol driver
-      procedure OpenTagEditor(OwnerOfNewTags:TComponent; InsertHook:TAddTagInEditorHook;
-        CreateProc:TCreateTagProc);
+    function SelectedReadFuntion(ADialog: TfrmModbusTagBuilder): Longint;
+    function SelectedWriteFuntion(ADialog: TfrmModbusTagBuilder): Longint;
+    function SeekFirstItem(LastItem: TTagNamesItemEditor): TTagNamesItemEditor;
+    function BuildItemName(NamePrefix: AnsiString; ZeroFill: Boolean; Index, NumZeros: Longint): AnsiString;
+  public
+    //: Opens the Tag Builder of the ModBus protocol driver
+    procedure OpenTagEditor(OwnerOfNewTags: TComponent; InsertHook: TAddTagInEditorHook; CreateProc: TCreateTagProc);
 
-    published
-      property Driver:TModBusDriver read FDriver write FDriver;
+  published
+    property Driver: TModBusDriver read FDriver write FDriver;
   end;
 
-  procedure OpenTagEditor(aProtocolDriver,
-                          aOwnerOfNewTags: TComponent;
-                          InsertHook: TAddTagInEditorHook;
-                          CreateProc: TCreateTagProc);
+procedure OpenTagEditor(AProtocolDriver, AOwnerOfNewTags: TComponent; InsertHook: TAddTagInEditorHook; CreateProc: TCreateTagProc);
+
 
 implementation
+
 
 uses
   PLCBlockElement, ValueProcessor, PLCTagNumber, PLCString,
   PLCBlock, Controls, Dialogs, hsstrings, ProtocolDriver;
 
-procedure OpenTagEditor(aProtocolDriver,
-                        aOwnerOfNewTags: TComponent;
-                        InsertHook: TAddTagInEditorHook;
-                        CreateProc: TCreateTagProc);
-var
-  wizard: TModBusTagAssistant;
-begin
-  if not (aProtocolDriver is TModBusDriver) then
-    raise exception.Create('A Modbus RTU/TCP driver required as protocol.');
 
-  wizard:=TModBusTagAssistant.Create;
+procedure OpenTagEditor(AProtocolDriver, AOwnerOfNewTags: TComponent; InsertHook: TAddTagInEditorHook; CreateProc: TCreateTagProc);
+var
+  Wizard: TModBusTagAssistant;
+begin
+  if not (AProtocolDriver is TModBusDriver) then
+    raise Exception.Create('A Modbus RTU/TCP driver required as protocol.');
+
+  Wizard := TModBusTagAssistant.Create;
   try
-    wizard.Driver:=TModBusDriver(aProtocolDriver);
-    wizard.OpenTagEditor(aOwnerOfNewTags,InsertHook,CreateProc);
+    Wizard.Driver := TModBusDriver(AProtocolDriver);
+    Wizard.OpenTagEditor(AOwnerOfNewTags, InsertHook, CreateProc);
   finally
-    FreeAndNil(wizard);
+    FreeAndNil(Wizard);
   end;
 end;
 
 { TModBusTagAssistant }
 
-procedure TModBusTagAssistant.OpenTagEditor(OwnerOfNewTags:TComponent;
-  InsertHook:TAddTagInEditorHook; CreateProc:TCreateTagProc);
+procedure TModBusTagAssistant.OpenTagEditor(OwnerOfNewTags: TComponent; InsertHook: TAddTagInEditorHook; CreateProc: TCreateTagProc);
 var
-  dlg:TfrmModbusTagBuilder;
-  tplc:TPLCTagNumber;
-  tstr:TPLCString;
-  tblk:TPLCBlock;
-  tbel:TPLCBlockElement;
-  c, CurMemtAdress, nameitem, BlockNo, Element:LongInt;
-  confItem:TTagNamesItemEditor;
-  knowstringsize:boolean;
-  tstrdummy:TPLCString;
-  defaultstringsize:LongInt;
-  count:LongInt;
-  ItemName:Strings;
-  ItemPtr:array of TComponent;
+  i: Longint;
+  Count: Longint;
+  ADialog: TfrmModbusTagBuilder;
+  TPLC: TPLCTagNumber;
+  TStr: TPLCString;
+  TBlk: TPLCBlock;
+  TBlockElement: TPLCBlockElement;
+  CurMemtAdress: Longint;
+  NameItem: Longint;
+  BlockNo: Longint;
+  Element: Longint;
+  ConfItem: TTagNamesItemEditor;
+  KnowStringSize: Boolean;
+  TStrDummy: TPLCString;
+  DefaultStringSize: Longint;
+  ItemName: Strings;
+  ItemPtr: array of TComponent;
 begin
-
   if not Assigned(FDriver) then
-    begin
-      ShowMessage(SDriverRequired);
-      Exit;
-    end;
+  begin
+    ShowMessage(SDriverRequired);
+    Exit;
+  end;
 
-  count:=1;
-  SetLength(ItemName,1);
+  Count := 1;
+  SetLength(ItemName, 1);
   SetLength(ItemPtr, 1);
-  ItemName[0]:='(none)';
-  ItemPtr[0] :=nil;
-  for c:=0 to OwnerOfNewTags.ComponentCount-1 do begin
-    if OwnerOfNewTags.Components[c] is TScaleProcessor then begin
-      inc(count);
-      SetLength(ItemName,count);
-      SetLength(ItemPtr, count);
-      ItemName[count-1]:= OwnerOfNewTags.Components[c].Name;
-      ItemPtr[count-1] := OwnerOfNewTags.Components[c];
+  ItemName[0] := '(none)';
+  ItemPtr[0] := nil;
+  for i := 0 to OwnerOfNewTags.ComponentCount - 1 do
+  begin
+    if OwnerOfNewTags.Components[i] is TScaleProcessor then
+    begin
+      Inc(Count);
+      SetLength(ItemName, Count);
+      SetLength(ItemPtr, Count);
+      ItemName[Count - 1] := OwnerOfNewTags.Components[i].Name;
+      ItemPtr[Count - 1] := OwnerOfNewTags.Components[i];
     end;
   end;
 
-  dlg:=TfrmModbusTagBuilder.Create(ItemName);
+  ADialog := TfrmModbusTagBuilder.Create(ItemName);
   try
-    if dlg.ShowModal=mrOk then begin
-      if Assigned(InsertHook) and Assigned(CreateProc) then begin
+    if ADialog.ShowModal = mrOk then
+    begin
+      if Assigned(InsertHook) and Assigned(CreateProc) then
+      begin
+        KnowStringSize := False;
 
-        knowstringsize:=false;
+        CurMemtAdress := ADialog.FirstMemAddress.Value;
 
-        CurMemtAdress:=dlg.FirstMemAddress.Value;
-
-        if dlg.optStartFromZero.Checked then
-          nameitem:=0
+        if ADialog.optStartFromZero.Checked then
+          NameItem := 0
         else
-          nameitem:=1;
+          NameItem := 1;
 
-        confItem:=SeekFirstItem(dlg.CurItem);
-        if confItem=nil then Exit;
+        ConfItem := SeekFirstItem(ADialog.CurItem);
+        if ConfItem = nil then Exit;
 
         ////////////////////////////////////////////////////////////////////////
         //plcnumber and string
         ////////////////////////////////////////////////////////////////////////
-        if dlg.optPLCTagNumber.Checked or dlg.optPLCString.Checked then begin
-          c:=1;
-          while c<=dlg.MemCount.Value do begin
-            if Trim(confItem.Nome.Text)<>'' then begin
-              if dlg.optPLCTagNumber.Checked then begin
-                tplc := TPLCTagNumber(CreateProc(TPLCTagNumber));
-                tplc.Name:=BuildItemName(confItem.Nome.Text,confItem.ZeroFill.Checked,nameitem,confItem.QtdDigitos.Value);
-                tplc.MemAddress := CurMemtAdress;
-                tplc.MemReadFunction  := SelectedReadFuntion(dlg);
-                tplc.MemWriteFunction := SelectedWriteFuntion(dlg);
-                tplc.PLCStation:=dlg.StationAddress.Value;
-                tplc.RefreshTime:=confItem.Scan.Value;
-                tplc.ProtocolDriver := FDriver;
-                if confItem.PIPES.ItemIndex<>-1 then
-                  tplc.ScaleProcessor:=TScalesQueue(ItemPtr[confItem.PIPES.ItemIndex]);
-                InsertHook(tplc);
-              end else begin
-                tstr := TPLCString(CreateProc(TPLCString));
-                tstr.Name:=BuildItemName(confItem.Nome.Text,confItem.ZeroFill.Checked,nameitem,confItem.QtdDigitos.Value);
-                tstr.MemAddress := CurMemtAdress;
-                tstr.MemReadFunction  := SelectedReadFuntion(dlg);
-                tstr.MemWriteFunction := SelectedWriteFuntion(dlg);
-                tstr.PLCStation:=dlg.StationAddress.Value;
-                tstr.RefreshTime:=confItem.Scan.Value;
-                tstr.ProtocolDriver := FDriver;
-                if dlg.optSTR_C.Checked then
-                  tstr.StringType:=stC
+        if ADialog.optPLCTagNumber.Checked or ADialog.optPLCString.Checked then
+        begin
+          i := 1;
+          while i <= ADialog.MemCount.Value do
+          begin
+            if Trim(ConfItem.Nome.Text) <> '' then
+            begin
+              if ADialog.optPLCTagNumber.Checked then
+              begin
+                TPLC := TPLCTagNumber(CreateProc(TPLCTagNumber));
+                TPLC.Name := BuildItemName(ConfItem.Nome.Text, ConfItem.ZeroFill.Checked, NameItem, ConfItem.QtdDigitos.Value);
+                TPLC.MemAddress := CurMemtAdress;
+                TPLC.MemReadFunction := SelectedReadFuntion(ADialog);
+                TPLC.MemWriteFunction := SelectedWriteFuntion(ADialog);
+                TPLC.PLCStation := ADialog.StationAddress.Value;
+                TPLC.RefreshTime := ConfItem.Scan.Value;
+                TPLC.ProtocolDriver := FDriver;
+                if ConfItem.PIPES.ItemIndex <> -1 then
+                  TPLC.ScaleProcessor := TScalesQueue(ItemPtr[ConfItem.PIPES.ItemIndex]);
+                InsertHook(TPLC);
+              end
+              else
+              begin
+                TStr := TPLCString(CreateProc(TPLCString));
+                TStr.Name := BuildItemName(ConfItem.Nome.Text, ConfItem.ZeroFill.Checked, NameItem, ConfItem.QtdDigitos.Value);
+                TStr.MemAddress := CurMemtAdress;
+                TStr.MemReadFunction := SelectedReadFuntion(ADialog);
+                TStr.MemWriteFunction := SelectedWriteFuntion(ADialog);
+                TStr.PLCStation := ADialog.StationAddress.Value;
+                TStr.RefreshTime := ConfItem.Scan.Value;
+                TStr.ProtocolDriver := FDriver;
+                if ADialog.optSTR_C.Checked then
+                  TStr.StringType := stC
                 else
-                  tstr.StringType:=stSIEMENS;
-                tstr.ByteSize:=Byte(dlg.ByteSize.Value);
-                tstr.StringSize:=dlg.MaxStringSize.Value;
-                InsertHook(tstr);
+                  TStr.StringType := stSIEMENS;
+                TStr.ByteSize := Byte(ADialog.ByteSize.Value);
+                TStr.StringSize := ADialog.MaxStringSize.Value;
+                InsertHook(TStr);
 
-                if not knowstringsize then begin
-                  knowstringsize:=true;
-                  defaultstringsize:=tstr.Size;
+                if not KnowStringSize then
+                begin
+                  KnowStringSize := True;
+                  DefaultStringSize := TStr.Size;
                 end;
               end;
             end;
 
-            if dlg.optPLCTagNumber.Checked then
-              inc(CurMemtAdress)
-            else begin
+            if ADialog.optPLCTagNumber.Checked then
+              Inc(CurMemtAdress)
+            else
+            begin
               //se o tamanho do bloco da string ainda não é conhecido.
               //if the string size is unknown.
-              if not knowstringsize then begin
+              if not KnowStringSize then
+              begin
                 try
-                  tstrdummy := TPLCString.Create(Nil);
-                  tstrdummy.MemAddress := CurMemtAdress;
-                  tstrdummy.MemReadFunction  := SelectedReadFuntion(dlg);
-                  tstrdummy.MemWriteFunction := SelectedWriteFuntion(dlg);
-                  tstrdummy.PLCStation:=dlg.StationAddress.Value;
-                  tstrdummy.RefreshTime:=confItem.Scan.Value;
-                  tstrdummy.ProtocolDriver := FDriver;
-                  if dlg.optSTR_C.Checked then
-                    tstrdummy.StringType:=stC
+                  TStrDummy := TPLCString.Create(nil);
+                  TStrDummy.MemAddress := CurMemtAdress;
+                  TStrDummy.MemReadFunction := SelectedReadFuntion(ADialog);
+                  TStrDummy.MemWriteFunction := SelectedWriteFuntion(ADialog);
+                  TStrDummy.PLCStation := ADialog.StationAddress.Value;
+                  TStrDummy.RefreshTime := ConfItem.Scan.Value;
+                  TStrDummy.ProtocolDriver := FDriver;
+                  if ADialog.optSTR_C.Checked then
+                    TStrDummy.StringType := stC
                   else
-                    tstrdummy.StringType:=stSIEMENS;
-                  tstrdummy.ByteSize:=Byte(dlg.ByteSize.Value);
-                  tstrdummy.StringSize:=dlg.MaxStringSize.Value;
-                  defaultstringsize:=tstrdummy.Size;
-                  knowstringsize:=true;
+                    TStrDummy.StringType := stSIEMENS;
+                  TStrDummy.ByteSize := Byte(ADialog.ByteSize.Value);
+                  TStrDummy.StringSize := ADialog.MaxStringSize.Value;
+                  DefaultStringSize := TStrDummy.Size;
+                  KnowStringSize := True;
                 finally
-                  tstrdummy.Destroy;
+                  TStrDummy.Destroy;
                 end;
               end;
-              inc(CurMemtAdress,defaultstringsize);
+              Inc(CurMemtAdress, DefaultStringSize);
             end;
 
-            if (Trim(confItem.Nome.Text)<>'') or confItem.CountEmpty.Checked  then
-              inc(c);
+            if (Trim(ConfItem.Nome.Text) <> '') or ConfItem.CountEmpty.Checked then
+              Inc(i);
 
-            if confItem.Next=nil then begin
-              confItem:=SeekFirstItem(dlg.CurItem);
-              inc(nameitem);
-            end else
-              confItem:=TTagNamesItemEditor(confItem.Next);
+            if ConfItem.Next = nil then
+            begin
+              ConfItem := SeekFirstItem(ADialog.CurItem);
+              Inc(NameItem);
+            end
+            else
+              ConfItem := TTagNamesItemEditor(ConfItem.Next);
           end;
         end;
 
         ////////////////////////////////////////////////////////////////////////
         //TPLCBlock
         ////////////////////////////////////////////////////////////////////////
-        if dlg.optPLCBlock.Checked then begin
-          c:=1;
-          BlockNo:=1;
-          while c<=dlg.MemCount.Value do begin
-            Element:=0;
-            tblk := TPLCBlock(CreateProc(TPLCBlock));
-            tblk.Name:=BuildItemName(dlg.NameOfEachBlock.Text, false, BlockNo, 9);
-            tblk.MemAddress := CurMemtAdress;
-            tblk.MemReadFunction  := SelectedReadFuntion(dlg);
-            tblk.MemWriteFunction := SelectedWriteFuntion(dlg);
-            tblk.PLCStation:=dlg.StationAddress.Value;
-            tblk.RefreshTime:=dlg.ScanOfEachBlock.Value;
-            tblk.Size := 1;
-            tblk.ProtocolDriver := FDriver;
-            InsertHook(tblk);
+        if ADialog.optPLCBlock.Checked then
+        begin
+          i := 1;
+          BlockNo := 1;
+          while i <= ADialog.MemCount.Value do
+          begin
+            Element := 0;
+            TBlk := TPLCBlock(CreateProc(TPLCBlock));
+            TBlk.Name := BuildItemName(ADialog.NameOfEachBlock.Text, False, BlockNo, 9);
+            TBlk.MemAddress := CurMemtAdress;
+            TBlk.MemReadFunction := SelectedReadFuntion(ADialog);
+            TBlk.MemWriteFunction := SelectedWriteFuntion(ADialog);
+            TBlk.PLCStation := ADialog.StationAddress.Value;
+            TBlk.RefreshTime := ADialog.ScanOfEachBlock.Value;
+            TBlk.Size := 1;
+            TBlk.ProtocolDriver := FDriver;
+            InsertHook(TBlk);
 
             //cria os elementos do bloco
             //create the block elements.
-            while Element<dlg.MaxBlockSize.Value do begin
-              if Trim(confItem.Nome.Text)<>'' then begin
-                tbel := TPLCBlockElement(CreateProc(TPLCBlockElement));
-                tbel.Name:=BuildItemName(confItem.Nome.Text,confItem.ZeroFill.Checked,nameitem,confItem.QtdDigitos.Value);
-                tbel.PLCBlock := tblk;
-                tblk.Size := Element+1;
-                tbel.Index:=Element;
-                if confItem.PIPES.ItemIndex<>-1 then
-                  tbel.ScaleProcessor:=TScalesQueue(ItemPtr[confItem.PIPES.ItemIndex]);
-                InsertHook(tbel);
+            while Element < ADialog.MaxBlockSize.Value do
+            begin
+              if Trim(ConfItem.Nome.Text) <> '' then
+              begin
+                TBlockElement := TPLCBlockElement(CreateProc(TPLCBlockElement));
+                TBlockElement.Name := BuildItemName(ConfItem.Nome.Text, ConfItem.ZeroFill.Checked, NameItem, ConfItem.QtdDigitos.Value);
+                TBlockElement.PLCBlock := TBlk;
+                TBlk.Size := Element + 1;
+                TBlockElement.index := Element;
+                if ConfItem.PIPES.ItemIndex <> -1 then
+                  TBlockElement.ScaleProcessor := TScalesQueue(ItemPtr[ConfItem.PIPES.ItemIndex]);
+                InsertHook(TBlockElement);
               end;
 
-              inc(Element);
-              inc(CurMemtAdress);
+              Inc(Element);
+              Inc(CurMemtAdress);
 
-              if (Trim(confItem.Nome.Text)<>'') or confItem.CountEmpty.Checked  then
-                inc(c);
+              if (Trim(ConfItem.Nome.Text) <> '') or ConfItem.CountEmpty.Checked then
+                Inc(i);
 
-              if confItem.Next=nil then begin
-                confItem:=SeekFirstItem(dlg.CurItem);
-                inc(nameitem);
-              end else
-                confItem:=TTagNamesItemEditor(confItem.Next);
+              if ConfItem.Next = nil then
+              begin
+                ConfItem := SeekFirstItem(ADialog.CurItem);
+                Inc(NameItem);
+              end
+              else
+                ConfItem := TTagNamesItemEditor(ConfItem.Next);
             end;
 
             //incrementa o numero do bloco.
             //inc the block number.
-            inc(BlockNo);
+            Inc(BlockNo);
           end;
         end;
       end;
     end;
   finally
-    dlg.Destroy;
+    ADialog.Destroy;
   end;
 end;
 
 
-
-
-function TModBusTagAssistant.SelectedReadFuntion(dlg:TfrmModbusTagBuilder):LongInt;
-begin
-  Result:=0;
-  if dlg.Type1.Checked then
-    Result:=1;
-  if dlg.Type2.Checked then
-    Result:=2;
-  if dlg.Type3.Checked then
-    Result:=3;
-  if dlg.Type4.Checked then
-    Result:=4;
-end;
-
-function TModBusTagAssistant.SelectedWriteFuntion(dlg:TfrmModbusTagBuilder):LongInt;
+function TModBusTagAssistant.SelectedReadFuntion(ADialog: TfrmModbusTagBuilder): Longint;
 begin
   Result := 0;
-  case SelectedReadFuntion(dlg) of
-    1: begin
-      if dlg.optSimpleFunctions.Checked then
-        Result:=5
-      else
-        Result := 15;
-    end;
-    3: begin
-      if dlg.optSimpleFunctions.Checked then
-        Result := 6
-      else
-        Result := 16;
-    end;
+  if ADialog.Type1.Checked then
+    Result := 1;
+  if ADialog.Type2.Checked then
+    Result := 2;
+  if ADialog.Type3.Checked then
+    Result := 3;
+  if ADialog.Type4.Checked then
+    Result := 4;
+end;
+
+function TModBusTagAssistant.SelectedWriteFuntion(ADialog: TfrmModbusTagBuilder): Longint;
+begin
+  Result := 0;
+  case SelectedReadFuntion(ADialog) of
+    1:  begin
+          if ADialog.optSimpleFunctions.Checked then
+            Result := 5
+          else
+            Result := 15;
+        end;
+    3:  begin
+          if ADialog.optSimpleFunctions.Checked then
+            Result := 6
+          else
+            Result := 16;
+        end;
   end;
 end;
 
-function TModBusTagAssistant.SeekFirstItem(LastItem:TTagNamesItemEditor):TTagNamesItemEditor;
+function TModBusTagAssistant.SeekFirstItem(LastItem: TTagNamesItemEditor): TTagNamesItemEditor;
 begin
   Result := LastItem;
-  while (Result<>nil) and (Result.Prior<>nil) do
-    Result:=TTagNamesItemEditor(Result.Prior);
+  while (Result <> nil) and (Result.Prior <> nil) do
+    Result := TTagNamesItemEditor(Result.Prior);
 end;
 
-function TModBusTagAssistant.BuildItemName(nameprefix: AnsiString;
-  ZeroFill: Boolean; index, NumZeros: LongInt): AnsiString;
+function TModBusTagAssistant.BuildItemName(NamePrefix: AnsiString; ZeroFill: Boolean; Index, NumZeros: Longint): AnsiString;
 var
-  idxfmt, numfmt:AnsiString;
-  c:LongInt;
+  IndexFormat: AnsiString;
+  NumFormat: AnsiString;
+  i: Longint;
 begin
-  if ZeroFill then begin
-    idxfmt:='0';
-    for c:= 2 to NumZeros do
-      idxfmt:=idxfmt+'0';
+  if ZeroFill then
+  begin
+    IndexFormat := '0';
+    for i := 2 to NumZeros do
+      IndexFormat := IndexFormat + '0';
   end
   else
-    idxfmt:='#0';
+    IndexFormat := '#0';
 
-  numfmt:=FormatFloat(idxfmt,index);
+  NumFormat := FormatFloat(IndexFormat, Index);
 
-  if Pos('%s',nameprefix)=0 then
-    Result:=nameprefix+numfmt
+  if Pos('%s', NamePrefix) = 0 then
+    Result := NamePrefix + NumFormat
   else
-    Result := Format(nameprefix,[numfmt]);
+    Result := Format(NamePrefix, [NumFormat]);
 end;
+
 
 initialization
   SetTagBuilderToolForModBusProtocolFamily(@OpenTagEditor)
 
-end.
 
+end.

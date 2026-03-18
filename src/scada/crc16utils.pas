@@ -50,7 +50,7 @@ The byte number 9 is the most significative.
          bytes of Pkg.)
 }
 {$ENDIF}
-function Test_crc(const Pkg:BYTES):Boolean;
+function Test_crc(const Pkg: Bytes): Boolean;
 
 {$IFDEF PORTUGUES}
 {:
@@ -79,126 +79,141 @@ significative.
 @returns(A Cardinal number with the CRC-16 calculated with length of Pkg - 2.)
 }
 {$ENDIF}
-function Calcul_crc(var Pkg:BYTES):Cardinal;
-function Calculate_CRC8(var data:BYTES):Byte;
-function Fast_CRC_Cal8Bits(data:BYTES):Byte;
+function Calcul_CRC(var Pkg: Bytes): Cardinal;
+function Calculate_CRC8(var Data: Bytes): Byte;
+function Fast_CRC_Cal8Bits(Data: Bytes): Byte;
 
 implementation
 
-function Test_crc(const Pkg:BYTES):Boolean;
+function Test_crc(const Pkg: Bytes): Boolean;
 var
-  crc,j,carry_flag,a:Cardinal;
-  i,n:LongInt;
+  CRC: Cardinal;
+  j: Cardinal;
+  CarryFlag: Cardinal;
+  a: Cardinal;
+  i: Longint;
+  n: Longint;
 begin
-  n := Length(Pkg)-2;
-  crc := $FFFF;
+  n := Length(Pkg) - 2;
+  CRC := $FFFF;
   i := 0;
-  while (i<n) do begin
-    crc := crc xor Cardinal(pkg[i]);
-    for j:=0 to 7 do begin
-      a := crc;
-      carry_flag := a and $0001;
-      crc := crc shr 1;
-      if (carry_flag=1) then
-        crc := crc xor $A001;
+  while (i < n) do
+  begin
+    CRC := CRC xor Cardinal(Pkg[i]);
+    for j := 0 to 7 do
+    begin
+      a := CRC;
+      CarryFlag := a and $0001;
+      CRC := CRC Shr 1;
+      if (CarryFlag = 1) then
+        CRC := CRC xor $A001;
     end;
-    inc(i);
+    Inc(i);
   end;
-  
-  //CRC must matches the two bytes, so should be a AND, not a OR
-  Result := ((n+2)<=Length(Pkg)) and ((Cardinal(pkg[n+1])=(crc shr 8)) AND (Cardinal(pkg[n])=(crc and 255)));
 
+  //CRC must matches the two Bytes, so should be a AND, not a OR
+  Result := ((n + 2) <= Length(Pkg)) and ((Cardinal(Pkg[n + 1]) = (CRC Shr 8)) and (Cardinal(Pkg[n]) = (CRC and 255)));
 end;
 
-function Calcul_crc(var Pkg:BYTES):Cardinal;
+function Calcul_CRC(var Pkg: Bytes): Cardinal;
 var
-  crc,j,carry_flag,a:Cardinal;
-  i,n:LongInt;
+  CRC: Cardinal;
+  j: Cardinal;
+  CarryFlag: Cardinal;
+  a: Cardinal;
+  i: Longint;
+  n: Longint;
 begin
-  n:=Length(Pkg)-2;
-  crc := $FFFF;
+  n := Length(Pkg) - 2;
+  CRC := $FFFF;
   i := 0;
-  while (i<n) do begin
-    crc :=crc xor Cardinal(pkg[i]);
-    for j:=0 to 7 do begin
-      a := crc;
-      carry_flag := a and $0001;
-      crc := crc shr 1;
-      if (carry_flag=1) then
-        crc := crc xor $A001;
+  while (i < n) do
+  begin
+    CRC := CRC xor Cardinal(Pkg[i]);
+    for j := 0 to 7 do
+    begin
+      a := CRC;
+      CarryFlag := a and $0001;
+      CRC := CRC Shr 1;
+      if (CarryFlag = 1) then
+        CRC := CRC xor $A001;
     end;
-    inc(i);
+    Inc(i);
   end;
-  pkg[n+1] := ((crc and $FF00) shr 8);
-  pkg[n]   := (crc and 255);
-  result := crc;
+  Pkg[n + 1] := ((CRC and $FF00) Shr 8);
+  Pkg[n] := (CRC and 255);
+  Result := CRC;
 end;
 
-function Calculate_CRC8(var data:BYTES):Byte;
+function Calculate_CRC8(var Data: Bytes): Byte;
 var
-  crc:Byte;
-  i, j: Integer;
+  CRC: Byte;
+  i: Integer;
+  j: Integer;
 begin
-  crc := $ff;
-  for i := 0 to high(data) do begin
-    crc := crc xor data[i];
-    for j := 0 to 7 do begin
-      if ((crc and $80) <> 0) then
-        crc := byte(((Word(crc) shl 1) xor $31))
+  CRC := $ff;
+  for i := 0 to high(Data) do
+  begin
+    CRC := CRC xor Data[i];
+    for j := 0 to 7 do
+    begin
+      if ((CRC and $80) <> 0) then
+        CRC := Byte(((Word(CRC) Shl 1) xor $31))
       else
-        crc := byte(Word(crc) shl 1);
+        CRC := Byte(Word(CRC) Shl 1);
     end;
   end;
-  Exit(crc);
+  Exit(CRC);
 end;
 
-function Fast_CRC_Cal8Bits(data:BYTES):Byte;
+function Fast_CRC_Cal8Bits(Data: Bytes): Byte;
 const
-  CrcTable:array[0..255] of byte = ( // 0x97 Polynomial Table, 8-bit, sourcer32@gmail.com
-                                    $00,$97,$B9,$2E,$E5,$72,$5C,$CB,
-                                    $5D,$CA,$E4,$73,$B8,$2F,$01,$96,
-                                    $BA,$2D,$03,$94,$5F,$C8,$E6,$71,
-                                    $E7,$70,$5E,$C9,$02,$95,$BB,$2C,
-                                    $E3,$74,$5A,$CD,$06,$91,$BF,$28,
-                                    $BE,$29,$07,$90,$5B,$CC,$E2,$75,
-                                    $59,$CE,$E0,$77,$BC,$2B,$05,$92,
-                                    $04,$93,$BD,$2A,$E1,$76,$58,$CF,
-                                    $51,$C6,$E8,$7F,$B4,$23,$0D,$9A,
-                                    $0C,$9B,$B5,$22,$E9,$7E,$50,$C7,
-                                    $EB,$7C,$52,$C5,$0E,$99,$B7,$20,
-                                    $B6,$21,$0F,$98,$53,$C4,$EA,$7D,
-                                    $B2,$25,$0B,$9C,$57,$C0,$EE,$79,
-                                    $EF,$78,$56,$C1,$0A,$9D,$B3,$24,
-                                    $08,$9F,$B1,$26,$ED,$7A,$54,$C3,
-                                    $55,$C2,$EC,$7B,$B0,$27,$09,$9E,
-                                    $A2,$35,$1B,$8C,$47,$D0,$FE,$69,
-                                    $FF,$68,$46,$D1,$1A,$8D,$A3,$34,
-                                    $18,$8F,$A1,$36,$FD,$6A,$44,$D3,
-                                    $45,$D2,$FC,$6B,$A0,$37,$19,$8E,
-                                    $41,$D6,$F8,$6F,$A4,$33,$1D,$8A,
-                                    $1C,$8B,$A5,$32,$F9,$6E,$40,$D7,
-                                    $FB,$6C,$42,$D5,$1E,$89,$A7,$30,
-                                    $A6,$31,$1F,$88,$43,$D4,$FA,$6D,
-                                    $F3,$64,$4A,$DD,$16,$81,$AF,$38,
-                                    $AE,$39,$17,$80,$4B,$DC,$F2,$65,
-                                    $49,$DE,$F0,$67,$AC,$3B,$15,$82,
-                                    $14,$83,$AD,$3A,$F1,$66,$48,$DF,
-                                    $10,$87,$A9,$3E,$F5,$62,$4C,$DB,
-                                    $4D,$DA,$F4,$63,$A8,$3F,$11,$86,
-                                    $AA,$3D,$13,$84,$4F,$D8,$F6,$61,
-                                    $F7,$60,$4E,$D9,$12,$85,$AB,$3C
-                                   );
+  CRC_TABLE: array[0..255] of Byte = ( // 0x97 Polynomial Table, 8-bit, sourcer32@gmail.com
+    $00, $97, $B9, $2E, $E5, $72, $5C, $CB,
+    $5D, $CA, $E4, $73, $B8, $2F, $01, $96,
+    $BA, $2D, $03, $94, $5F, $C8, $E6, $71,
+    $E7, $70, $5E, $C9, $02, $95, $BB, $2C,
+    $E3, $74, $5A, $CD, $06, $91, $BF, $28,
+    $BE, $29, $07, $90, $5B, $CC, $E2, $75,
+    $59, $CE, $E0, $77, $BC, $2B, $05, $92,
+    $04, $93, $BD, $2A, $E1, $76, $58, $CF,
+    $51, $C6, $E8, $7F, $B4, $23, $0D, $9A,
+    $0C, $9B, $B5, $22, $E9, $7E, $50, $C7,
+    $EB, $7C, $52, $C5, $0E, $99, $B7, $20,
+    $B6, $21, $0F, $98, $53, $C4, $EA, $7D,
+    $B2, $25, $0B, $9C, $57, $C0, $EE, $79,
+    $EF, $78, $56, $C1, $0A, $9D, $B3, $24,
+    $08, $9F, $B1, $26, $ED, $7A, $54, $C3,
+    $55, $C2, $EC, $7B, $B0, $27, $09, $9E,
+    $A2, $35, $1B, $8C, $47, $D0, $FE, $69,
+    $FF, $68, $46, $D1, $1A, $8D, $A3, $34,
+    $18, $8F, $A1, $36, $FD, $6A, $44, $D3,
+    $45, $D2, $FC, $6B, $A0, $37, $19, $8E,
+    $41, $D6, $F8, $6F, $A4, $33, $1D, $8A,
+    $1C, $8B, $A5, $32, $F9, $6E, $40, $D7,
+    $FB, $6C, $42, $D5, $1E, $89, $A7, $30,
+    $A6, $31, $1F, $88, $43, $D4, $FA, $6D,
+    $F3, $64, $4A, $DD, $16, $81, $AF, $38,
+    $AE, $39, $17, $80, $4B, $DC, $F2, $65,
+    $49, $DE, $F0, $67, $AC, $3B, $15, $82,
+    $14, $83, $AD, $3A, $F1, $66, $48, $DF,
+    $10, $87, $A9, $3E, $F5, $62, $4C, $DB,
+    $4D, $DA, $F4, $63, $A8, $3F, $11, $86,
+    $AA, $3D, $13, $84, $4F, $D8, $F6, $61,
+    $F7, $60, $4E, $D9, $12, $85, $AB, $3C
+    );
 var
   i: Integer;
-  crc:Byte;
+  CRC: Byte;
 begin
-  crc:=0;
-  for i:=0 to High(data) do begin
-    crc := crc xor data[i]; // Apply Byte
-    crc := CrcTable[crc and $FF]; // One round of 8-bits
+  CRC := 0;
+  for i := 0 to high(Data) do
+  begin
+    CRC := CRC xor Data[i]; // Apply Byte
+    CRC := CRC_TABLE[CRC and $FF]; // One round of 8-bits
   end;
 
-  Exit(crc);
+  Exit(CRC);
 end;
 
 end.

@@ -42,24 +42,26 @@ type
     FAfterSendValueToTag: TAfterSendNumericValueToTagEvent;
     FBeforeSendValueToTag: TBeforeSendNumericValueToTagEvent;
     Ftag: TPLCTag;
-    FIsEnabled, FIsEnabledBySecurity: Boolean;
+    FIsEnabled: Boolean;
+    FIsEnabledBySecurity: Boolean;
     FModified: Boolean;
 
     FSecurityCode: UTF8String;
-    procedure SetSecurityCode(sc: UTF8String);
+
+    procedure SetSecurityCode(ASecurityCode: UTF8String);
 
     function GetPosition: Longint;
     procedure RefreshTagValue(DataPtr: PtrInt);
 
     //: @seealso(IHMIInterface.SetHMITag)
-    procedure SetHMITag(t: TPLCTag);                    //seta um tag
+    procedure SetHMITag(APLCTag: TPLCTag);                    //seta um tag
     //: @seealso(IHMIInterface.GetHMITag)
     function GetHMITag: TPLCTag;
 
     //: @seealso(IHMIInterface.GetControlSecurityCode)
     function GetControlSecurityCode: UTF8String;
     //: @seealso(IHMIInterface.CanBeAccessed)
-    procedure CanBeAccessed(a: Boolean);
+    procedure CanBeAccessed(A: Boolean);
     //: @seealso(IHMIInterface.MakeUnsecure)
     procedure MakeUnsecure;
 
@@ -72,7 +74,7 @@ type
     procedure KeyUp(var Key: Word; Shift: TShiftState); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Longint); override;
     {$IFDEF FPC}
-    procedure DoChange(var msg); message LM_CHANGED;
+    procedure DoChange(var Msg); message LM_CHANGED;
     {$ELSE}
     procedure Changed; override;
     {$ENDIF}
@@ -145,9 +147,13 @@ type
     property BeforeSendAValueToTag: TBeforeSendNumericValueToTagEvent read FBeforeSendValueToTag write FBeforeSendValueToTag;
   end;
 
+
 implementation
 
-uses hsstrings, ControlSecurityManager, Forms;
+
+uses
+  hsstrings, ControlSecurityManager, Forms;
+
 
 constructor THMITrackBar.Create(AOwner: TComponent);
 begin
@@ -194,12 +200,12 @@ begin
   FModified := False;
 end;
 
-procedure THMITrackBar.SetHMITag(t: TPLCTag);
+procedure THMITrackBar.SetHMITag(APLCTag: TPLCTag);
 begin
   //se o tag esta entre um dos aceitos.
 
   //check if the tag is valid (only numeric tags);
-  if (t <> nil) and (not Supports(t, ITagNumeric)) then
+  if (APLCTag <> nil) and (not Supports(APLCTag, ITagNumeric)) then
     raise Exception.Create(SonlyNumericTags);
 
   //se ja estou associado a um tag, remove
@@ -211,15 +217,15 @@ begin
 
   //adiona o callback para o novo tag
   //link with the new tag.
-  if t <> nil then
+  if APLCTag <> nil then
   begin
-    t.AddWriteFaultHandler(@WriteFaultCallBack);
-    t.AddTagChangeHandler(@TagChangeCallBack);
-    t.AddRemoveTagHandler(@RemoveTagCallBack);
-    Ftag := t;
+    APLCTag.AddWriteFaultHandler(@WriteFaultCallBack);
+    APLCTag.AddTagChangeHandler(@TagChangeCallBack);
+    APLCTag.AddRemoveTagHandler(@RemoveTagCallBack);
+    Ftag := APLCTag;
     RefreshTagValue(0);
   end;
-  Ftag := t;
+  Ftag := APLCTag;
 end;
 
 function THMITrackBar.GetHMITag: TPLCTag;
@@ -232,9 +238,9 @@ begin
   Result := FSecurityCode;
 end;
 
-procedure THMITrackBar.CanBeAccessed(a: Boolean);
+procedure THMITrackBar.CanBeAccessed(A: Boolean);
 begin
-  FIsEnabledBySecurity := a;
+  FIsEnabledBySecurity := A;
   SetEnabled(FIsEnabled);
 end;
 
@@ -250,21 +256,21 @@ begin
   inherited SetEnabled(FIsEnabled and FIsEnabledBySecurity);
 end;
 
-procedure THMITrackBar.SetSecurityCode(sc: UTF8String);
+procedure THMITrackBar.SetSecurityCode(ASecurityCode: UTF8String);
 begin
-  if Trim(sc) = '' then
+  if Trim(ASecurityCode) = '' then
     Self.CanBeAccessed(True)
   else
     with GetControlSecurityManager do
     begin
-      ValidateSecurityCode(sc);
-      if not SecurityCodeExists(sc) then
-        RegisterSecurityCode(sc);
+      ValidateSecurityCode(ASecurityCode);
+      if not SecurityCodeExists(ASecurityCode) then
+        RegisterSecurityCode(ASecurityCode);
 
-      Self.CanBeAccessed(CanAccess(sc));
+      Self.CanBeAccessed(CanAccess(ASecurityCode));
     end;
 
-  FSecurityCode := sc;
+  FSecurityCode := ASecurityCode;
 end;
 
 function THMITrackBar.GetPosition: Longint;
@@ -320,10 +326,10 @@ begin
 end;
 
 {$IFDEF FPC}
-procedure THMITrackBar.DoChange(var msg);
+procedure THMITrackBar.DoChange(var Msg);
 begin
   FModified:=true;
-  inherited DoChange(msg);
+  inherited DoChange(Msg);
 end;
 {$ELSE}
 

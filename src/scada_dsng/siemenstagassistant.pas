@@ -24,81 +24,72 @@ interface
 implementation
 
 uses
-  Classes, SysUtils, ProtocolTypes, PLCTagNumber,PLCStructElement,
+  Classes, SysUtils, ProtocolTypes, PLCTagNumber, PLCStructElement,
   us7tagbuilder, PLCBlockElement, PLCNumber, TagBit, plcblock, tag, Controls,
   PLCStruct, Dialogs, StrUtils, ProtocolDriver, s7family;
 
-procedure OpenTagEditor(aProtocolDriver,
-                        aOwnerOfNewTags: TComponent;
-                        InsertHook: TAddTagInEditorHook;
-                        CreateProc: TCreateTagProc);
+procedure OpenTagEditor(AProtocolDriver, AOwnerOfNewTags: TComponent; InsertHook: TAddTagInEditorHook; CreateProc: TCreateTagProc);
 var
-  frmS7tb:TfrmS7TagBuilder;
+  S7TagBuilderForm: TfrmS7TagBuilder;
+  CurItem: Longint;
+  CurStructItem: Longint;
+  CurAddress: Longint;
+  CurIdx: Longint;
+  CurTCAddress: Longint;
+  CurBit: Longint;
+  CurDb: Longint;
+  Block: TPLCBlock;
+  Item: TPLCNumber;
+  BitItem: TTagBit;
+  MoreThanOneDb: Boolean;
+  MoreThanOneItem: Boolean;
+  Started: Boolean;
 
-  curitem, curstructitem,
-  curaddress, curidx,
-  curTCaddress, curbit, curdb:LongInt;
-
-  block:TPLCBlock;
-  item:TPLCNumber;
-  bititem:TTagBit;
-
-
-  morethanonedb, morethanoneitem:Boolean;
-
-  started:Boolean;
-
-  function GetCurWordSize:LongInt;
+  function GetCurWordSize: Longint;
   var
-    ttype:TTagType;
+    ATagType: TTagType;
   begin
-    if frmS7tb.optplcblock.Checked then
-      ttype:=frmS7tb.CurBlockType
+    if S7TagBuilderForm.optPLCBlock.Checked then
+      ATagType := S7TagBuilderForm.CurBlockType
     else
-      ttype:=frmS7tb.StructItem[curstructitem].TagType;
+      ATagType := S7TagBuilderForm.StructItem[CurStructItem].TagType;
 
-    case ttype of
-      pttDefault, pttShortInt, pttByte:
-        Result := 1;
-      pttSmallInt, pttWord:
-        Result := 2;
-      pttLongInt, pttDWord, pttFloat:
-        Result := 4;
+    case ATagType of
+      pttDefault,
+      pttShortInt,
+      pttByte:    Result := 1;
+      pttSmallInt,
+      pttWord:    Result := 2;
+      pttLongInt,
+      pttDWord,
+      pttFloat:   Result := 4;
     end;
   end;
 
-  function GetValueWithZeros(value, endvalue:LongInt; toFill:Boolean):AnsiString;
+  function GetValueWithZeros(Value, EndValue: Longint; ToFill: Boolean): AnsiString;
   var
-    numdig, dig:LongInt;
-    strendval, fill:AnsiString;
+    NumDig: Longint;
+    Dig: Longint;
+    StrEndVal: AnsiString;
+    Fill: AnsiString;
   begin
-    strendval:=IntToStr(endvalue);
+    StrEndVal := IntToStr(EndValue);
 
-    fill:='';
-    numdig:=Length(strendval);
-    for dig:=1 to numdig do
-      fill:=fill+'0';
+    Fill := '';
+    NumDig := Length(StrEndVal);
+    for Dig := 1 to NumDig do
+      Fill := Fill + '0';
 
-    if toFill then
-      Result:=RightStr(fill+IntToStr(value),numdig)
+    if ToFill then
+      Result := RightStr(Fill + IntToStr(Value), NumDig)
     else
-      Result:=IntToStr(value);
+      Result := IntToStr(Value);
   end;
 
-  function ReplaceBlockNamePattern(namepattern:AnsiString):AnsiString;
+  function ReplaceBlockNamePattern(NamePattern: AnsiString): AnsiString;
   var
-    has_atleastonereplacement:Boolean;
+    HasAtLestOneReplacement: Boolean;
   begin
-    {$IFDEF PORTUGUES}
-    {
-    %db  - Numero do DB.
-    %di  - Contador de DB atual, comecando de 1.
-    %de  - Contador de DB atual, comecando de 0.
-    %0db - Numero do DB, preenchido com zeros.
-    %0di - Contador de DB atual, comecando de 1, preenchido com zeros.
-    %0de - Contador de DB atual, comecando de 0, preenchido com zeros.
-    }
-    {$ELSE}
     {
     %db  - DB number.
     %di  - DB counter, starting from 1.
@@ -107,44 +98,32 @@ var
     %0di - DB counter, starting from 1, filled with zeroes.
     %0de - DB counter, starting from 0, filled with zeroes.
     }
-    {$ENDIF}
+    HasAtLestOneReplacement := (Pos('%db', NamePattern) <> 0)
+      or (Pos('%di', NamePattern) <> 0)
+      or (Pos('%de', NamePattern) <> 0)
+      or (Pos('%0db', NamePattern) <> 0)
+      or (Pos('%0di', NamePattern) <> 0)
+      or (Pos('%0de', NamePattern) <> 0);
 
-    has_atleastonereplacement:=(Pos('%db',namepattern)<>0) or
-                               (Pos('%di',namepattern)<>0) or
-                               (Pos('%de',namepattern)<>0) or
-                               (Pos('%0db',namepattern)<>0) or
-                               (Pos('%0di',namepattern)<>0) or
-                               (Pos('%0de',namepattern)<>0);
+    if (not HasAtLestOneReplacement) and MoreThanOneDb then
+      NamePattern := NamePattern + '%di';
 
-    if (not has_atleastonereplacement) and morethanonedb then
-      namepattern:=namepattern+'%di';
+    Result := NamePattern;
 
-    Result:=namepattern;
+    Result := StringReplace(Result, '%db', IntToStr(CurDb), [rfReplaceAll]);
+    Result := StringReplace(Result, '%di', IntToStr(CurDb - S7TagBuilderForm.spinDBNumber.Value + 1), [rfReplaceAll]);
+    Result := StringReplace(Result, '%de', IntToStr(CurDb - S7TagBuilderForm.spinDBNumber.Value + 0), [rfReplaceAll]);
 
-    Result:= StringReplace(Result,'%db',IntToStr(curdb),[rfReplaceAll]);
-    Result:= StringReplace(Result,'%di',IntToStr(curdb-frmS7tb.spinDBNumber.Value+1),[rfReplaceAll]);
-    Result:= StringReplace(Result,'%de',IntToStr(curdb-frmS7tb.spinDBNumber.Value+0),[rfReplaceAll]);
-
-    Result:= StringReplace(Result,'%0db',GetValueWithZeros(curdb,                              frmS7tb.spinFinalDBNumber.Value,                              true),[rfReplaceAll]);
-    Result:= StringReplace(Result,'%0di',GetValueWithZeros(curdb-frmS7tb.spinDBNumber.Value+1, frmS7tb.spinFinalDBNumber.Value-frmS7tb.spinDBNumber.Value+1, true),[rfReplaceAll]);
-    Result:= StringReplace(Result,'%0di',GetValueWithZeros(curdb-frmS7tb.spinDBNumber.Value,   frmS7tb.spinFinalDBNumber.Value-frmS7tb.spinDBNumber.Value  , true),[rfReplaceAll]);
+    Result := StringReplace(Result, '%0db', GetValueWithZeros(CurDb, S7TagBuilderForm.spinFinalDBNumber.Value, True), [rfReplaceAll]);
+    Result := StringReplace(Result, '%0di', GetValueWithZeros(CurDb - S7TagBuilderForm.spinDBNumber.Value + 1, S7TagBuilderForm.spinFinalDBNumber.Value - S7TagBuilderForm.spinDBNumber.Value + 1, True), [rfReplaceAll]);
+    Result := StringReplace(Result, '%0di', GetValueWithZeros(CurDb - S7TagBuilderForm.spinDBNumber.Value, S7TagBuilderForm.spinFinalDBNumber.Value - S7TagBuilderForm.spinDBNumber.Value, True), [rfReplaceAll]);
   end;
 
-  function GetItemName(namepattern:AnsiString):AnsiString;
+  function GetItemName(NamePattern: AnsiString): AnsiString;
   var
-    has_atleastonereplacement,
-    has_atleastoneDBreplacement:Boolean;
+    HasAtLeastOneReplacement: Boolean;
+    HasAtLeastOneDBReplacement: Boolean;
   begin
-    {$IFDEF PORTUGUES}
-    {
-    %a    - Endereço do item
-    %i    - Numero do item comecando de 1
-    %e    - Numero do item comecando de 0
-    %0a   - Endereço do item preenchido com zeros.
-    %0i   - Numero do item comecando de 1, preenchido com zeros
-    %0e   - Numero do item comecando de 0, preenchido com zeros
-    }
-    {$ELSE}
     {
     %a    - Item address
     %i    - Item number starting from 1.
@@ -153,63 +132,51 @@ var
     %0i   - Item number starting from 1, filled with zeroes.
     %0e   - Item number starting from 0, filled with zeroes.
     }
-    {$ENDIF}
-    has_atleastoneDBreplacement:=(Pos('%db',namepattern)<>0) or
-                                 (Pos('%di',namepattern)<>0) or
-                                 (Pos('%de',namepattern)<>0) or
-                                 (Pos('%0db',namepattern)<>0) or
-                                 (Pos('%0di',namepattern)<>0) or
-                                 (Pos('%0de',namepattern)<>0);
+    HasAtLeastOneDBReplacement := (Pos('%db', NamePattern) <> 0)
+      or (Pos('%di', NamePattern) <> 0)
+      or (Pos('%de', NamePattern) <> 0)
+      or (Pos('%0db', NamePattern) <> 0)
+      or (Pos('%0di', NamePattern) <> 0)
+      or (Pos('%0de', NamePattern) <> 0);
 
-    has_atleastonereplacement:=(Pos('%a',namepattern)<>0) or
-                               (Pos('%i',namepattern)<>0) or
-                               (Pos('%e',namepattern)<>0) or
-                               (Pos('%0a',namepattern)<>0) or
-                               (Pos('%0i',namepattern)<>0) or
-                               (Pos('%0e',namepattern)<>0);
+    HasAtLeastOneReplacement := (Pos('%a', NamePattern) <> 0)
+      or (Pos('%i', NamePattern) <> 0)
+      or (Pos('%e', NamePattern) <> 0)
+      or (Pos('%0a', NamePattern) <> 0)
+      or (Pos('%0i', NamePattern) <> 0)
+      or (Pos('%0e', NamePattern) <> 0);
 
-    if morethanonedb and (not has_atleastoneDBreplacement) then
-      namepattern:=namepattern+'%di';
+    if MoreThanOneDb and (not HasAtLeastOneDBReplacement) then
+      NamePattern := NamePattern + '%di';
 
-    if morethanoneitem and (not has_atleastonereplacement) then begin
-      if morethanonedb then
-        namepattern:=namepattern+'_%i'
+    if MoreThanOneItem and (not HasAtLeastOneReplacement) then
+    begin
+      if MoreThanOneDb then
+        NamePattern := NamePattern + '_%i'
       else
-        namepattern:=namepattern+'%i';
+        NamePattern := NamePattern + '%i';
     end;
 
-    //replaces the block name patterns present on item names.
-    Result:=ReplaceBlockNamePattern(namepattern);
+    //replaces the Block name patterns present on Item names.
+    Result := ReplaceBlockNamePattern(NamePattern);
 
-    if frmS7tb.MemoryArea.ItemIndex in [4,9,5,10] then begin
-      Result:= StringReplace(Result,'%a', IntToStr(curTCaddress),[rfReplaceAll]);
-      Result:= StringReplace(Result,'%0a',GetValueWithZeros(curTCaddress, frmS7tb.GetTheLastItemOffset div 2, true),[rfReplaceAll]);
-    end else begin
-      Result:= StringReplace(Result,'%a',IntToStr(curaddress),[rfReplaceAll]);
-      Result:= StringReplace(Result,'%0a',GetValueWithZeros(curaddress, frmS7tb.RealEndOffset, true),[rfReplaceAll]);
+    if S7TagBuilderForm.MemoryArea.ItemIndex in [4, 9, 5, 10] then
+    begin
+      Result := StringReplace(Result, '%a', IntToStr(CurTCAddress), [rfReplaceAll]);
+      Result := StringReplace(Result, '%0a', GetValueWithZeros(CurTCAddress, S7TagBuilderForm.GetTheLastItemOffset Div 2, True), [rfReplaceAll]);
+    end
+    else
+    begin
+      Result := StringReplace(Result, '%a', IntToStr(CurAddress), [rfReplaceAll]);
+      Result := StringReplace(Result, '%0a', GetValueWithZeros(CurAddress, S7TagBuilderForm.RealEndOffset, True), [rfReplaceAll]);
     end;
-    Result:= StringReplace(Result,'%i',IntToStr(curitem),[rfReplaceAll]);
-    Result:= StringReplace(Result,'%0i',GetValueWithZeros(curitem, frmS7tb.spinNumItens.Value, true),[rfReplaceAll]);
-    Result:= StringReplace(Result,'%e',IntToStr(curitem-1),[rfReplaceAll]);
-    Result:= StringReplace(Result,'%0e',GetValueWithZeros(curitem-1, frmS7tb.spinNumItens.Value-1, true),[rfReplaceAll]);
+    Result := StringReplace(Result, '%i', IntToStr(CurItem), [rfReplaceAll]);
+    Result := StringReplace(Result, '%0i', GetValueWithZeros(CurItem, S7TagBuilderForm.spinNumItens.Value, True), [rfReplaceAll]);
+    Result := StringReplace(Result, '%e', IntToStr(CurItem - 1), [rfReplaceAll]);
+    Result := StringReplace(Result, '%0e', GetValueWithZeros(CurItem - 1, S7TagBuilderForm.spinNumItens.Value - 1, True), [rfReplaceAll]);
   end;
 
 begin
-  {$IFDEF PORTUGUES}
-  { o que está faltando??
-    NO FORMULARIO:
-    ** Checagens de substituições ausentes nos nomes a fim de evitar duplicidades de nomes...
-
-    SUBSTITUIÇÕES:
-
-    %a  - Endereço do item
-    %i  - Numero do item comecando de 1
-    %e  - Numero do item comecando de 0
-    %0a - Endereço do item preenchido com zeros.
-    %0i - Numero do item comecando de 1, preenchido com zeros
-    %0e - Numero do item comecando de 0, preenchido com zeros
-  }
-  {$ELSE}
   { What's missing??
     On form:
     ** Check of missing replacements to avoid name duplicity...
@@ -223,123 +190,131 @@ begin
     %0i - Item number starting from 1, filled with zeroes.
     %0e - Item number starting from 0, filled with zeroes.
   }
-  {$ENDIF}
-
-  if not (aProtocolDriver is TProtocolDriver) then
+  if not (AProtocolDriver is TProtocolDriver) then
     raise Exception.Create('Protocol driver must be a instance of TProtocolDriver.');
 
-  frmS7tb:=TfrmS7TagBuilder.Create(nil);
+  S7TagBuilderForm := TfrmS7TagBuilder.Create(nil);
   try
-    with frmS7tb do begin
-      if ShowModal=mrOK then begin
+    with S7TagBuilderForm do
+    begin
+      if ShowModal = mrOk then
+      begin
+        MoreThanOneDb := spinDBNumber.Value <> spinFinalDBNumber.Value;
+        MoreThanOneItem := spinNumItens.Value > 1;
 
-        morethanonedb:=spinDBNumber.Value<>spinFinalDBNumber.Value;
-        morethanoneitem:=spinNumItens.Value>1;
-
-        for curdb:=spinDBNumber.Value to spinFinalDBNumber.Value do begin
+        for CurDb := spinDBNumber.Value to spinFinalDBNumber.Value do
+        begin
           //cria o bloco simples ou bloco estrutura e faz sua configuração.
-          //create the block or struture and configure it.
-          if optplcblock.Checked or optplcStruct.Checked then begin
-
+          //create the Block or struture and configure it.
+          if optPLCBlock.Checked or optplcStruct.Checked then
+          begin
             //cria o bloco
-            //creates the block
-            if optplcblock.Checked then
-              block:=TPLCBlock(CreateProc(TPLCBlock))
+            //creates the Block
+            if optPLCBlock.Checked then
+              Block := TPLCBlock(CreateProc(TPLCBlock))
             else
-              block:=TPLCStruct(CreateProc(TPLCStruct));
+              Block := TPLCStruct(CreateProc(TPLCStruct));
 
-            block.PLCRack:=PLCRack.Value;
-            block.PLCSlot:=PLCSlot.Value;
-            block.PLCStation:=PLCStation.Value;
-            block.MemReadFunction := GetTagType;
-            block.Name := ReplaceBlockNamePattern(BlockName.Text);
-            if block.MemReadFunction=4 then
-              block.MemFile_DB:=curdb;
-            block.MemAddress:=RealStartOffset;
+            Block.PLCRack := PLCRack.Value;
+            Block.PLCSlot := PLCSlot.Value;
+            Block.PLCStation := PLCStation.Value;
+            Block.MemReadFunction := GetTagType;
+            Block.Name := ReplaceBlockNamePattern(BlockName.Text);
+            if Block.MemReadFunction = 4 then
+              Block.MemFile_DB := CurDb;
+            Block.MemAddress := RealStartOffset;
 
-            if optplcblock.Checked then begin
-              block.RefreshTime:=BlockScan.Value;
-              block.TagType:=CurBlockType;
-              Block.SwapBytes:=BlockSwapBytes.Checked;
-              block.SwapWords:=BlockSwapWords.Checked;
-            end else
-              block.RefreshTime:=StructScan.Value;
+            if optPLCBlock.Checked then
+            begin
+              Block.RefreshTime := BlockScan.Value;
+              Block.TagType := CurBlockType;
+              Block.SwapBytes := BlockSwapBytes.Checked;
+              Block.SwapWords := BlockSwapWords.Checked;
+            end
+            else
+              Block.RefreshTime := StructScan.Value;
 
-            block.ProtocolDriver:=TProtocolDriver(aProtocolDriver);
-            InsertHook(block);
+            Block.ProtocolDriver := TProtocolDriver(AProtocolDriver);
+            InsertHook(Block);
           end;
 
           //comeca a criar os itens da estrutura
           //creates the structure items
-          curaddress:=spinStartAddress.Value;
-          curTCaddress:=spinStartAddress.Value;
-          curidx := 0;
-          started:=false;
-          for curitem:=1 to spinNumItens.Value do begin
-            for curstructitem:=0 to StructItemsCount-1 do begin
+          CurAddress := spinStartAddress.Value;
+          CurTCAddress := spinStartAddress.Value;
+          CurIdx := 0;
+          Started := False;
+          for CurItem := 1 to spinNumItens.Value do
+          begin
+            for CurStructItem := 0 to StructItemsCount - 1 do
+            begin
               //se é para criar o tag.
               //if the tag must be created.
-              if not StructItem[curstructitem].SkipTag then begin
-                started:=true;
-                if optplctagnumber.Checked then begin
+              if not StructItem[CurStructItem].SkipTag then
+              begin
+                Started := True;
+                if optPLCTagNumber.Checked then
+                  begin
+                    Item := TPLCTagNumber(CreateProc(TPLCTagNumber));
 
-                  item:=TPLCTagNumber(CreateProc(TPLCTagNumber));
+                    with TPLCTagNumber(Item) do
+                    begin
+                      PLCRack := S7TagBuilderForm.PLCRack.Value;
+                      PLCSlot := S7TagBuilderForm.PLCSlot.Value;
+                      PLCStation := S7TagBuilderForm.PLCStation.Value;
+                      MemReadFunction := GetTagType;
+                      if MemReadFunction = 4 then
+                        MemFile_DB := CurDb;
+                      MemAddress := CurAddress;
 
-                  with TPLCTagNumber(item) do begin
+                      RefreshTime := StructItem[CurStructItem].TagScan;
+                      TagType := StructItem[CurStructItem].TagType;
+                      SwapBytes := StructItem[CurStructItem].SwapBytes;
+                      SwapWords := StructItem[CurStructItem].SwapWords;
 
-                    PLCRack:=frmS7tb.PLCRack.Value;
-                    PLCSlot:=frmS7tb.PLCSlot.Value;
-                    PLCStation:=frmS7tb.PLCStation.Value;
-                    MemReadFunction := GetTagType;
-                    if MemReadFunction=4 then
-                      MemFile_DB:=curdb;
-                    MemAddress:=curaddress;
-
-                    RefreshTime:=StructItem[curstructitem].TagScan;
-                    TagType:=StructItem[curstructitem].TagType;
-                    SwapBytes:=StructItem[curstructitem].SwapBytes;
-                    SwapWords:=StructItem[curstructitem].SwapWords;
-
-                    ProtocolDriver:=TProtocolDriver(aProtocolDriver);
+                      ProtocolDriver := TProtocolDriver(AProtocolDriver);
+                    end;
+                  end
+                else if optPLCBlock.Checked then
+                  begin
+                    TPLCBlock(Block).Size := CurIdx + 1;
+                    Item := TPLCBlockElement(CreateProc(TPLCBlockElement));
+                    TPLCBlockElement(Item).plcblock := Block;
+                    TPLCBlockElement(Item).Index := CurIdx;
+                  end
+                else
+                  begin
+                    Item := TPLCStructItem(CreateProc(TPLCStructItem));
+                    TPLCStruct(Block).Size := CurIdx + GetCurWordSize;
+                    TPLCStructItem(Item).PLCBlock := TPLCStruct(Block);
+                    TPLCStructItem(Item).Index := CurIdx;
+                    TPLCStructItem(Item).TagType := StructItem[CurStructItem].TagType;
+                    TPLCStructItem(Item).SwapBytes := StructItem[CurStructItem].SwapBytes;
+                    TPLCStructItem(Item).SwapWords := StructItem[CurStructItem].SwapWords;
                   end;
 
-                end else begin
-                  if optplcblock.Checked then begin
-                    TPLCBlock(block).Size:=curidx+1;
-                    item:=TPLCBlockElement(CreateProc(TPLCBlockElement));
-                    TPLCBlockElement(item).PLCBlock:=block;
-                    TPLCBlockElement(item).Index:=curidx;
-                  end else begin
-                    item:=TPLCStructItem(CreateProc(TPLCStructItem));
-                    TPLCStruct(block).Size:=curidx+GetCurWordSize;
-                    TPLCStructItem(item).PLCBlock:=TPLCStruct(block);
-                    TPLCStructItem(item).Index:=curidx;
-                    TPLCStructItem(item).TagType:=StructItem[curstructitem].TagType;
-                    TPLCStructItem(item).SwapBytes:=StructItem[curstructitem].SwapBytes;
-                    TPLCStructItem(item).SwapWords:=StructItem[curstructitem].SwapWords;
-                  end;
-                end;
+                Item.Name := GetItemName(StructItem[CurStructItem].TagName);
+                InsertHook(Item);
 
-                item.Name:=GetItemName(StructItem[curstructitem].TagName);
-                InsertHook(item);
-
-                for curbit:=0 to StructItem[curstructitem].BitCount-1 do begin
-                  bititem:=TTagBit(CreateProc(TTagBit));
-                  bititem.EndBit:=StructItem[curstructitem].Bit[curbit].EndBit;
-                  bititem.StartBit:=StructItem[curstructitem].Bit[curbit].StartBit;
-                  bititem.Name:=GetItemName(StructItem[curstructitem].Bit[curbit].TagName);
-                  bititem.PLCTag:=item;
-                  InsertHook(bititem);
+                for CurBit := 0 to StructItem[CurStructItem].BitCount - 1 do
+                begin
+                  BitItem := TTagBit(CreateProc(TTagBit));
+                  BitItem.EndBit := StructItem[CurStructItem].Bit[CurBit].EndBit;
+                  BitItem.StartBit := StructItem[CurStructItem].Bit[CurBit].StartBit;
+                  BitItem.Name := GetItemName(StructItem[CurStructItem].Bit[CurBit].TagName);
+                  BitItem.PLCTag := Item;
+                  InsertHook(BitItem);
                 end;
               end;
 
-              inc(curTCaddress);
-              inc(curaddress,GetCurWordSize);
-              if started then begin
-                if optplcblock.Checked then
-                  inc(curidx)
+              Inc(CurTCAddress);
+              Inc(CurAddress, GetCurWordSize);
+              if Started then
+              begin
+                if optPLCBlock.Checked then
+                  Inc(CurIdx)
                 else
-                  inc(curidx, GetCurWordSize);
+                  Inc(CurIdx, GetCurWordSize);
               end;
             end;
           end;
@@ -347,12 +322,13 @@ begin
       end;
     end;
   finally
-    frmS7tb.Destroy;
+    S7TagBuilderForm.Destroy;
   end;
 end;
+
 
 initialization
   SetTagBuilderToolForSiemensS7ProtocolFamily(@OpenTagEditor)
 
-end.
 
+end.
