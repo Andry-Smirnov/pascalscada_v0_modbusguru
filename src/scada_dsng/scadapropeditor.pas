@@ -838,7 +838,7 @@ var
   AList: TStringList;
   AValue: TStringList;
   i: Integer;
-begin  GetPortas
+begin
   AList := TStringList.Create;
   AValue := TStringList.Create;
   ARegistry := TRegistry.Create;

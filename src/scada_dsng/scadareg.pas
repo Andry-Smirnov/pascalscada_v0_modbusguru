@@ -33,7 +33,7 @@ uses
   mutexserver, MutexClient, siemenstagassistant, modbustagassistant, MelsecTCP,
   westasciitagassistant, bitmappertagassistant, blockstructtagassistant,
 {$IFDEF FPC}
-  LResources, PropEdits, ComponentEditors, IDECommands, MenuIntf, LCLType
+  LResources, PropEdits, ComponentEditors, IDECommands, MenuIntf, LCLType,
 {$ELSE}
   {$IFDEF PORTUGUES}
     {$MESSAGE ERROR 'Somente Lazarus/Freepascal é suportado!'}
@@ -42,7 +42,8 @@ uses
   {$ENDIF}
 {$ENDIF}
   numexprtag,
-  plcstructstring;
+  plcstructstring
+  ;
 
 procedure Register;
 var
