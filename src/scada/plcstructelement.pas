@@ -1,17 +1,8 @@
 {$i ../common/language.inc}
-{$IFDEF PORTUGUES}
 {:
   @author(Fabio Luis Girardi <fabio@pascalscada.com>)
-
-  @abstract(Implementação de tag item de uma estrutura de comunicação.)
-}
-{$ELSE}
-{:
-  @author(Fabio Luis Girardi <fabio@pascalscada.com>)
-
   @abstract(Unit that implements a tag item of an structure communication.)
 }
-{$ENDIF}
 unit PLCStructElement;
 
 interface
@@ -20,36 +11,25 @@ uses
   Classes, SysUtils, Tag, PLCTag, PLCBlockElement, ProtocolTypes, PLCStruct;
 
 type
-  {$IFDEF PORTUGUES}
-  {:
-    @author(Fabio Luis Girardi <fabio@pascalscada.com>)
-
-    @abstract(Classe de tag item de uma estrutura de comunicação.)
-  }
-  {$ELSE}
-  {:
-    @author(Fabio Luis Girardi <fabio@pascalscada.com>)
-
-    @abstract(Class of a tag item of a structure communication tag.)
-  }
-  {$ENDIF}
+  {: @author(Fabio Luis Girardi <fabio@pascalscada.com>)
+     @abstract(Class of a tag item of a structure communication tag.) }
 
   { TPLCStructItem }
 
   TPLCStructItem = class(TPLCBlockElement, ITagInterface, ITagNumeric)
   private
     function GetBlock: TPLCStruct;
-    function GetMySize(newType: TTagType): Integer;
+    function GetMySize(NewType: TTagType): Integer;
   protected
-    procedure SetBlock(blk: TPLCStruct);
+    procedure SetBlock(Blk: TPLCStruct);
     //: @seealso(TPLCTag.GetValueRaw)
     function GetValueRaw: Double; override;
     //: @seealso(TPLCNumber.SetValueRaw)
-    procedure SetValueRaw(aValue: Double); override;
+    procedure SetValueRaw(AValue: Double); override;
     //: @seealso(TPLCBlockElement.SetIndex)
-    procedure SetIndex(i: Cardinal); override;
+    procedure SetIndex(AValue: Cardinal); override;
     //: @seealso(TPLCTag.SetTagType)
-    procedure SetTagType(newType: TTagType); override;
+    procedure SetTagType(NewType: TTagType); override;
 
     //IHMITagInterface
     procedure TagChangeCallback(Sender: TObject); override;
@@ -60,7 +40,7 @@ type
   public
     //: @exclude
     constructor Create(AOwner: TComponent); override;
-    procedure SetMinMaxValues(aMin, aMax: Double); override;
+    procedure SetMinMaxValues(AMin, AMax: Double); override;
     //: @seealso(TPLCTag.Write)
     procedure Write(Values: TArrayOfDouble; Count, Offset: Cardinal); override;
   published
@@ -73,11 +53,6 @@ type
     //: @seealso(TPLCTag.SwapDWords)
     property SwapDWords;
 
-    {$IFDEF PORTUGUES}
-    //: Tag estrutura a que o item pertence.
-    {$ELSE}
-    //: Structure tag which the item belongs.
-    {$ENDIF}
     property PLCBlock: TPLCStruct read GetBlock write SetBlock;
   end;
 
@@ -96,19 +71,19 @@ begin
   FProtocolWordSize := 8;
 end;
 
-procedure TPLCStructItem.SetMinMaxValues(aMin, aMax: Double);
+procedure TPLCStructItem.SetMinMaxValues(AMin, AMax: Double);
 begin
-  inherited SetMinMaxValues(aMin, aMax);
+  inherited SetMinMaxValues(AMin, AMax);
 end;
 
 procedure TPLCStructItem.Write(Values: TArrayOfDouble; Count, Offset: Cardinal);
 var
-  blkvalues: TArrayOfDouble;
+  BlkValues: TArrayOfDouble;
 begin
   if Assigned(PBlock) then
   begin
-    blkvalues := TagValuesToPLCValues(Values, 0);
-    PBlock.Write(blkvalues, Length(blkvalues), PIndex + Offset);
+    BlkValues := TagValuesToPLCValues(Values, 0);
+    PBlock.Write(BlkValues, Length(BlkValues), PIndex + Offset);
   end;
 end;
 
@@ -136,27 +111,27 @@ end;
 
 procedure TPLCStructItem.UpdateTagSizeOnProtocol;
 var
-  oldprotocol: TProtocolDriver;
+  OldProtocol: TProtocolDriver;
 begin
-  oldprotocol := PProtocolDriver;
+  OldProtocol := PProtocolDriver;
   PProtocolDriver := TProtocolDriver(1);
   inherited UpdateTagSizeOnProtocol;
-  PProtocolDriver := oldprotocol;
+  PProtocolDriver := OldProtocol;
 end;
 
-procedure TPLCStructItem.SetBlock(blk: TPLCStruct);
+procedure TPLCStructItem.SetBlock(Blk: TPLCStruct);
 begin
-  if blk = PLCBlock then Exit;
+  if Blk = PLCBlock then Exit;
   //se esta setando o bloco
   //if the block is being set
-  if (blk <> nil) then
+  if (Blk <> nil) then
   begin
-    if (PIndex + GetMySize(FTagType)) > blk.Size then
+    if (PIndex + GetMySize(FTagType)) > Blk.Size then
       raise Exception.Create(STagIdxMoreSizeExceedStructLen);
 
-    blk.AddRemoveTagHandler(@RemoveTagCallBack);
-    blk.AddTagChangeHandler(@TagChangeCallback);
-    blk.AddWriteFaultHandler(@WriteFaultCallback);
+    Blk.AddRemoveTagHandler(@RemoveTagCallBack);
+    Blk.AddTagChangeHandler(@TagChangeCallback);
+    Blk.AddWriteFaultHandler(@WriteFaultCallback);
   end;
 
   //esta removendo do bloco.
@@ -166,14 +141,14 @@ begin
     PBlock.RemoveAllHandlersFromObject(Self);
   end;
 
-
-  PBlock := blk;
+  PBlock := Blk;
 end;
 
 function TPLCStructItem.GetValueRaw: Double;
 var
-  notify: Boolean;
-  Data, converted_value: TArrayOfDouble;
+  Notify: Boolean;
+  Data: TArrayOfDouble;
+  ConvertedValue: TArrayOfDouble;
 begin
   Result := 0;
   if Assigned(PBlock) then
@@ -206,62 +181,62 @@ begin
       Data[7] := PBlock.ValueRaw[PIndex + 7];
     end;
 
-    converted_value := PLCValuesToTagValues(Data, 0);
+    ConvertedValue := PLCValuesToTagValues(Data, 0);
 
-    if Length(converted_value) <= 0 then Exit;
+    if Length(ConvertedValue) <= 0 then Exit;
 
-    notify := (IsNan(converted_value[0]) and (not IsNan(PValueRaw))) or
-      ((not IsNan(converted_value[0])) and IsNan(PValueRaw)) or (PValueRaw <> converted_value[0]);
-    PValueRaw := converted_value[0];
+    Notify := (IsNan(ConvertedValue[0]) and (not IsNan(PValueRaw))) or
+      ((not IsNan(ConvertedValue[0])) and IsNan(PValueRaw)) or (PValueRaw <> ConvertedValue[0]);
+    PValueRaw := ConvertedValue[0];
     PValueTimeStamp := PBlock.ValueTimestamp;
 
     Result := PValueRaw;
 
-    if notify or PFirstUpdate then
+    if Notify or PFirstUpdate then
     begin
       PFirstUpdate := False;
       NotifyChange();
     end;
 
     SetLength(Data, 0);
-    SetLength(converted_value, 0);
+    SetLength(ConvertedValue, 0);
   end;
 end;
 
-procedure TPLCStructItem.SetValueRaw(aValue: Double);
+procedure TPLCStructItem.SetValueRaw(AValue: Double);
 var
-  blkvalues, Values: TArrayOfDouble;
+  BlkValues: TArrayOfDouble;
+  Values: TArrayOfDouble;
 begin
   if Assigned(PBlock) then
-  begin
-    SetLength(Values, 1);
-    Values[0] := aValue;
-    blkvalues := TagValuesToPLCValues(Values, 0);
-    if PBlock.SyncWrites then
-      PBlock.Write(blkvalues, Length(blkvalues), PIndex)
-    else
-      PBlock.ScanWrite(blkvalues, Length(blkvalues), PIndex);
-    SetLength(blkvalues, 0);
-    SetLength(Values, 0);
-  end
-  else
-  if PValueRaw <> Value then
-  begin
-    PValueRaw := Value;
-    NotifyChange;
-  end;
+    begin
+      SetLength(Values, 1);
+      Values[0] := AValue;
+      BlkValues := TagValuesToPLCValues(Values, 0);
+      if PBlock.SyncWrites then
+        PBlock.Write(BlkValues, Length(BlkValues), PIndex)
+      else
+        PBlock.ScanWrite(BlkValues, Length(BlkValues), PIndex);
+      SetLength(BlkValues, 0);
+      SetLength(Values, 0);
+    end
+  else if PValueRaw <> Value then
+    begin
+      PValueRaw := Value;
+      NotifyChange;
+    end;
 end;
 
-procedure TPLCStructItem.SetIndex(i: Cardinal);
+procedure TPLCStructItem.SetIndex(AValue: Cardinal);
 var
   MySize: Longint;
 begin
-  MySize := FCurrentWordSize Div 8;
+  MySize := FCurrentWordSize div 8;
   if PBlock <> nil then
-    if (i + MySize) > PBlock.Size then
+    if (AValue + MySize) > PBlock.Size then
       raise Exception.Create(SItemOutOfStructure);
 
-  inherited SetIndex(i);
+  inherited SetIndex(AValue);
 end;
 
 function TPLCStructItem.GetBlock: TPLCStruct;
@@ -271,36 +246,37 @@ begin
     Result := PBlock as TPLCStruct;
 end;
 
-function TPLCStructItem.GetMySize(newType: TTagType): Integer;
+function TPLCStructItem.GetMySize(NewType: TTagType): Integer;
 begin
-  case newType of
-    pttDefault:
-      if FProtocolWordSize = 1 then
-        Result := 1
-      else
-        Result := FProtocolWordSize Div 8;
-    pttByte, pttShortInt:
-      Result := 1;
-    pttSmallInt, pttWord:
-      Result := 2;
-    pttLongInt, pttDWord, pttFloat:
-      Result := 4;
-    pttInt64, pttQWord, pttDouble:
-      Result := 8;
+  case NewType of
+    pttDefault:   if FProtocolWordSize = 1 then
+                    Result := 1
+                  else
+                    Result := FProtocolWordSize div 8;
+    pttByte,
+    pttShortInt:  Result := 1;
+    pttSmallInt,
+    pttWord:      Result := 2;
+    pttLongInt,
+    pttDWord,
+    pttFloat:     Result := 4;
+    pttInt64,
+    pttQWord,
+    pttDouble:    Result := 8;
   end;
 end;
 
-procedure TPLCStructItem.SetTagType(newType: TTagType);
+procedure TPLCStructItem.SetTagType(NewType: TTagType);
 var
   MySize: Integer;
 begin
-  MySize := GetMySize(newType);
+  MySize := GetMySize(NewType);
 
   if PBlock <> nil then
     if (PIndex + MySize) > PBlock.Size then
       raise Exception.Create(SItemOutOfStructure);
 
-  inherited SetTagType(newType);
+  inherited SetTagType(NewType);
 end;
 
 end.

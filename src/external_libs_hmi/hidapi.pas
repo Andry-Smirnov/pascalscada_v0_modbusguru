@@ -172,7 +172,7 @@ end;
 
 function THidDevice.Write(const Data; Length: SizeInt): SizeInt;
 begin
-  Result := hid_write(@self, @Data, Length);
+  Result := hid_write(@Self, @Data, Length);
 end;
 
 function THidDevice.Read(out Data; Length: SizeInt): SizeInt;
@@ -202,7 +202,7 @@ end;
 
 function THidDevice.GetManufacturerString: UnicodeString;
 var
-  Buf: array[0..255] of TCWChar;
+  Buf: array [0..255] of TCWChar;
 begin
   hid_get_manufacturer_string(@Self, @Buf, Length(Buf) - 1);
   Result := PCWCharToUnicodeString(@Buf);
@@ -210,7 +210,7 @@ end;
 
 function THidDevice.GetProductString: UnicodeString;
 var
-  Buf: array[0..255] of TCWChar;
+  Buf: array [0..255] of TCWChar;
 begin
   hid_get_product_string(@Self, @Buf, Length(Buf) - 1);
   Result := PCWCharToUnicodeString(@Buf);
@@ -218,7 +218,7 @@ end;
 
 function THidDevice.GetSerialNumberString: UnicodeString;
 var
-  Buf: array[0..255] of TCWChar;
+  Buf: array [0..255] of TCWChar;
 begin
   hid_get_serial_number_string(@Self, @Buf, Length(Buf) - 1);
   Result := PCWCharToUnicodeString(@Buf);
@@ -226,7 +226,7 @@ end;
 
 function THidDevice.GetIndexedString(Index: Integer): UnicodeString;
 var
-  Buf: array[0..255] of TCWChar;
+  Buf: array [0..255] of TCWChar;
 begin
   hid_get_indexed_string(@Self, Index, @Buf, Length(Buf) - 1);
   Result := PCWCharToUnicodeString(@Buf);

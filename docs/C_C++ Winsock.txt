@@ -51,13 +51,13 @@ Server: Starting Server
 
 struct sockaddr_in sin;
 
-memset( &sin, 0, sizeof sin );
+memset( &sin, 0, SizeOf sin );
 
 sin.sin_family = AF_INET;
 sin.sin_addr.s_addr = INADDR_ANY;
 sin.sin_port = htons( 21 );
 
-if ( bind( server, &sin, sizeof sin ) == SOCKET_ERROR )
+if ( bind( server, &sin, SizeOf sin ) == SOCKET_ERROR )
 {
     /* could not start server */
     return FALSE;
@@ -72,7 +72,7 @@ Server: Accepting Connection
 SOCKET client;
 int length;
 
-length = sizeof sin;
+length = SizeOf sin;
 client = accept( server, &sin, &length );
 
 Client: Create Socket
@@ -93,13 +93,13 @@ Client: Connecting to Server
 
 struct sockaddr_in sin;
 
-memset( &sin, 0, sizeof sin );
+memset( &sin, 0, SizeOf sin );
 
 sin.sin_family = AF_INET;
 sin.sin_addr.s_addr = ((struct in_addr *)(host->h_addr))->s_addr;
 sin.sin_point = htons( 21 );
 
-if ( connect( client, &sin, sizeof sin ) == SOCKET_ERROR )
+if ( connect( client, &sin, SizeOf sin ) == SOCKET_ERROR )
 {
     /* could not connect to server */
     return FALSE;

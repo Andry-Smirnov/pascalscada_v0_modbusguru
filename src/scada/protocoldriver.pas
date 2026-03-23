@@ -1,10 +1,4 @@
 {$i ../common/language.inc}
-{$IFDEF PORTUGUES}
-{:
-@abstract(Implementação da base de um driver de protocolo.)
-@author(Fabio Luis Girardi fabio@pascalscada.com)
-}
-{$ELSE}
 {:
 @abstract(Unit that implements a base class of protocol driver.)
 @author(Fabio Luis Girardi fabio@pascalscada.com)
@@ -15,21 +9,22 @@
 07/2013 - Moved OpenTagEditor to TagBuilderAssistant to remove form dependencies
 @author(Juanjo Montero <juanjo.montero@gmail.com>)
 ***********************************************************************
-
 }
-{$ENDIF}
 unit ProtocolDriver;
 
 interface
 
 uses
   SysUtils, Classes, CommPort, CommTypes, ProtocolTypes, protscanupdate,
-  protscan, CrossEvent, Tag, syncobjs, fgl {$IFNDEF FPC}, Windows{$ENDIF};
+  protscan, CrossEvent, Tag, syncobjs, fgl
+  {$IFNDEF FPC}
+  , Windows
+  {$ENDIF}
+  ;
 
 type
   TTagList = specialize TFPGList<TTag>;
 
-  {$IFDEF PORTUGUES}
   {:
   @abstract(Classe base para drivers de protocolo.)
 
@@ -72,9 +67,6 @@ type
   Sobrescrevendo esses métodos e rotinas, seu driver estará pronto. @bold(Veja
   a documentação detalhada de cada método para enteder como cada um funciona.)
   }
-  {$ELSE}
-
-  {$ENDIF}
 
   { TProtocolDriver }
 
@@ -82,736 +74,311 @@ type
   private
     //Array de tags associados ao driver.
     //Array of linked tags.
-    PTags:TTagList;
+    PTags: TTagList;
 
-    //Armazena se o protocolo está em modo somente leitura
+    //Armazena se o protocolo está em modo somente reading
     //stores if the protocol is in read-only mode
-    FReadOnly:LongInt;
+    FReadOnly: Longint;
 
     //Tempo de gasto em millisegundos atualizando valores dos tags (e seus dependentes)
     //Time used in milliseconds to update the tag value and their dependents. 
-    FUserUpdateTime:Double;
+    FUserUpdateTime: Double;
 
     //thread de execução do scan dos tags
     //Scan read thread object
-    PScanReadThread:TScanThread;
+    PScanReadThread: TScanThread;
     ////Thread de execução de escritas
     ////scan write thead object
     //PScanWriteThread:TScanThread;
     //thread de atualização dos pedidos dos tags
     //thread that updates tag values.
-    PScanUpdateThread:TScanUpdate;
+    PScanUpdateThread: TScanUpdate;
 
     //excessao caso o index to tag esteja fora dos limites
     //raises an exception if the that index is out of bounds.
-    procedure DoExceptionIndexOut(index:LongInt);
+    procedure DoExceptionIndexOut(index: Longint);
     function GetIsReadOnly: Boolean;
 
     //metodos para manipulação da lista de tags
     //procedures to handle the taglist.
-    function  GetTagCount:LongInt;
-    function  GetTag(index:LongInt):TTag;
-    function  GetTagName(index:LongInt):AnsiString;
-    function  GetTagByName(Nome:AnsiString):TTag;
+    function GetTagCount: Longint;
+    function GetTag(index: Longint): TTag;
+    function GetTagName(index: Longint): AnsiString;
+    function GetTagByName(AName: AnsiString): TTag;
 
     //metodo chamado pela thread de scan para ler valores do dispositivo.
     //procedure called to read data from your device.
-    procedure SafeScanRead(Sender:TObject; var NeedSleep:LongInt);
+    procedure SafeScanRead(Sender: TObject; var NeedSleep: Longint);
     //metodo chamado pela thred de scan de escrita para escrever valores no dispositivo.
     //procedure called by the scan write thread to write data on your device.
-    function  SafeScanWrite(const TagRec:TTagRec; const values:TArrayOfDouble):TProtocolIOResult;
+    function SafeScanWrite(const TagRec: TTagRec; const Values: TArrayOfDouble): TProtocolIOResult;
     //metodo chamado para atualizar o valor de um tag (simples ou bloco)
     //procedure called to update the value of an tag (single or block)
-    procedure SafeGetValue(const TagRec:TTagRec; var values:TScanReadRec);
+    procedure SafeGetValue(const TagRec: TTagRec; var Values: TScanReadRec);
     //metodo chamado para atualizar o valores de varios tags (simples ou bloco)
     //procedure called to update values of multiples tag (single or block)
-    function  GetMultipleValues(var MultiValues:TArrayOfScanUpdateRec):LongInt;
+    function GetMultipleValues(var MultiValues: TArrayOfScanUpdateRec): Longint;
 
-    function SafeSingleScanRead(var TagRec: TTagRec; var values: TArrayOfDouble): TProtocolIOResult;
+    function SafeSingleScanRead(var TagRec: TTagRec; var Values: TArrayOfDouble): TProtocolIOResult;
 
     procedure DoPortOpened(Sender: TObject);
     procedure DoPortClosed(Sender: TObject);
     procedure DoPortDisconnected(Sender: TObject);
-    procedure DoPortRemoved(Sender:TObject);
+    procedure DoPortRemoved(Sender: TObject);
 
     procedure SetIsReadOnly(AValue: Boolean);
-    procedure UpdateUserTime(usertime:Double);
+    procedure UpdateUserTime(usertime: Double);
   protected
-
-    {$IFDEF PORTUGUES}
-    {:
-    Informa ao driver que uma operação de alta latência irá começar, fazendo
-    que ele libere os recursos para atualização dos tags.
-    }
-    {$ELSE}
-    {:
-    Tells to driver that a high latency operation will begins, releasing some
-    resources of the driver.
-    }
-    {$ENDIF}
-    procedure HighLatencyOperationWillBegin(Sender:TObject);
-
-    {$IFDEF PORTUGUES}
-    {:
-    Informa ao driver que uma operação de alta latência foi finalizada,
-    recuperando os recursos necessários para o driver.
-    }
-    {$ELSE}
-    {:
-    Tells to driver that a high latency operation was ended, taking back some
-    resources back to driver.
-    }
-    {$ENDIF}
-    procedure HighLatencyOperationWasEnded(Sender:TObject);
-
+    {: Tells to driver that a high latency operation will begins, releasing some
+    resources of the driver. }
+    procedure HighLatencyOperationWillBegin(Sender: TObject);
+    {: Tells to driver that a high latency operation was ended, taking back some
+    resources back to driver. }
+    procedure HighLatencyOperationWasEnded(Sender: TObject);
   protected
-    {$IFDEF PORTUGUES}
-    {:
-    Flag que informa ao driver se ao menos uma variavel deve ser lida a cada
-    ciclo de scan do driver.
-    }
-    {$ELSE}
-    {:
-    Tells if at least one item must be read at each scan cycle of protocol driver.
-    }
-    {$ENDIF}
-    PReadSomethingAlways:Boolean;
-
-    {$IFDEF PORTUGUES}
-    //: Faltando comentário
-    {$ELSE}
+    //: Tells if at least one item must be read at each scan cycle of protocol driver.
+    PReadSomethingAlways: Boolean;
     //: Missing comment.
-    {$ENDIF}
-    PUpdatingMultipleTags:Integer;
-
-    {$IFDEF PORTUGUES}
-    // Indica se o driver está pronto.
-    {$ELSE}
+    PUpdatingMultipleTags: Integer;
     //: Tells if the protocol driver is ready
-    {$ENDIF}
-    FProtocolReady:Boolean;
-
-    {$IFDEF PORTUGUES}
-    //: Armazena a ID (número único) do driver.
-    {$ELSE}
+    FProtocolReady: Boolean;
     //: Stores the unique identification of protocol driver.
-    {$ENDIF}
-    PDriverID:Cardinal;
-
-    {$IFDEF PORTUGUES}
-    //: Armazena o driver de porta associado a esse driver de protocolo.
-    {$ELSE}
+    PDriverID: Cardinal;
     //: Stores the communication port driver used by protocol driver.
-    {$ENDIF}
-    PCommPort:TCommPortDriver;
-
-    {$IFDEF PORTUGUES}
-    //: Armazena o ID (número único) esses pedidos.
-    {$ELSE}
+    PCommPort: TCommPortDriver;
     //: Stores the unique identification of each kind of request.
-    {$ENDIF}
-    FScanReadID, FScanWriteID, FReadID, FWriteID:Cardinal;
-
-    {$IFDEF PORTUGUES}
-    //: Mutex que proteje o driver de protocolo.
-    {$ELSE}
+    FScanReadID: Cardinal;
+    FScanWriteID: Cardinal;
+    FReadID: Cardinal;
+    FWriteID: Cardinal;
     //: Mutex that protect the protocol driver.
-    {$ENDIF}
-    FReadCS, FWriteCS:TCriticalSection;
-
-    {$IFDEF PORTUGUES}
-    //: Forca a suspensão das threads, a fim de manter a execução correta do sistema.
-    {$ELSE}
+    FReadCS: TCriticalSection;
+    FWriteCS: TCriticalSection;
     //: Stop thread to keep the normal execution of the all system.
-    {$ENDIF}
-    FPause:TCrossEvent;
-
-    {$IFDEF PORTUGUES}
-    //: Mutex que proteje as chamadas de scan do driver.
-    {$ELSE}
+    FPause: TCrossEvent;
     //: Mutex that protect the scan procedures of the protocol driver.
-    {$ENDIF}
-    PCallersCS:TCriticalSection;
+    PCallersCS: TCriticalSection;
 
-    {$IFDEF PORTUGUES}
-    {:
-    Retorna o procedimento do driver de protocolo que deve ser chamado quando
-    a porta de comunicação é aberta.
-
+    {: Returns the procedure of protocol driver that must be called when the
+       communication port was open.
     @seealso(PortOpened)
-    @seealso(NotifyThisEvents)
-    }
-    {$ELSE}
-    {:
-    Returns the procedure of protocol driver that must be called when the
-    communication port was open.
-
-    @seealso(PortOpened)
-    @seealso(NotifyThisEvents)
-    }
-    {$ENDIF}
-    function  GetPortOpenedEvent:TNotifyEvent;
-
-    {$IFDEF PORTUGUES}
-    {:
-    Retorna o procedimento do driver de protocolo que deve ser chamado quando
-    a porta de comunicação é fechada.
+    @seealso(NotifyThisEvents) }
+    function GetPortOpenedEvent: TNotifyEvent;
+    {: Returns the procedure of protocol driver that must be called when the
+       communication port was closed.
     @seealso(PortClosed)
-    @seealso(NotifyThisEvents)
-    }
-    {$ELSE}
-    {:
-    Returns the procedure of protocol driver that must be called when the
-    communication port was closed.
-    @seealso(PortClosed)
-    @seealso(NotifyThisEvents)
-    }
-    {$ENDIF}
-    function  GetPortClosedEvent:TNotifyEvent;
-
-    {$IFDEF PORTUGUES}
-    {:
-    Retorna o procedimento do driver de protocolo que deve ser chamado quando
-    a porta de comunicação é desconectada.
+    @seealso(NotifyThisEvents) }
+    function GetPortClosedEvent: TNotifyEvent;
+    {: Returns the procedure of protocol driver that must be called when the
+       communication port was disconnected.
     @seealso(PortDisconnected)
-    @seealso(NotifyThisEvents)
-    }
-    {$ELSE}
-    {:
-    Returns the procedure of protocol driver that must be called when the
-    communication port was disconnected.
-    @seealso(PortDisconnected)
-    @seealso(NotifyThisEvents)
-    }
-    {$ENDIF}
-    function  GetPortDisconnectedEvent:TNotifyEvent;
+    @seealso(NotifyThisEvents) }
+    function GetPortDisconnectedEvent: TNotifyEvent;
 
-    {$IFDEF PORTUGUES}
-    {:
-    Retorna os eventos de porta de comunicação que o driver de protocolo deseja
-    ser notificado.
+    {: Returns what's the events of communication port driver must be notified to
+       protocol driver.
     @seealso(PortOpened)
     @seealso(PortClosed)
     @seealso(PortDisconnected)
-    @seealso(TNotifyEvent)
-    }
-    {$ELSE}
-    {:
-    Returns what's the events of communication port driver must be notified to
-    protocol driver.
-    @seealso(PortOpened)
-    @seealso(PortClosed)
-    @seealso(PortDisconnected)
-    @seealso(TNotifyEvent)
-    }
-    {$ENDIF}
-    function  NotifyThisEvents:TNotifyThisEvents; virtual;
+    @seealso(TNotifyEvent) }
+    function NotifyThisEvents: TNotifyThisEvents; virtual;
 
-    function NeedsExternalPort:Boolean; virtual;
-
-    {$IFDEF PORTUGUES}
-    {:
-    Procedimento chamado pela porta de comunicação é aberta.
+    function NeedsExternalPort: Boolean; virtual;
+    {: Procedure called by the communication port when it was open.
     @seealso(NotifyThisEvents)
-    @seealso(GetPortOpenedEvent)
-    }
-    {$ELSE}
-    {:
-    Procedure called by the communication port when it was open.
-    @seealso(NotifyThisEvents)
-    @seealso(GetPortOpenedEvent)
-    }
-    {$ENDIF}
+    @seealso(GetPortOpenedEvent) }
     procedure PortOpened(Sender: TObject); virtual;
-
-    {$IFDEF PORTUGUES}
-    {:
-    Procedimento chamado pela porta de comunicação é fechada.
+    {: Procedure called by the communication port when it was closed.
     @seealso(NotifyThisEvents)
-    @seealso(GetPortClosedEvent)
-    }
-    {$ELSE}
-    {:
-    Procedure called by the communication port when it was closed.
-    @seealso(NotifyThisEvents)
-    @seealso(GetPortClosedEvent)
-    }
-    {$ENDIF}
+    @seealso(GetPortClosedEvent) }
     procedure PortClosed(Sender: TObject); virtual;
-
-    {$IFDEF PORTUGUES}
-    {:
-    Procedimento chamado pela porta de comunicação é desconectada.
+    {: Procedure called by the communication port when it was disconnected.
     @seealso(NotifyThisEvents)
-    @seealso(GetPortClosedEvent)
-    }
-    {$ELSE}
-    {:
-    Procedure called by the communication port when it was disconnected.
-    @seealso(NotifyThisEvents)
-    @seealso(GetPortDisconnectedEvent)
-    }
-    {$ENDIF}
+    @seealso(GetPortDisconnectedEvent) }
     procedure PortDisconnected(Sender: TObject); virtual;
 
-
-    {$IFDEF PORTUGUES}
-    //: Configura a porta de comunicação que será usada pelo driver.
-    {$ELSE}
     //: Sets the communication port driver that will be used by the protocol driver.
-    {$ENDIF}
-    procedure SetCommPort(CommPort:TCommPortDriver);
-
-    {$IFDEF PORTUGUES}
-    {:
-    Copia uma estrutura TIOPacket para outra.
-    @param(Source TIOPacket. Estrutura de origem dos dados.)
-    @param(Dest TIOPacket. Estrutura para onde os dados serão copiados.)
-    }
-    {$ELSE}
-    {:
-    Copies a TIOPacket to another
+    procedure SetCommPort(CommPort: TCommPortDriver);
+    {: Copies a TIOPacket to another
     @param(Source TIOPacket. Source record.)
-    @param(Dest TIOPacket. Destination record.)
-    }
-    {$ENDIF}
-    procedure CopyIOPacket(const Source:TIOPacket; var Dest:TIOPacket);
-
-    {$IFDEF PORTUGUES}
-    {:
-    Callback que o driver de porta (TCommPortDriver) irá chamar para retornar os
-    resultados de E/S.
-    @param(Result TIOPacket. Estrutura com os dados de retorno da solicitação
-           de I/O. @bold(É automaticamente destruida após retornar desse
-           método.)
-    }
-    {$ELSE}
-    {:
-    Callback called by the communication port driver to returns the result of I/O.
+    @param(Dest TIOPacket. Destination record.) }
+    procedure CopyIOPacket(const Source: TIOPacket; var Dest: TIOPacket);
+    {: Callback called by the communication port driver to returns the result of I/O.
     @param(Result TIOPacket. Record with the data and I/O results returned by
-    the communication port. @bold(Is destroyed automaticaly.)
-    }
-    {$ENDIF}
-    procedure CommPortCallBack(var Result:TIOPacket); virtual;
-
-    {$IFDEF PORTUGUES}
-    {:
-    Método chamado para adicionar um tag ao scan driver.
-    @param(TagObj TTag. Tag a adicionar como dependente do driver.)
-    @seealso(AddTag)
-    }
-    {$ELSE}
-    {:
-    Procedure called to add a tag into the scan of the protocol driver.
+    the communication port. @bold(Is destroyed automaticaly.) }
+    procedure CommPortCallBack(var Result: TIOPacket); virtual;
+    {: Procedure called to add a tag into the scan of the protocol driver.
     @param(TagObj TTag. Tag to be added into the scan of protocol driver.)
-    @seealso(AddTag)
-    }
-    {$ENDIF}
-    procedure DoAddTag(TagObj:TTag; TagValid:Boolean); virtual;
-
-    {$IFDEF PORTUGUES}
-    {:
-    Método chamado pelo driver de protocolo para remover um tag do scan do driver.
-    @param(TagObj TTag. Tag dependente para remover do driver.)
-    @seealso(RemoveTag)
-    }
-    {$ELSE}
-    {:
-    Procedure called to remove a tag from the scan of the protocol driver.
+    @seealso(AddTag) }
+    procedure DoAddTag(TagObj: TTag; TagValid: Boolean); virtual;
+    {: Procedure called to remove a tag from the scan of the protocol driver.
     @param(TagObj TTag. Tag to be removed of the scan of protocol driver.)
-    @seealso(RemoveTag)
-    }
-    {$ENDIF}
-    procedure DoDelTag(TagObj:TTag); virtual;
-
-    {$IFDEF PORTUGUES}
-    {:
-    Método chamado pelas threads do driver de protocolo para verificar se há tags
-    que precisam ser lidos do dispositivo.
-    @param(Sender TObject. Thread que está solicitando a varredura de atualização.)
-    @param(NeedSleep LongInt. Caso o procedimento não encontrou nada que precise
-                              ser lido, escreva um valor negativo na variável para
-                              forçar o scheduler do seu sistema operacional a
-                              executar outra thread ou um valor positivo para
-                              fazer a thread de scan dormir. O tempo que ela
-                              ficará dormindo é o valor escrito nessa variável.
-                              Caso o seu driver encontrou algum tag necessitando
-                              de atualização, retorne 0 (Zero).)
-    @seealso(TProtocolDriver.DoRead)
-    }
-    {$ELSE}
-    {:
-    Procedure called by the protocol driver threads to check if has some tags
-    that must be updated/readed from device.
+    @seealso(RemoveTag) }
+    procedure DoDelTag(TagObj: TTag); virtual;
+    {: Procedure called by the protocol driver threads to check if has some tags
+       that must be updated/readed from device.
     @param(Sender TObject. Thread that's calling the procedure.)
     @param(NeedSleep LongInt. If the procedure did not found anything to be
     read/updated, write in this variable a negative value to force the scheduler
     of the OS to switch to another thread, or a positive value to make the caller
     thread sleep. The time of the sleep is the value of this variable. If this
     procedure found some tag that was updated, write 0 (zero) on this variable.)
-    @seealso(TProtocolDriver.DoRead)
-    }
-    {$ENDIF}
-    procedure DoScanRead(Sender:TObject; var NeedSleep:LongInt); virtual; abstract;
-
-    {$IFDEF PORTUGUES}
-    {:
-    Método chamado pelas threads do driver de protocolo para atualizar os valores
-    dos tags.
-    @param(TagRec TTagRec. Estrutura com informações do tag.)
-    @param(values TScanReadRec. Armazena os valores que serão enviados ao tag.)
-    }
-    {$ELSE}
-    {:
-    Procedure called by the protocol driver threads to update the tag values.
+    @seealso(TProtocolDriver.DoRead) }
+    procedure DoScanRead(Sender: TObject; var NeedSleep: Longint); virtual; abstract;
+    {: Procedure called by the protocol driver threads to update the tag values.
     @param(TagRec TTagRec. Structure with informations about the tag.)
-    @param(values TScanReadRec. Array with the tag values.)
-    }
-    {$ENDIF}
-    procedure DoGetValue(TagRec:TTagRec; var values:TScanReadRec); virtual; abstract;
-
-    {$IFDEF PORTUGUES}
-    {:
-    Função chamada para escrever valores de um tag (simples ou bloco) no
-    equipamento.
-
-    @param(tagrec TTagRec. Estrutura com informações do tag.)
-    @param(Values TArrayOfDouble. Valores a serem escritos no equipamento.)
-
-    @returns(TProtocolIOResult).
-    }
-    {$ELSE}
-    {:
-    Function called to write tag values (single or block) on device.
-
+    @param(values TScanReadRec. Array with the tag values.) }
+    procedure DoGetValue(TagRec: TTagRec; var values: TScanReadRec); virtual; abstract;
+    {: Function called to write tag values (single or block) on device.
     @param(tagrec TTagRec. Strucutre with informations about the tag.)
     @param(Values TArrayOfDouble. Values to be written on device.)
-
-    @returns(TProtocolIOResult).
-    }
-    {$ENDIF}
-    function DoWrite(const tagrec:TTagRec; const Values:TArrayOfDouble; Sync:Boolean):TProtocolIOResult; virtual; abstract;
-
-    {$IFDEF PORTUGUES}
-    {:
-    Função chamada para ler valores do equipamento.
-
-    @param(tagrec TTagRec. Estrutura com informações do tag.)
-    @param(Values TArrayOfDouble. Array que irá armazenar os valores lidos do equipamento.)
-
-    @returns(TProtocolIOResult).
-    }
-    {$ELSE}
-    {:
-    Function called to read values from your device.
-
+    @returns(TProtocolIOResult). }
+    function DoWrite(const TagRec: TTagRec; const values: TArrayOfDouble; Sync: Boolean): TProtocolIOResult; virtual; abstract;
+    {: Function called to read values from your device.
     @param(tagrec TTagRec. Strucutre with informations about the tag.)
     @param(Values TArrayOfDouble. Array that will store the values read from your device.)
+    @returns(TProtocolIOResult). }
+    function DoRead(const TagRec: TTagRec; out values: TArrayOfDouble; Sync: Boolean): TProtocolIOResult; virtual; abstract;
 
-    @returns(TProtocolIOResult).
-    }
-    {$ENDIF}
-    function DoRead (const tagrec:TTagRec; out   Values:TArrayOfDouble; Sync:Boolean):TProtocolIOResult; virtual; abstract;
-
-    {$IFDEF PORTUGUES}
-    //: Informa ao driver se ele deve ler algum tag a todo scan.
-    {$ELSE}
     //: Tells if the protocol driver must read something on each scan cycle.
-    {$ENDIF}
-    property ReadSomethingAlways:Boolean read PReadSomethingAlways write PReadSomethingAlways default true;
-
-    {$IFDEF PORTUGUES}
-    //: Habilita/desabilita o modo somente leitura do protocolo.
-    {$ELSE}
+    property ReadSomethingAlways: Boolean read PReadSomethingAlways write PReadSomethingAlways default True;
     //: Average time in milliseconds used to update values of tags and their dependents.
-    {$ENDIF}
-    property ReadOnly:Boolean read GetIsReadOnly write SetIsReadOnly;
+    property ReadOnly: Boolean read GetIsReadOnly write SetIsReadOnly;
   public
     //: @exclude
-    constructor Create(AOwner:TComponent); override;
+    constructor Create(AOwner: TComponent); override;
 
     //: @exclude
     procedure AfterConstruction; override;
 
     //: @exclude
-    destructor  Destroy; override;
+    destructor Destroy; override;
 
-    {$IFDEF PORTUGUES}
-    {:
-    Adiciona um tag ao scan do driver.
-    @param(Tag TTag. Tag a adicionar no scan do driver.)
-    @raises(Exception caso alguma configuração esteja errada.)
-    }
-    {$ELSE}
-    {:
-    Add a tag into the scan cycle of the protocol driver.
+    {: Add a tag into the scan cycle of the protocol driver.
     @param(Tag TTag. Tag to be added into scan cycle of the protocol driver.)
-    @raises(Exception if something is wrong.)
-    }
-    {$ENDIF}
-    procedure AddTag(TagObj:TTag);
-
+    @raises(Exception if something is wrong.) }
+    procedure AddTag(TagObj: TTag);
 
     procedure StartUpdateMultipleTags;
     procedure StopUpdateMultipleTags;
 
-    {$IFDEF PORTUGUES}
-    {:
-    Remove um tag do scan do driver.
-    @param(Tag TTag. Tag a remover do scan do driver.)
-    }
-    {$ELSE}
-    {:
-    Remove a tag from the scan cycle of the protocol driver.
-    @param(Tag TTag. Tag to be removed.)
-    }
-    {$ENDIF}
-    procedure RemoveTag(TagObj:TTag);
-
-    {$IFDEF PORTUGUES}
-    {:
-    Função que informa se o Tag está associado ao driver.
-    @param(TagObj TTag. Tag que deseja saber se está associado ao driver.)
-    @returns(@true caso o tag esteja associado ao driver.)
-    }
-    {$ELSE}
-    {:
-    Function that returns if the tag is already linked with the protocol driver.
+    {: Remove a tag from the scan cycle of the protocol driver.
+    @param(Tag TTag. Tag to be removed.) }
+    procedure RemoveTag(TagObj: TTag);
+    {: Function that returns if the tag is already linked with the protocol driver.
     @param(TagObj TTag. Tag to be checked if it's linked.)
-    @returns(@true if the tag is linked with protocol.)
-    }
-    {$ENDIF}
-    function  IsMyTag(TagObj:TTag):Boolean;
-
-    {$IFDEF PORTUGUES}
-    {:
-    Função que retorna o tamanho em bits do registrador mapeado pelo tag.
-    @param(Tag TTag. Tag que se deseja saber o tamanho do registrador.)
-    @param(isWrite Boolean. Caso @true, informa o tamanho em bits usando as
-           funções de escrita.)
-    @returns(Tamanho em bits do registrador associado ou 0 (zero) caso falhe.)
-    }
-    {$ELSE}
-    {:
-    Returns the word size of the tag on protocol, in bits.
+    @returns(@true if the tag is linked with protocol.) }
+    function IsMyTag(TagObj: TTag): Boolean;
+    {: Returns the word size of the tag on protocol, in bits.
     @param(Tag TTag. Tag that wants know the word size.)
     @param(isWrite Boolean. If @true, returns the word size if want know the size
            using the write function.)
-    @returns(The current word size on protocol of the tag, OR 0 (zero) if it fails.)
-    }
-    {$ENDIF}
-    function  SizeOfTag(aTag:TTag; isWrite:Boolean; var ProtocolTagType:TProtocolTagType):BYTE; virtual; abstract;
+    @returns(The current word size on protocol of the tag, OR 0 (zero) if it fails.) }
+    function SizeOfTag(aTag: TTag; isWrite: Boolean; var ProtocolTagType: TProtocolTagType): Byte; virtual; abstract;
 
-    {$IFDEF PORTUGUES}
-    {:
-    Solicita uma leitura por scan (@bold(assincrona)) de um tag.
-    @param(tagrec TTagRec. Estrutura com as informações do tag que se deseja ler.)
-    @returns(Cardinal. Número único do pedido de leitura por scan.)
-    }
-    {$ELSE}
-    {:
-    Requests a tag update.
+    {: Requests a tag update.
     @param(tagrec TTagRec. Record with informations about the tag.)
-    @returns(Cardinal. The unique identification number of the request.)
-    }
-    {$ENDIF}
-    function  SingleScanRead(const tagrec:TTagRec):Cardinal;
-
-    {$IFDEF PORTUGUES}
-    {:
-    Solicita a escrita por scan (assincrona) de um tag.
-    @param(tagrec TTagRec. Estrutura com as informações do tag que se deseja escrever.)
-    @param(Values TArrayOfDouble Conjunto de valores a escrever.)
-    @returns(Cardinal. Número único do pedido de escrita por scan.)
-    }
-    {$ELSE}
-    {:
-    Write values @bold(asynchronous) using the scan of the protocol driver.
+    @returns(Cardinal. The unique identification number of the request.) }
+    function SingleScanRead(const TagRec: TTagRec): Cardinal;
+    {: Write values @bold(asynchronous) using the scan of the protocol driver.
     @param(tagrec TTagRec. Record with informations about the tag.)
     @param(Values TArrayOfDouble Values to be written.)
-    @returns(Cardinal. The unique identification number of the request.)
-    }
-    {$ENDIF}
-    function  ScanWrite(const tagrec:TTagRec; const Values:TArrayOfDouble):Cardinal;
-
-    {$IFDEF PORTUGUES}
-    {:
-    Solicita a leitura (sincrona) de um tag.
-    @param(tagrec TTagRec. Estrutura com as informações do tag que se deseja ler.)
-    }
-    {$ELSE}
-    {:
-    Read the tag value from the device (synchronous).
+    @returns(Cardinal. The unique identification number of the request.) }
+    function ScanWrite(const TagRec: TTagRec; const Values: TArrayOfDouble): Cardinal;
+    {: Read the tag value from the device (synchronous).
+    @param(tagrec TTagRec. Record with informations about the tag.) }
+    procedure Read(const TagRec: TTagRec);
+    {: Write the tag values (synchronous).
     @param(tagrec TTagRec. Record with informations about the tag.)
-    }
-    {$ENDIF}
-    procedure Read(const tagrec:TTagRec);
+    @param(Values TArrayOfDouble Values to be written.) }
+    procedure Write(const TagRec: TTagRec; const Values: TArrayOfDouble);
 
-    {$IFDEF PORTUGUES}
-    {:
-    Escreve valores de um tag (sincrono).
-    @param(tagrec TTagRec. Estrutura com as informações do tag que se deseja escrever.)
-    @param(Values TArrayOfDouble Conjunto de valores a escrever.)
-    }
-    {$ELSE}
-    {:
-    Write the tag values (synchronous).
-    @param(tagrec TTagRec. Record with informations about the tag.)
-    @param(Values TArrayOfDouble Values to be written.)
-    }
-    {$ENDIF}
-    procedure Write(const tagrec:TTagRec; const Values:TArrayOfDouble);
-
-    {$IFDEF PORTUGUES}
-    //: Retorna o endereço literal de um tag.
-    {$ELSE}
     //: Returns the literal address of the tag.
-    {$ENDIF}
-    function LiteralTagAddress(aTag:TTag; aBlockTag:TTag=nil):AnsiString; virtual;
+    function LiteralTagAddress(aTag: TTag; aBlockTag: TTag = nil): AnsiString; virtual;
 
-    {$IFDEF PORTUGUES}
-    //: Conta os tags dependentes desse driver de protocolo.
-    {$ELSE}
     //: Return how many tags are on scan cycle of the protocol driver.
-    {$ENDIF}
-    property TagCount:LongInt read GetTagCount;
-
-    {$IFDEF PORTUGUES}
-    //: Lista cada tag dependente desse driver.
-    {$ELSE}
+    property TagCount: Longint read GetTagCount;
     //: Return the tags using the index.
-    {$ENDIF}
-    property Tag[index:LongInt]:TTag read GetTag;
-
-    {$IFDEF PORTUGUES}
-    //: Lista o nome de cada tag dependente desse driver.
-    {$ELSE}
+    property Tag[index: Longint]: TTag read GetTag;
     //: Return the tag names.
-    {$ENDIF}
-    property TagName[index:LongInt]:AnsiString read GetTagName;
-
-    {$IFDEF PORTUGUES}
-    //: Lista cada tag dependente desse driver usando o nome do tag como indice.
-    {$ELSE}
+    property TagName[index: Longint]: AnsiString read GetTagName;
     //: Returns the tag by the name index.
-    {$ENDIF}
-    property TagByName[Nome:AnsiString]:TTag read GetTagByName;
-
-    {$IFDEF PORTUGUES}
-    //: Chama o editor de tags do driver.
-    {$ELSE}
+    property TagByName[Nome: AnsiString]: TTag read GetTagByName;
     //: Opens the Tag Builder of the protocol driver (if exists)
-    {$ENDIF}
-    procedure OpenTagEditor(InsertHook:TAddTagInEditorHook;
-      CreateProc:TCreateTagProc); virtual;
-
-    {$IFDEF PORTUGUES}
-    //: Diz ao editor de componente se ha um editor de tag definido.
-    {$ELSE}
+    procedure OpenTagEditor(InsertHook: TAddTagInEditorHook; CreateProc: TCreateTagProc); virtual;
     //: Tell to the protocol editor if the current protocol has a tab builder tool defined.
-    {$ENDIF}
-    function HasTabBuilderEditor:Boolean; virtual;
+    function HasTabBuilderEditor: Boolean; virtual;
   published
-    {$IFDEF PORTUGUES}
-    {:
-    Driver de porta que será usado para realizar as operações de comunicação
-    do protoloco.
-    @seealso(TCommPortDriver)
-    }
-    {$ELSE}
-    {:
-    Communication port driver used by the protocol driver.
-    @seealso(TCommPortDriver)
-    }
-    {$ENDIF}
-    property CommunicationPort:TCommPortDriver read PCommPort write SetCommPort nodefault;
-
-    {$IFDEF PORTUGUES}
-    //: Identificação (número único) do driver.
-    {$ELSE}
+    {: Communication port driver used by the protocol driver.
+    @seealso(TCommPortDriver) }
+    property CommunicationPort: TCommPortDriver read PCommPort write SetCommPort nodefault;
     //: Unique protocol identification.
-    {$ENDIF}
-    property DriverID:Cardinal read PDriverID;
-
-    {$IFDEF PORTUGUES}
-    //: Tempo médio em millisegundos gasto atualizando valores dos tags e seus dependentes.
-    {$ELSE}
+    property DriverID: Cardinal read PDriverID;
     //: Average time in milliseconds used to update values of tags and their dependents.
-    {$ENDIF}
-    property AvgTagUpdateTime:Double read FUserUpdateTime;
+    property AvgTagUpdateTime: Double read FUserUpdateTime;
   end;
 
 var
+  {: Protocol driver counter, used to generate unique names of events, mutexes and
+     semaphores on Windows platforms.
+  @bold(Don't change the value of this variable.) }
+  DriverCount: Cardinal;
 
-  {$IFDEF PORTUGUES}
-  {:
-  Contador de drivers criados, usado para gerar nomes únicos dos eventos
-  seções críticas e semaforos em ambiente Windows.
-
-  @bold(Não altere o valor dessa variável.)
-  }
-  {$ELSE}
-  {:
-  Protocol driver counter, used to generate unique names of events, mutexes and
-  semaphores on Windows platforms.
-
-  @bold(Don't change the value of this variable.)
-  }
-  {$ENDIF}
-   DriverCount:Cardinal;
 
 implementation
 
-uses dateutils, PLCTag, hsstrings, math, crossdatetime, pascalScadaMTPCPU;
 
-////////////////////////////////////////////////////////////////////////////////
-//             inicio da implementação de TProtocolDriver
-//                 implementation of TProtocolDriver
-////////////////////////////////////////////////////////////////////////////////
+uses
+  dateutils, PLCTag, hsstrings, Math, crossdatetime, pascalScadaMTPCPU;
 
-constructor TProtocolDriver.Create(AOwner:TComponent);
+
+  ////////////////////////////////////////////////////////////////////////////////
+  //                 implementation of TProtocolDriver
+  ////////////////////////////////////////////////////////////////////////////////
+
+constructor TProtocolDriver.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FScanReadID  := 0;
+  FScanReadID := 0;
   FScanWriteID := 0;
-  FReadID      := 0;
-  FWriteID     := 0;
+  FReadID := 0;
+  FWriteID := 0;
 
-  PUpdatingMultipleTags:=0;
+  PUpdatingMultipleTags := 0;
 
-  FReadOnly:=0;
+  FReadOnly := 0;
   PDriverID := DriverCount;
   Inc(DriverCount);
-  PTags:=TTagList.Create;
+  PTags := TTagList.Create;
 
-  FProtocolReady:=true;
+  FProtocolReady := True;
 
   FReadCS := TCriticalSection.Create;
-  FWriteCS:= TCriticalSection.Create;
+  FWriteCS := TCriticalSection.Create;
 
-  FPause := TCrossEvent.Create(true, true);
+  FPause := TCrossEvent.Create(True, True);
 
   PCallersCS := TCriticalSection.Create;
 
-  PScanUpdateThread := TScanUpdate.Create(true, Self, @UpdateUserTime);
+  PScanUpdateThread := TScanUpdate.Create(True, Self, @UpdateUserTime);
   {$IFNDEF WINCE}
-  PScanUpdateThread.Priority:=tpHighest;
+  PScanUpdateThread.Priority := tpHighest;
   {$ENDIF}
-  PScanUpdateThread.OnGetValue     := @SafeGetValue;
-  PScanUpdateThread.OnScanTags     := @GetMultipleValues;
+  PScanUpdateThread.OnGetValue := @SafeGetValue;
+  PScanUpdateThread.OnScanTags := @GetMultipleValues;
 
-  PScanReadThread := TScanThread.Create(true, PScanUpdateThread);
+  PScanReadThread := TScanThread.Create(True, PScanUpdateThread);
   {$IFNDEF WINCE}
-  PScanReadThread.Priority:=tpTimeCritical;
+  PScanReadThread.Priority := tpTimeCritical;
   {$ENDIF}
-  PScanReadThread.OnDoScanRead       := @SafeScanRead;
-  PScanReadThread.OnDoScanWrite      := @SafeScanWrite;
+  PScanReadThread.OnDoScanRead := @SafeScanRead;
+  PScanReadThread.OnDoScanWrite := @SafeScanWrite;
   PScanReadThread.OnDoSingleScanRead := @SafeSingleScanRead;
 end;
 
 procedure TProtocolDriver.AfterConstruction;
 begin
-  Inherited AfterConstruction;
+  inherited AfterConstruction;
   PScanUpdateThread.WakeUp;
 
   PScanReadThread.WakeUp;
@@ -823,7 +390,7 @@ end;
 
 destructor TProtocolDriver.Destroy;
 var
-  c:LongInt;
+  i: Longint;
 begin
   PScanReadThread.Terminate;
   PScanReadThread.WaitFor;
@@ -837,8 +404,8 @@ begin
   PScanUpdateThread.WaitFor;
   PScanUpdateThread.Destroy;
 
-  for c:=PTags.Count-1 downto 0 do
-    TPLCTag(PTags.Items[c]).RemoveDriver;
+  for i := PTags.Count - 1 downto 0 do
+    TPLCTag(PTags.Items[i]).RemoveDriver;
 
   SetCommPort(nil);
 
@@ -846,35 +413,35 @@ begin
   FWriteCS.Destroy;
 
   FPause.Destroy;
-  
+
   FreeAndNil(PTags);
   PCallersCS.Destroy;
   inherited Destroy;
 end;
 
 
-procedure TProtocolDriver.SetCommPort(CommPort:TCommPortDriver);
+procedure TProtocolDriver.SetCommPort(CommPort: TCommPortDriver);
 begin
   try
-    //tenta entrar no Mutex
-    //try enter on mutex
+    // try enter on mutex
     while not FPause.ResetEvent do
       CrossThreadSwitch;
 
     FWriteCS.Enter;
     FReadCS.Enter;
 
-    //se for a mesma porta cai fora...
-    //if is the same communication port, Exit.
-    if CommPort=PCommPort then Exit;
+    // if is the same communication port, Exit
+    if CommPort = PCommPort then Exit;
 
-    if PCommPort<>nil then begin
-      if PCommPort.LockedBy=PDriverID then
+    if PCommPort <> nil then
+    begin
+      if PCommPort.LockedBy = PDriverID then
         PCommPort.Unlock(PDriverID);
       PCommPort.DelProtocol(Self);
     end;
 
-    if CommPort<>nil then begin
+    if CommPort <> nil then
+    begin
       CommPort.AddProtocol(Self);
     end;
     PCommPort := CommPort;
@@ -885,9 +452,9 @@ begin
   end;
 end;
 
-procedure TProtocolDriver.DoAddTag(TagObj:TTag; TagValid:Boolean);
+procedure TProtocolDriver.DoAddTag(TagObj: TTag; TagValid: Boolean);
 begin
-  if PTags.IndexOf(TagObj)<>-1 then
+  if PTags.IndexOf(TagObj) <> -1 then
     raise Exception.Create(STagAlreadyRegiteredWithThisDriver);
 
   PTags.Add(TagObj);
@@ -895,36 +462,36 @@ begin
   (TagObj as IScanableTagInterface).SetTagValidity(TagValid);
 end;
 
-procedure TProtocolDriver.DoDelTag(TagObj:TTag);
+procedure TProtocolDriver.DoDelTag(TagObj: TTag);
 begin
-  if PTags.Count<=0 then Exit;
+  if PTags.Count <= 0 then Exit;
 
-  if PTags.IndexOf(TagObj)<>-1 then begin
-    (TagObj as IScanableTagInterface).SetTagValidity(false);
+  if PTags.IndexOf(TagObj) <> -1 then
+  begin
+    (TagObj as IScanableTagInterface).SetTagValidity(False);
     PTags.Remove(TagObj);
   end;
 end;
 
-procedure TProtocolDriver.AddTag(TagObj:TTag);
+procedure TProtocolDriver.AddTag(TagObj: TTag);
 begin
   if not Supports(TagObj, IScanableTagInterface) then
     raise Exception.Create(SScanableNotSupported);
 
   try
-    //tenta entrar no Mutex
-    //try enter on mutex
-
-    if InterLockedExchange(PUpdatingMultipleTags,PUpdatingMultipleTags)=0 then begin
+    // try enter on mutex
+    if InterLockedExchange(PUpdatingMultipleTags, PUpdatingMultipleTags) = 0 then
+    begin
       while not FPause.ResetEvent do
         CrossThreadSwitch;
-
       FWriteCS.Enter;
       FReadCS.Enter;
     end;
 
-    DoAddTag(TagObj,false);
+    DoAddTag(TagObj, False);
   finally
-    if InterLockedExchange(PUpdatingMultipleTags,PUpdatingMultipleTags)=0 then begin
+    if InterLockedExchange(PUpdatingMultipleTags, PUpdatingMultipleTags) = 0 then
+    begin
       FReadCS.Leave;
       FWriteCS.Leave;
       while not FPause.SetEvent do
@@ -935,9 +502,10 @@ end;
 
 procedure TProtocolDriver.StartUpdateMultipleTags;
 begin
-  //if I'm the first starting this multiple tags update,
-  //gets the mutexes
-  if InterLockedIncrement(PUpdatingMultipleTags)=1 then begin
+  // if I'm the first starting this multiple tags update,
+  // gets the mutexes
+  if InterLockedIncrement(PUpdatingMultipleTags) = 1 then
+  begin
     while not FPause.ResetEvent do
       CrossThreadSwitch;
 
@@ -948,8 +516,8 @@ end;
 
 procedure TProtocolDriver.StopUpdateMultipleTags;
 begin
-  if InterLockedDecrement(PUpdatingMultipleTags)<=0 then begin
-
+  if InterLockedDecrement(PUpdatingMultipleTags) <= 0 then
+  begin
     FReadCS.Leave;
     FWriteCS.Leave;
 
@@ -960,12 +528,12 @@ begin
   end;
 end;
 
-procedure TProtocolDriver.RemoveTag(TagObj:TTag);
+procedure TProtocolDriver.RemoveTag(TagObj: TTag);
 begin
   try
-    //tenta entrar no Mutex
-    //try enter on mutex
-    if InterLockedExchange(PUpdatingMultipleTags,PUpdatingMultipleTags)=0 then begin
+    // try enter on mutex
+    if InterLockedExchange(PUpdatingMultipleTags, PUpdatingMultipleTags) = 0 then
+    begin
       while not FPause.ResetEvent do
         CrossThreadSwitch;
 
@@ -975,7 +543,8 @@ begin
 
     DoDelTag(TagObj);
   finally
-    if InterLockedExchange(PUpdatingMultipleTags,PUpdatingMultipleTags)=0 then begin
+    if InterLockedExchange(PUpdatingMultipleTags, PUpdatingMultipleTags) = 0 then
+    begin
       FReadCS.Leave;
       FWriteCS.Leave;
 
@@ -985,21 +554,21 @@ begin
   end;
 end;
 
-procedure TProtocolDriver.DoExceptionIndexOut(index:LongInt);
+procedure TProtocolDriver.DoExceptionIndexOut(index: Longint);
 begin
-  if (index>=PTags.Count) then
+  if (index >= PTags.Count) then
     raise Exception.Create(SoutOfBounds);
 end;
 
 function TProtocolDriver.GetIsReadOnly: Boolean;
 var
-  FInReadOnlyMode: LongInt;
+  FInReadOnlyMode: Longint;
 begin
-  InterLockedExchange(FInReadOnlyMode,FReadOnly);
-  Result:=FInReadOnlyMode=1;
+  InterLockedExchange(FInReadOnlyMode, FReadOnly);
+  Result := FInReadOnlyMode = 1;
 end;
 
-function TProtocolDriver.GetTagCount: LongInt;
+function TProtocolDriver.GetTagCount: Longint;
 begin
   //FCritical.Enter;
   try
@@ -1009,159 +578,142 @@ begin
   end;
 end;
 
-function TProtocolDriver.GetTag(index:LongInt):TTag;
+function TProtocolDriver.GetTag(index: Longint): TTag;
 begin
   //FCritical.Enter;
   try
     DoExceptionIndexOut(index);
-    result:=PTags[index];
+    Result := PTags[index];
   finally
     //FCritical.Leave;
   end;
 end;
 
-function TProtocolDriver.GetTagName(index:LongInt):AnsiString;
+function TProtocolDriver.GetTagName(index: Longint): AnsiString;
 begin
-  Result:='';
+  Result := '';
   //FCritical.Enter;
   try
     DoExceptionIndexOut(index);
-    result:=PTags[index].Name;
+    Result := PTags[index].Name;
   finally
     //FCritical.Leave;
   end;
-
 end;
 
-function TProtocolDriver.GetTagByName(Nome:AnsiString):TTag;
+function TProtocolDriver.GetTagByName(AName: AnsiString): TTag;
 var
-  c:LongInt;
+  i: Longint;
 begin
   Result := nil;
   //FCritical.Enter;
   try
-    for c:=0 to PTags.Count-1 do
-      if PTags.Items[c].Name = Nome then begin
-        Result := PTags.Items[c];
-        break;
+    for i := 0 to PTags.Count - 1 do
+      if PTags.Items[i].Name = AName then
+      begin
+        Result := PTags.Items[i];
+        Break;
       end;
   finally
     //FCritical.Leave;
   end;
 end;
 
-function TProtocolDriver.IsMyTag(TagObj:TTag):Boolean;
+function TProtocolDriver.IsMyTag(TagObj: TTag): Boolean;
 begin
-  Result := false;
+  Result := False;
   //FCritical.Enter;
   try
-    Result:=PTags.IndexOf(TagObj)<>-1;
+    Result := PTags.IndexOf(TagObj) <> -1;
   finally
     //FCritical.Leave;
   end;
 end;
 
-function TProtocolDriver.SingleScanRead(const tagrec: TTagRec): Cardinal;
+function TProtocolDriver.SingleScanRead(const TagRec: TTagRec): Cardinal;
 var
-   pkg:PScanReqRec;
+  Pkg: PScanReqRec;
 begin
   try
     PCallersCS.Enter;
-    //verifica se esta em edição, caso positivo evita o comando.
-    //check if is in design-time
+    // check if is in design-time
     if (csReading in ComponentState) or
-       (csDestroying in ComponentState) then begin
-       Result := 0;
-       Exit;
+      (csDestroying in ComponentState) then
+    begin
+      Result := 0;
+      Exit;
     end;
-
-    //incrementa o contador de scanReads
-    //zera o contador para evitar overflow;
-    //
-    //increment the scan read unique identification
-    if FScanReadID=$FFFFFFFF then
-       FScanReadID := 1
+    // increment the scan read unique identification
+    if FScanReadID = $FFFFFFFF then
+      FScanReadID := 1
     else
-       inc(FScanReadID);
+      Inc(FScanReadID);
 
-    //cria um pacote de leitura por scan
-    //creates the message of scan read
-    New(pkg);
-    //copia o TagRec
-    //copy the tagrec
-    pkg^.Tag:=tagrec;
-    //copia o id da requisição
-    //copy the request id
-    pkg^.Tag.ID:=FScanReadID;
-    //copia os valores
-    //copy the values
-    SetLength(pkg^.Values, 0);
-    pkg^.RequestResult:=ioNone;
-    pkg^.ValueTimeStamp:=CrossNow;
+    // creates the message of scan read
+    New(Pkg);
+    // copy the tagrec
+    Pkg^.Tag := TagRec;
+    // copy the request id
+    Pkg^.Tag.ID := FScanReadID;
+    // copy the values
+    SetLength(Pkg^.values, 0);
+    Pkg^.RequestResult := ioNone;
+    Pkg^.ValueTimeStamp := CrossNow;
 
-    //posta uma mensagem de Leitura por Scan
-    //send a message requesting a scanread
-    if (PScanUpdateThread<>nil) then
-      PScanReadThread.SingleScanRead(pkg);
+    // send a message requesting a scanread
+    if (PScanUpdateThread <> nil) then
+      PScanReadThread.SingleScanRead(Pkg);
 
     Result := FScanReadID;
-
   finally
     PCallersCS.Leave;
   end;
 end;
 
-function TProtocolDriver.ScanWrite(const tagrec:TTagRec; const Values:TArrayOfDouble):Cardinal;
+function TProtocolDriver.ScanWrite(const TagRec: TTagRec; const Values: TArrayOfDouble): Cardinal;
 var
-   pkg:PScanReqRec;
+  Pkg: PScanReqRec;
 begin
-  //read only protocol.
-  if GetIsReadOnly then begin
-    tagrec.CallBack(0, Values,Now,tcScanWrite,ioReadOnlyProtocol,tagrec.RealOffset);
-    Result:=0;
+  // read only protocol
+  if GetIsReadOnly then
+  begin
+    TagRec.CallBack(0, Values, Now, tcScanWrite, ioReadOnlyProtocol, TagRec.RealOffset);
+    Result := 0;
     Exit;
   end;
 
   try
     PCallersCS.Enter;
-    //verifica se esta em edição, caso positivo evita o comando.
-    //check if is in design-time.
+    // check if is in design-time
     if (csReading in ComponentState) or
-       (csDestroying in ComponentState) then begin
-       Result := 0;
-       Exit;
+      (csDestroying in ComponentState) then
+    begin
+      Result := 0;
+      Exit;
     end;
-
-    //incrementa o contador de ScanWrites
-    //zera o contador para evitar overflow;
-    //
-    //increment the scan write unique identification
-    if FScanWriteID=$FFFFFFFF then
-       FScanWriteID := 1
+    // increment the scan write unique identification
+    if FScanWriteID = $FFFFFFFF then
+      FScanWriteID := 1
     else
-       inc(FScanWriteID);
-       
-    //cria um pacote de escrita por scan
-    //creates the message of scan write
-    New(pkg);
-    FillByte(pkg^,SizeOf(Pkg^),0);
-    //copia o TagRec
-    //copy the tagrec
-    pkg^.Tag:=tagrec;
-    pkg^.Tag.Path:=tagrec.Path;
-    //copia o id da requisição
-    //copy the request id
-    pkg^.Tag.ID:=FScanWriteID;
-    //copia os valores
-    //copy the values
-    pkg^.Values := Values;
-    pkg^.RequestResult:=ioNone;
-    pkg^.ValueTimeStamp:=CrossNow;
+      Inc(FScanWriteID);
 
-    //posta uma mensagem de Escrita por Scan
-    //send the scanwrite message to thread.
-    if (PScanReadThread<>nil) then begin
-      PScanReadThread.ScanWrite(pkg);
+    // creates the message of scan write
+    New(Pkg);
+    FillByte(Pkg^, SizeOf(Pkg^), 0);
+    // copy the tagrec
+    Pkg^.Tag := TagRec;
+    Pkg^.Tag.Path := TagRec.Path;
+    // copy the request id
+    Pkg^.Tag.ID := FScanWriteID;
+    // copy the Values
+    Pkg^.values := Values;
+    Pkg^.RequestResult := ioNone;
+    Pkg^.ValueTimeStamp := CrossNow;
+
+    // send the scanwrite message to thread.
+    if (PScanReadThread <> nil) then
+    begin
+      PScanReadThread.ScanWrite(Pkg);
       CrossThreadSwitch;
     end;
 
@@ -1171,51 +723,50 @@ begin
   end;
 end;
 
-procedure TProtocolDriver.Read(const tagrec:TTagRec);
+procedure TProtocolDriver.Read(const TagRec: TTagRec);
 var
-  res:TProtocolIOResult;
-  Values:TArrayOfDouble;
+  Res: TProtocolIOResult;
+  Values: TArrayOfDouble;
 begin
   try
-    //tenta entrar no Mutex
-    //try enter on mutex
+    // try enter on mutex
     while not FPause.ResetEvent do
       CrossThreadSwitch;
 
     FWriteCS.Enter;
     FReadCS.Enter;
-    res := DoRead(tagrec,Values,true);
-    if Assigned(tagrec.CallBack) then
-      tagrec.CallBack(0, Values,CrossNow,tcRead,res,tagrec.RealOffset);
+    Res := DoRead(TagRec, Values, True);
+    if Assigned(TagRec.CallBack) then
+      TagRec.CallBack(0, Values, CrossNow, tcRead, Res, TagRec.RealOffset);
   finally
     FReadCS.Leave;
     FWriteCS.Leave;
     FPause.SetEvent;
-    SetLength(Values,0);
+    SetLength(Values, 0);
   end;
 end;
 
-procedure TProtocolDriver.Write(const tagrec:TTagRec; const Values:TArrayOfDouble);
+procedure TProtocolDriver.Write(const TagRec: TTagRec; const Values: TArrayOfDouble);
 var
-  res:TProtocolIOResult;
+  Res: TProtocolIOResult;
 begin
-  if GetIsReadOnly then begin
-    tagrec.CallBack(0, Values,Now,tcWrite,ioReadOnlyProtocol,tagrec.RealOffset);
+  if GetIsReadOnly then
+  begin
+    TagRec.CallBack(0, Values, Now, tcWrite, ioReadOnlyProtocol, TagRec.RealOffset);
     Exit;
   end;
 
   try
-    //tenta entrar no Mutex
-    //try enter on mutex
+    // try enter on mutex
     while not FPause.ResetEvent do
       CrossThreadSwitch;
 
     FWriteCS.Enter;
     FReadCS.Enter;
 
-    res := DoWrite(tagrec,Values,true);
-    if Assigned(tagrec.CallBack) then
-      tagrec.CallBack(0, Values,CrossNow,tcWrite,res,tagrec.RealOffset);
+    Res := DoWrite(TagRec, Values, True);
+    if Assigned(TagRec.CallBack) then
+      TagRec.CallBack(0, Values, CrossNow, tcWrite, Res, TagRec.RealOffset);
   finally
     FReadCS.Leave;
     FWriteCS.Leave;
@@ -1223,31 +774,30 @@ begin
   end;
 end;
 
-function TProtocolDriver.LiteralTagAddress(aTag: TTag; aBlockTag: TTag):AnsiString;
+function TProtocolDriver.LiteralTagAddress(aTag: TTag; aBlockTag: TTag): AnsiString;
 begin
-  Result:='';
+  Result := '';
 end;
 
-procedure TProtocolDriver.OpenTagEditor(InsertHook: TAddTagInEditorHook;
-  CreateProc: TCreateTagProc);
+procedure TProtocolDriver.OpenTagEditor(InsertHook: TAddTagInEditorHook; CreateProc: TCreateTagProc);
 begin
   raise Exception.Create('This protocol driver do not have a Tag Builder tool defined.');
 end;
 
 function TProtocolDriver.HasTabBuilderEditor: Boolean;
 begin
-  Result:=False;
+  Result := False;
 end;
 
-procedure TProtocolDriver.CommPortCallBack(var Result:TIOPacket);
+procedure TProtocolDriver.CommPortCallBack(var Result: TIOPacket);
 begin
-  if Result.Res2<>nil then
-     CopyIOPacket(Result,PIOPacket(Result.Res2)^);
+  if Result.Res2 <> nil then
+    CopyIOPacket(Result, PIOPacket(Result.Res2)^);
   if Result.res1 is TCrossEvent then
-     TCrossEvent(Result.res1).SetEvent;
+    TCrossEvent(Result.res1).SetEvent;
 end;
 
-procedure TProtocolDriver.CopyIOPacket(const Source:TIOPacket; var Dest:TIOPacket);
+procedure TProtocolDriver.CopyIOPacket(const Source: TIOPacket; var Dest: TIOPacket);
 begin
   Dest.PacketID := Source.PacketID;
   Dest.WriteIOResult := Source.WriteIOResult;
@@ -1262,43 +812,41 @@ begin
   SetLength(Dest.BufferToRead, 0);
   SetLength(Dest.BufferToWrite, 0);
   Dest.BufferToRead := Source.BufferToRead;
-  Dest.BufferToWrite:= Source.BufferToWrite;
-  Dest.Res1 := Source.Res1;
+  Dest.BufferToWrite := Source.BufferToWrite;
+  Dest.res1 := Source.res1;
   Dest.Res2 := Source.Res2;
 end;
 
-procedure TProtocolDriver.SafeScanRead(Sender:TObject; var NeedSleep:LongInt);
+procedure TProtocolDriver.SafeScanRead(Sender: TObject; var NeedSleep: Longint);
 begin
-   try
-      FPause.WaitFor($FFFFFFFF);
-      FWriteCS.Enter;
-      FReadCS.Enter;
-      DoScanRead(Sender, NeedSleep);
-   finally
-      FReadCS.Leave;
-      FWriteCS.Leave;
-      CrossThreadSwitch;
-   end;
+  try
+    FPause.WaitFor($FFFFFFFF);
+    FWriteCS.Enter;
+    FReadCS.Enter;
+    DoScanRead(Sender, NeedSleep);
+  finally
+    FReadCS.Leave;
+    FWriteCS.Leave;
+    CrossThreadSwitch;
+  end;
 end;
 
-function  TProtocolDriver.SafeScanWrite(const TagRec:TTagRec; const values:TArrayOfDouble):TProtocolIOResult;
+function TProtocolDriver.SafeScanWrite(const TagRec: TTagRec; const Values: TArrayOfDouble): TProtocolIOResult;
 begin
-
-  if GetIsReadOnly then begin
-    Result:=ioReadOnlyProtocol;
-    Exit;
-  end;
-
+  if GetIsReadOnly then
+    begin
+      Result := ioReadOnlyProtocol;
+      Exit;
+    end;
   try
-    //tenta entrar no Mutex
-    //try enter on mutex
+    // try enter on mutex
     while not FPause.ResetEvent do
       CrossThreadSwitch;
 
     FWriteCS.Enter;
     FReadCS.Enter;
 
-    Result := DoWrite(TagRec,values,false)
+    Result := DoWrite(TagRec, Values, False)
   finally
     FReadCS.Leave;
     FWriteCS.Leave;
@@ -1306,18 +854,17 @@ begin
   end;
 end;
 
-function  TProtocolDriver.SafeSingleScanRead(var TagRec:TTagRec; var values:TArrayOfDouble):TProtocolIOResult;
+function TProtocolDriver.SafeSingleScanRead(var TagRec: TTagRec; var Values: TArrayOfDouble): TProtocolIOResult;
 begin
   try
-    //tenta entrar no Mutex
-    //try enter on mutex
+    // try enter on mutex
     while not FPause.ResetEvent do
       CrossThreadSwitch;
 
     FWriteCS.Enter;
     FReadCS.Enter;
 
-    Result := DoRead(TagRec,values,false)
+    Result := DoRead(TagRec, Values, False)
   finally
     FReadCS.Leave;
     FWriteCS.Leave;
@@ -1325,155 +872,168 @@ begin
   end;
 end;
 
-procedure TProtocolDriver.SafeGetValue(const TagRec:TTagRec; var values:TScanReadRec);
+procedure TProtocolDriver.SafeGetValue(const TagRec: TTagRec; var Values: TScanReadRec);
 begin
   try
-    //tenta entrar no Mutex
-    //try enter on mutex
+    // try enter on mutex
     while not FPause.ResetEvent do
       CrossThreadSwitch;
 
     FReadCS.Enter;
 
-    DoGetValue(TagRec,values);
+    DoGetValue(TagRec, Values);
   finally
     FReadCS.Leave;
     FPause.SetEvent;
   end;
 end;
 
-function  TProtocolDriver.GetMultipleValues(var MultiValues:TArrayOfScanUpdateRec):LongInt;
+function TProtocolDriver.GetMultipleValues(var MultiValues: TArrayOfScanUpdateRec): Longint;
 var
-  t, valueSet, IntTagCount:LongInt;
-  first:Boolean;
-  tagiface:IScanableTagInterface;
-  tr:TTagRec;
-  remainingMs:Int64;
-  ScanReadRec:TScanReadRec;
-  doneOne, PortError:Boolean;
+  i: Longint;
+  ValueSet: Longint;
+  IntTagCount: Longint;
+  First: Boolean;
+  TagInterface: IScanableTagInterface;
+  TagRec: TTagRec;
+  RemainingMs: Int64;
+  ScanReadRec: TScanReadRec;
+  DoneOne: Boolean;
+  PortError: Boolean;
   ErrorStatus: TProtocolIOResult;
 begin
-  doneOne:=false;
+  DoneOne := False;
   try
-    Result:=0;
-    valueSet:=-1;
-    
-    //tenta entrar no Mutex
-    //try enter on mutex
+    Result := 0;
+    ValueSet := -1;
+    // try enter on mutex
     while not FPause.ResetEvent do
       CrossThreadSwitch;
 
     FReadCS.Enter;
 
-    if ComponentState*[csDestroying]<>[] then Exit;
-    PortError:=false;
+    if ComponentState * [csDestroying] <> [] then Exit;
+    PortError := False;
 
-    if NeedsExternalPort then begin
-      if (PCommPort=nil) then begin
-        PortError:=true;
-        ErrorStatus:=ioNullCommPort;
-      end else begin
-        if (PCommPort.ReallyActive=false) then begin
-          PortError:=true;
-          ErrorStatus:=ioCommPortClosed;
+    if NeedsExternalPort then
+    begin
+      if (PCommPort = nil) then
+        begin
+          PortError := True;
+          ErrorStatus := ioNullCommPort;
+        end
+      else
+        begin
+          if (PCommPort.ReallyActive = False) then
+          begin
+            PortError := True;
+            ErrorStatus := ioCommPortClosed;
+          end;
         end;
-      end;
     end;
 
     IntTagCount := TagCount;
 
-    for t:=0 to TagCount-1 do begin
-      if Supports(Tag[t], IScanableTagInterface) then begin
-        tagiface:=Tag[t] as IScanableTagInterface;
-        if tagiface.IsValidTag then begin
-
+    for i := 0 to TagCount - 1 do
+    begin
+      if Supports(Tag[i], IScanableTagInterface) then
+      begin
+        TagInterface := Tag[i] as IScanableTagInterface;
+        if TagInterface.IsValidTag then
+        begin
           if PReadSomethingAlways then
-            remainingMs:=tagiface.RemainingMiliseconds
+            RemainingMs := TagInterface.RemainingMiliseconds
           else
-            remainingMs:=tagiface.RemainingMilisecondsForNextScan;
+            RemainingMs := TagInterface.RemainingMilisecondsForNextScan;
+          // if the remaining time is greater than zero
+          if RemainingMs > 0 then
+            begin
+              if First then
+              begin
+                Result := RemainingMs;
+                First := False;
+              end
+              else
+                Result := Min(RemainingMs, Result);
+            end
+          else
+            begin
 
-          //se o tempo restante é maior que zero
-          //if the remaining time is greater than zero.
-          if remainingMs>0 then begin
-            if first then begin
-              Result:=remainingMs;
-              first:=false;
-            end else
-              Result := Min(remainingMs, Result);
-          end else begin
+              TagInterface.BuildTagRec(TagRec, 0, 0);
+              SetLength(ScanReadRec.values, TagRec.Size);
+              if PortError then
+                begin
+                  ScanReadRec.ValuesTimestamp := CrossNow;
+                  ScanReadRec.LastQueryResult := ErrorStatus;
+                  ScanReadRec.Offset := 0;
+                  ScanReadRec.ReadFaults := 0;
+                  ScanReadRec.ReadsOK := 0;
+                  ScanReadRec.RealOffset := 0;
+                end
+              else
+                DoGetValue(TagRec, ScanReadRec);
 
-            tagiface.BuildTagRec(tr,0,0);
-            SetLength(ScanReadRec.Values, tr.Size);
-            if PortError then begin
-              ScanReadRec.ValuesTimestamp:=CrossNow;
-              ScanReadRec.LastQueryResult:=ErrorStatus;
-              ScanReadRec.Offset:=0;
-              ScanReadRec.ReadFaults:=0;
-              ScanReadRec.ReadsOK:=0;
-              ScanReadRec.RealOffset:=0;
-            end else
-              DoGetValue(tr, ScanReadRec);
+              if ScanReadRec.ValuesTimestamp > TagInterface.GetLastUpdateTimestamp then
+              begin
+                // calcula o tempo para a proxima atualização
+                if First then
+                  begin
+                    Result := TagInterface.GetUpdateTime - MilliSecondsBetween(CrossNow, ScanReadRec.ValuesTimestamp);
+                    First := False;
+                  end
+                else
+                  Result := Min(TagInterface.GetUpdateTime - MilliSecondsBetween(CrossNow, ScanReadRec.ValuesTimestamp), Result);
 
-            if ScanReadRec.ValuesTimestamp>tagiface.GetLastUpdateTimestamp then begin
-              //calcula o tempo para a proxima atualização
-              if first then begin
-                 Result:=tagiface.GetUpdateTime-MilliSecondsBetween(CrossNow,ScanReadRec.ValuesTimestamp);
-                 first:=false;
-               end else
-                 Result := Min(tagiface.GetUpdateTime-MilliSecondsBetween(CrossNow,ScanReadRec.ValuesTimestamp), Result);
+                DoneOne := True;
+                Inc(ValueSet);
+                SetLength(MultiValues, ValueSet + 1);
 
-              doneOne:=true;
-              inc(valueSet);
-              SetLength(MultiValues,valueSet+1);
-
-              MultiValues[valueSet].LastResult    :=ScanReadRec.LastQueryResult;
-              MultiValues[valueSet].CallBack      :=tr.CallBack;
-              MultiValues[valueSet].Values        :=ScanReadRec.Values;
-              MultiValues[valueSet].ValueTimeStamp:=ScanReadRec.ValuesTimestamp;
+                MultiValues[ValueSet].LastResult := ScanReadRec.LastQueryResult;
+                MultiValues[ValueSet].CallBack := TagRec.CallBack;
+                MultiValues[ValueSet].values := ScanReadRec.values;
+                MultiValues[ValueSet].ValueTimeStamp := ScanReadRec.ValuesTimestamp;
+              end;
             end;
-          end;
         end;
       end;
     end;
-
   finally
     FReadCS.Leave;
     FPause.SetEvent;
-    if (ErrorStatus in [ioNullCommPort, ioCommPortClosed]) or (IntTagCount<=0) then
+    if (ErrorStatus in [ioNullCommPort, ioCommPortClosed]) or (IntTagCount <= 0) then
       Sleep(50);
   end;
 end;
 
-function  TProtocolDriver.GetPortOpenedEvent:TNotifyEvent;
+function TProtocolDriver.GetPortOpenedEvent: TNotifyEvent;
 begin
   Result := @DoPortOpened;
 end;
 
-function  TProtocolDriver.GetPortClosedEvent:TNotifyEvent;
+function TProtocolDriver.GetPortClosedEvent: TNotifyEvent;
 begin
   Result := @DoPortClosed;
 end;
 
-function  TProtocolDriver.GetPortDisconnectedEvent:TNotifyEvent;
+function TProtocolDriver.GetPortDisconnectedEvent: TNotifyEvent;
 begin
   Result := @DoPortDisconnected;
 end;
 
-function  TProtocolDriver.NotifyThisEvents:TNotifyThisEvents;
+function TProtocolDriver.NotifyThisEvents: TNotifyThisEvents;
 begin
-  Result:=[];
+  Result := [];
 end;
 
 function TProtocolDriver.NeedsExternalPort: Boolean;
 begin
-  Result:=true;
+  Result := True;
 end;
 
 procedure TProtocolDriver.DoPortOpened(Sender: TObject);
 begin
   try
-    //tenta entrar no Mutex
-    //try enter on mutex
+    // try enter on mutex
     while not FPause.ResetEvent do
       CrossThreadSwitch;
 
@@ -1491,8 +1051,7 @@ end;
 procedure TProtocolDriver.DoPortClosed(Sender: TObject);
 begin
   try
-    //tenta entrar no Mutex
-    //try enter on mutex
+    // try enter on mutex
     while not FPause.ResetEvent do
       CrossThreadSwitch;
 
@@ -1510,8 +1069,7 @@ end;
 procedure TProtocolDriver.DoPortDisconnected(Sender: TObject);
 begin
   try
-    //tenta entrar no Mutex
-    //try enter on mutex
+    // try enter on mutex
     while not FPause.ResetEvent do
       CrossThreadSwitch;
 
@@ -1526,23 +1084,23 @@ begin
   end;
 end;
 
-procedure TProtocolDriver.DoPortRemoved(Sender:TObject);
+procedure TProtocolDriver.DoPortRemoved(Sender: TObject);
 begin
-  if CommunicationPort=Sender then
-    CommunicationPort:=nil;
+  if CommunicationPort = Sender then
+    CommunicationPort := nil;
 end;
 
 procedure TProtocolDriver.SetIsReadOnly(AValue: Boolean);
 begin
   if AValue then
-    InterLockedExchange(FReadOnly,1)
+    InterLockedExchange(FReadOnly, 1)
   else
     InterLockedExchange(FReadOnly, 0);
 end;
 
 procedure TProtocolDriver.UpdateUserTime(usertime: Double);
 begin
-  FUserUpdateTime:=usertime;
+  FUserUpdateTime := usertime;
 end;
 
 procedure TProtocolDriver.HighLatencyOperationWillBegin(Sender: TObject);
@@ -1570,8 +1128,9 @@ begin
 
 end;
 
-initialization
 
-DriverCount:=1;
+initialization
+  DriverCount := 1;
+
 
 end.

@@ -1,10 +1,4 @@
 ﻿{$i ../common/language.inc}
-{$IFDEF PORTUGUES}
-{:
-  @abstract(Unit que implementa um mutex de rede.)
-  @author(Fabio Luis Girardi <fabio@pascalscada.com>)
-}
-{$ELSE}
 {:
   @abstract(Unit that implements a network mutex.)
   @author(Fabio Luis Girardi <fabio@pascalscada.com>)
@@ -16,29 +10,48 @@
   @author(Juanjo Montero <juanjo.montero@gmail.com>)
   ***********************************************************************
 }
-{$ENDIF}
 unit MutexClient;
 
 {$I ../common/delphiver.inc}
 interface
 
 uses
-  Classes, SysUtils, socket_types, CrossEvent, crossthreads,
+  Classes,
+  SysUtils,
+  socket_types,
+  CrossEvent,
+  crossthreads,
   syncobjs
-  {$IF defined(WIN32) or defined(WIN64)} //delphi or lazarus over windows
-    {$IFDEF FPC}
-    , WinSock2,
-    {$ELSE}
-    , WinSock,
-    {$ENDIF}
-    sockets_w32_w64
+  // delphi or lazarus over windows
+{$IF defined(WIN32) or defined(WIN64)}
+  {$IFDEF FPC}
+  , WinSock2,
   {$ELSE}
+  , WinSock,
+  {$ENDIF}
+  sockets_w32_w64
+{$ELSE}
   {$IF defined(FPC) AND (defined(UNIX) or defined(WINCE))}
-  , Sockets {$IFDEF UNIX}  , sockets_unix, netdb, Unix{$ENDIF}
-            {$IFDEF WINCE} , sockets_wince {$ENDIF}
-            {$IFDEF FDEBUG}, LCLProc{$ENDIF}
+  , Sockets
+  {$IFDEF UNIX}
+  , sockets_unix,
+  netdb,
+  Unix
+  {$ENDIF}
+  {$IFDEF WINCE}
+  , sockets_wince
+  {$ENDIF}
+  {$IFDEF FDEBUG}
+  , LCLProc
+  {$ENDIF}
   {$IFEND}
-  {$IFEND};
+{$IFEND}
+  ;
+
+
+const
+  MUTEX_CLIENT_PORT = 52321;//51342;
+
 
 type
 
@@ -46,154 +59,171 @@ type
 
   TMutexClientThread = class(TpSCADACoreAffinityThread)
   private
-    fConnectionBroken: TNotifyEvent;
-    FOwnMutex:Boolean;
-    fServerHasBeenFinished: TNotifyEvent;
-    FSocket:Tsocket;
-    FEnd:TCrossEvent;
-    FSocketMutex:TCriticalSection;
-    LastPingSent:TDateTime;
-    Quit:Boolean;
+    FConnectionBroken: TNotifyEvent;
+    FOwnMutex: Boolean;
+    FServerHasBeenFinished: TNotifyEvent;
+    FSocket: TSocket;
+    FEnd: TCrossEvent;
+    FSocketMutex: TCriticalSection;
+    LastPingSent: TDateTime;
+    Quit: Boolean;
   private
     procedure ConnectionIsGone;
   protected
-    //called when client got the mutex
+    // called when client got the mutex
     procedure SetIntoServerMutexBehavior; virtual;
-    //called when the client leaves the mutex.
+    // called when the client leaves the mutex
     procedure SetOutServerMutexBehavior; virtual;
-    //check for ping commmands when client owns the mutex.
+    // check for ping commmands when client owns the mutex
     procedure Execute; override;
-    //called when server sends a quit command.
+    // called when server sends a quit command
     procedure ServerHasBeenFinished; virtual;
-    //ping server
-    function PingServer:Boolean;
+    // ping server
+    function PingServer: Boolean;
   public
-    constructor Create(CreateSuspended: Boolean; aSocket: Tsocket);
+    constructor Create(CreateSuspended: Boolean; aSocket: TSocket);
     destructor Destroy; override;
-    //try enter on server mutex.
-    function TryEnter:Boolean;
-    //leave the server mutex.
+    // try enter on server mutex
+    function TryEnter: Boolean;
+    // leave the server mutex
     function Leave: Boolean;
-    //send a quit command to server.
+    // send a quit command to server
     procedure DisconnectFromServer; virtual;
-    //wait the client thread ends.
+    // wait the client thread ends
     procedure WaitEnd;
   published
-    property onServerHasBeenFinished:TNotifyEvent read fServerHasBeenFinished write fServerHasBeenFinished;
-    property onConnectionBroken:TNotifyEvent read fConnectionBroken write fConnectionBroken;
+    property onServerHasBeenFinished: TNotifyEvent read FServerHasBeenFinished write FServerHasBeenFinished;
+    property onConnectionBroken: TNotifyEvent read FConnectionBroken write FConnectionBroken;
   end;
 
   { TMutexClient }
 
   TMutexClient = class(TComponent)
   private
-    FActive,
-    FActiveLoaded:Boolean;
-    FConnected:LongInt;
+    FActive: Boolean;
+    FActiveLoaded: Boolean;
+    FConnected: Longint;
     FPort: Word;
-    FServerHost:AnsiString;
+    FServerHost: AnsiString;
     FSocket: TSocket;
-    FDefaultBehavior:Boolean;
-    FConnectionStatusThread:TMutexClientThread;
+    FDefaultBehavior: Boolean;
+    FConnectionStatusThread: TMutexClientThread;
     procedure Connect;
     procedure Disconnect;
-    procedure setActive(AValue: Boolean);
+    procedure SetActive(AValue: Boolean);
     procedure SetPort(AValue: Word);
     procedure SetServerHost(AValue: AnsiString);
-    procedure ConnectionFinished(Sender:TObject);
-    {$IFDEF FPC}
-    function InterLockedExchangePointer(var Target: Pointer;Source : Pointer) : Pointer;
-    {$ENDIF}
+    procedure ConnectionFinished(Sender: TObject);
+{$IFDEF FPC}
+    function InterLockedExchangePointer(var Target: Pointer; Source : Pointer): Pointer;
+{$ENDIF}
   protected
     procedure Loaded; override;
   public
     constructor Create(AOwner: TComponent); override;
-    destructor  Destroy; override;
-    function    TryEnter:Boolean; overload;
-    function    TryEnter(out PickedTheDefaultBehavior: Boolean): Boolean; overload;
+    destructor Destroy; override;
+    function TryEnter: Boolean; overload;
+    function TryEnter(out PickedTheDefaultBehavior: Boolean): Boolean; overload;
     function Leave: Boolean;
   published
-    property Active:Boolean read FActive write setActive stored true default false;
-    property Host:AnsiString read FServerHost write SetServerHost stored true nodefault;
-    property DefaultBehavior:Boolean read FDefaultBehavior write FDefaultBehavior stored true default false;
-    property Port:Word read FPort write SetPort stored true default 52321;
+    property Active: Boolean read FActive write SetActive stored True default False;
+    property Host: AnsiString read FServerHost write SetServerHost stored True nodefault;
+    property DefaultBehavior: Boolean read FDefaultBehavior write FDefaultBehavior stored True default False;
+    property Port: Word read FPort write SetPort stored True default MUTEX_CLIENT_PORT;//52321;
   end;
+
 
 implementation
 
-uses hsstrings, dateutils, hsutils{$IFNDEF FPC}, Windows{$ENDIF};
+
+uses
+  hsstrings,
+  dateutils,
+  hsutils
+  {$IFNDEF FPC}
+  , Windows
+  {$ENDIF}
+  ;
+
 
 { TMutexClientThread }
 
 procedure TMutexClientThread.ConnectionIsGone;
 begin
-  if Assigned(fConnectionBroken) then
-    fConnectionBroken(Self);
+  if Assigned(FConnectionBroken) then
+    FConnectionBroken(Self);
 end;
 
 procedure TMutexClientThread.SetIntoServerMutexBehavior;
 begin
-  FOwnMutex:=true;
+  FOwnMutex := True;
 end;
 
 procedure TMutexClientThread.SetOutServerMutexBehavior;
 begin
-  FOwnMutex:=False;
+  FOwnMutex := False;
 end;
 
 procedure TMutexClientThread.Execute;
 var
-  serverrequest:Byte;
+  ServerRequest: Byte;
 
-  function SendPingCmd:Boolean;
+  function SendPingCmd: Boolean;
   var
-    request:Byte;
+    Request: Byte;
   begin
-    request:=254;
-    if socket_send(FSocket,@request,1,0,1000)<1 then begin
+    Request := 254;
+    if SocketSend(FSocket, @Request, 1, 0, 1000) < 1 then
+    begin
       ConnectionIsGone;
-      Result:=false;
-    end else
-      LastPingSent:=Now;
+      Result := False;
+    end
+    else
+      LastPingSent := Now;
   end;
 
-  function InternalPingServer:Boolean;
+  function InternalPingServer: Boolean;
   begin
-    Result:=true;
-    if MilliSecondsBetween(now,LastPingSent)>=1000 then begin
-      Result:=SendPingCmd;
+    Result := True;
+    if MilliSecondsBetween(Now, LastPingSent) >= 1000 then
+    begin
+      Result := SendPingCmd;
     end;
   end;
 
 begin
   FEnd.ResetEvent;
-  LastPingSent:=Now;
-  while (not Terminated) AND (not Quit) do begin
+  LastPingSent := Now;
+  while (not Terminated) and (not Quit) do
+  begin
     FSocketMutex.Enter;
     try
       repeat
-        if socket_recv(FSocket,@serverrequest,1,0,5)>=1 then begin
-          case serverrequest of
+        if SocketRecv(FSocket, @ServerRequest, 1, 0, 5) >= 1 then
+        begin
+          case ServerRequest of
             21: begin
-              SetIntoServerMutexBehavior;
-              Exit;
-            end;
-            20, 30, 31, 32: begin
-              SetOutServerMutexBehavior;
-              Exit;
-            end;
-            253: begin
-              ServerHasBeenFinished;
-            end;
-            255: begin
-              if not SendPingCmd then begin
-                ConnectionIsGone;
-                break;
-              end;
-            end;
+                  SetIntoServerMutexBehavior;
+                  Exit;
+                end;
+            20, 30,
+            31, 32: begin
+                      SetOutServerMutexBehavior;
+                      Exit;
+                    end;
+            253:  begin
+                    ServerHasBeenFinished;
+                  end;
+            255:  begin
+                    if not SendPingCmd then
+                    begin
+                      ConnectionIsGone;
+                      Break;
+                    end;
+                  end;
           end;
         end;
-      until GetNumberOfBytesInReceiveBuffer(FSocket)<=0;
+      until GetNumberOfBytesInReceiveBuffer(FSocket) <= 0;
       InternalPingServer;
     finally
       FSocketMutex.Leave;
@@ -206,50 +236,50 @@ end;
 
 procedure TMutexClientThread.DisconnectFromServer;
 var
-  request:Byte;
+  Request: Byte;
 begin
   FSocketMutex.Enter;
-  request:=253;//try enter on mutex
-  socket_send(FSocket,@request,1,0,1000);
-  Quit:=true;
+  Request := 253;//try enter on mutex
+  SocketSend(FSocket, @Request, 1, 0, 1000);
+  Quit := True;
   ConnectionIsGone;
   FSocketMutex.Leave;
 end;
 
 procedure TMutexClientThread.WaitEnd;
 begin
-  while not (FEnd.WaitFor(10)=wrSignaled) do
+  while not (FEnd.WaitFor(10) = wrSignaled) do
     CheckSynchronize();
 end;
 
 procedure TMutexClientThread.ServerHasBeenFinished;
 begin
-  Quit:=true;
+  Quit := True;
   ConnectionIsGone;
 end;
 
 function TMutexClientThread.PingServer: Boolean;
 var
-  request: byte;
+  Request: Byte;
 begin
-  Result:=false;
-  request:=254;
-  if socket_send(FSocket,@request,1,0,1000)<1 then
+  Result := False;
+  Request := 254;
+  if SocketSend(FSocket, @Request, 1, 0, 1000) < 1 then
     ConnectionIsGone
-  else begin
-    LastPingSent:=Now;
-    Result:=true;
-  end;
+  else
+    begin
+      LastPingSent := Now;
+      Result := True;
+    end;
 end;
 
-constructor TMutexClientThread.Create(CreateSuspended: Boolean; aSocket: Tsocket
-  );
+constructor TMutexClientThread.Create(CreateSuspended: Boolean; aSocket: TSocket);
 begin
   inherited Create(CreateSuspended);
-  FSocketMutex:=TCriticalSection.Create;
-  FEnd:=TCrossEvent.Create(true, false);
-  FSocket:=aSocket;
-  Quit:=false;
+  FSocketMutex := TCriticalSection.Create;
+  FEnd := TCrossEvent.Create(True, False);
+  FSocket := aSocket;
+  Quit := False;
 end;
 
 destructor TMutexClientThread.Destroy;
@@ -261,85 +291,95 @@ end;
 
 function TMutexClientThread.TryEnter: Boolean;
 var
-  request, response:Byte;
-  ExpectedResponse:Boolean;
+  Request: Byte;
+  Response: Byte;
+  ExpectedResponse: Boolean;
 begin
-  Result:=False;
-  ExpectedResponse:=false;
+  Result := False;
+  ExpectedResponse := False;
   FSocketMutex.Enter;
   try
-    request:=2;//try enter on mutex
-    if socket_send(FSocket,@request,1,0,1000)>=1 then begin
-      repeat
-        if socket_recv(FSocket,@response,1,0,1000)>=1 then begin
-          case response of
-            20: begin
-              Result:=false;
-              ExpectedResponse:=true;
-              SetOutServerMutexBehavior;
+    // try enter on mutex
+    Request := 2;
+    if SocketSend(FSocket, @Request, 1, 0, 1000) >= 1 then
+      begin
+        repeat
+          if SocketRecv(FSocket, @Response, 1, 0, 1000) >= 1 then
+          begin
+            case Response of
+              20: begin
+                    Result := False;
+                    ExpectedResponse := True;
+                    SetOutServerMutexBehavior;
+                  end;
+              21: begin
+                    Result := True;
+                    ExpectedResponse := True;
+                    SetIntoServerMutexBehavior;
+                  end;
+              253:  begin
+                      Result := False;
+                      ExpectedResponse := False;
+                      ServerHasBeenFinished;
+                      Break;
+                    end;
+              255:  begin
+                      ExpectedResponse := False;
+                      PingServer;
+                    end;
+              else
+                ExpectedResponse := False;
             end;
-            21: begin
-              Result:=true;
-              ExpectedResponse:=true;
-              SetIntoServerMutexBehavior;
-            end;
-            253: begin
-              Result:=false;
-              ExpectedResponse:=false;
-              ServerHasBeenFinished;
-              break;
-            end;
-            255: begin
-              ExpectedResponse:=false;
-              PingServer;
-            end;
-            else
-              ExpectedResponse:=false;
           end;
-        end;
-        CheckSynchronize(1);
-      until (GetNumberOfBytesInReceiveBuffer(FSocket)<=0) and ExpectedResponse;
-    end else
+          CheckSynchronize(1);
+        until (GetNumberOfBytesInReceiveBuffer(FSocket) <= 0) and ExpectedResponse;
+      end
+    else
       ConnectionIsGone;
   finally
     FSocketMutex.Leave;
   end;
 end;
 
-function TMutexClientThread.Leave:Boolean;
+function TMutexClientThread.Leave: Boolean;
 var
-  request, response:Byte;
-  ExpectedResponse:Boolean;
+  Request: Byte;
+  Response: Byte;
+  ExpectedResponse: Boolean;
 begin
-  Result:=false;
-  ExpectedResponse:=false;
+  Result := False;
+  ExpectedResponse := False;
   FSocketMutex.Enter;
   try
-    request:=3;//try enter on mutex
-    if socket_send(FSocket,@request,1,0,1000)>=1 then begin
-      repeat
-        if socket_recv(FSocket,@response,1,0,1000)>=1 then begin
-          case response of
-            30, 31, 32: begin
-              Result:=true;
-              ExpectedResponse:=true;
-              SetOutServerMutexBehavior;
+    // try enter on mutex
+    Request := 3;
+    if SocketSend(FSocket, @Request, 1, 0, 1000) >= 1 then
+      begin
+        repeat
+          if SocketRecv(FSocket, @Response, 1, 0, 1000) >= 1 then
+          begin
+            case Response of
+              30, 31, 32: begin
+                            Result := True;
+                            ExpectedResponse := True;
+                            SetOutServerMutexBehavior;
+                          end;
+              253:  begin
+                      ExpectedResponse := False;
+                      ServerHasBeenFinished;
+                      Break;
+                    end;
+              255:  begin
+                      ExpectedResponse := False;
+                      PingServer;
+                    end;
+              else
+                ExpectedResponse := False;
             end;
-            253: begin
-              ExpectedResponse:=False;
-              ServerHasBeenFinished;
-              break;
-            end;
-            255: begin
-              ExpectedResponse:=false;
-              PingServer;
-            end;
-            else
-              ExpectedResponse:=false;
           end;
-        end;
-      until (GetNumberOfBytesInReceiveBuffer(FSocket)<=0) and ExpectedResponse;
-    end else
+        until (GetNumberOfBytesInReceiveBuffer(FSocket) <= 0) and ExpectedResponse;
+      end
+    else
       ConnectionIsGone;
   finally
     FSocketMutex.Leave;
@@ -351,161 +391,155 @@ end;
 procedure TMutexClient.Connect;
 var
 {$IF defined(FPC) and defined(UNIX)}
-  ServerAddr:THostEntry;
-  channel:sockaddr_in;
+  ServerAddr: THostEntry;
+  Сhannel: sockaddr_in;
 {$IFEND}
-
 {$IF defined(FPC) and defined(WINCE)}
-  channel:sockaddr_in;
+  Сhannel: sockaddr_in;
 {$IFEND}
-
 {$IF defined(WIN32) or defined(WIN64)}
-  channel:sockaddr_in;
+  Channel: sockaddr_in;
 {$IFEND}
-
-  flag:LongInt;
-  socketOpen:boolean;
+  Flag: Longint;
+  SocketOpen: Boolean;
 begin
+  if FConnected <> 0 then Exit;
 
-  if FConnected<>0 then Exit;
-
-  socketOpen:=false;
+  SocketOpen := False;
 
   try
     //##########################################################################
-    // RESOLUCAO DE NOMES SOBRE LINUX/FREEBSD e outros.
-    // NAME RESOLUTION OVER LINUX/FREEBSD and others.
+    // NAME RESOLUTION OVER LINUX/FREEBSD and others
     //##########################################################################
-    {$IF defined(FPC) and defined(UNIX)}
-      if not GetHostByName(FServerHost,ServerAddr) then begin
-        ServerAddr.Addr:=StrToHostAddr(FServerHost);
-        if ServerAddr.Addr.s_addr=0 then begin
-          //PActive:=false;
+{$IF defined(FPC) and defined(UNIX)}
+      if not GetHostByName(FServerHost, ServerAddr) then
+      begin
+        ServerAddr.Addr := StrToHostAddr(FServerHost);
+        if ServerAddr.Addr.s_addr = 0 then
+        begin
+          //PActive := False;
           //RefreshLastOSError;
           Exit;
         end;
       end;
-    {$IFEND}
+{$IFEND}
 
     //##########################################################################
-    // CRIA O SOCKET
-    // CREATE THE SOCKET.
+    // CREATE THE SOCKET
     //##########################################################################
 
-    {$IF defined(FPC) AND (defined(UNIX) or defined(WINCE))}
-    //UNIX and WINDOWS CE
+{$IF defined(FPC) AND (defined(UNIX) or defined(WINCE))}
+    // UNIX and WINDOWS CE
     FSocket := fpSocket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
 
-    if FSocket<0 then begin
-      //PActive:=false;
+    if FSocket < 0 then
+    begin
+      //PActive := False;
       //RefreshLastOSError;
       Exit;
     end;
-    {$ELSE}
-    //WINDOWS
-    FSocket :=   Socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+{$ELSE}
+    // WINDOWS
+    FSocket := Socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
 
-    if FSocket=INVALID_SOCKET then begin
-      //PActive:=false;
+    if FSocket = INVALID_SOCKET then
+    begin
+      //PActive := False;
       //RefreshLastOSError;
       Exit;
     end;
-    {$IFEND}
+{$IFEND}
 
-    socketOpen:=true;
-
-    //##########################################################################
-    //SETA O MODO DE OPERACAO DE NAO BLOQUEIO DE CHAMADA.
-    //SET THE NON-BLOCKING OPERATING MODE OF THE SOCKET
-    //##########################################################################
-    setblockingmode(FSocket,MODE_NONBLOCKING);
+    SocketOpen := True;
 
     //##########################################################################
-    //SETA AS OPCOES DO SOCKET
-    //OPCOES DE TIMEOUT IRÃO SER FEITAS USANDO SELECT/FPSELECT
-    //POIS ESTAS OPÇÕES NÃO SAO SUPORTADAS POR ALGUNS SISTEMAS OPERACIONAIS
-    //
-    //SOCKET OPTIONS
-    //TIMEOUT OPTIONS ARE MADE USING SELECT/FPSELECT, BECAUSE THIS OPTIONS
-    //AREN'T SUPPORTED BY SOME OSes LIKE WINDOWS CE
+    // SET THE NON-BLOCKING OPERATING MODE OF THE SOCKET
     //##########################################################################
-    flag:=1;
-    //UNIX AND WINDOWS CE
-    {$IF defined(FPC) AND (defined(UNIX) or defined(WINCE))}
-    fpsetsockopt(FSocket, IPPROTO_TCP, TCP_NODELAY,  @flag,           sizeof(LongInt));
-    {$IFEND}
-    //WINDOWS
-    {$IF defined(WIN32) or defined(WIN64)}
-    setsockopt  (FSocket, IPPROTO_TCP, TCP_NODELAY, PAnsiChar(@flag), sizeof(LongInt));
-    {$IFEND}
+    SetBlockingMode(FSocket, MODE_NONBLOCKING);
 
     //##########################################################################
-    //CONFIGURA E ENDERECO QUE O SOCKET VAI CONECTAR
-    //SETS THE TARGET ADDRESS TO SOCKET CONNECT
+    // SOCKET OPTIONS
+    // TIMEOUT OPTIONS ARE MADE USING SELECT/FPSELECT, BECAUSE THIS OPTIONS
+    // AREN'T SUPPORTED BY SOME OSes LIKE WINDOWS CE
     //##########################################################################
-    channel.sin_family      := AF_INET;      //FAMILY
-    channel.sin_port        := htons(FPort); //PORT NUMBER
+    Flag := 1;
+    // UNIX AND WINDOWS CE
+{$IF defined(FPC) AND (defined(UNIX) or defined(WINCE))}
+    fpsetsockopt(FSocket, IPPROTO_TCP, TCP_NODELAY,  @flag, SizeOf(LongInt));
+{$IFEND}
+    // WINDOWS
+{$IF defined(WIN32) or defined(WIN64)}
+    setsockopt(FSocket, IPPROTO_TCP, TCP_NODELAY, PAnsiChar(@Flag), SizeOf(LongInt));
+{$IFEND}
 
-    {$IF defined(FPC) AND defined(UNIX)}
-    channel.sin_addr.S_addr := longword(htonl(LongInt(ServerAddr.Addr.s_addr)));
-    {$IFEND}
+    //##########################################################################
+    // SETS THE TARGET ADDRESS TO SOCKET CONNECT
+    //##########################################################################
+    Channel.sin_family := AF_INET;    // Family
+    Channel.sin_port := htons(FPort); // Port number
+{$IF defined(FPC) AND defined(UNIX)}
+    Channel.sin_addr.S_addr := LongWord(htonl(LongInt(ServerAddr.Addr.s_addr)));
+{$IFEND}
+{$IF defined(FPC) AND defined(WINCE)}
+    Channel.sin_addr := StrToNetAddr(FServerHost);
+{$IFEND}
+{$IF defined(WIN32) OR defined(WIN64)}
+    Channel.sin_addr.S_addr := inet_addr(PAnsiChar(FServerHost));
+{$IFEND}
 
-    {$IF defined(FPC) AND defined(WINCE)}
-    channel.sin_addr := StrToNetAddr(FServerHost);
-    {$IFEND}
-
-    {$IF defined(WIN32) OR defined(WIN64)}
-    channel.sin_addr.S_addr := inet_addr(PAnsiChar(FServerHost));
-    {$IFEND}
-
-    if connect_with_timeout(FSocket,@channel,sizeof(channel),2000)<>0 then begin
+    if ConnectWithTimeout(FSocket, @Channel, SizeOf(Channel), 2000) <> 0 then
+    begin
       Exit;
     end;
-    FConnected:=1;
-    FConnectionStatusThread:=TMutexClientThread.Create(true, FSocket);
-    FConnectionStatusThread.FreeOnTerminate:=true;
-    FConnectionStatusThread.OnTerminate:=@ConnectionFinished;
-    FConnectionStatusThread.onConnectionBroken:=@ConnectionFinished;
-    FConnectionStatusThread.onServerHasBeenFinished:=@ConnectionFinished;
+    FConnected := 1;
+    FConnectionStatusThread := TMutexClientThread.Create(True, FSocket);
+    FConnectionStatusThread.FreeOnTerminate := True;
+    FConnectionStatusThread.OnTerminate := @ConnectionFinished;
+    FConnectionStatusThread.onConnectionBroken := @ConnectionFinished;
+    FConnectionStatusThread.onServerHasBeenFinished := @ConnectionFinished;
 
-
-    //after setup the thread, wake up it.
+    // after setup the thread, wake up it
     FConnectionStatusThread.WakeUp;
   finally
-    if socketOpen and (FConnected=0) then
+    if SocketOpen and (FConnected = 0) then
       CloseSocket(FSocket);
   end;
 end;
 
 procedure TMutexClient.Disconnect;
 var
-  threadinstance: TMutexClientThread;
+  ThreadInstance: TMutexClientThread;
 begin
-  if FConnected<>0 then begin
-    if FConnectionStatusThread<>nil then begin
-      threadinstance:=FConnectionStatusThread;
-      with threadinstance do begin
-        FreeOnTerminate:=false;
+  if FConnected <> 0 then
+  begin
+    if FConnectionStatusThread <> nil then
+    begin
+      ThreadInstance := FConnectionStatusThread;
+      with ThreadInstance do
+      begin
+        FreeOnTerminate := False;
         DisconnectFromServer;
         WaitEnd;
         Destroy;
       end;
     end;
-    FConnectionStatusThread:=nil;
+    FConnectionStatusThread := nil;
     CloseSocket(FSocket);
-    FConnected:=0;
+    FConnected := 0;
   end;
 end;
 
-procedure TMutexClient.setActive(AValue: Boolean);
+procedure TMutexClient.SetActive(AValue: Boolean);
 begin
-  if [csLoading,csReading]*ComponentState<>[] then begin
-    FActiveLoaded:=AValue;
+  if [csLoading, csReading] * ComponentState <> [] then
+  begin
+    FActiveLoaded := AValue;
     Exit;
   end;
 
-  if [csDesigning]*ComponentState<>[] then begin
-    FActive:=AValue;
+  if [csDesigning] * ComponentState <> [] then
+  begin
+    FActive := AValue;
     Exit;
   end;
 
@@ -514,83 +548,93 @@ begin
   else
     Disconnect;
 
-  FActive:=AValue;
+  FActive := AValue;
 end;
 
 procedure TMutexClient.SetPort(AValue: Word);
 begin
   if FActive then
-    raise exception.Create(SimpossibleToChangeWhenActive);
+    raise Exception.Create(SimpossibleToChangeWhenActive);
 
-  if FPort=AValue then Exit;
+  if FPort = AValue then Exit;
 
-  FPort:=AValue;
+  FPort := AValue;
 end;
 
 procedure TMutexClient.SetServerHost(AValue: AnsiString);
 var
-  ip: TStringArray;
-  i, ZeroCount, FFCount: Integer;
-  octeto: Longint;
-
+  IP: TStringArray;
+  i: Integer;
+  ZeroCount: Integer;
+  FFCount: Integer;
+  Octet: Longint;
 label
-  err;
+  Err;
 begin
   if FActive then
-    raise exception.Create(SimpossibleToChangeWhenActive);
+    raise Exception.Create(SimpossibleToChangeWhenActive);
 
-  if (FServerHost=trim(AValue)) then Exit;
+  if (FServerHost = trim(AValue)) then Exit;
 
-  if (trim(AValue)='') then begin
-    FServerHost:=trim(AValue);
+  if (trim(AValue) = '') then
+  begin
+    FServerHost := trim(AValue);
     Exit;
   end;
 
-  if FServerHost<>AValue then begin
-    ip:=ExplodeString('.',AValue);
-    if Length(ip)<>4 then
-      goto err;
+  if FServerHost <> AValue then
+  begin
+    IP := ExplodeString('.', AValue);
+    if Length(IP) <> 4 then
+      goto Err;
 
-    ZeroCount:=0;
-    FFCount:=0;
-    for i:=0 to 3 do begin
-      if TryStrToInt(ip[i],octeto)=false then goto err;
-      if not (octeto in [0..255]) then goto err;
-      if ((i=0) or (i=3)) and ((octeto=0) or (octeto=255)) then goto err;
-      if octeto=0   then ZeroCount:=ZeroCount + 1;
-      if octeto=255 then FFCount  :=FFCount   + 1;
+    ZeroCount := 0;
+    FFCount := 0;
+    for i := 0 to 3 do
+    begin
+      if TryStrToInt(IP[i], Octet) = False then
+        goto Err;
+      if not (Octet in [0..255]) then
+        goto Err;
+      if ((i = 0) or (i = 3)) and ((Octet = 0) or (Octet = 255)) then
+        goto Err;
+      if Octet = 0 then
+        ZeroCount := ZeroCount + 1;
+      if Octet = 255 then
+        FFCount := FFCount + 1;
     end;
-    if ZeroCount=4 then goto err;
-    if FFCount=4   then goto err;
+    if ZeroCount = 4 then
+      goto Err;
+    if FFCount = 4 then
+      goto Err;
 
-    FServerHost:=AValue;
+    FServerHost := AValue;
     Exit;
   end;
 
-err:
-  raise Exception.Create(Format('The address "%s" is not a valid IPv4 address',[AValue]));
+Err:
+  raise Exception.Create(Format('The address "%s" is not a valid IPv4 address', [AValue]));
 end;
 
 procedure TMutexClient.ConnectionFinished(Sender: TObject);
 begin
   CloseSocket(FSocket);
-  InterLockedExchange(FConnected,0);
+  InterLockedExchange(FConnected, 0);
 
-  //TSocket 32 bits sized
-  {$IF sizeof(TSocket)=4}
-  InterLockedExchange(integer(FSocket),0);
+  // TSocket 32 bits sized
+  {$IF SizeOf(TSocket)=4}
+  InterLockedExchange(Integer(FSocket), 0);
   {$IFEND}
 
-  {$IF sizeof(TSocket)=8}
+  {$IF SizeOf(TSocket)=8}
   InterLockedExchange64(Int64(FSocket), 0);
   {$IFEND}
 
-  InterlockedExchangePointer(Pointer(FConnectionStatusThread),nil);
+  InterlockedExchangePointer(Pointer(FConnectionStatusThread), nil);
 end;
 
 {$IFDEF FPC}
-function TMutexClient.InterLockedExchangePointer(var Target: Pointer;
-  Source: Pointer): Pointer;
+function TMutexClient.InterLockedExchangePointer(var Target: Pointer; Source: Pointer): Pointer;
 begin
   Result := InterLockedExchange (Target, Source);
 end;
@@ -599,65 +643,71 @@ end;
 procedure TMutexClient.Loaded;
 begin
   inherited Loaded;
-  setActive(FActiveLoaded);
+  SetActive(FActiveLoaded);
 end;
 
 constructor TMutexClient.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FPort:=51342;
-  FActive:=false;
-  FConnected:=0;
-  FActiveLoaded:=false;
+  FPort := MUTEX_CLIENT_PORT;//51342;
+  FActive := False;
+  FConnected := 0;
+  FActiveLoaded := False;
 end;
 
 destructor TMutexClient.Destroy;
 begin
-  setActive(false);
+  SetActive(False);
   inherited Destroy;
 end;
 
 function TMutexClient.TryEnter: Boolean;
 var
-  adefaultbehavior: Boolean;
+  ADefaultBehavior: Boolean;
 begin
-  Result:=TryEnter(adefaultbehavior);
+  Result := TryEnter(ADefaultBehavior);
 end;
 
 function TMutexClient.TryEnter(out PickedTheDefaultBehavior: Boolean): Boolean;
 begin
-  Result:=FDefaultBehavior;
-  PickedTheDefaultBehavior:=true;
-  if FActive then begin
-    //if not connected, connect
-    if FConnected=0 then
+  Result := FDefaultBehavior;
+  PickedTheDefaultBehavior := True;
+  if FActive then
+  begin
+    // if not connected, connect
+    if FConnected = 0 then
       Connect;
 
-    //if still disconnected, Exit.
-    if FConnected=0 then Exit;
+    // if still disconnected, Exit
+    if FConnected = 0 then
+      Exit;
 
-    if FConnectionStatusThread=nil then Exit;
+    if FConnectionStatusThread = nil then
+      Exit;
 
-    PickedTheDefaultBehavior:=false;
-    Result:=FConnectionStatusThread.TryEnter;
+    PickedTheDefaultBehavior := False;
+    Result := FConnectionStatusThread.TryEnter;
   end;
 end;
 
-function TMutexClient.Leave:Boolean;
+function TMutexClient.Leave: Boolean;
 begin
-  Result:=True;
+  Result := True;
 
-  if FActive then begin
-    //if not connected, connect
-    if FConnected=0 then
+  if FActive then
+  begin
+    // if not connected, connect
+    if FConnected = 0 then
       Connect;
 
-    //if still disconnected, Exit.
-    if FConnected=0 then Exit;
+    // if still disconnected, Exit
+    if FConnected = 0 then
+      Exit;
 
-    if FConnectionStatusThread=nil then Exit;
+    if FConnectionStatusThread = nil then
+      Exit;
 
-    Result:=FConnectionStatusThread.Leave;
+    Result := FConnectionStatusThread.Leave;
   end;
 end;
 

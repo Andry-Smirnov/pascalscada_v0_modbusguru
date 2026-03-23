@@ -742,7 +742,7 @@ begin
     (FInputFlowPolyline as IColorChangeNotification).RemoveNotifyCallback(Self as IColorChangeNotification);
 
   if Assigned(aValue) then
-    (AValue as IColorChangeNotification).AddNotifyCallback(self as IColorChangeNotification);
+    (AValue as IColorChangeNotification).AddNotifyCallback(Self as IColorChangeNotification);
 
   FInputFlowPolyline:=AValue;
   UpdateDrawAndFlow;

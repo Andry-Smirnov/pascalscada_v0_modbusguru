@@ -222,7 +222,7 @@ procedure TfrmMain.secureAlarmesExecute(Sender: TObject);
 //var
 //  filtro:TfrmFiltro;
 begin
-  //filtro:=TfrmFiltro.Create(self);
+  //filtro:=TfrmFiltro.Create(Self);
   //try
   //  if filtro.ShowModal=mrOK then begin
   //    with dmdb do begin
@@ -261,7 +261,7 @@ procedure TfrmMain.secureGraphicsExecute(Sender: TObject);
 var
   x:TfrmGraficos;
 begin
-  x:=TfrmGraficos.Create(self);
+  x:=TfrmGraficos.Create(Self);
   try
     x.ShowModal;
   finally
@@ -273,7 +273,7 @@ procedure TfrmMain.secureRelatorioAcionamentoExecute(Sender: TObject);
 //var
 //  filtro:TfrmFiltro;
 begin
-  //filtro:=TfrmFiltro.Create(self);
+  //filtro:=TfrmFiltro.Create(Self);
   //try
   //  if filtro.ShowModal=mrOK then begin
   //    with dmdb do begin

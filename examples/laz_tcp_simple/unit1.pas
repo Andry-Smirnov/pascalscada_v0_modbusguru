@@ -67,7 +67,7 @@ begin
                                     nil, //não iremos escrever nada
                                     1,   //vamos ler um byte de cada vez
                                     0,   //driver ID, vc não irá precisar,
-                                    0,   //delay entre leitura => escrita e escrita => leitura
+                                    0,   //delay entre reading => escrita e escrita => reading
                                     @pkg);
 
     if (pkg.ReadIOResult=iorOK) and (pkg.Received>=1) and (Length(pkg.BufferToRead)>0) then begin
@@ -86,7 +86,7 @@ begin
     end;
   finally
     Edit1.Text:=Trim(Buffer);
-    //enfileira a proxima leitura para ser executda no proximo ciclo de exceução do programa.
+    //enfileira a proxima reading para ser executda no proximo ciclo de exceução do programa.
     if (Application.Flags*[AppDoNotCallAsyncQueue])=[] then
       Application.QueueAsyncCall(@VerificaDadosPortaSerial, 0);
   end;

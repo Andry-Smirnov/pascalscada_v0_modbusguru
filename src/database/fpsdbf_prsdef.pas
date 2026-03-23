@@ -60,11 +60,11 @@ type
     AuxData: pointer;
     ResetDest: boolean;
     WantsFunction: boolean;
-    Args: array[0..MaxArg-1] of PChar;
-    ArgsPos: array[0..MaxArg-1] of PChar;
-    ArgsSize: array[0..MaxArg-1] of LongInt;
-    ArgsType: array[0..MaxArg-1] of TExpressionType;
-    ArgList: array[0..MaxArg-1] of PExpressionRec;
+    Args: array [0..MaxArg-1] of PChar;
+    ArgsPos: array [0..MaxArg-1] of PChar;
+    ArgsSize: array [0..MaxArg-1] of LongInt;
+    ArgsType: array [0..MaxArg-1] of TExpressionType;
+    ArgList: array [0..MaxArg-1] of PExpressionRec;
   end;
 
   TExprCollection = class(TNoOwnerCollection)

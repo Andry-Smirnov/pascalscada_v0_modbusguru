@@ -65,7 +65,7 @@ begin
     //adiciona os pontos a poliline da rosca..
     SetLength(X, H + 1);
     X[H].x := LineX;
-    if (LineX Mod (2 * FBodyHeight)) = 0 then
+    if (LineX mod (2 * FBodyHeight)) = 0 then
     begin
       X[H].Y := 0;
     end

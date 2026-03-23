@@ -1,7 +1,7 @@
 {$i ../common/language.inc}
 {$IFDEF PORTUGUES}
 {:
-  @abstract(Define um controle de opções para leitura/escrita de valores de tags numéricos.)
+  @abstract(Define um controle de opções para reading/escrita de valores de tags numéricos.)
   @author(Fabio Luis Girardi <fabio@pascalscada.com>)
 }
 {$ELSE}
@@ -26,7 +26,7 @@ uses
 type
   {$IFDEF PORTUGUES}
   {:
-    @abstract(Classe de controle de multiplas opções para leitura/escrita de
+    @abstract(Classe de controle de multiplas opções para reading/escrita de
     valores de tags numéricos.)
     @author(Fabio Luis Girardi <fabio@pascalscada.com>)
   }

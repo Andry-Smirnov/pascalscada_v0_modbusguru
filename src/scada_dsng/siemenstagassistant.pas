@@ -1,4 +1,4 @@
-﻿{$i ../common/language.inc}
+{$i ../common/language.inc}
 {:
   @abstract(Implementation of TagAssistant for Siemens.)
   @author(Juanjo Montero <juanjo.montero@gmail.com>)
@@ -163,7 +163,7 @@ var
     if S7TagBuilderForm.MemoryArea.ItemIndex in [4, 9, 5, 10] then
     begin
       Result := StringReplace(Result, '%a', IntToStr(CurTCAddress), [rfReplaceAll]);
-      Result := StringReplace(Result, '%0a', GetValueWithZeros(CurTCAddress, S7TagBuilderForm.GetTheLastItemOffset Div 2, True), [rfReplaceAll]);
+      Result := StringReplace(Result, '%0a', GetValueWithZeros(CurTCAddress, S7TagBuilderForm.GetTheLastItemOffset div 2, True), [rfReplaceAll]);
     end
     else
     begin

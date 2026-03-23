@@ -111,9 +111,9 @@ const
 var s: string;
   OldPos: integer;
 begin
-  SetLength(s,length(FormTextStart));
+  SetLength(s,Length(FormTextStart));
   OldPos:=Stream.Position;
-  Stream.Read(s[1],length(s));
+  Stream.Read(s[1],Length(s));
   Result:=AnsiCompareText(s,FormTextStart)=0;
   Stream.Position:=OldPos;
 end;
@@ -124,9 +124,9 @@ const
 var s: string;
   OldPos: integer;
 begin
-  SetLength(s,length(FormFCLStart));
+  SetLength(s,Length(FormFCLStart));
   OldPos:=Stream.Position;
-  Stream.Read(s[1],length(s));
+  Stream.Read(s[1],Length(s));
   Result:=s=FormFCLStart;
   Stream.Position:=OldPos;
 end;
@@ -330,7 +330,7 @@ begin
               LFMtoLRSstream(BinMemStream,ResMemStream);
             end
             else begin
-              ResourceType:=copy(BinExt,2,length(BinExt)-1);;
+              ResourceType:=copy(BinExt,2,Length(BinExt)-1);;
 
               if ResourceName='' then
                 raise Exception.Create('ERROR: no resourcename');

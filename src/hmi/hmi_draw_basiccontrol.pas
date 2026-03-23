@@ -397,7 +397,7 @@ end;
 procedure THMIBasicControl.WMLButtonDBLCLK(var Message: TLMLButtonDblClk);
 begin
   if IsControlArea(Message.XPos, Message.YPos) then begin
-    //TODO: SendCancelMode(self);
+    //TODO: SendCancelMode(Self);
     if (csCaptureMouse in ControlStyle) and (mbLeft in CaptureMouseButtons) then
       MouseCapture := True;
 
@@ -959,9 +959,9 @@ procedure THMIBasicControl.CMDesigerHitTest(var Message: TCMHittest);
 var
   p: TPoint;
 begin
-  writeln('MX=',Message.XPos,'  MY=',Message.YPos);
+  WriteLn('MX=',Message.XPos,'  MY=',Message.YPos);
   p:=ParentToClient(Point(Message.XPos, Message.YPos),GetDesignerForm(Self));
-  writeln('pX=',p.X,'  pY=',p.Y);
+  WriteLn('pX=',p.X,'  pY=',p.Y);
 
   if IsControlArea(p.X,p.Y) then
     Message.Result:=0
@@ -1008,7 +1008,7 @@ begin
   FRegInSecMan:=GetControlSecurityManager.RegisterControl(Self as IHMIInterface);
   if not FRegInSecMan then begin
     {$IFNDEF WINDOWS}
-    writeln('FIX-ME: Failed to register class ',ClassName,' instace with name="',Name,'" in the ControlSecurityManager?',{$i %FILE%},':',{$i %LINE%});
+    WriteLn('FIX-ME: Failed to register class ',ClassName,' instace with name="',Name,'" in the ControlSecurityManager?',{$i %FILE%},':',{$i %LINE%});
     {$ENDIF}
   end;
   Color:=clBackground;
@@ -1029,7 +1029,7 @@ begin
     GetControlSecurityManager.UnRegisterControl(Self as IHMIInterface)
   else begin
     {$IFNDEF WINDOWS}
-    writeln('FIX-ME: Why class ',ClassName,', instace name="',Name,'" ins''t registered in ControlSecurityManager?',{$i %FILE%},':',{$i %LINE%});
+    WriteLn('FIX-ME: Why class ',ClassName,', instace name="',Name,'" ins''t registered in ControlSecurityManager?',{$i %FILE%},':',{$i %LINE%});
     {$ENDIF}
   end;
 

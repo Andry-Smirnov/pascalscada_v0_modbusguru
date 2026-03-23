@@ -1,11 +1,4 @@
 {$i ../common/language.inc}
-{$IFDEF PORTUGUES}
-{:
-  @author(Fabio Luis Girardi <fabio@pascalscada.com>)
-
-  @abstract(Implementa a base para os drivers de protocolo ModBus RTU e ModBus TCP.)
-}
-{$ELSE}
 {:
   @author(Fabio Luis Girardi <fabio@pascalscada.com>)
   @abstract(Unit that implements the base of ModBus RTU and ModBus TCP protocol drivers.)
@@ -16,7 +9,6 @@
   @author(Juanjo Montero <juanjo.montero@gmail.com>)
   ***********************************************************************
 }
-{$ENDIF}
 unit ModBusDriver;
 
 interface
@@ -24,9 +16,9 @@ interface
 uses
   SysUtils, Classes, CommTypes, ProtocolDriver, ProtocolTypes, Tag, PLCTagNumber,
   PLCMemoryManager, PLCBlock, PLCString, fgl, modbus_tagscan_req
-  {$IFNDEF FPC}
+{$IFNDEF FPC}
   , Windows
-  {$ENDIF}
+{$ENDIF}
   ;
 
 type
@@ -38,48 +30,19 @@ type
 
   TReqList = specialize TFPGList<TReqItem>;
 
-  {$IFDEF PORTUGUES}
-  {:
-  @author(Fabio Luis Girardi <fabio@pascalscada.com>)
-
-  Estrutura que simula as áreas de memória de um equipamento modbus escravo.
-
-  @member Station Armazena o endereço do equipamento modbus.
-  @member Inputs Gerenciador de blocos de memórias não continuas que mapeia
-          as entradas digitais do equipamento modbus.
-  @member Outputs Gerenciador de blocos de memórias não continuas que mapeia
-          as saidas digitais do equipamento modbus.
-  @member Registers Gerenciador de blocos de memórias não continuas que mapeia
-          as registradores do equipamento modbus.
-  @member AnalogReg Gerenciador de blocos de memórias não continuas que mapeia
-          as entradas analógicas do equipamento modbus.
-  @member Status07Value Guarda o valor retornado pela função 07 do ModBus.
-  @member Status07TimeStamp Guarda a data/hora do status retornado pela função
-          07 do ModBus.
-  @member Status07LastError Guarda o status do driver ao executar a função
-          07 do ModBus.
-  }
-  {$ELSE}
   {:
   @author(Fabio Luis Girardi <fabio@pascalscada.com>)
 
   Record that represents a modbus slave device.
 
   @member Station Address of the modbus device.
-  @member Inputs Memory mananger object that handles the digital inputs of
-          your modbus device.
-  @member Outputs Memory mananger object that handles the digital outputs of
-          your modbus device (coils).
-  @member Registers Memory mananger object that handles the registers of
-          your modbus device.
-  @member AnalogReg Memory mananger object that handles the analog registers of
-          your modbus device.
+  @member Inputs Memory mananger object that handles the digital inputs of your modbus device.
+  @member Outputs Memory mananger object that handles the digital outputs of your modbus device (coils).
+  @member Registers Memory mananger object that handles the registers of your modbus device.
+  @member AnalogReg Memory mananger object that handles the analog registers of your modbus device.
   @member Status07Value Stores the value returned by the ModBus function 07.
-  @member Status07TimeStamp Stores the date/time of the last action of ModBus
-          function 07.
-  @member Status07LastError Stores the IO result of the last ModBus function 07.
-  }
-  {$ENDIF}
+  @member Status07TimeStamp Stores the date/time of the last action of ModBus function 07.
+  @member Status07LastError Stores the IO result of the last ModBus function 07. }
   TModBusPLC = record
     Station: Longint;
     Inputs: TPLCMemoryManager;
@@ -91,42 +54,6 @@ type
     Status07LastError: TProtocolIOResult;
   end;
 
-  {$IFDEF PORTUGUES}
-  {:
-  @abstract(Classe base do driver ModBus (RTU e TCP))
-  @author(Fabio Luis Girardi <fabio@pascalscada.com>)
-
-  Para configurar um tag para usar o ModBus, é necessário configurar as
-  seguintes propriedades do tag:
-
-  @unorderedList(
-    @item(@bold(PLCStation): Endereço do equipamento modbus.)
-    @item(@bold(MemAddress): Endereço da entrada/saida/registrador que se deseja
-          lêr/escrever. Os endereços começam de zero)
-    @item(@bold(MemReadFuntion): Função que será usada para ler o tag. Veja
-          tabela abaixo.)
-    @item(@bold(MemWriteFuntion): Função que será usada para escrever valores do
-          tag. Veja tabela abaixo.)
-  )
-
-  Para as propriedades MemReadFunction e MemWriteFunction são aceitos os seguintes
-  valores de acordo com a área de memória desejada:
-
-  @table(
-    @rowHead( @cell(Área desejada)       @cell(MemReadFunction) @cell(MemWriteFunction) )
-    @row(     @cell(Entradas digitais)   @cell(2)               @cell(0) )
-    @row(     @cell(Saidas digitais)     @cell(1)               @cell(5 (simples), 15 (bloco)) )
-    @row(     @cell(Registradores)       @cell(3)               @cell(6 (simples), 16 (bloco)) )
-    @row(     @cell(Entradas analógicas) @cell(4)               @cell(0) )
-    @row(     @cell(Status equipamento)  @cell(7)               @cell(0) )
-  )
-
-  É necessário que você conheça as funções ModBus que seu equipamento suporta.)
-
-  @seealso(TModBusRTUDriver)
-  @seealso(TModBusTCPDriver)
-  }
-  {$ELSE}
   {:
   @abstract(Base class of ModBus protocol driver (RTU e TCP))
   @author(Fabio Luis Girardi <fabio@pascalscada.com>)
@@ -158,9 +85,7 @@ type
   You must know what's the supported functions of your modbus slave.
 
   @seealso(TModBusRTUDriver)
-  @seealso(TModBusTCPDriver)
-  }
-  {$ENDIF}
+  @seealso(TModBusTCPDriver) }
   TModBusDriver = class(TProtocolDriver)
   private
     FMustReleaseResources: Boolean;
@@ -168,11 +93,11 @@ type
     PHoldingRegsMaxBlockSize: THoldingRegistersBlockSize;
     PInputBlockSize: TInputBlockSize;
     POutputBlockSize: TOutputBlockSize;
+
     procedure SetAnalogRegsMaxBlockSize(AValue: TAnalogBlockSize);
     procedure SetHoldingRegsMaxBlockSize(AValue: THoldingRegistersBlockSize);
     procedure SetInputBlockSize(AValue: TInputBlockSize);
     procedure SetOutputBlockSize(AValue: TOutputBlockSize);
-
   protected
     PFirstRequestLen: Longint;
     PFuncByteOffset: Longint;
@@ -182,6 +107,7 @@ type
     PRegistersMaxHole: Cardinal;
     PInternalDelayBetweenCmds: Cardinal;
     PModbusPLC: array of TModBusPLC;
+
     function AllowBroadCast: Boolean; virtual;
     function GetTagProperts(TagObj: TTag; var Station, Address, Size, RegType, ScanTime: Longint): Boolean;
     procedure SetOutputMaxHole(AValue: Cardinal);
@@ -189,26 +115,12 @@ type
     procedure SetRegisterMaxHole(AValue: Cardinal);
     procedure BuildTagRec(PLC, Func, StartAddress, Size: Longint; out ATagRec: TTagRec);
 
-    {$IFDEF PORTUGUES}
-    //: Cria um pacote modbus
-    {$ELSE}
     //: Encode a modbus packet.
-    {$ENDIF}
     function EncodePkg(TagObj: TTagRec; ToWrite: TArrayOfDouble; var ResultLen: Longint): Bytes; virtual;
-
-    {$IFDEF PORTUGUES}
-    //: Extrai os dados de um pacote modbus
-    {$ELSE}
     //: Decodes a modbus packet.
-    {$ENDIF}
-    function DecodePkg(pkg: TIOPacket; out values: TArrayOfDouble): TProtocolIOResult; virtual;
-
-    {$IFDEF PORTUGUES}
-    //: Retorna os bytes que restaram no buffer RX da porta de comunicação.
-    {$ELSE}
+    function DecodePkg(Pkg: TIOPacket; out Values: TArrayOfDouble): TProtocolIOResult; virtual;
     //: Returns the remaing Bytes on RX buffer of communication port.
-    {$ENDIF}
-    function RemainingBytes(buffer: Bytes): Longint; virtual;
+    function RemainingBytes(Buffer: Bytes): Longint; virtual;
 
     //: @seealso(TProtocolDriver.DoAddTag)
     procedure DoAddTag(TagObj: TTag; TagValid: Boolean); override;
@@ -225,102 +137,26 @@ type
     //: @seealso(TProtocolDriver.DoRead)
     function DoRead(const ATagRec: TTagRec; out Values: TArrayOfDouble; Sync: Boolean): TProtocolIOResult; override;
 
-    {$IFDEF PORTUGUES}
-    {:
-    Informa quantas saidas podem ficar sem serem declaradas para manter um bloco
-    de saidas continuo.
-    @seealso(TPLCMemoryManager.MaxHole)
-    }
-    {$ELSE}
-    {:
-    How many digital outputs can be undeclared to keep the block continuous.
-    @seealso(TPLCMemoryManager.MaxHole)
-    }
-    {$ENDIF}
+    {: How many digital outputs can be undeclared to keep the block continuous.
+       @seealso(TPLCMemoryManager.MaxHole) }
     property OutputMaxHole: Cardinal read POutputMaxHole write SetOutputMaxHole default 50;
-
-    {$IFDEF PORTUGUES}
-    {:
-    Informa quantas entradas podem ficar sem serem declaradas para manter um bloco
-    continuo.
-    @seealso(TPLCMemoryManager.MaxHole)
-    }
-    {$ELSE}
-    {:
-    How many digital inputs can be undeclared to keep the block continuous.
-    @seealso(TPLCMemoryManager.MaxHole)
-    }
-    {$ENDIF}
+    {: How many digital inputs can be undeclared to keep the block continuous.
+       @seealso(TPLCMemoryManager.MaxHole) }
     property InputMaxHole: Cardinal read PInputMaxHole write SetInputMaxHole default 50;
-
-    {$IFDEF PORTUGUES}
-    {:
-    Informa quantos registradores podem ficar sem serem declaradas para manter
-    um bloco continuo.
-    @seealso(TPLCMemoryManager.MaxHole)
-    }
-    {$ELSE}
-    {:
-    How many registers can be undeclared to keep the block continuous.
-    @seealso(TPLCMemoryManager.MaxHole)
-    }
-    {$ENDIF}
+    {: How many registers can be undeclared to keep the block continuous.
+       @seealso(TPLCMemoryManager.MaxHole) }
     property RegisterMaxHole: Cardinal read PRegistersMaxHole write SetRegisterMaxHole default 10;
-
-    {$IFDEF PORTUGUES}
-    {:
-    Informa quantos bits de entrada podem ser lidos no mesmo bloco de dados.
-    um bloco continuo.
-    @seealso(TPLCMemoryManager.MaxBlockItems)
-    }
-    {$ELSE}
-    {:
-    How many input bits can be read in single block.
-    @seealso(TPLCMemoryManager.MaxBlockItems)
-    }
-    {$ENDIF}
+    {: How many input bits can be read in single block.
+       @seealso(TPLCMemoryManager.MaxBlockItems) }
     property InputsMaxBlockSize: TInputBlockSize read PInputBlockSize write SetInputBlockSize default 2000;
-
-    {$IFDEF PORTUGUES}
-    {:
-    Informa quantos bits de saída podem ser lidos no mesmo bloco de dados.
-    um bloco continuo.
-    @seealso(TPLCMemoryManager.MaxBlockItems)
-    }
-    {$ELSE}
-    {:
-    How many output bits can be read in single block.
-    @seealso(TPLCMemoryManager.MaxBlockItems)
-    }
-    {$ENDIF}
+    {: How many output bits can be read in single block.
+       @seealso(TPLCMemoryManager.MaxBlockItems) }
     property OutputsMaxBlockSize: TOutputBlockSize read POutputBlockSize write SetOutputBlockSize default 2000;
-
-    {$IFDEF PORTUGUES}
-    {:
-    Informa quantas entradas analógicas (words) podem ser lidos no mesmo bloco de dados.
-    um bloco continuo.
-    @seealso(TPLCMemoryManager.MaxBlockItems)
-    }
-    {$ELSE}
-    {:
-    How many analog inputs (words) can be read in single block.
-    @seealso(TPLCMemoryManager.MaxBlockItems)
-    }
-    {$ENDIF}
+    {: How many analog inputs (words) can be read in single block.
+       @seealso(TPLCMemoryManager.MaxBlockItems) }
     property AnalogRegsMaxBlockSize: TAnalogBlockSize read PAnalogRegsMaxBlockSize write SetAnalogRegsMaxBlockSize default 125;
-
-    {$IFDEF PORTUGUES}
-    {:
-    Informa quantos registradores (words) podem ser lidos no mesmo bloco de dados.
-    um bloco continuo.
-    @seealso(TPLCMemoryManager.MaxBlockItems)
-    }
-    {$ELSE}
-    {:
-    How many holding registers (words) can be read in single block.
-    @seealso(TPLCMemoryManager.MaxBlockItems)
-    }
-    {$ENDIF}
+    {: How many holding registers (words) can be read in single block.
+       @seealso(TPLCMemoryManager.MaxBlockItems) }
     property HoldingRegsMaxBlockSize: THoldingRegistersBlockSize read PHoldingRegsMaxBlockSize write SetHoldingRegsMaxBlockSize default 125;
   public
     //: @exclude
@@ -329,10 +165,8 @@ type
     destructor Destroy; override;
     //: @seealso(TProtocolDriver.SizeOfTag)
     function SizeOfTag(ATag: TTag; isWrite: Boolean; var ProtocolTagType: TProtocolTagType): Byte; override;
-
     //: @seealso(TProtocolDriver.OpenTagEditor)
     procedure OpenTagEditor(InsertHook: TAddTagInEditorHook; CreateProc: TCreateTagProc); override;
-
     //: @seealso(TProtocolDriver.HasTabBuilderEditor)
     function HasTabBuilderEditor: Boolean; override;
   end;
@@ -353,25 +187,26 @@ var
   ScanPercent1: Double;
   ScanPercent2: Double;
 begin
-  BitCombination := ifthen(Item1.NeedUpdate, 1, 0) + ifthen(Item2.NeedUpdate, 2, 0);
+  BitCombination := IfThen(Item1.NeedUpdate, 1, 0) + IfThen(Item2.NeedUpdate, 2, 0);
   case BitCombination of
     1: Result := -1;
     2: Result := 1;
-    0,
-    3:  begin
-          ScanPercent1 := 0;
-          if Item1.UpdateRate <> 0 then ScanPercent1 := (MilliSecondsBetween(Now, Item1.LastUpdate) / Item1.UpdateRate);
+    0, 3: begin
+            ScanPercent1 := 0;
+            if Item1.UpdateRate <> 0 then
+              ScanPercent1 := (MilliSecondsBetween(Now, Item1.LastUpdate) / Item1.UpdateRate);
 
-          ScanPercent2 := 0;
-          if Item2.UpdateRate <> 0 then ScanPercent2 := (MilliSecondsBetween(Now, Item2.LastUpdate) / Item2.UpdateRate);
+            ScanPercent2 := 0;
+            if Item2.UpdateRate <> 0 then
+              ScanPercent2 := (MilliSecondsBetween(Now, Item2.LastUpdate) / Item2.UpdateRate);
 
-          if ScanPercent1 = ScanPercent2 then
-            Result := 0
-          else if ScanPercent1 > ScanPercent2 then
-            Result := -1
-          else
-            Result := 1;
-        end;
+            if ScanPercent1 = ScanPercent2 then
+              Result := 0
+            else if ScanPercent1 > ScanPercent2 then
+              Result := -1
+            else
+              Result := 1;
+          end;
   end;
 end;
 
@@ -536,7 +371,7 @@ begin
       //if not Found the slave, add it.
       if not Found then
       begin
-        PLC := length(PModbusPLC);
+        PLC := Length(PModbusPLC);
         SetLength(PModbusPLC, PLC + 1);
         PModbusPLC[PLC].Station := Station;
         PModbusPLC[PLC].Inputs := TPLCMemoryManager.Create();
@@ -646,24 +481,20 @@ begin
   end;
 
   //retorna o tamanho em bits dos registradores lidos/escritos por
-  //cada tipo de função de leitura/escrita
+  //cada tipo de função de reading/escrita
 
   //return the size in bits of the ATag
   case FunctionCode of
-    $01,
-    $02,
-    $05,
-    $0F:  begin
-            Result := 1;
-            ProtocolTagType := ptBit;
-          end;
-    $03,
-    $04,
-    $06,
-    $10:  begin
-            Result := 16;
-            ProtocolTagType := ptWord;
-          end;
+    $01, $02,
+    $05, $0F: begin
+                Result := 1;
+                ProtocolTagType := ptBit;
+              end;
+    $03, $04,
+    $06, $10: begin
+                Result := 16;
+                ProtocolTagType := ptWord;
+              end;
     $11:  begin
             Result := 8;
             ProtocolTagType := ptByte;
@@ -681,12 +512,12 @@ begin
   Result := nil;
 end;
 
-function TModBusDriver.DecodePkg(pkg: TIOPacket; out values: TArrayOfDouble): TProtocolIOResult;
+function TModBusDriver.DecodePkg(Pkg: TIOPacket; out Values: TArrayOfDouble): TProtocolIOResult;
 begin
   Result := ioDriverError;
 end;
 
-function TModBusDriver.RemainingBytes(buffer: Bytes): Longint;
+function TModBusDriver.RemainingBytes(Buffer: Bytes): Longint;
 begin
   Result := 0;
 end;
@@ -705,8 +536,8 @@ var
     Info: TReqItem;
   begin
     Info.Station := Station;
-    Info.func := Func;
-    Info.startaddress := StartAddress;
+    Info.Func := Func;
+    Info.StartAddress := StartAddress;
     Info.Size := Size;
     Info.LastUpdate := LastUpdate;
     Info.UpdateRate := UpdateRate;
@@ -737,28 +568,48 @@ begin
     begin
       for Block := 0 to High(PModbusPLC[PLC].OutPuts.Blocks) do
       begin
-        AddToTagList(PModbusPLC[PLC].Station, 1, PModbusPLC[PLC].OutPuts.Blocks[Block].AddressStart, PModbusPLC[PLC].OutPuts.Blocks[Block].Size, PModbusPLC[PLC].OutPuts.Blocks[Block].ScanTime, PModbusPLC[PLC].OutPuts.Blocks[Block].LastUpdate, PModbusPLC[PLC].OutPuts.Blocks[Block].NeedRefresh);
+        AddToTagList(PModbusPLC[PLC].Station, 1,
+          PModbusPLC[PLC].OutPuts.Blocks[Block].AddressStart,
+          PModbusPLC[PLC].OutPuts.Blocks[Block].Size,
+          PModbusPLC[PLC].OutPuts.Blocks[Block].ScanTime,
+          PModbusPLC[PLC].OutPuts.Blocks[Block].LastUpdate,
+          PModbusPLC[PLC].OutPuts.Blocks[Block].NeedRefresh);
       end;
 
       for Block := 0 to High(PModbusPLC[PLC].Inputs.Blocks) do
       begin
-        AddToTagList(PModbusPLC[PLC].Station, 2, PModbusPLC[PLC].Inputs.Blocks[Block].AddressStart, PModbusPLC[PLC].Inputs.Blocks[Block].Size, PModbusPLC[PLC].Inputs.Blocks[Block].ScanTime, PModbusPLC[PLC].Inputs.Blocks[Block].LastUpdate, PModbusPLC[PLC].Inputs.Blocks[Block].NeedRefresh);
+        AddToTagList(PModbusPLC[PLC].Station, 2,
+          PModbusPLC[PLC].Inputs.Blocks[Block].AddressStart,
+          PModbusPLC[PLC].Inputs.Blocks[Block].Size,
+          PModbusPLC[PLC].Inputs.Blocks[Block].ScanTime,
+          PModbusPLC[PLC].Inputs.Blocks[Block].LastUpdate,
+          PModbusPLC[PLC].Inputs.Blocks[Block].NeedRefresh);
       end;
 
       for Block := 0 to High(PModbusPLC[PLC].Registers.Blocks) do
       begin
-        AddToTagList(PModbusPLC[PLC].Station, 3, PModbusPLC[PLC].Registers.Blocks[Block].AddressStart, PModbusPLC[PLC].Registers.Blocks[Block].Size, PModbusPLC[PLC].Registers.Blocks[Block].ScanTime, PModbusPLC[PLC].Registers.Blocks[Block].LastUpdate, PModbusPLC[PLC].Registers.Blocks[Block].NeedRefresh);
+        AddToTagList(PModbusPLC[PLC].Station, 3,
+          PModbusPLC[PLC].Registers.Blocks[Block].AddressStart,
+          PModbusPLC[PLC].Registers.Blocks[Block].Size,
+          PModbusPLC[PLC].Registers.Blocks[Block].ScanTime,
+          PModbusPLC[PLC].Registers.Blocks[Block].LastUpdate,
+          PModbusPLC[PLC].Registers.Blocks[Block].NeedRefresh);
       end;
 
       for Block := 0 to High(PModbusPLC[PLC].AnalogReg.Blocks) do
       begin
-        AddToTagList(PModbusPLC[PLC].Station, 4, PModbusPLC[PLC].AnalogReg.Blocks[Block].AddressStart, PModbusPLC[PLC].AnalogReg.Blocks[Block].Size, PModbusPLC[PLC].AnalogReg.Blocks[Block].ScanTime, PModbusPLC[PLC].AnalogReg.Blocks[Block].LastUpdate, PModbusPLC[PLC].AnalogReg.Blocks[Block].NeedRefresh);
+        AddToTagList(PModbusPLC[PLC].Station, 4,
+          PModbusPLC[PLC].AnalogReg.Blocks[Block].AddressStart,
+          PModbusPLC[PLC].AnalogReg.Blocks[Block].Size,
+          PModbusPLC[PLC].AnalogReg.Blocks[Block].ScanTime,
+          PModbusPLC[PLC].AnalogReg.Blocks[Block].LastUpdate,
+          PModbusPLC[PLC].AnalogReg.Blocks[Block].NeedRefresh);
       end;
     end;
 
     EntireTagList.Sort(@SortGenericTagList);
 
-    //faz a leitura do bloco que mais precisa ser lido
+    //faz a reading do bloco que mais precisa ser lido
 
     //update the tag 
     if (EntireTagList.Count > 0) and (EntireTagList.Items[0].NeedUpdate or PReadSomethingAlways) then
@@ -766,8 +617,8 @@ begin
       //compila o bloco do mais necessitado;
       //build the tagrec record.
       BuildTagRec(EntireTagList.Items[0].Station,
-        EntireTagList.Items[0].func,
-        EntireTagList.Items[0].startaddress,
+        EntireTagList.Items[0].Func,
+        EntireTagList.Items[0].StartAddress,
         EntireTagList.Items[0].Size, ATagRec);
       FMustReleaseResources := True;
       DoRead(ATagRec, Values, False);
@@ -793,10 +644,10 @@ var
   i: Longint;
   Found: Boolean;
 begin
-  if length(Values.values) < TagObj.Size then
+  if Length(Values.values) < TagObj.Size then
     SetLength(Values.values, TagObj.Size);
 
-  for i := 0 to length(Values.values) - 1 do
+  for i := 0 to Length(Values.values) - 1 do
     Values.values[i] := 0;
 
   Found := False;
@@ -826,15 +677,15 @@ begin
   end;
 
   if Values.LastQueryResult = ioOk then
-  begin
-    Values.ReadsOK := 1;
-    Values.ReadFaults := 0;
-  end
+    begin
+      Values.ReadsOK := 1;
+      Values.ReadFaults := 0;
+    end
   else
-  begin
-    Values.ReadsOK := 0;
-    Values.ReadFaults := 1;
-  end;
+    begin
+      Values.ReadsOK := 0;
+      Values.ReadFaults := 1;
+    end;
 end;
 
 function TModBusDriver.DoWrite(const ATagRec: TTagRec; const Values: TArrayOfDouble; Sync: Boolean): TProtocolIOResult;
@@ -843,74 +694,71 @@ var
   IOResult2: TIOPacket;
   Pkg: Bytes;
   FRemainingBytes: Longint;
-  rl: Longint;
+  Rl: Longint;
   Res: Longint;
   TempValues: TArrayOfDouble;
 begin
   try
-    Pkg := EncodePkg(ATagRec, Values, rl);
+    Pkg := EncodePkg(ATagRec, Values, Rl);
     if (PCommPort <> nil) and PCommPort.ReallyActive then
-    begin
-      PCommPort.Lock(DriverID);
-      try
-        if AllowBroadCast and (ATagRec.Station = 0) then
-        begin
-          Res := PCommPort.IOCommandSync(iocWrite, length(Pkg), Pkg, 0, DriverID, 0, @IOResult1);
-          case IOResult1.WriteIOResult of
-            iorOK: Result := ioOk;
-            iorTimeOut: Result := ioTimeOut;
-            iorNotReady: Result := ioDriverError;
-            iorNone: Result := ioNone;
-            iorPortError: Result := ioDriverError;
-          end;
-          Exit;
-        end
-        else
-          Res := PCommPort.IOCommandSync(iocWriteRead, length(Pkg), Pkg, PFirstRequestLen, DriverID, PInternalDelayBetweenCmds, @IOResult1);
-
-        //se o resultado de leitura deu ok, le o resto do pacote.
-        //if the IO result is OK, reads the remaing packet...
-        if (Res <> 0) and (IOResult1.ReadIOResult = iorOK) then
-        begin
-
-          //retorna o numero de Bytes que está aguardando ser lido no buffer da porta de comunicação.
-          //calculates the remaining package length at the communication buffer.
-          FRemainingBytes := RemainingBytes(IOResult1.BufferToRead);
-
-          //clear the remaining buffer...
-          if (IOResult1.BufferToRead[PFuncByteOffset - 1] <> Pkg[PFuncByteOffset - 1]) or
-            ((IOResult1.BufferToRead[PFuncByteOffset] <> Pkg[PFuncByteOffset]) and
-            (not (IOResult1.BufferToRead[PFuncByteOffset] in [$81..$88]))) then
-          begin
-            repeat
-              Res := PCommPort.IOCommandSync(iocRead, 0, nil, 1, DriverID, 0, @IOResult2);
-            until IOResult2.ReadIOResult = iorTimeOut;
-            Result := ioCommError;
-            Exit;
-          end;
-
-          if FRemainingBytes > 0 then
-          begin
-            Res := PCommPort.IOCommandSync(iocRead, 0, nil, FRemainingBytes, DriverID, 0, @IOResult2);
-
-            if Res <> 0 then
+      begin
+        PCommPort.Lock(DriverID);
+        try
+          if AllowBroadCast and (ATagRec.Station = 0) then
             begin
-              IOResult1.BufferToRead := ConcatenateBYTES(IOResult1.BufferToRead, IOResult2.BufferToRead);
-              IOResult1.Received := IOResult1.Received + IOResult2.Received;
-              if IOResult2.ReadIOResult <> iorOK then
-                IOResult1.ReadIOResult := IOResult2.ReadIOResult;
+              Res := PCommPort.IOCommandSync(iocWrite, Length(Pkg), Pkg, 0, DriverID, 0, @IOResult1);
+              case IOResult1.WriteIOResult of
+                iorOK: Result := ioOk;
+                iorTimeOut: Result := ioTimeOut;
+                iorNotReady: Result := ioDriverError;
+                iorNone: Result := ioNone;
+                iorPortError: Result := ioDriverError;
+              end;
+              Exit;
             end
-            else
-              Result := ioDriverError;
-          end;
-          Result := DecodePkg(IOResult1, TempValues);
-        end
-        else
-          Result := ioEmptyPacket;
-      finally
-        PCommPort.Unlock(DriverID);
-      end;
-    end
+          else
+            Res := PCommPort.IOCommandSync(iocWriteRead, Length(Pkg), Pkg, PFirstRequestLen, DriverID, PInternalDelayBetweenCmds, @IOResult1);
+
+          // if the IO result is OK, reads the remaing packet...
+          if (Res <> 0) and (IOResult1.ReadIOResult = iorOK) then
+            begin
+              // calculates the remaining package length at the communication buffer
+              FRemainingBytes := RemainingBytes(IOResult1.BufferToRead);
+
+              //clear the remaining buffer...
+              if (IOResult1.BufferToRead[PFuncByteOffset - 1] <> Pkg[PFuncByteOffset - 1]) or
+                ((IOResult1.BufferToRead[PFuncByteOffset] <> Pkg[PFuncByteOffset]) and
+                (not (IOResult1.BufferToRead[PFuncByteOffset] in [$81..$88]))) then
+              begin
+                repeat
+                  Res := PCommPort.IOCommandSync(iocRead, 0, nil, 1, DriverID, 0, @IOResult2);
+                until IOResult2.ReadIOResult = iorTimeOut;
+                Result := ioCommError;
+                Exit;
+              end;
+
+              if FRemainingBytes > 0 then
+              begin
+                Res := PCommPort.IOCommandSync(iocRead, 0, nil, FRemainingBytes, DriverID, 0, @IOResult2);
+
+                if Res <> 0 then
+                begin
+                  IOResult1.BufferToRead := ConcatenateBYTES(IOResult1.BufferToRead, IOResult2.BufferToRead);
+                  IOResult1.Received := IOResult1.Received + IOResult2.Received;
+                  if IOResult2.ReadIOResult <> iorOK then
+                    IOResult1.ReadIOResult := IOResult2.ReadIOResult;
+                end
+                else
+                  Result := ioDriverError;
+              end;
+              Result := DecodePkg(IOResult1, TempValues);
+            end
+          else
+            Result := ioEmptyPacket;
+        finally
+          PCommPort.Unlock(DriverID);
+        end;
+      end
     else
       Result := ioNullDriver;
   finally
@@ -929,73 +777,68 @@ var
   IOResult2: TIOPacket;
   FRemainingBytes: Longint;
   Pkg: Bytes;
-  rl: Longint;
+  Rl: Longint;
   Res: Longint;
   Starts: TNotifyEvent;
   Ends: TNotifyEvent;
 begin
   try
     if FMustReleaseResources then
-    begin
-      Starts := @HighLatencyOperationWillBegin;
-      Ends := @HighLatencyOperationWasEnded;
-    end
-    else
-    begin
-      Starts := nil;
-      Ends := nil;
-    end;
-
-    Pkg := EncodePkg(ATagRec, nil, rl);
-    if (PCommPort <> nil) and PCommPort.ReallyActive then
-    begin
-      PCommPort.Lock(DriverID);
-      Res := PCommPort.IOCommandSync(iocWriteRead, length(Pkg), Pkg, PFirstRequestLen, DriverID, PInternalDelayBetweenCmds, @IOResult1, Starts, Ends);
-
-      //se o resultado de leitura deu ok, le o resto do pacote.
-      //if the IO result is OK, reads the remaing packet...
-      if (Res <> 0) and (IOResult1.ReadIOResult = iorOK) then
       begin
-        //retorna o numero de Bytes que está aguardando ser lido no buffer da porta de comunicação.
-        //calculates the remaining package length at the communication buffer.
-        FRemainingBytes := RemainingBytes(IOResult1.BufferToRead);
-
-        //clear the remaining buffer...
-        if (IOResult1.BufferToRead[PFuncByteOffset - 1] <> Pkg[PFuncByteOffset - 1]) or
-          ((IOResult1.BufferToRead[PFuncByteOffset] <> Pkg[PFuncByteOffset]) and
-          (not (IOResult1.BufferToRead[PFuncByteOffset] in [$81..$88]))) then
-        begin
-          repeat
-            Res := PCommPort.IOCommandSync(iocRead, 0, nil, 1, DriverID, 0, @IOResult2, Starts, Ends);
-          until IOResult2.ReadIOResult = iorTimeOut;
-          Result := ioCommError;
-          Exit;
-        end;
-
-        if FRemainingBytes > 0 then
-        begin
-          Res := PCommPort.IOCommandSync(iocRead, 0, nil, FRemainingBytes, DriverID, 0, @IOResult2, Starts, Ends);
-
-          if Res <> 0 then
-          begin
-            IOResult1.BufferToRead := ConcatenateBYTES(IOResult1.BufferToRead, IOResult2.BufferToRead);
-            IOResult1.Received := IOResult1.Received + IOResult2.Received;
-            if IOResult2.ReadIOResult <> iorOK then
-              IOResult1.ReadIOResult := IOResult2.ReadIOResult;
-          end
-          else
-            Result := ioDriverError;
-        end;
-        Result := DecodePkg(IOResult1, Values);
+        Starts := @HighLatencyOperationWillBegin;
+        Ends := @HighLatencyOperationWasEnded;
       end
-      else
+    else
       begin
-        Result := DecodePkg(IOResult1, Values);
-        //Result:=ioEmptyPacket;
+        Starts := nil;
+        Ends := nil;
       end;
+    Pkg := EncodePkg(ATagRec, nil, Rl);
+    if (PCommPort <> nil) and PCommPort.ReallyActive then
+      begin
+        PCommPort.Lock(DriverID);
+        Res := PCommPort.IOCommandSync(iocWriteRead, Length(Pkg), Pkg, PFirstRequestLen, DriverID, PInternalDelayBetweenCmds, @IOResult1, Starts, Ends);
 
-      PCommPort.Unlock(DriverID);
-    end
+        //if the IO result is OK, reads the remaing packet...
+        if (Res <> 0) and (IOResult1.ReadIOResult = iorOK) then
+          begin
+            //calculates the remaining package length at the communication buffer.
+            FRemainingBytes := RemainingBytes(IOResult1.BufferToRead);
+
+            //clear the remaining buffer...
+            if (IOResult1.BufferToRead[PFuncByteOffset - 1] <> Pkg[PFuncByteOffset - 1]) or
+              ((IOResult1.BufferToRead[PFuncByteOffset] <> Pkg[PFuncByteOffset]) and
+              (not (IOResult1.BufferToRead[PFuncByteOffset] in [$81..$88]))) then
+            begin
+              repeat
+                Res := PCommPort.IOCommandSync(iocRead, 0, nil, 1, DriverID, 0, @IOResult2, Starts, Ends);
+              until IOResult2.ReadIOResult = iorTimeOut;
+              Result := ioCommError;
+              Exit;
+            end;
+
+            if FRemainingBytes > 0 then
+            begin
+              Res := PCommPort.IOCommandSync(iocRead, 0, nil, FRemainingBytes, DriverID, 0, @IOResult2, Starts, Ends);
+              if Res <> 0 then
+                begin
+                  IOResult1.BufferToRead := ConcatenateBYTES(IOResult1.BufferToRead, IOResult2.BufferToRead);
+                  IOResult1.Received := IOResult1.Received + IOResult2.Received;
+                  if IOResult2.ReadIOResult <> iorOK then
+                    IOResult1.ReadIOResult := IOResult2.ReadIOResult;
+                end
+              else
+                Result := ioDriverError;
+            end;
+            Result := DecodePkg(IOResult1, Values);
+          end
+        else
+          begin
+            Result := DecodePkg(IOResult1, Values);
+            //Result:=ioEmptyPacket;
+          end;
+        PCommPort.Unlock(DriverID);
+      end
     else
       Result := ioNullDriver;
   finally

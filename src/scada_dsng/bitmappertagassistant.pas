@@ -46,11 +46,11 @@ var
     if ADialog.BitNameStartsFrom1.Checked then
       Inc(BitNum);
 
-    ByteNum := CurBit Div 8;
+    ByteNum := CurBit div 8;
     if ADialog.ByteNameStartsFrom1.Checked then
       Inc(ByteNum);
 
-    WordNum := CurBit Div 16;
+    WordNum := CurBit div 16;
     if ADialog.WordNameStartsFrom1.Checked then
       Inc(WordNum);
   end;

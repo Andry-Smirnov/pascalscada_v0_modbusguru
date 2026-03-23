@@ -9,26 +9,29 @@ uses
 
 type
   TReqItem = record
-    LastUpdate:TDateTime;
+    LastUpdate: TDateTime;
 
-    station,
-    func,
-    startaddress,
-    size,
+    Station: LongInt;
+    Func: LongInt;
+    StartAddress: LongInt;
+    Size: LongInt;
 
-    UpdateRate:LongInt;
-    Read,
-    NeedUpdate:Boolean;
-    class operator Equal (a, b: TReqItem) r: Boolean;
+    UpdateRate: LongInt;
+    Read: Boolean;
+    NeedUpdate: Boolean;
+    class operator Equal(A, B: TReqItem) R: Boolean;
   end;
   PReqItem = ^TReqItem;
 
+
 implementation
 
-class operator TReqItem.Equal (a, b: TReqItem)r: Boolean;
+
+class operator TReqItem.Equal(A, B: TReqItem) R: Boolean;
 begin
-  r:=true;
+  R := True;
 end;
+
 
 end.
 

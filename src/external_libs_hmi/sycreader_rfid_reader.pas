@@ -77,7 +77,7 @@ type
   end;
 
 var
-  map:array[0..511] of char;
+  map:array [0..511] of char;
 
 procedure Register;
 
@@ -156,7 +156,7 @@ procedure TSycreaderRFID_USBHIDReader.Loop;
 var
   aux:LongWord;
   ShouldReopen: Boolean = false;
-  Buffer: array[0..511] of Byte;
+  Buffer: array [0..511] of Byte;
   Num: SizeInt;
   auxptr: PStrRec;
 begin

@@ -13,28 +13,27 @@ type
 
   TNumericExprTag = class(TPLCNumberMappable, ITagInterface, ITagNumeric)
   private
-    FExpr: String;
+    FExpr: string;
     FLastASyncWriteStatus: TProtocolIOResult;
-    FLastEvalutionError: String;
+    FLastEvalutionError: string;
     FLastSyncReadStatus: TProtocolIOResult;
     FLastSyncWriteStatus: TProtocolIOResult;
-    FvarA: TPLCNumber;
-    FvarB: TPLCNumber;
-    FvarC: TPLCNumber;
-    FvarD: TPLCNumber;
-    FvarE: TPLCNumber;
-    FvarF: TPLCNumber;
-    FvarG: TPLCNumber;
-    FvarH: TPLCNumber;
-    FvarI: TPLCNumber;
-    FvarJ: TPLCNumber;
+    FVarA: TPLCNumber;
+    FVarB: TPLCNumber;
+    FVarC: TPLCNumber;
+    FVarD: TPLCNumber;
+    FVarE: TPLCNumber;
+    FVarF: TPLCNumber;
+    FVarG: TPLCNumber;
+    FVarH: TPLCNumber;
+    FVarI: TPLCNumber;
+    FVarJ: TPLCNumber;
     procedure CalculateValue;
-    procedure ExprIfThen(var Result: TFPExpressionResult;
-      const Args: TExprParameterArray);
+    procedure ExprIfThen(var Result: TFPExpressionResult; const Args: TExprParameterArray);
     function GetValueTimestamp: TDatetime;
     function GetVariantValue: Variant;
-    function IsValidValue(aValue: Variant): Boolean;
-    procedure SetExpr(AValue: String);
+    function IsValidValue(AValue: Variant): Boolean;
+    procedure SetExpr(AValue: string);
     procedure SetVarA(AValue: TPLCNumber);
     procedure SetVarB(AValue: TPLCNumber);
     procedure SetVarC(AValue: TPLCNumber);
@@ -44,392 +43,450 @@ type
     procedure SetVarG(AValue: TPLCNumber);
     procedure SetVarH(AValue: TPLCNumber);
     procedure SetVarI(AValue: TPLCNumber);
-    procedure SetVariantValue(V: Variant);
+    procedure SetVariantValue(AValue: Variant);
     procedure SetVarJ(AValue: TPLCNumber);
     procedure TagRemovedCallback(Sender: TObject);
     procedure VarTagChanged(Sender: TObject);
   protected
-    procedure SetValueRaw(aValue: Double); override;
+    procedure SetValueRaw(AValue: Double); override;
     function GetValueRaw: Double; override;
   public
     procedure Loaded; override;
     destructor Destroy; override;
   published
-    property A:TPLCNumber read FvarA write SetVarA;
-    property B:TPLCNumber read FvarB write SetVarB;
-    property C:TPLCNumber read FvarC write SetVarC;
-    property D:TPLCNumber read FvarD write SetVarD;
-    property E:TPLCNumber read FvarE write SetVarE;
-    property F:TPLCNumber read FvarF write SetVarF;
-    property G:TPLCNumber read FvarG write SetVarG;
-    property H:TPLCNumber read FvarH write SetVarH;
-    property I:TPLCNumber read FvarI write SetVarI;
-    property J:TPLCNumber read FvarJ write SetVarJ;
-    property Expression:String Read FExpr write SetExpr;
+    property A: TPLCNumber read FVarA write SetVarA;
+    property B: TPLCNumber read FVarB write SetVarB;
+    property C: TPLCNumber read FVarC write SetVarC;
+    property D: TPLCNumber read FVarD write SetVarD;
+    property E: TPLCNumber read FVarE write SetVarE;
+    property F: TPLCNumber read FVarF write SetVarF;
+    property G: TPLCNumber read FVarG write SetVarG;
+    property H: TPLCNumber read FVarH write SetVarH;
+    property I: TPLCNumber read FVarI write SetVarI;
+    property J: TPLCNumber read FVarJ write SetVarJ;
+    property Expression: string read FExpr write SetExpr;
     property ScaleProcessor;
-    property LastEvalutionError:String read FLastEvalutionError;
+    property LastEvalutionError: string read FLastEvalutionError;
     property OnValueChangeFirst;
     property OnValueChangeLast;
     property OnReadFail;
     property OnWriteFail;
   end;
 
+
 implementation
 
-uses Variants, Math, hsstrings;
 
-{ TNumericExprTag }
+uses
+  Variants, Math, hsstrings;
 
-function  TNumericExprTag.GetVariantValue:Variant;
+
+  { TNumericExprTag }
+
+function TNumericExprTag.GetVariantValue: Variant;
 begin
-   Result := Value;
+  Result := Value;
 end;
 
-procedure TNumericExprTag.SetVariantValue(V:Variant);
+procedure TNumericExprTag.SetVariantValue(AValue: Variant);
 var
-   aux:double;
+  Aux: Double;
 begin
-   if VarIsNumeric(v) then begin
-      Value := V
-   end else
-      if VarIsStr(V) then begin
-         if TryStrToFloat(V,aux) then
-            Value := aux
-         else
-            raise exception.Create(SinvalidValue);
-      end else
-         if VarIsType(V,varboolean) then begin
-            if V=true then
-               Value := 1
-            else
-               Value := 0;
-         end else
-            raise exception.Create(SinvalidValue);
+  if VarIsNumeric(AValue) then
+    begin
+      Value := AValue;
+    end
+  else if VarIsStr(AValue) then
+    begin
+      if TryStrToFloat(AValue, Aux) then
+        Value := Aux
+      else
+        raise Exception.Create(SinvalidValue);
+    end
+  else if VarIsType(AValue, varboolean) then
+    begin
+      if AValue = True then
+        Value := 1
+      else
+        Value := 0;
+    end
+  else
+    raise Exception.Create(SinvalidValue);
 end;
 
-function  TNumericExprTag.IsValidValue(aValue:Variant):Boolean;
+function TNumericExprTag.IsValidValue(AValue: Variant): Boolean;
 var
-   aux:Double;
-   aValueStr: AnsiString;
+  Aux: Double;
+  AValueStr: AnsiString;
 begin
-   aValueStr:=aValue;
-   Result := VarIsNumeric(aValue) or
-             (VarIsStr(aValue) and TryStrToFloat(aValueStr,aux)) or
-             VarIsType(aValue, varboolean);
+  AValueStr := AValue;
+  Result := VarIsNumeric(AValue) or
+    (VarIsStr(AValue) and TryStrToFloat(AValueStr, Aux)) or
+    VarIsType(AValue, varboolean);
 end;
 
-function TNumericExprTag.GetValueTimestamp:TDatetime;
+function TNumericExprTag.GetValueTimestamp: TDatetime;
 begin
-   Result := PValueTimeStamp;
+  Result := PValueTimeStamp;
 end;
 
-procedure TNumericExprTag.ExprIfThen(var Result: TFPExpressionResult; Const Args: TExprParameterArray);
+procedure TNumericExprTag.ExprIfThen(var Result: TFPExpressionResult; const Args: TExprParameterArray);
 const
-  {$IF FPC_FULLVERSION>=030200}
-  TypeNames:array[Low(TResultType)..High(TResultType)] of string = ('Boolean','Integer','Float','DateTime','String','Currency');
-  {$ELSE}
-  TypeNames:array[Low(TResultType)..High(TResultType)] of string = ('Boolean','Integer','Float','DateTime','String');
-  {$ENDIF}
+{$IF FPC_FULLVERSION >= 030200}
+  TypeNames: array [Low(TResultType)..High(TResultType)] of string = ('Boolean', 'Integer', 'Float', 'DateTime', 'String', 'Currency');
+{$ELSE}
+  TypeNames: array [Low(TResultType)..High(TResultType)] of string = ('Boolean', 'Integer', 'Float', 'DateTime', 'String');
+{$ENDIF}
 begin
-  if Length(Args)<>3 then
-    raise exception.Create('IfThen param count mismatch.');
+  if Length(Args) <> 3 then
+    raise Exception.Create('IfThen param count mismatch.');
 
-  if Args[0].ResultType<>rtBoolean then
-    raise exception.Create('IfThen param0 (condition) type mismatch. Expected Boolean, got '+TypeNames[Args[0].ResultType]);
+  if Args[0].ResultType <> rtBoolean then
+    raise Exception.Create('IfThen param0 (condition) type mismatch. Expected Boolean, got ' + TypeNames[Args[0].ResultType]);
 
-  if Args[1].ResultType<>rtFloat then
-    raise exception.Create('IfThen param1 (valueTrue) type mismatch. Expected Float, got '+TypeNames[Args[1].ResultType]);
+  if Args[1].ResultType <> rtFloat then
+    raise Exception.Create('IfThen param1 (valueTrue) type mismatch. Expected Float, got ' + TypeNames[Args[1].ResultType]);
 
-  if Args[2].ResultType<>rtFloat then
-    raise exception.Create('IfThen param2 (valueFalse) type mismatch. Expected Float, got '+TypeNames[Args[2].ResultType]);
+  if Args[2].ResultType <> rtFloat then
+    raise Exception.Create('IfThen param2 (valueFalse) type mismatch. Expected Float, got ' + TypeNames[Args[2].ResultType]);
 
-  Result.resFloat := ifthen(Args[0].ResBoolean,Args[1].ResFloat,Args[2].ResFloat);
+  Result.resFloat := IfThen(Args[0].ResBoolean, Args[1].resFloat, Args[2].resFloat);
 end;
 
 procedure TNumericExprTag.CalculateValue;
 var
-  FParser: TFPExpressionParser;
-  exprValue: TExprFloat;
+  AParser: TFPExpressionParser;
+  ExprValue: TExprFloat;
 begin
-  if [csLoading,csReading]*ComponentState=[] then begin
-    FParser := TFpExpressionParser.Create(self);
+  if [csLoading, csReading] * ComponentState = [] then
+  begin
+    AParser := TFPExpressionParser.Create(Self);
     try
-      FParser.BuiltIns := [bcMath, bcBoolean,bcUser];
-      FParser.Identifiers.AddFunction('ifthen', 'F', 'BFF', @ExprIfThen);
-      if Assigned(FvarA) then
-        FParser.Identifiers.AddFloatVariable('A', (FvarA as ITagNumeric).GetValue);
+      AParser.BuiltIns := [bcMath, bcBoolean, bcUser];
+      AParser.Identifiers.AddFunction('IfThen', 'F', 'BFF', @ExprIfThen);
+      if Assigned(FVarA) then
+        AParser.Identifiers.AddFloatVariable('A', (FVarA as ITagNumeric).GetValue);
 
-      if Assigned(FvarB) then
-        FParser.Identifiers.AddFloatVariable('B', (FvarB as ITagNumeric).GetValue);
+      if Assigned(FVarB) then
+        AParser.Identifiers.AddFloatVariable('B', (FVarB as ITagNumeric).GetValue);
 
-      if Assigned(FvarC) then
-        FParser.Identifiers.AddFloatVariable('C', (FvarC as ITagNumeric).GetValue);
+      if Assigned(FVarC) then
+        AParser.Identifiers.AddFloatVariable('C', (FVarC as ITagNumeric).GetValue);
 
-      if Assigned(FvarD) then
-        FParser.Identifiers.AddFloatVariable('D', (FvarD as ITagNumeric).GetValue);
+      if Assigned(FVarD) then
+        AParser.Identifiers.AddFloatVariable('D', (FVarD as ITagNumeric).GetValue);
 
-      if Assigned(FvarE) then
-        FParser.Identifiers.AddFloatVariable('E', (FvarE as ITagNumeric).GetValue);
+      if Assigned(FVarE) then
+        AParser.Identifiers.AddFloatVariable('E', (FVarE as ITagNumeric).GetValue);
 
-      if Assigned(FvarF) then
-        FParser.Identifiers.AddFloatVariable('F', (FvarF as ITagNumeric).GetValue);
+      if Assigned(FVarF) then
+        AParser.Identifiers.AddFloatVariable('F', (FVarF as ITagNumeric).GetValue);
 
-      if Assigned(FvarG) then
-        FParser.Identifiers.AddFloatVariable('G', (FvarG as ITagNumeric).GetValue);
+      if Assigned(FVarG) then
+        AParser.Identifiers.AddFloatVariable('G', (FVarG as ITagNumeric).GetValue);
 
-      if Assigned(FvarH) then
-        FParser.Identifiers.AddFloatVariable('H', (FvarH as ITagNumeric).GetValue);
+      if Assigned(FVarH) then
+        AParser.Identifiers.AddFloatVariable('H', (FVarH as ITagNumeric).GetValue);
 
-      if Assigned(FvarI) then
-        FParser.Identifiers.AddFloatVariable('I', (FvarI as ITagNumeric).GetValue);
+      if Assigned(FVarI) then
+        AParser.Identifiers.AddFloatVariable('I', (FVarI as ITagNumeric).GetValue);
 
-      if Assigned(FvarJ) then
-        FParser.Identifiers.AddFloatVariable('J', (FvarJ as ITagNumeric).GetValue);
+      if Assigned(FVarJ) then
+        AParser.Identifiers.AddFloatVariable('J', (FVarJ as ITagNumeric).GetValue);
 
-
-
-      FLastEvalutionError:='OK';
+      FLastEvalutionError := 'OK';
       try
-        FParser.Expression:=FExpr;
-        exprValue:=FParser.Evaluate.ResFloat;
-        if exprValue<>PValueRaw then begin
-          PValueRaw:=exprValue;
-          PValueTimeStamp:=Now;
+        AParser.Expression := FExpr;
+        ExprValue := AParser.Evaluate.ResFloat;
+        if ExprValue <> PValueRaw then
+        begin
+          PValueRaw := ExprValue;
+          PValueTimeStamp := Now;
           NotifyChange;
         end;
       except
-        on e:Exception do begin
-          FLastEvalutionError:=e.Message;
+        on E: Exception do
+        begin
+          FLastEvalutionError := E.Message;
           NotifyReadFault;
         end;
       end;
-
     finally
-      FParser.Free;
+      AParser.Free;
     end;
   end;
 end;
 
-procedure TNumericExprTag.SetExpr(AValue: String);
+procedure TNumericExprTag.SetExpr(AValue: string);
 begin
-  if FExpr=AValue then Exit;
-  FExpr:=AValue;
+  if FExpr = AValue then Exit;
+  FExpr := AValue;
 
   CalculateValue;
 end;
 
 procedure TNumericExprTag.SetVarA(AValue: TPLCNumber);
 begin
-  if FvarA=AValue then Exit;
-  if Assigned(AValue) and (not Supports(AValue,ITagNumeric)) then Exit;
+  if FVarA = AValue then
+    Exit;
+  if Assigned(AValue) and (not Supports(AValue, ITagNumeric)) then
+    Exit;
 
-  if Assigned(FvarA) THEN begin
-    FvarA.RemoveAllHandlersFromObject(Self);
+  if Assigned(FVarA) then
+  begin
+    FVarA.RemoveAllHandlersFromObject(Self);
   end;
 
-  if Assigned(AValue) then begin
+  if Assigned(AValue) then
+  begin
     AValue.AddTagChangeHandler(@VarTagChanged);
     AValue.AddWriteFaultHandler(@VarTagChanged);
     AValue.AddRemoveTagHandler(@TagRemovedCallback);
   end;
 
-  FvarA:=AValue;
+  FVarA := AValue;
 
   CalculateValue;
 end;
 
 procedure TNumericExprTag.SetVarB(AValue: TPLCNumber);
 begin
-  if FvarB=AValue then Exit;
-  if Assigned(AValue) and (not Supports(AValue,ITagNumeric)) then Exit;
+  if FVarB = AValue then
+    Exit;
+  if Assigned(AValue) and (not Supports(AValue, ITagNumeric)) then
+    Exit;
 
-  if Assigned(FvarB) THEN begin
-    FvarB.RemoveAllHandlersFromObject(Self);
+  if Assigned(FVarB) then
+  begin
+    FVarB.RemoveAllHandlersFromObject(Self);
   end;
 
-  if Assigned(AValue) then begin
+  if Assigned(AValue) then
+  begin
     AValue.AddTagChangeHandler(@VarTagChanged);
     AValue.AddWriteFaultHandler(@VarTagChanged);
     AValue.AddRemoveTagHandler(@TagRemovedCallback);
   end;
 
-  FvarB:=AValue;
+  FVarB := AValue;
 
   CalculateValue;
 end;
 
 procedure TNumericExprTag.SetVarC(AValue: TPLCNumber);
 begin
-  if FvarC=AValue then Exit;
-  if Assigned(AValue) and (not Supports(AValue,ITagNumeric)) then Exit;
+  if FVarC = AValue then
+    Exit;
+  if Assigned(AValue) and (not Supports(AValue, ITagNumeric)) then
+    Exit;
 
-  if Assigned(FvarC) THEN begin
-    FvarC.RemoveAllHandlersFromObject(Self);
+  if Assigned(FVarC) then
+  begin
+    FVarC.RemoveAllHandlersFromObject(Self);
   end;
 
-  if Assigned(AValue) then begin
+  if Assigned(AValue) then
+  begin
     AValue.AddTagChangeHandler(@VarTagChanged);
     AValue.AddWriteFaultHandler(@VarTagChanged);
     AValue.AddRemoveTagHandler(@TagRemovedCallback);
   end;
 
-  FvarC:=AValue;
+  FVarC := AValue;
 
   CalculateValue;
 end;
 
 procedure TNumericExprTag.SetVarD(AValue: TPLCNumber);
 begin
-  if FvarD=AValue then Exit;
-  if Assigned(AValue) and (not Supports(AValue,ITagNumeric)) then Exit;
+  if FVarD = AValue then
+    Exit;
+  if Assigned(AValue) and (not Supports(AValue, ITagNumeric)) then
+    Exit;
 
-  if Assigned(FvarD) THEN begin
-    FvarD.RemoveAllHandlersFromObject(Self);
+  if Assigned(FVarD) then
+  begin
+    FVarD.RemoveAllHandlersFromObject(Self);
   end;
 
-  if Assigned(AValue) then begin
+  if Assigned(AValue) then
+  begin
     AValue.AddTagChangeHandler(@VarTagChanged);
     AValue.AddWriteFaultHandler(@VarTagChanged);
     AValue.AddRemoveTagHandler(@TagRemovedCallback);
   end;
 
-  FvarD:=AValue;
+  FVarD := AValue;
 
   CalculateValue;
 end;
 
 procedure TNumericExprTag.SetVarE(AValue: TPLCNumber);
 begin
-  if FvarE=AValue then Exit;
-  if Assigned(AValue) and (not Supports(AValue,ITagNumeric)) then Exit;
+  if FVarE = AValue then
+    Exit;
+  if Assigned(AValue) and (not Supports(AValue, ITagNumeric)) then
+    Exit;
 
-  if Assigned(FvarE) THEN begin
-    FvarE.RemoveAllHandlersFromObject(Self);
+  if Assigned(FVarE) then
+  begin
+    FVarE.RemoveAllHandlersFromObject(Self);
   end;
 
-  if Assigned(AValue) then begin
+  if Assigned(AValue) then
+  begin
     AValue.AddTagChangeHandler(@VarTagChanged);
     AValue.AddWriteFaultHandler(@VarTagChanged);
     AValue.AddRemoveTagHandler(@TagRemovedCallback);
   end;
 
-  FvarE:=AValue;
+  FVarE := AValue;
 
   CalculateValue;
 end;
 
 procedure TNumericExprTag.SetVarF(AValue: TPLCNumber);
 begin
-  if FvarF=AValue then Exit;
-  if Assigned(AValue) and (not Supports(AValue,ITagNumeric)) then Exit;
+  if FVarF = AValue then
+    Exit;
+  if Assigned(AValue) and (not Supports(AValue, ITagNumeric)) then
+    Exit;
 
-  if Assigned(FvarF) THEN begin
-    FvarF.RemoveAllHandlersFromObject(Self);
+  if Assigned(FVarF) then
+  begin
+    FVarF.RemoveAllHandlersFromObject(Self);
   end;
 
-  if Assigned(AValue) then begin
+  if Assigned(AValue) then
+  begin
     AValue.AddTagChangeHandler(@VarTagChanged);
     AValue.AddWriteFaultHandler(@VarTagChanged);
     AValue.AddRemoveTagHandler(@TagRemovedCallback);
   end;
 
-  FvarF:=AValue;
+  FVarF := AValue;
 
   CalculateValue;
 end;
 
 procedure TNumericExprTag.SetVarG(AValue: TPLCNumber);
 begin
-  if FvarG=AValue then Exit;
-  if Assigned(AValue) and (not Supports(AValue,ITagNumeric)) then Exit;
+  if FVarG = AValue then
+    Exit;
+  if Assigned(AValue) and (not Supports(AValue, ITagNumeric)) then
+    Exit;
 
-  if Assigned(FvarG) THEN begin
-    FvarG.RemoveAllHandlersFromObject(Self);
+  if Assigned(FVarG) then
+  begin
+    FVarG.RemoveAllHandlersFromObject(Self);
   end;
 
-  if Assigned(AValue) then begin
+  if Assigned(AValue) then
+  begin
     AValue.AddTagChangeHandler(@VarTagChanged);
     AValue.AddWriteFaultHandler(@VarTagChanged);
     AValue.AddRemoveTagHandler(@TagRemovedCallback);
   end;
 
-  FvarG:=AValue;
+  FVarG := AValue;
 
   CalculateValue;
 end;
 
 procedure TNumericExprTag.SetVarH(AValue: TPLCNumber);
 begin
-  if FvarH=AValue then Exit;
-  if Assigned(AValue) and (not Supports(AValue,ITagNumeric)) then Exit;
+  if FVarH = AValue then
+    Exit;
+  if Assigned(AValue) and (not Supports(AValue, ITagNumeric)) then
+    Exit;
 
-  if Assigned(FvarH) THEN begin
-    FvarH.RemoveAllHandlersFromObject(Self);
+  if Assigned(FVarH) then
+  begin
+    FVarH.RemoveAllHandlersFromObject(Self);
   end;
 
-  if Assigned(AValue) then begin
+  if Assigned(AValue) then
+  begin
     AValue.AddTagChangeHandler(@VarTagChanged);
     AValue.AddWriteFaultHandler(@VarTagChanged);
     AValue.AddRemoveTagHandler(@TagRemovedCallback);
   end;
 
-  FvarH:=AValue;
+  FVarH := AValue;
 
   CalculateValue;
 end;
 
 procedure TNumericExprTag.SetVarI(AValue: TPLCNumber);
 begin
-  if FvarI=AValue then Exit;
-  if Assigned(AValue) and (not Supports(AValue,ITagNumeric)) then Exit;
+  if FVarI = AValue then
+    Exit;
+  if Assigned(AValue) and (not Supports(AValue, ITagNumeric)) then
+    Exit;
 
-  if Assigned(FvarI) THEN begin
-    FvarI.RemoveAllHandlersFromObject(Self);
+  if Assigned(FVarI) then
+  begin
+    FVarI.RemoveAllHandlersFromObject(Self);
   end;
 
-  if Assigned(AValue) then begin
+  if Assigned(AValue) then
+  begin
     AValue.AddTagChangeHandler(@VarTagChanged);
     AValue.AddWriteFaultHandler(@VarTagChanged);
     AValue.AddRemoveTagHandler(@TagRemovedCallback);
   end;
 
-  FvarI:=AValue;
+  FVarI := AValue;
 
   CalculateValue;
 end;
 
 procedure TNumericExprTag.SetVarJ(AValue: TPLCNumber);
 begin
-  if FvarJ=AValue then Exit;
-  if Assigned(AValue) and (not Supports(AValue,ITagNumeric)) then Exit;
+  if FVarJ = AValue then
+    Exit;
+  if Assigned(AValue) and (not Supports(AValue, ITagNumeric)) then
+    Exit;
 
-  if Assigned(FvarJ) THEN begin
-    FvarJ.RemoveAllHandlersFromObject(Self);
+  if Assigned(FVarJ) then
+  begin
+    FVarJ.RemoveAllHandlersFromObject(Self);
   end;
 
-  if Assigned(AValue) then begin
+  if Assigned(AValue) then
+  begin
     AValue.AddTagChangeHandler(@VarTagChanged);
     AValue.AddWriteFaultHandler(@VarTagChanged);
     AValue.AddRemoveTagHandler(@TagRemovedCallback);
   end;
 
-  FvarJ:=AValue;
+  FVarJ := AValue;
 
   CalculateValue;
 end;
 
 procedure TNumericExprTag.TagRemovedCallback(Sender: TObject);
 begin
-  IF SENDER=FvarA THEN FvarA:=NIL;
-  IF SENDER=FvarB THEN FvarB:=NIL;
-  IF SENDER=FvarC THEN FvarC:=NIL;
-  IF SENDER=FvarD THEN FvarD:=NIL;
-  IF SENDER=FvarE THEN FvarE:=NIL;
-  IF SENDER=FvarF THEN FvarF:=NIL;
-  IF SENDER=FvarG THEN FvarG:=NIL;
-  IF SENDER=FvarH THEN FvarH:=NIL;
-  IF SENDER=FvarI THEN FvarI:=NIL;
-  IF SENDER=FvarJ THEN FvarJ:=NIL;
+  if Sender = FVarA then
+    FVarA := nil;
+  if Sender = FVarB then
+    FVarB := nil;
+  if Sender = FVarC then
+    FVarC := nil;
+  if Sender = FVarD then
+    FVarD := nil;
+  if Sender = FVarE then
+    FVarE := nil;
+  if Sender = FVarF then
+    FVarF := nil;
+  if Sender = FVarG then
+    FVarG := nil;
+  if Sender = FVarH then
+    FVarH := nil;
+  if Sender = FVarI then
+    FVarI := nil;
+  if Sender = FVarJ then
+    FVarJ := nil;
   CalculateValue;
 end;
 
@@ -438,14 +495,14 @@ begin
   CalculateValue;
 end;
 
-procedure TNumericExprTag.SetValueRaw(aValue: Double);
+procedure TNumericExprTag.SetValueRaw(AValue: Double);
 begin
   NotifyWriteFault;
 end;
 
 function TNumericExprTag.GetValueRaw: Double;
 begin
-  Result:=PValueRaw;
+  Result := PValueRaw;
 end;
 
 procedure TNumericExprTag.Loaded;
@@ -456,18 +513,27 @@ end;
 
 destructor TNumericExprTag.Destroy;
 begin
-  if Assigned(FvarA) THEN  FvarA.RemoveAllHandlersFromObject(Self);
-  if Assigned(FvarB) THEN  FvarB.RemoveAllHandlersFromObject(Self);
-  if Assigned(FvarC) THEN  FvarC.RemoveAllHandlersFromObject(Self);
-  if Assigned(FvarD) THEN  FvarD.RemoveAllHandlersFromObject(Self);
-  if Assigned(FvarE) THEN  FvarE.RemoveAllHandlersFromObject(Self);
-  if Assigned(FvarF) THEN  FvarF.RemoveAllHandlersFromObject(Self);
-  if Assigned(FvarG) THEN  FvarG.RemoveAllHandlersFromObject(Self);
-  if Assigned(FvarH) THEN  FvarH.RemoveAllHandlersFromObject(Self);
-  if Assigned(FvarI) THEN  FvarI.RemoveAllHandlersFromObject(Self);
-  if Assigned(FvarJ) THEN  FvarJ.RemoveAllHandlersFromObject(Self);
+  if Assigned(FVarA) then
+     FVarA.RemoveAllHandlersFromObject(Self);
+  if Assigned(FVarB) then
+    FVarB.RemoveAllHandlersFromObject(Self);
+  if Assigned(FVarC) then
+    FVarC.RemoveAllHandlersFromObject(Self);
+  if Assigned(FVarD) then
+    FVarD.RemoveAllHandlersFromObject(Self);
+  if Assigned(FVarE) then
+    FVarE.RemoveAllHandlersFromObject(Self);
+  if Assigned(FVarF) then
+    FVarF.RemoveAllHandlersFromObject(Self);
+  if Assigned(FVarG) then
+    FVarG.RemoveAllHandlersFromObject(Self);
+  if Assigned(FVarH) then
+    FVarH.RemoveAllHandlersFromObject(Self);
+  if Assigned(FVarI) then
+    FVarI.RemoveAllHandlersFromObject(Self);
+  if Assigned(FVarJ) then
+    FVarJ.RemoveAllHandlersFromObject(Self);
   inherited Destroy;
 end;
 
 end.
-

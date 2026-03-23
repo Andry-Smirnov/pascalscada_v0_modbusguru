@@ -1,11 +1,4 @@
 {$i ../common/language.inc}
-{$IFDEF PORTUGUES}
-{:
-  @author(Fabio Luis Girardi <fabio@pascalscada.com>)
-
-  @abstract(Implementação de um elemento de um tag bloco de comunicação.)
-}
-{$ELSE}
 {:
   @author(Fabio Luis Girardi <fabio@pascalscada.com>)
   @abstract(Unit that implements a block element tag.)
@@ -17,7 +10,6 @@
   ***********************************************************************
 
 }
-{$ENDIF}
 unit PLCBlockElement;
 
 interface
@@ -26,80 +18,57 @@ uses
   SysUtils, Classes, PLCNumber, PLCBlock, ProtocolTypes, variants, Tag;
 
 type
-  {$IFDEF PORTUGUES}
-  {:
-  @author(Fabio Luis Girardi <fabio@pascalscada.com>)
-
-  Classe de Tag Elemento de Bloco de comunicação.
-  Usado para retirar uma informação de um conjunto (bloco) de informações.
-
-  @seealso(TPLCBlock)
-  }
-  {$ELSE}
-  {:
-  @author(Fabio Luis Girardi <fabio@pascalscada.com>)
+  {: @author(Fabio Luis Girardi <fabio@pascalscada.com>)
 
   Class of Block element tag.
   Used to get a single value from a set of values (block).
 
-  @seealso(TPLCBlock)
-  }
-  {$ENDIF}
+  @seealso(TPLCBlock) }
   TPLCBlockElement = class(TPLCNumberMappable, ITagInterface, ITagNumeric)
   protected
-    PBlock:TPLCBlock;
+    PBlock: TPLCBlock;
   protected
-    PIndex:Cardinal;
+    PIndex: Cardinal;
 
-    function GetLastAsyncReadStatus: TProtocolIOResult;  override;
+    function GetLastAsyncReadStatus: TProtocolIOResult; override;
     function GetLastAsyncWriteStatus: TProtocolIOResult; override;
-    function GetLastSyncReadStatus: TProtocolIOResult;   override;
-    function GetLastSyncWriteStatus: TProtocolIOResult;  override;
+    function GetLastSyncReadStatus: TProtocolIOResult; override;
+    function GetLastSyncWriteStatus: TProtocolIOResult; override;
 
-    procedure SetBlock(blk:TPLCBlock);
-    procedure SetIndex(i:Cardinal); virtual;
+    procedure SetBlock(Blk: TPLCBlock);
+    procedure SetIndex(AValue: Cardinal); virtual;
 
-    function  GetVariantValue:Variant;
-    procedure SetVariantValue(V:Variant);
-    function  IsValidValue(aValue:Variant):Boolean;
-    function  GetValueTimestamp:TDatetime;
+    function GetVariantValue: Variant;
+    procedure SetVariantValue(AValue: Variant);
+    function IsValidValue(AValue: Variant): Boolean;
+    function GetValueTimestamp: TDatetime;
 
-    procedure WriteFaultCallback(Sender:TObject); virtual;
-    procedure TagChangeCallback(Sender:TObject); virtual;
-    procedure RemoveTagCallBack(Sender:TObject); virtual;
+    procedure WriteFaultCallback(Sender: TObject); virtual;
+    procedure TagChangeCallback(Sender: TObject); virtual;
+    procedure RemoveTagCallBack(Sender: TObject); virtual;
   protected
     //: @seealso(TPLCNumber.GetValueRaw)
-    function  GetValueRaw:Double; override;
+    function GetValueRaw: Double; override;
     //: @seealso(TPLCNumber.SetValueRaw)
-    procedure SetValueRaw(aValue:Double); override;
+    procedure SetValueRaw(AValue: Double); override;
   public
     //: @exclude
-    constructor Create(AOwner:TComponent); override;
+    constructor Create(AOwner: TComponent); override;
     //: @exclude
-    destructor  Destroy; override;
+    destructor Destroy; override;
     //: @seealso(TPLCTag.ScanRead)
-    function ScanRead:Int64; override;
+    function ScanRead: Int64; override;
     //: @seealso(TPLCTag.ScanWrite)
-    function ScanWrite(Values:TArrayOfDouble; Count, Offset:Cardinal; const IgnoreAutoWrite:Boolean = false):Int64; override;
+    function ScanWrite(Values: TArrayOfDouble; Count, Offset: Cardinal; const IgnoreAutoWrite: Boolean = False): Int64; override;
     //: @seealso(TPLCTag.Read)
     procedure Read; override;
     //: @seealso(TPLCTag.Write)
-    procedure Write(Values:TArrayOfDouble; Count, Offset:Cardinal); override;
+    procedure Write(Values: TArrayOfDouble; Count, Offset: Cardinal); override;
   published
-
-    {$IFDEF PORTUGUES}
-    //: Bloco de comunicações que o elemento pertence.
-    {$ELSE}
     //: Communication Block of the element.
-    {$ENDIF}
-    property PLCBlock:TPLCBlock read PBlock write SetBlock;
-
-    {$IFDEF PORTUGUES}
-    //: Offset da elemento de memória dentro do bloco (indice).
-    {$ELSE}
+    property PLCBlock: TPLCBlock read PBlock write SetBlock;
     //: Index of tag element on the Tag Block.
-    {$ENDIF}
-    property Index:Cardinal read PIndex write SetIndex;
+    property Index: Cardinal read PIndex write SetIndex;
     //: @seealso(TPLCNumber.EnableMaxValue)
     property EnableMaxValue;
     //: @seealso(TPLCNumber.EnableMinValue)
@@ -115,212 +84,234 @@ type
     property LastSyncWriteStatus;
   end;
 
+
 implementation
 
-uses hsstrings, math;
 
-constructor TPLCBlockElement.Create(AOwner:TComponent);
+
+uses
+  hsstrings,
+  Math;
+
+
+constructor TPLCBlockElement.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   PBlock := nil;
-  AutoRead := false;
-  AutoWrite := false;
+  AutoRead := False;
+  AutoWrite := False;
   PIndex := 0;
 end;
 
-destructor  TPLCBlockElement.Destroy;
+destructor TPLCBlockElement.Destroy;
 begin
   if Assigned(PBlock) then
-     PBlock.RemoveAllHandlersFromObject(Self);
-  PBlock:=nil;
+    PBlock.RemoveAllHandlersFromObject(Self);
+  PBlock := nil;
   inherited Destroy;
 end;
 
 function TPLCBlockElement.GetLastAsyncReadStatus: TProtocolIOResult;
 begin
   if Assigned(PBlock) then
-    Result:=PBlock.LastASyncReadStatus
+    Result := PBlock.LastASyncReadStatus
   else
-    Result:=ioNullTagBlock
+    Result := ioNullTagBlock;
 end;
 
 function TPLCBlockElement.GetLastAsyncWriteStatus: TProtocolIOResult;
 begin
   if Assigned(PBlock) then
-    Result:=PBlock.LastASyncWriteStatus
+    Result := PBlock.LastASyncWriteStatus
   else
-    Result:=ioNullTagBlock
+    Result := ioNullTagBlock;
 end;
 
 function TPLCBlockElement.GetLastSyncReadStatus: TProtocolIOResult;
 begin
   if Assigned(PBlock) then
-    Result:=PBlock.LastSyncReadStatus
+    Result := PBlock.LastSyncReadStatus
   else
-    Result:=ioNullTagBlock;
+    Result := ioNullTagBlock;
 end;
 
 function TPLCBlockElement.GetLastSyncWriteStatus: TProtocolIOResult;
 begin
   if Assigned(PBlock) then
-    Result:=PBlock.LastSyncWriteStatus
+    Result := PBlock.LastSyncWriteStatus
   else
-    Result:=ioNullTagBlock;
+    Result := ioNullTagBlock;
 end;
 
-procedure TPLCBlockElement.SetBlock(blk:TPLCBlock);
+procedure TPLCBlockElement.SetBlock(Blk: TPLCBlock);
 begin
-  if blk=PLCBlock then Exit;
+  if Blk = PLCBlock then Exit;
   //esta removendo do bloco.
   //removing the link with the block
-  if Assigned(PBlock) then begin
+  if Assigned(PBlock) then
+  begin
     PBlock.RemoveAllHandlersFromObject(Self);
   end;
 
   //se esta setando o bloco
   //if the block is being set
-  if (blk<>nil) then begin
-    blk.AddRemoveTagHandler(@RemoveTagCallBack);
-    blk.AddTagChangeHandler(@TagChangeCallback);
-    blk.AddWriteFaultHandler(@WriteFaultCallback);
-    if PIndex>=blk.Size then
-      PIndex := blk.Size - 1;
+  if (Blk <> nil) then
+  begin
+    Blk.AddRemoveTagHandler(@RemoveTagCallBack);
+    Blk.AddTagChangeHandler(@TagChangeCallback);
+    Blk.AddWriteFaultHandler(@WriteFaultCallback);
+    if PIndex >= Blk.Size then
+      PIndex := Blk.Size - 1;
   end;
-  PBlock:=blk;
+  PBlock := Blk;
 end;
 
-procedure TPLCBlockElement.SetIndex(i:Cardinal);
+procedure TPLCBlockElement.SetIndex(AValue: Cardinal);
 begin
-  if PBlock=nil then begin
-    PIndex := i;
+  if PBlock = nil then
+  begin
+    PIndex := AValue;
     Exit;
   end;
 
-  if i>=PBlock.Size then
+  if AValue >= PBlock.Size then
     raise Exception.Create(SoutOfBounds);
-  PIndex := i;
+  PIndex := AValue;
 end;
 
-function TPLCBlockElement.GetValueRaw:Double;
+function TPLCBlockElement.GetValueRaw: Double;
 begin
   if Assigned(PBlock) then
-     Result := PBlock.ValueRaw[PIndex]
+    Result := PBlock.ValueRaw[PIndex]
   else
-     Result := PValueRaw ;
+    Result := PValueRaw;
 end;
 
-function  TPLCBlockElement.GetVariantValue:Variant;
+function TPLCBlockElement.GetVariantValue: Variant;
 begin
-   Result := Value;
+  Result := Value;
 end;
 
-procedure TPLCBlockElement.SetVariantValue(V:Variant);
+procedure TPLCBlockElement.SetVariantValue(AValue: Variant);
 var
-   aux:double;
+  Aux: Double;
 begin
-   if VarIsNumeric(v) then begin
-      Value := V
-   end else
-      if VarIsStr(V) then begin
-         if TryStrToFloat(V,aux) then
-            Value := aux
-         else
-            raise exception.Create(SinvalidValue);
-      end else
-         if VarIsType(V,varboolean) then begin
-            if V=true then
-               Value := 1
-            else
-               Value := 0;
-         end else
-            raise exception.Create(SinvalidValue);
+    if VarIsNumeric(AValue) then
+    begin
+      Value := AValue;
+    end
+  else if VarIsStr(AValue) then
+    begin
+      if TryStrToFloat(AValue, Aux) then
+        Value := Aux
+      else
+        raise Exception.Create(SinvalidValue);
+    end
+  else if VarIsType(AValue, varBoolean) then
+    begin
+      if AValue = True then
+        Value := 1
+      else
+        Value := 0;
+    end
+  else
+    raise Exception.Create(SinvalidValue);
 end;
 
-function  TPLCBlockElement.IsValidValue(aValue:Variant):Boolean;
+function TPLCBlockElement.IsValidValue(AValue: Variant): Boolean;
 var
-   aux:Double;
-   aValueStr: AnsiString;
+  Aux: Double;
+  AValueStr: AnsiString;
 begin
-   aValueStr:=aValue;
-   Result := VarIsNumeric(aValue) or
-             (VarIsStr(aValue) and TryStrToFloat(aValueStr,aux)) or
-             VarIsType(aValue, varboolean);
+  AValueStr := AValue;
+  Result := VarIsNumeric(AValue)
+    or (VarIsStr(AValue) and TryStrToFloat(AValueStr, Aux))
+    or VarIsType(AValue, varboolean);
 end;
 
-function TPLCBlockElement.GetValueTimestamp:TDatetime;
+function TPLCBlockElement.GetValueTimestamp: TDatetime;
 begin
-   Result := PValueTimeStamp;
+  Result := PValueTimeStamp;
 end;
 
-procedure TPLCBlockElement.SetValueRaw(aValue:Double);
+procedure TPLCBlockElement.SetValueRaw(AValue: Double);
 begin
-  if Assigned(PBlock) then begin
-    PBlock.ValueRaw[PIndex] := aValue;
-    PValueRaw := aValue;
-  end else
-    if PValueRaw<>Value then begin
-      PValueRaw:=Value;
-      NotifyChange;
-    end;
+  if Assigned(PBlock) then
+  begin
+    PBlock.ValueRaw[PIndex] := AValue;
+    PValueRaw := AValue;
+  end
+  else
+  if PValueRaw <> Value then
+  begin
+    PValueRaw := Value;
+    NotifyChange;
+  end;
 end;
 
 function TPLCBlockElement.ScanRead: Int64;
 begin
   if Assigned(PBlock) then
-    Result:=PBlock.ScanRead
+    Result := PBlock.ScanRead
   else
-    Result:=-1;
+    Result := -1;
 end;
 
-function TPLCBlockElement.ScanWrite(Values: TArrayOfDouble; Count,
-  Offset: Cardinal; const IgnoreAutoWrite: Boolean): Int64;
+function TPLCBlockElement.ScanWrite(Values: TArrayOfDouble; Count, Offset: Cardinal; const IgnoreAutoWrite: Boolean): Int64;
 begin
   if Assigned(PBlock) then
-    Result := PBlock.ScanWrite(values, 1, PIndex, IgnoreAutoWrite)
+    Result := PBlock.ScanWrite(Values, 1, PIndex, IgnoreAutoWrite)
   else
-    Result:=-1;
+    Result := -1;
 end;
 
 procedure TPLCBlockElement.Read;
 begin
-  if Assigned(PBlock) then begin
+  if Assigned(PBlock) then
+  begin
     PBlock.Read;
   end;
 end;
 
-procedure TPLCBlockElement.Write(Values:TArrayOfDouble; Count, Offset:Cardinal);
+procedure TPLCBlockElement.Write(Values: TArrayOfDouble; Count, Offset: Cardinal);
 begin
   if Assigned(PBlock) then
-    PBlock.Write(values, 1, PIndex)
+    PBlock.Write(Values, 1, PIndex);
 end;
 
 procedure TPLCBlockElement.WriteFaultCallback(Sender: TObject);
 var
-  notify:Boolean;
+  Notify: Boolean;
 begin
-  if Assigned(PBlock) then begin
-    notify := (PValueRaw<>PBlock.ValueRaw[PIndex]) or (IsNan(PBlock.ValueRaw[PIndex]) and (not IsNan(PValueRaw)));
+  if Assigned(PBlock) then
+  begin
+    Notify := (PValueRaw <> PBlock.ValueRaw[PIndex])
+      or (IsNan(PBlock.ValueRaw[PIndex]) and (not IsNan(PValueRaw)));
     PValueRaw := PBlock.ValueRaw[PIndex];
     PValueTimeStamp := PBlock.ValueTimestamp;
 
-    if notify or PFirstUpdate then begin
-      PFirstUpdate:=false;
+    if Notify or PFirstUpdate then
+    begin
+      PFirstUpdate := False;
       NotifyWriteFault();
     end;
   end;
 end;
 
-procedure TPLCBlockElement.TagChangeCallback(Sender:TObject);
+procedure TPLCBlockElement.TagChangeCallback(Sender: TObject);
 var
-  notify:Boolean;
+  Notify: Boolean;
 begin
-  if Assigned(PBlock) then begin
-    notify := (PValueRaw<>PBlock.ValueRaw[PIndex]) or (IsNan(PBlock.ValueRaw[PIndex]) and (not IsNan(PValueRaw)));
+  if Assigned(PBlock) then
+  begin
+    Notify := (PValueRaw <> PBlock.ValueRaw[PIndex])
+      or (IsNan(PBlock.ValueRaw[PIndex]) and (not IsNan(PValueRaw)));
     PValueRaw := PBlock.ValueRaw[PIndex];
     PValueTimeStamp := PBlock.ValueTimestamp;
 
-    if notify or PFirstUpdate then begin
-      PFirstUpdate:=false;
+    if Notify or PFirstUpdate then
+    begin
+      PFirstUpdate := False;
       NotifyChange();
     end;
   end;
@@ -328,7 +319,7 @@ end;
 
 procedure TPLCBlockElement.RemoveTagCallBack(Sender: TObject);
 begin
-  if PBlock=sender then
+  if PBlock = Sender then
     PBlock := nil;
 end;
 

@@ -180,7 +180,7 @@ var
 
   function ProgressNormalized: Double;
   begin
-    Result := ((Progress - FMin) / ifthen((FMax - FMin) = 0, 1, (FMax - FMin)));
+    Result := ((Progress - FMin) / IfThen((FMax - FMin) = 0, 1, (FMax - FMin)));
     if Result < 0 then
       Result := 0;
     if Result > 1 then
@@ -198,7 +198,7 @@ begin
     pbVertical: begin
                   FControlArea.CanvasBGRA.Pen.Width := 0;
                   FControlArea.CanvasBGRA.Brush.Color := FBodyColor;
-                  Aux := Height * ((FMax - Progress) / ifthen((FMax - FMin) = 0, 1, (FMax - FMin)));
+                  Aux := Height * ((FMax - Progress) / IfThen((FMax - FMin) = 0, 1, (FMax - FMin)));
                   FControlArea.RectangleAntialias(FBorderWidth,
                     Height - (Height * ProgressNormalized),
                     Width - (FBorderWidth * 2),
@@ -231,7 +231,7 @@ begin
     pbTopDown:  begin
                   FControlArea.CanvasBGRA.Pen.Width := 0;
                   FControlArea.CanvasBGRA.Brush.Color := FBodyColor;
-                  Aux := Height * ((FMax - Progress) / ifthen((FMax - FMin) = 0, 1, (FMax - FMin)));
+                  Aux := Height * ((FMax - Progress) / IfThen((FMax - FMin) = 0, 1, (FMax - FMin)));
                   FControlArea.RectangleAntialias(FBorderWidth,
                     FBorderWidth,
                     Width - (FBorderWidth * 2),

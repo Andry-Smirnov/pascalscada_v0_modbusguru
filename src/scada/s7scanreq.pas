@@ -13,18 +13,18 @@ type
   { TReqItem }
 
   TS7ScanReqItem = record
-    LastUpdate:TDateTime;
-    iPLC,
-    iDB,
-    iDBNum,
-    iReqType,
-    iStartAddress,
-    iSize,
-    NextUpdtInMs,
-    UpdateRate:LongInt;
-    Read,
-    NeedUpdate:Boolean;
-    class operator Equal (a, b: TS7ScanReqItem) r: Boolean;
+    LastUpdate: TDateTime;
+    iPLC: LongInt;
+    iDB: LongInt;
+    iDBNum: LongInt;
+    iReqType: LongInt;
+    iStartAddress: LongInt;
+    iSize: LongInt;
+    NextUpdtInMs: LongInt;
+    UpdateRate: LongInt;
+    Read: Boolean;
+    NeedUpdate: Boolean;
+    class operator Equal (A, B: TS7ScanReqItem) R: Boolean;
   end;
   PS7ScanReqItem = ^TS7ScanReqItem;
 
@@ -32,17 +32,17 @@ implementation
 
 { TReqItem }
 
-class operator TS7ScanReqItem.Equal(a, b: TS7ScanReqItem)r: Boolean;
+class operator TS7ScanReqItem.Equal(A, B: TS7ScanReqItem) R: Boolean;
 begin
-  r:=(a.LastUpdate    = b.LastUpdate   ) and
-     (a.iPLC          = b.iPLC         ) and
-     (a.iDB           = b.iDB          ) and
-     (a.iDBNum        = b.iDBNum       ) and
-     (a.iReqType      = b.iReqType     ) and
-     (a.iStartAddress = b.iStartAddress) and
-     (a.iSize         = b.iSize        ) and
-     (a.UpdateRate    = b.UpdateRate   ) and
-     (a.NeedUpdate    = b.NeedUpdate);
+  R := (A.LastUpdate = B.LastUpdate)
+    and (A.iPLC = B.iPLC)
+    and (A.iDB = B.iDB)
+    and (A.iDBNum = B.iDBNum)
+    and (A.iReqType = B.iReqType)
+    and (A.iStartAddress = B.iStartAddress)
+    and (A.iSize = B.iSize)
+    and (A.UpdateRate = B.UpdateRate)
+    and (A.NeedUpdate = B.NeedUpdate);
 end;
 
 end.

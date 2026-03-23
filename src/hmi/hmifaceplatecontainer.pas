@@ -117,7 +117,7 @@ end;
 
 procedure TFaceplateFrame.CMHitTest(var Message: TCMHittest);
 begin
-  Message.Result := ifthen(FTransparent, 0, 1);
+  Message.Result := IfThen(FTransparent, 0, 1);
 end;
 
 constructor TFaceplateFrame.Create(TheOwner: TComponent);

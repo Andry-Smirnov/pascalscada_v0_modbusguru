@@ -138,7 +138,7 @@ begin
     end else PopupMenu1.OnClose := @PopupMenu1CloseDoNothing;
 
     case Escolha of
-      1: CheckListBox1.Selected.StateIndex:=ifthen(CheckListBox1.Selected.StateIndex=0,1,0);
+      1: CheckListBox1.Selected.StateIndex:=IfThen(CheckListBox1.Selected.StateIndex=0,1,0);
       2: begin
         sChecked := 0;
         sUnchecked := 0;
@@ -146,7 +146,7 @@ begin
           if CheckListBox1.Selected.Items[i].StateIndex=0 then Inc(sUnchecked);
           if CheckListBox1.Selected.Items[i].StateIndex=1 then Inc(sChecked);
         end;
-        StateToChange := 1=ifthen(sChecked>sUnchecked,0,1);
+        StateToChange := 1=IfThen(sChecked>sUnchecked,0,1);
         for i:=0 to CheckListBox1.Selected.Count-1 do begin
           ChangeAuth(CheckListBox1.Selected.Items[i],StateToChange,hasSubItems);
         end;
@@ -176,7 +176,7 @@ end;
 procedure TfrmUserPerms.MenuItem1Click(Sender: TObject);
 begin
   Escolha:=1;
-  //CheckListBox1.Selected.StateIndex:=ifthen(CheckListBox1.Selected.StateIndex=0,1,0);
+  //CheckListBox1.Selected.StateIndex:=IfThen(CheckListBox1.Selected.StateIndex=0,1,0);
   //UpdateParents(CheckListBox1.Selected);
 end;
 
@@ -217,7 +217,7 @@ procedure TfrmUserPerms.ChangeAuth(auth: TTreeNode; Check, IncludeChildItems: Bo
 var
   i: Integer;
 begin
-  auth.StateIndex:=ifthen( Check and ((auth.Data=Nil) or (GetControlSecurityManager.CanAccess(TNamedIntegerList(auth.Data).Listname))),1,0);
+  auth.StateIndex:=IfThen( Check and ((auth.Data=Nil) or (GetControlSecurityManager.CanAccess(TNamedIntegerList(auth.Data).Listname))),1,0);
   if IncludeChildItems and (auth.Count>0) then
     for i:=0 to auth.Count-1 do
       ChangeAuth(auth.Items[i],Check,IncludeChildItems);

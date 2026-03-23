@@ -146,7 +146,7 @@ begin
   inherited Logout;
   if Assigned(FLogoutEvent) then
   try
-    FLogoutEvent(self);
+    FLogoutEvent(Self);
   except
   end;
 end;
@@ -154,7 +154,7 @@ end;
 procedure TCustomizedUserManagement.Manage;
 begin
   if Assigned(FManageUsersAndGroupsEvent) then
-    FManageUsersAndGroupsEvent(self);
+    FManageUsersAndGroupsEvent(Self);
 end;
 
 procedure TCustomizedUserManagement.ValidateSecurityCode(ASecurityCode: UTF8String);

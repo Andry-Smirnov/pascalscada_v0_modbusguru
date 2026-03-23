@@ -1,15 +1,8 @@
 {$i ../common/language.inc}
-{$IFDEF PORTUGUES}
-{:
-  @abstract(Implementação de processadores de escala.)
-  @author(Fabio Luis Girardi <fabio@pascalscada.com>)
-}
-{$ELSE}
 {:
   @abstract(Implements the scale processors.)
   @author(Fabio Luis Girardi <fabio@pascalscada.com>)
 }
-{$ENDIF}
 unit ValueProcessor;
 
 interface
@@ -18,185 +11,70 @@ uses
   SysUtils, Classes, PLCTag;
 
 type
-  {$IFDEF PORTUGUES}
-  {:
-    @abstract(Classe base processadora de escalas.)
-    @author(Fabio Luis Girardi <fabio@pascalscada.com>)
-  }
-  {$ELSE}
-  {:
-    @abstract(Base class for all scale processors.)
-    @author(Fabio Luis Girardi <fabio@pascalscada.com>)
-  }
-  {$ENDIF}
+  {: @abstract(Base class for all scale processors.)
+     @author(Fabio Luis Girardi <fabio@pascalscada.com>) }
   TScaleProcessor = class(TComponent)
   private
-    FValueIn:Double;
-    FQueueItems:array of TCollectionItem;
-    procedure SetInput(value:Double);
-    function  GetOutput:Double;
-    procedure SetOutput(value:Double);
+    FValueIn: Double;
+    FQueueItems: array of TCollectionItem;
+    procedure SetInput(Value: Double);
+    function GetOutput: Double;
+    procedure SetOutput(Value: Double);
   public
     //: @exclude
-    constructor Create(AOwner:TComponent); override;
+    constructor Create(AOwner: TComponent); override;
     //: @exclude
     destructor Destroy; override;
 
-    {$IFDEF PORTUGUES}
-    //: Adiciona um dependente desse processador de escalas.
-    {$ELSE}
     //: Adds a object to dependents list.
-    {$ENDIF}
-    procedure AddQueueItem(QueueItem:TCollectionItem);
+    procedure AddQueueItem(QueueItem: TCollectionItem);
 
-    {$IFDEF PORTUGUES}
-    //: Remove um dependente desse processador de escalas.
-    {$ELSE}
     //: Removes a object from the dependent object list.
-    {$ENDIF}
-    procedure DelQueueItem(QueueItem:TCollectionItem);
+    procedure DelQueueItem(QueueItem: TCollectionItem);
 
-    {$IFDEF PORTUGUES}
-    {:
-    Fornece um valor na escala de engenharia a partir de um valor puro em função
-    e dos parametros da escala, se existirem.
-
-    @bold(Geralmente é a informação no sentido Equipamento -> Usuário.)
-
-    @param(Sender TComponent: Quem está solicitando esse processamento.)
-    @param(Input Double: Valor de entrada.)
-    @returns(Double. Valor processado para a escala de engenharia.)
-    }
-    {$ELSE}
-    {:
-    Returns a value in engineering scale based on a raw value and in the scales
-    parameters, if there exists.
-
+    {: Returns a value in engineering scale based on a raw value and in the scales
+       parameters, if there exists.
     @bold(Usually, this value is comming from device and going to user.)
-
     @param(Sender TComponent: Who is requesting this transformation.)
     @param(Input Double: Input value to be processed.)
-    @returns(Double. The value tranformed to engineering scale.)
-    }
-    {$ENDIF}
-    function SetInGetOut(Sender:TComponent; Input:Double):Double; virtual;
+    @returns(Double. The value tranformed to engineering scale.) }
+    function SetInGetOut(Sender: TComponent; Input: Double): Double; virtual;
 
-    {$IFDEF PORTUGUES}
-    {:
-    Fornece um valor puro a partir de um valor processado em função dos
-    parametros da escala, se existirem.
-
-    @bold(Geralmente é a informação no sentido Usuário -> Equipamento.)
-
-    @param(Sender TComponent: Quem está solicitando esse processamento.)
-    @param(Output Double: Valor na escala de engenharia a ser transformado em um valor puro.)
-    @returns(Double. Valor puro em função dos parametros da escala.)
-    }
-    {$ELSE}
-    {:
-    Returns a raw value based on a value in engineering scale and in scales
-    parameters, if there exists.
-
+    {: Returns a raw value based on a value in engineering scale and in scales
+       parameters, if there exists.
     @bold(Usually, this value is comming from a user input going to device.)
-
     @param(Sender TComponent: Who is requesting this value transformation.)
     @param(Output Double: Value in engineering scale to be processed to a raw value.)
-    @returns(Double. The tranformed raw value.)
-    }
-    {$ENDIF}
-    function SetOutGetIn(Sender:TComponent; Output:Double):Double; virtual;
+    @returns(Double. The tranformed raw value.) }
+    function SetOutGetIn(Sender: TComponent; Output: Double): Double; virtual;
   published
-
-    {$IFDEF PORTUGUES}
-    {:
-    Propriedade para testes da escala.
-
-    Se for escrito em @name, o valor processado será entregue em OutPut.
-
-    Se for escrito em OutPut, o valor processado será entregue em @name.
-
-    @seealso(OutPut)
-    }
-    {$ELSE}
-    {:
-    Property to test the scale processor.
-
+    {: Property to test the scale processor.
     If something is written in @name, the transformed value will be returned on OutPut property.
-
     If something is written in OutPut, the transformed value will be returned on @name property.
+    @seealso(OutPut) }
+    property Input: Double read FValueIn write SetInput stored False;
 
-    @seealso(OutPut)
-    }
-    {$ENDIF}
-    property Input:Double read FValueIn write SetInput Stored false;
-
-    {$IFDEF PORTUGUES}
-    {:
-    Propriedade para testes da escala.
-
-    Se for escrito em @name, o valor processado será entregue em Input.
-
-    Se for escrito em Input, o valor processado será entregue em @name.
-
-    @seealso(OutPut)
-    }
-    {$ELSE}
-    {:
-    Property to test the scale processor.
-
+    {: Property to test the scale processor.
     If something is written in @name, the transformed value will be returned on Input property.
-
     If something is written in Input, the transformed value will be returned on @name property.
-
-    @seealso(Input)
-    }
-    {$ENDIF}
-    property Output:Double read GetOutput write SetOutput Stored false;
+    @seealso(Input) }
+    property Output: Double read GetOutput write SetOutput stored False;
   end;
 
-  {$IFDEF PORTUGUES}
-  //: Implementa um item de uma coleção de processadores de escala.
-  {$ELSE}
-  //: Implements a item of a scales processors collection.
-  {$ENDIF}
+  //: Implements a item of a scales processors collection
   TScaleQueueItem = class(TCollectionItem)
   private
-    SProcessor:TScaleProcessor;
-    procedure SetScaleProcessor(SP:TScaleProcessor);
+    SProcessor: TScaleProcessor;
+    procedure SetScaleProcessor(SP: TScaleProcessor);
   protected
     //: @exclude
-    function  GetDisplayName: AnsiString; override;
+    function GetDisplayName: AnsiString; override;
   public
-    {$IFDEF PORTUGUES}
-    {:
-    Procedimento chamado para remover a dependencia de um objeto de escalas que
-    está sendo destruido.
-    }
-    {$ELSE}
-    {:
-    Procedure called to remove a dependency with a scale processor object that
-    is being destroyed.
-    }
-    {$ENDIF}
+    {: Procedure called to remove a dependency with a scale processor object that
+       is being destroyed. }
     procedure RemoveScaleProcessor;
 
-    {$IFDEF PORTUGUES}
-    {:
-    Repassa a chamada para o método SetInGetOut do processador de escalas
-    configurado em ScaleProcessor.
-
-    @param(Sender TComponent: Objeto solicitante.)
-    @param(Input Double: Valor puro que será processado pela escala.)
-
-    @returns(O valor processado pela escala associada em ScaleProcessor. Caso
-    ScaleProcessor não tenha um objeto associado, retorna o valor passado
-    em Input.)
-
-    @seealso(TScaleProcessor.SetInGetOut)
-    }
-    {$ELSE}
-    {:
-    Calls the procedure SetInGetOut of the scale processor, if it's set.
+    {: Calls the procedure SetInGetOut of the scale processor, if it's set.
 
     @param(Sender TComponent: Object that did the request.)
     @param(Input Double: Value to be processed.)
@@ -204,28 +82,10 @@ type
     @returns(The value processed by the scale processor. If there isn't an
     object associated, returns the value of Input.)
 
-    @seealso(TScaleProcessor.SetInGetOut)
-    }
-    {$ENDIF}
-    function SetInGetOut(Sender:TComponent; Input:Double):Double;
+    @seealso(TScaleProcessor.SetInGetOut) }
+    function SetInGetOut(Sender: TComponent; Input: Double): Double;
 
-    {$IFDEF PORTUGUES}
-    {:
-    Repassa a chamada para o método SetOutGetIn do processador de escalas
-    configurado em ScaleProcessor.
-
-    @param(Sender TComponent: Objeto solicitante.)
-    @param(Output Double: Valor processado que se deseja obter um valor puro.)
-
-    @returns(O valor puro retornado pela escala associada em ScaleProcessor. Caso
-    ScaleProcessor não tenha um objeto associado, retorna o valor passado
-    em Output.)
-
-    @seealso(TScaleProcessor.SetOutGetIn)
-    }
-    {$ELSE}
-    {:
-    Calls the procedure SetOutGetIn of the scale processor, if it's set.
+    {: Calls the procedure SetOutGetIn of the scale processor, if it's set.
 
     @param(Sender TComponent: Object that did the request.)
     @param(Output Double: Value to be processed.)
@@ -233,72 +93,30 @@ type
     @returns(The value processed by the scale processor. If there isn't an
     object associated, returns the value of Output parameter.)
 
-    @seealso(TScaleProcessor.SetInGetOut)
-    }
-    {$ENDIF}
-    function SetOutGetIn(Sender:TComponent; Output:Double):Double;
+    @seealso(TScaleProcessor.SetInGetOut) }
+    function SetOutGetIn(Sender: TComponent; Output: Double): Double;
   published
-
-    {$IFDEF PORTUGUES}
-    //: Objeto de escalas responsável por fazer os processamentos desse item.
-    {$ELSE}
     //: Scale processor object that does the values transformations of this item.
-    {$ENDIF}
-    property ScaleProcessor:TScaleProcessor read SProcessor write SetScaleProcessor;
+    property ScaleProcessor: TScaleProcessor read SProcessor write SetScaleProcessor;
   end;
 
-  {$IFDEF PORTUGUES}
-  //: Implementa uma coleção de processadores de escala.
-  {$ELSE}
-  //: Implements a collection of scale processors.
-  {$ENDIF}
+  //: Implements a collection of scale processors
   TScaleQueue = class(TCollection)
   private
-    FOwner:TPersistent;
+    FOwner: TPersistent;
   protected
     //: @exclude
     function GetOwner: TPersistent; override;
   public
     //: @exclude
-    constructor Create(aOwner:TPersistent);
+    constructor Create(AOwner: TPersistent);
 
-    {$IFDEF PORTUGUES}
-    {:
-    Adiciona um novo item de processamento de escalas a coleção.
-    @returns(O novo item da coleção.)
-    }
-    {$ELSE}
-    {:
-    Adds a new item to collection.
-    @returns(The new item of the collection.)
-    }
-    {$ENDIF}
-    function Add:TScaleQueueItem;
+    {: Adds a new item to collection.
+    @returns(The new item of the collection.) }
+    function Add: TScaleQueueItem;
 
-    {$IFDEF PORTUGUES}
-    {:
-    Tranforma um valor puro (Entrada) em um valor processado pelas multiplas
-    escalas pertencentes a coleção (Saida).
-
-    Para isso ele passa Input para o método SetInGetOut do primeiro item da
-    coleção e o resultado ele repassa como parametro do próximo item coleção,
-    repetindo isso até atingir o fim da lista.
-
-    @bold(Logo, o primeiro item da lista é primeiro a ser chamado quando o valor
-    vem no sentido Equipamento -> Usuário assim como o último item da coleção é
-    o primeiro a ser chamado quando o valor vai do Usuário -> Equipamento.)
-
-    @param(Sender TComponent: Quem chamou esse processamento.)
-    @param(Input Double: Valor puro a processar.)
-    @returns(Retorna o valor processado em função das escalas associadas aos
-             itens da coleção. Se não há itens na coleção ou se os itens dela não
-             tiverem um processador de escala associado, Input é retornado.)
-    @seealso(TScalePIPEItem.SetInGetOut)
-    }
-    {$ELSE}
-    {:
-    Process a raw value (Input) to a value in engineering scale, processed by
-    each scale processors of the collection.
+    {: Process a raw value (Input) to a value in engineering scale, processed by
+       each scale processors of the collection.
 
     To do this, this method passes the Input parameter to TScalePIPEItem.SetInGetOut
     of the first item of the collection, takes the result and passes it again as
@@ -316,37 +134,11 @@ type
              collection is empty or all items of the collection aren't set
              correctly (a value processor isn't set), returns the value given in
              Input parameter.)
-    @seealso(TScalePIPEItem.SetInGetOut)
-    }
-    {$ENDIF}
-    function SetInGetOut(Sender:TComponent; Input:Double):Double;
+    @seealso(TScalePIPEItem.SetInGetOut) }
+    function SetInGetOut(Sender: TComponent; Input: Double): Double;
 
-    {$IFDEF PORTUGUES}
-    {:
-    Tranforma um valor processado pelas multiplas escalas da coleção (Saida) em
-    um valor puro (Entrada).
-
-    Para isso ele passa Output para o método SetOutGetIn do último item da
-    coleção e o resultado ele repassa como parametro do item que o antecede,
-    repetindo isso até atingir o inicio da coleção.
-
-    @bold(Logo, o primeiro item da lista é primeiro a ser chamado quando o valor
-    vem no sentido Equipamento -> Usuário assim como o último item da coleção é
-    o primeiro a ser chamado quando o valor vai do Usuário -> Equipamento.)
-
-    @param(Sender TComponent: Quem chamou esse processamento.)
-    @param(Output Double: Valor processado da qual se deseja obter um valor puro.)
-    @returns(Retorna o valor puro em função das escalas associadas aos
-             itens da coleção. Se não há itens na coleção ou se os itens dela não
-             tiverem um processador de escala associado, Output é retornado.)
-    @seealso(TScalePIPEItem.SetOutGetIn)
-    }
-    {$ELSE}
-
-
-    {:
-    Process a raw value in engineering scale to a raw value, processed by each
-    scale processors of the collection.
+    {: Process a raw value in engineering scale to a raw value, processed by each
+       scale processors of the collection.
 
     Para fazer isso, esse método passa o parâmetro de entrada para
     TScalePIPEItem.SetInGetOut do último item da coleção, leva o resultado e
@@ -364,91 +156,85 @@ type
              collection is empty or all items of the collection aren't set
              correctly (a value processor isn't set), returns the value given in
              Outpu parameter.)
-    @seealso(TScalePIPEItem.SetInGetOut)
-    }
-    {$ENDIF}
-    function SetOutGetIn(Sender:TComponent; Output:Double):Double;
+    @seealso(TScalePIPEItem.SetInGetOut) }
+    function SetOutGetIn(Sender: TComponent; Output: Double): Double;
   end;
-  
 
-  {$IFDEF PORTUGUES}
-  //: Componente de enfileiramento de processadores de escala.
-  {$ELSE}
+
   //: Scale processors queue.
-  {$ENDIF}
   TScalesQueue = class(TScaleProcessor)
   private
-    FScaleQueue:TScaleQueue;
-    FTags:array of TPLCTag;
-    function  GetScaleQueue:TScaleQueue;
-    procedure SetScaleQueue(ScaleQueue:TScaleQueue);
+    FScaleQueue: TScaleQueue;
+    FTags: array of TPLCTag;
+
+    function GetScaleQueue: TScaleQueue;
+    procedure SetScaleQueue(ScaleQueue: TScaleQueue);
   public
     //: @exclude
-    constructor Create(AOwner:TComponent); override;
+    constructor Create(AOwner: TComponent); override;
     //: @exclude
-    destructor  Destroy; override;
+    destructor Destroy; override;
 
     //: @seealso(TScalePIPE.SetInGetOut)
-    function SetInGetOut(Sender: TComponent; aInput: Double): Double; override;
+    function SetInGetOut(Sender: TComponent; AInput: Double): Double; override;
     //: @seealso(TScalePIPE.SetOutGetIn)
-    function SetOutGetIn(Sender: TComponent; aOutput: Double): Double; override;
+    function SetOutGetIn(Sender: TComponent; AOutput: Double): Double; override;
   published
-
-    {$IFDEF PORTUGUES}
-    //: Coleção de escalas.
-    {$ELSE}
     //: Collection of scale processors.
-    {$ENDIF}
-    property Escalas:TScaleQueue read GetScaleQueue write SetScaleQueue stored false; // to be removed after 1.0
-    property ScalesQueue:TScaleQueue read GetScaleQueue write SetScaleQueue stored true;
+    property Scales: TScaleQueue read GetScaleQueue write SetScaleQueue stored False; // to be removed after 1.0
+    property ScalesQueue: TScaleQueue read GetScaleQueue write SetScaleQueue stored True;
   end;
-    
+
+
 implementation
 
-uses PLCNumber, hsstrings;
+
+uses
+  PLCNumber, hsstrings;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // TScaleQueueItem implementation
 ////////////////////////////////////////////////////////////////////////////////
-procedure TScaleQueueItem.SetScaleProcessor(SP:TScaleProcessor);
+procedure TScaleQueueItem.SetScaleProcessor(SP: TScaleProcessor);
 begin
-  if SP=Collection.Owner then
+  if SP = Collection.Owner then
     raise Exception.Create(SInvalidQueueOperation);
 
-  if sp=SProcessor then Exit;
+  if SP = SProcessor then Exit;
 
-  if SProcessor<>nil then
-     SProcessor.DelQueueItem(self);
+  if SProcessor <> nil then
+    SProcessor.DelQueueItem(Self);
 
-  if SP<>nil then
-     SP.AddQueueItem(self);
+  if SP <> nil then
+    SP.AddQueueItem(Self);
 
-  DisplayName:=SP.Name;
+  DisplayName := SP.Name;
   SProcessor := SP;
 end;
 
 function TScaleQueueItem.GetDisplayName: AnsiString;
 begin
-   if SProcessor<>nil then
-      Result := SProcessor.Name
-   else
-      Result := SEmpty;
+  if SProcessor <> nil then
+    Result := SProcessor.Name
+  else
+    Result := SEmpty;
 end;
 
-function TScaleQueueItem.SetInGetOut(Sender:TComponent; Input:Double):Double;
+function TScaleQueueItem.SetInGetOut(Sender: TComponent; Input: Double): Double;
 begin
-  if SProcessor<>nil then
-     Result := SProcessor.SetInGetOut(Sender,Input)
+  if SProcessor <> nil then
+    Result := SProcessor.SetInGetOut(Sender, Input)
   else
-     Result := Input;
+    Result := Input;
 end;
 
-function TScaleQueueItem.SetOutGetIn(Sender:TComponent; Output:Double):Double;
+function TScaleQueueItem.SetOutGetIn(Sender: TComponent; Output: Double): Double;
 begin
-  if SProcessor<>nil then
-     Result := SProcessor.SetOutGetIn(Sender,Output)
+  if SProcessor <> nil then
+    Result := SProcessor.SetOutGetIn(Sender, Output)
   else
-     Result := Output;
+    Result := Output;
 end;
 
 procedure TScaleQueueItem.RemoveScaleProcessor;
@@ -460,165 +246,170 @@ end;
 // TScalePIPE implementation
 ////////////////////////////////////////////////////////////////////////////////
 
-constructor TScaleQueue.Create(aOwner:TPersistent);
+constructor TScaleQueue.Create(AOwner: TPersistent);
 begin
   inherited Create(TScaleQueueItem);
-  FOwner:=aOwner;
+  FOwner := AOwner;
 end;
 
-function TScaleQueue.GetOwner:TPersistent;
+function TScaleQueue.GetOwner: TPersistent;
 begin
-  Result:=FOwner;
+  Result := FOwner;
 end;
 
-function TScaleQueue.Add:TScaleQueueItem;
+function TScaleQueue.Add: TScaleQueueItem;
 begin
-   Result := TScaleQueueItem(inherited Add)
+  Result := TScaleQueueItem(inherited Add);
 end;
 
-function TScaleQueue.SetInGetOut(Sender:TComponent; Input:Double):Double;
+function TScaleQueue.SetInGetOut(Sender: TComponent; Input: Double): Double;
 var
-  c:LongInt;
+  c: Longint;
 begin
   Result := Input;
-  for c:=0 to Count-1 do
+  for c := 0 to Count - 1 do
     if GetItem(c) is TScaleQueueItem then
-       Result := TScaleQueueItem(GetItem(c)).SetInGetOut(Sender,Result);
+      Result := TScaleQueueItem(GetItem(c)).SetInGetOut(Sender, Result);
 end;
 
-function TScaleQueue.SetOutGetIn(Sender:TComponent; Output:Double):Double;
+function TScaleQueue.SetOutGetIn(Sender: TComponent; Output: Double): Double;
 var
-  c:LongInt;
+  c: Longint;
 begin
   Result := Output;
-  for c:=(Count-1) downto 0 do
+  for c := (Count - 1) downto 0 do
     if GetItem(c) is TScaleQueueItem then
-       Result := TScaleQueueItem(GetItem(c)).SetOutGetIn(Sender,Result);
+      Result := TScaleQueueItem(GetItem(c)).SetOutGetIn(Sender, Result);
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
 // TPIPE implementation
 ////////////////////////////////////////////////////////////////////////////////
 
-constructor TScalesQueue.Create(AOwner:TComponent);
+constructor TScalesQueue.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FScaleQueue := TScaleQueue.Create(Self);
 end;
 
-destructor  TScalesQueue.Destroy;
+destructor TScalesQueue.Destroy;
 var
-  t:LongInt;
+  t: Longint;
 begin
-  for t:=High(FTags) downto 0 do begin
-    TPLCNumber(FTags[t]).ScaleProcessor:=nil;
+  for t := High(FTags) downto 0 do
+  begin
+    TPLCNumber(FTags[t]).ScaleProcessor := nil;
   end;
   FScaleQueue.Destroy;
   inherited Destroy;
 end;
 
-function  TScalesQueue.GetScaleQueue:TScaleQueue;
+function TScalesQueue.GetScaleQueue: TScaleQueue;
 begin
   Result := FScaleQueue;
 end;
 
-procedure TScalesQueue.SetScaleQueue(ScaleQueue:TScaleQueue);
+procedure TScalesQueue.SetScaleQueue(ScaleQueue: TScaleQueue);
 begin
   FScaleQueue.Assign(ScaleQueue);
 end;
 
-function TScalesQueue.SetInGetOut(Sender:TComponent; aInput:Double):Double;
+function TScalesQueue.SetInGetOut(Sender: TComponent; AInput: Double): Double;
 begin
-   Result := FScaleQueue.SetInGetOut(Sender,aInput);
+  Result := FScaleQueue.SetInGetOut(Sender, AInput);
 end;
 
-function TScalesQueue.SetOutGetIn(Sender:TComponent; aOutput:Double):Double;
+function TScalesQueue.SetOutGetIn(Sender: TComponent; AOutput: Double): Double;
 begin
-   Result := FScaleQueue.SetOutGetIn(Sender, aOutput);
+  Result := FScaleQueue.SetOutGetIn(Sender, AOutput);
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
 // TScaleProcessor implementation
 ////////////////////////////////////////////////////////////////////////////////
-constructor TScaleProcessor.Create(AOwner:TComponent);
+constructor TScaleProcessor.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
 end;
 
 destructor TScaleProcessor.Destroy;
 var
-  c:LongInt;
+  c: Longint;
 begin
-  for c:=0 to High(FQueueItems) do
+  for c := 0 to High(FQueueItems) do
     TScaleQueueItem(FQueueItems[c]).RemoveScaleProcessor;
-  SetLength(FQueueItems,0);
+  SetLength(FQueueItems, 0);
   inherited Destroy;
 end;
 
-procedure TScaleProcessor.AddQueueItem(QueueItem:TCollectionItem);
+procedure TScaleProcessor.AddQueueItem(QueueItem: TCollectionItem);
 var
-  found:Boolean;
-  c:LongInt;
+  found: Boolean;
+  c: Longint;
 begin
   if not (QueueItem is TScaleQueueItem) then
     raise Exception.Create(SinvalidType);
 
-  found := false;
-  for c:=0 to High(FQueueItems) do
-    if FQueueItems[c]=QueueItem then begin
-      found := true;
-      break;
+  found := False;
+  for c := 0 to High(FQueueItems) do
+    if FQueueItems[c] = QueueItem then
+    begin
+      found := True;
+      Break;
     end;
 
-  if not found  then begin
-    c:=Length(FQueueItems);
-    SetLength(FQueueItems,c+1);
-    FQueueItems[c]:=QueueItem;
+  if not found then
+  begin
+    c := Length(FQueueItems);
+    SetLength(FQueueItems, c + 1);
+    FQueueItems[c] := QueueItem;
   end;
 end;
 
-procedure TScaleProcessor.DelQueueItem(QueueItem:TCollectionItem);
+procedure TScaleProcessor.DelQueueItem(QueueItem: TCollectionItem);
 var
-  found:Boolean;
-  c,h:LongInt;
+  found: Boolean;
+  c, h: Longint;
 begin
-  found := false;
-  h:=High(FQueueItems);
-  for c:=0 to h do
-    if FQueueItems[c]=QueueItem then begin
-      found := true;
-      break;
+  found := False;
+  h := High(FQueueItems);
+  for c := 0 to h do
+    if FQueueItems[c] = QueueItem then
+    begin
+      found := True;
+      Break;
     end;
 
-  if found then begin
-    FQueueItems[c]:=FQueueItems[h];
-    SetLength(FQueueItems,h);
+  if found then
+  begin
+    FQueueItems[c] := FQueueItems[h];
+    SetLength(FQueueItems, h);
   end;
 end;
 
-function TScaleProcessor.SetInGetOut(Sender:TComponent; Input:Double):Double;
+function TScaleProcessor.SetInGetOut(Sender: TComponent; Input: Double): Double;
 begin
   Result := Input;
 end;
 
-function TScaleProcessor.SetOutGetIn(Sender:TComponent; Output:Double):Double;
+function TScaleProcessor.SetOutGetIn(Sender: TComponent; Output: Double): Double;
 begin
   Result := Output;
 end;
 
-procedure TScaleProcessor.SetInput(value:Double);
+procedure TScaleProcessor.SetInput(Value: Double);
 begin
-  FValueIn := value;
+  FValueIn := Value;
 end;
 
-procedure TScaleProcessor.SetOutput(value:Double);
+procedure TScaleProcessor.SetOutput(Value: Double);
 begin
-  FValueIn := SetOutGetIn(self, value);
+  FValueIn := SetOutGetIn(Self, Value);
 end;
 
-function  TScaleProcessor.GetOutput:Double;
+function TScaleProcessor.GetOutput: Double;
 begin
-  Result := SetInGetOut(self, FValueIn);
+  Result := SetInGetOut(Self, FValueIn);
 end;
 
 end.

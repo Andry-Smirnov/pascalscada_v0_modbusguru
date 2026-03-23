@@ -229,7 +229,7 @@ begin
       SStream := TStringStream.Create;
       try
         try
-          AClient.Post(ifthen(FUseSSL, 'https', 'http') + '://' + FAuthServer
+          AClient.Post(IfThen(FUseSSL, 'https', 'http') + '://' + FAuthServer
             + ':' + FAuthServerPort.ToString + '/' + AAPIEndpoint, SStream);
         except
         end;

@@ -1,7 +1,7 @@
 {$i ../common/language.inc}
 {$IFDEF PORTUGUES}
 {:
-  @abstract(Implementa um controle em forma de TrackBar para a leitura/escrita
+  @abstract(Implementa um controle em forma de TrackBar para a reading/escrita
             de valores numéricos de tags.)
   @author(Fabio Luis Girardi <fabio@pascalscada.com>)
 }
@@ -26,7 +26,7 @@ uses
 type
   {$IFDEF PORTUGUES}
   {:
-    @abstract(Classe de controle TrackBar para a leitura/escrita de valores
+    @abstract(Classe de controle TrackBar para a reading/escrita de valores
               numéricos em tags.)
     @author(Fabio Luis Girardi <fabio@pascalscada.com>)
   }
@@ -162,7 +162,7 @@ begin
   if not FRegInSecMan then
   begin
     {$IFNDEF WINDOWS}
-    writeln('FIX-ME: Failed to register class ', ClassName, ' instace with name="', Name, '" in the ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
+    WriteLn('FIX-ME: Failed to register class ', ClassName, ' instace with name="', Name, '" in the ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
     {$ENDIF}
   end;
   FIsEnabled := True;
@@ -175,7 +175,7 @@ begin
   else
   begin
     {$IFNDEF WINDOWS}
-    writeln('FIX-ME: Why class ', ClassName, ', instace name="', Name, '" ins''t registered in ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
+    WriteLn('FIX-ME: Why class ', ClassName, ', instace name="', Name, '" ins''t registered in ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
     {$ENDIF}
   end;
 

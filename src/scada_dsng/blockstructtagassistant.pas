@@ -81,7 +81,7 @@ begin
       CurElement := StartElement;
       while CurElement <= EndElement do
       begin
-        ElementNumber := ifthen(ADialog.ElementsStartFromOne.Checked, CurElement + 1, CurElement);
+        ElementNumber := IfThen(ADialog.ElementsStartFromOne.Checked, CurElement + 1, CurElement);
         TagElement := TPLCBlockElement(CreateProc(TPLCBlockElement));
         TagElement.Name := GetNewTagElementName;
         TagElement.plcblock := FBlockStructTag;

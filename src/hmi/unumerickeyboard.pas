@@ -168,7 +168,7 @@ begin
     Top := TargetRect.Top - (NumKeyRect.Bottom - NumKeyRect.Top) - 30  //borda inferior do form com borda superior do target
   else
   begin
-    Top := (TargetRect.Top + ((TargetRect.Bottom - TargetRect.Top) Div 2) - ((NumKeyRect.Bottom - NumKeyRect.Top) Div 2)); //meio
+    Top := (TargetRect.Top + ((TargetRect.Bottom - TargetRect.Top) div 2) - ((NumKeyRect.Bottom - NumKeyRect.Top) div 2)); //meio
     if Top < 0 then
       Top := 0;
     if (Top + (NumKeyRect.Bottom - NumKeyRect.Top)) > Screen.Height then
@@ -182,7 +182,7 @@ begin
     Left := TargetRect.Left   //borda esquerda do form com borda esquerda do target
   else
   begin
-    Left := (TargetRect.Left + ((TargetRect.Right - TargetRect.Left) Div 2) - ((NumKeyRect.Right - NumKeyRect.Left) Div 2)); //meio
+    Left := (TargetRect.Left + ((TargetRect.Right - TargetRect.Left) div 2) - ((NumKeyRect.Right - NumKeyRect.Left) div 2)); //meio
     if Left < 0 then
       Left := 0;
     if (Left + (NumKeyRect.Right - NumKeyRect.Left)) > Screen.Width then

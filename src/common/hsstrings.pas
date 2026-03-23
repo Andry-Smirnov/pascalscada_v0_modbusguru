@@ -195,7 +195,7 @@ resourcestring
   SUpdateThreadWinit = 'The thread does not respond to the INIT command';  //ok
   SCompIsntADriver = 'The component is not a valid protocol driver';    //ok
   SthreadSuspended ='The thread is suspended?'; //ok
-  ScannotBlinkWithItSelf = 'The animation zone can''t blink with it self!';  //ok
+  ScannotBlinkWithItSelf = 'The animation zone can''t blink with it Self!';  //ok
   SfileNotFound = 'File not found!'; //ok
   SPLCMinPLCMaxMustBeDifferent = 'The properties PLCMin and PLCMax must be different!';  //ok
   SsysMinSysMaxMustBeDifferent = 'The properties SysMin and SysMax must be different!';  //ok

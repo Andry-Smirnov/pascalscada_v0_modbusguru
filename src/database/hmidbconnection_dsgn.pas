@@ -64,7 +64,7 @@ begin
 end;
 
 var
-  SupportedDBDrivers: array[0..3] of string = ('postgresql', 'sqlite', 'mysql', 'firebird');
+  SupportedDBDrivers: array [0..3] of string = ('postgresql', 'sqlite', 'mysql', 'firebird');
 
 //only accepted drivers are show.
 procedure THMIDBProtocolPropertyEditor.GetValueList(List: TStrings);

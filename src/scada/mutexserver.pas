@@ -22,135 +22,158 @@ unit mutexserver;
 {$I ../common/delphiver.inc}
 interface
 
+
 uses
-  Classes, SysUtils, socket_types, CrossEvent, crossthreads, socketserver,
+  Classes,
+  SysUtils,
+  socket_types,
+  CrossEvent,
+  crossthreads,
+  socketserver,
   syncobjs
-  {$IF defined(WIN32) or defined(WIN64)} //delphi or lazarus over windows
-    {$IFDEF FPC}
-    , WinSock2,
-    {$ELSE}
-    , WinSock,
-    {$ENDIF}
-    sockets_w32_w64
+  // delphi or lazarus over windows
+{$IF defined(WIN32) or defined(WIN64)}
+  {$IFDEF FPC}
+  , WinSock2,
   {$ELSE}
+  , WinSock,
+  {$ENDIF}
+  sockets_w32_w64
+{$ELSE}
   {$IF defined(FPC) AND (defined(UNIX) or defined(WINCE))}
-  , Sockets {$IFDEF UNIX}  , sockets_unix, netdb, Unix{$ENDIF}
-            {$IFDEF WINCE} , sockets_wince {$ENDIF}
-            {$IFDEF FDEBUG}, LCLProc{$ENDIF}
+  , Sockets
+    {$IFDEF UNIX}  
+  , sockets_unix, 
+  netdb, 
+  Unix
+    {$ENDIF}
+    {$IFDEF WINCE} 
+  , sockets_wince 
+    {$ENDIF}
+    {$IFDEF FDEBUG}
+  , LCLProc
+    {$ENDIF}
   {$IFEND}
-  {$IFEND};
+{$IFEND}
+  ;
+
+
+const
+  MUTEX_SERVER_PORT = 52321;//51342;
+
 
 type
   { TAcceptThread }
 
-  TAcceptThread = Class(TSocketAcceptThread)
+  TAcceptThread = class(TSocketAcceptThread)
   private
-    FMutex:TCriticalSection;
+    FMutex: TCriticalSection;
   protected
     procedure LaunchNewThread; override;
   public
-    constructor Create(CreateSuspended: Boolean;
-                       ServerSocket:TSocket;
-                       ServerMutex:syncobjs.TCriticalSection;
-                       AddClientThread,
-                       RemoveClientThread:TNotifyEvent);
+    constructor Create(CreateSuspended: Boolean; ServerSocket: TSocket; ServerMutex: syncobjs.TCriticalSection; AddClientThread, RemoveClientThread: TNotifyEvent);
   end;
 
   { TClientThread }
 
-  TClientThread = Class(TSocketClientThread)
+  TClientThread = class(TSocketClientThread)
   private
-    FMutex:TCriticalSection;
-    FIntoCriticalSection:Boolean;
+    FMutex: TCriticalSection;
+    FIntoCriticalSection: Boolean;
   protected
     procedure ThreadLoop; override;
   public
-    constructor Create(CreateSuspended: Boolean;
-                       ClientSocket:TSocket;
-                       ClientSockinfo:TSockAddr;
-                       ServerMutex:syncobjs.TCriticalSection;
-                       RemoveClientThread:TNotifyEvent);
+    constructor Create(CreateSuspended: Boolean; ClientSocket: TSocket; ClientSockinfo: TSockAddr; ServerMutex: syncobjs.TCriticalSection; RemoveClientThread: TNotifyEvent);
   end;
 
   { TMutexServer }
 
   TMutexServer = class(TComponent)
   private
-    FActive,
+    FActive: Boolean;
     FActiveLoaded: Boolean;
     FPort: Word;
     FSocket: TSocket;
-    FMutex:TCriticalSection;
-    FAcceptThread:TAcceptThread;
-    FClients:Array of TClientThread;
-    procedure setActive(AValue: Boolean);
+    FMutex: TCriticalSection;
+    FAcceptThread: TAcceptThread;
+    FClients: array of TClientThread;
+
+    procedure SetActive(AValue: Boolean);
     procedure SetPort(AValue: Word);
-    procedure AddClientThread(Sender:TObject);
-    procedure RemoveClientThread(Sender:TObject);
-    { Private declarations }
+    procedure AddClientThread(Sender: TObject);
+    procedure RemoveClientThread(Sender: TObject);
   protected
     procedure Loaded; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
   published
-    property Active:Boolean read FActive write setActive stored true default false;
-    property Port:Word read FPort write SetPort stored true default 52321;
-
+    property Active: Boolean read FActive write SetActive stored True default False;
+    property Port: Word read FPort write SetPort stored True default MUTEX_SERVER_PORT;//52321;
   end;
+
 
 implementation
 
-uses dateutils, hsstrings {$IF defined(WIN32) or defined(WIN64)} , Windows{$IFEND};
+
+uses
+  dateutils, hsstrings
+{$IF defined(WIN32) or defined(WIN64)}
+ , Windows
+{$IFEND}
+  ;
 
 
 procedure TClientThread.ThreadLoop;
 var
-  ClientCmd, Response:Byte;
-  FaultCount:LongInt;
-  Quit:Boolean;
+  ClientCmd: Byte;
+  Response: Byte;
+  FaultCount: Longint;
+  Quit: Boolean;
   LastPingSent: TDateTime;
+const
+  FaultLimit = 10;
 
-  const FaultLimit = 10;
-
-  procedure ProcClientCommand(cmd:Byte);
+  procedure ProcClientCommand(Cmd: Byte);
   begin
     case Cmd of
-      2: begin
-        if FIntoCriticalSection or FMutex.TryEnter then begin
-          FIntoCriticalSection:=true;
-          LastPingSent:=Now;
-          Response:=21;
-        end else begin
-          FIntoCriticalSection:=false;
-          Response:=20;
-        end;
-        if socket_send(FSocket, @Response, 1, 0, 1000)<1 then
-          FaultCount:=FaultLimit+1;
-      end;
-      3: begin
-        try
-          if FIntoCriticalSection then begin
-            FMutex.Leave;
-            FIntoCriticalSection:=false;
-            Response:=30;
-          end else
-            Response:=31;
-        except
-          Response:=32;
-        end;
+      2:  begin
+            if FIntoCriticalSection or FMutex.TryEnter then
+            begin
+              FIntoCriticalSection := True;
+              LastPingSent := Now;
+              Response := 21;
+            end
+            else
+            begin
+              FIntoCriticalSection := False;
+              Response := 20;
+            end;
+            if SocketSend(FSocket, @Response, 1, 0, 1000) < 1 then
+              FaultCount := FaultLimit + 1;
+          end;
+      3:  begin
+            try
+              if FIntoCriticalSection then
+              begin
+                FMutex.Leave;
+                FIntoCriticalSection := False;
+                Response := 30;
+              end
+              else
+                Response := 31;
+            except
+              Response := 32;
+            end;
 
-        if socket_send(FSocket, @Response, 1, 0, 1000)<1 then
-          FaultCount:=FaultLimit+1;
-      end;
-
-      //client was finished.
-      253: Quit:=true;
-      //client ping response.
-      254: begin
-        FaultCount:=0;
-        LastPingSent:=Now;
-      end;
+            if SocketSend(FSocket, @Response, 1, 0, 1000) < 1 then
+              FaultCount := FaultLimit + 1;
+          end;
+      253: Quit := True; // client was finished
+      254:  begin // client ping response
+              FaultCount := 0;
+              LastPingSent := Now;
+            end;
     end;
   end;
 
@@ -167,267 +190,282 @@ begin
   //253 - Connection closed...
   //254 - Ping response (from client to server)
   //255 - Ping request (from server to client)
-  FaultCount:=0;
-  Quit:=false;
+  FaultCount := 0;
+  Quit := False;
 
-  LastPingSent:=Now;
-  while ((not Terminated) and (not Quit)) and (FaultCount<FaultLimit) do begin
-    //if more than one seconds was elapsed, send a ping command.
-    if MilliSecondsBetween(Now,LastPingSent)>=1000 then begin
-      Response:=255;
+  LastPingSent := Now;
+  while ((not Terminated) and (not Quit)) and (FaultCount < FaultLimit) do
+  begin
+    // if more than one seconds was elapsed, send a ping command
+    if MilliSecondsBetween(Now, LastPingSent) >= 1000 then
+    begin
+      Response := 255;
 
-      if socket_send(FSocket, @Response, 1, 0, 1000)<1 then begin
-        FaultCount:=FaultLimit+1;
+      if SocketSend(FSocket, @Response, 1, 0, 1000) < 1 then
+      begin
+        FaultCount := FaultLimit + 1;
         Break;
       end;
 
-      LastPingSent:=Now;
-      if socket_recv(FSocket, @Response, 1, 0, 1000)>=1 then
+      LastPingSent := Now;
+      if SocketRecv(FSocket, @Response, 1, 0, 1000) >= 1 then
         ProcClientCommand(Response)
       else
         Inc(FaultCount);
     end;
 
-    if socket_recv(FSocket, @ClientCmd, 1{byte to read}, 0{noflasgs}, 5{ms})=1 then begin
+    if SocketRecv(FSocket, @ClientCmd, 1{byte to read}, 0{noflasgs}, 5{ms}) = 1 then
+    begin
       ProcClientCommand(ClientCmd);
     end;
   end;
 
-  //if server was terminated, quit the client side.
-  if Terminated or (FaultCount>=FaultLimit) then begin
-    Response:=253;
-    socket_send(FSocket,PByte(@Response),1,0,1000);
+  // if server was terminated, quit the client side
+  if Terminated or (FaultCount >= FaultLimit) then
+  begin
+    Response := 253;
+    SocketSend(FSocket, Pbyte(@Response), 1, 0, 1000);
   end;
 
-  //leaves the mutex.
-  if FIntoCriticalSection then begin
+  // leaves the mutex
+  if FIntoCriticalSection then
+  begin
     FMutex.Leave;
-    FIntoCriticalSection:=false;
+    FIntoCriticalSection := False;
   end;
 end;
 
-constructor TClientThread.Create(CreateSuspended: Boolean;
-  ClientSocket: TSocket; ClientSockinfo: TSockAddr;
-  ServerMutex: syncobjs.TCriticalSection; RemoveClientThread: TNotifyEvent);
+constructor TClientThread.Create(CreateSuspended: Boolean; ClientSocket: TSocket; ClientSockinfo: TSockAddr; ServerMutex: syncobjs.TCriticalSection; RemoveClientThread: TNotifyEvent);
 begin
-  inherited Create(CreateSuspended,ClientSocket,ClientSockinfo,RemoveClientThread);
-  FMutex              := ServerMutex;
-  FIntoCriticalSection:=false;
+  inherited Create(CreateSuspended, ClientSocket, ClientSockinfo, RemoveClientThread);
+  FMutex := ServerMutex;
+  FIntoCriticalSection := False;
 end;
 
 { TAcceptThread }
 
 procedure TAcceptThread.LaunchNewThread;
 begin
-  //launch a new thread that will handle this new connection
-  setblockingmode(ClientSocket,MODE_NONBLOCKING);
-  FClientThread := TClientThread.Create(True, ClientSocket, ClientSockInfo, FMutex, FRemoveClientThread);
+  // launch a new thread that will handle this new connection
+  SetBlockingMode(ClientSocket, MODE_NONBLOCKING);
+  FClientThread := TClientThread.Create(True, ClientSocket, ClientSockinfo, FMutex, FRemoveClientThread);
   Synchronize(@AddClientToMainThread);
   FClientThread.WakeUp;
 end;
 
-constructor TAcceptThread.Create(CreateSuspended: Boolean;
-                                 ServerSocket: TSocket;
-                                 ServerMutex:syncobjs.TCriticalSection;
-                                 AddClientThread,
-                                 RemoveClientThread:TNotifyEvent);
+constructor TAcceptThread.Create(CreateSuspended: Boolean; ServerSocket: TSocket; ServerMutex: syncobjs.TCriticalSection; AddClientThread, RemoveClientThread: TNotifyEvent);
 begin
-  inherited Create(CreateSuspended,ServerSocket,AddClientThread,RemoveClientThread);
-  FMutex              := ServerMutex;
+  inherited Create(CreateSuspended, ServerSocket, AddClientThread, RemoveClientThread);
+  FMutex := ServerMutex;
 end;
 
 { TMutexServer }
 
-procedure TMutexServer.setActive(AValue: Boolean);
+procedure TMutexServer.SetActive(AValue: Boolean);
 var
 {$IF defined(FPC) and defined(UNIX)}
-  channel:sockaddr;
+  Channel: sockaddr;
 {$IFEND}
-
 {$IF defined(FPC) and defined(WINCE)}
-  channel:sockaddr_in;
+  Channel: sockaddr_in;
 {$IFEND}
-
 {$IF defined(WIN32) or defined(WIN64)}
-  channel:sockaddr_in;
+  Channel: sockaddr_in;
+{$IFEND}
+  ReuseAddr: Longint;
+  i: Longint;
+begin
+  ReuseAddr := 1;
+
+  if [csLoading, csReading] * ComponentState <> [] then
+  begin
+    FActiveLoaded := AValue;
+    Exit;
+  end;
+
+  if [csDesigning] * ComponentState <> [] then
+  begin
+    FActive := AValue;
+    Exit;
+  end;
+
+  if FActive = AValue then Exit;
+
+  if AValue then
+  begin
+    // creates the socket
+{$IF defined(FPC) AND (defined(UNIX) or defined(WINCE))}
+    // UNIX and Windows CE
+    FSocket := fpSocket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if FSocket < 0 then
+    begin
+      FActive := False;
+      //RefreshLastOSError;
+      Exit;
+    end;
+{$ELSE}
+    // Windows 32 and 64 bits
+    FSocket := Socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if FSocket = INVALID_SOCKET then
+    begin
+      FActive := False;
+      //RefreshLastOSError;
+      Exit;
+    end;
 {$IFEND}
 
-  reuse_addr:LongInt;
-  ct: LongInt;
-begin
-  reuse_addr:=1;
+{$IF defined(FPC) AND (defined(UNIX) or defined(WINCE))}
+    fpsetsockopt(FSocket, SOL_SOCKET,  SO_REUSEADDR, @reuse_addr, SizeOf(reuse_addr));
+{$IFEND}
+{$IF defined(WIN32) or defined(WIN64)}
+    // Windows
+    setsockopt(FSocket, SOL_SOCKET, SO_REUSEADDR, @ReuseAddr, SizeOf(ReuseAddr));
+{$IFEND}
 
-  if [csLoading,csReading]*ComponentState<>[] then begin
-    FActiveLoaded:=AValue;
-    Exit;
-  end;
+    // set the non-blocking mode
+    SetBlockingMode(FSocket, MODE_NONBLOCKING);
 
-  if [csDesigning]*ComponentState<>[] then begin
-    FActive:=AValue;
-    Exit;
-  end;
+    Channel.sin_family := AF_INET;
+    Channel.sin_addr.S_addr := INADDR_ANY;
+    Channel.sin_port := htons(FPort); //PORT NUMBER
 
-  if FActive=AValue then Exit;
-
-  if AValue then begin
-    //creates the socket...
-    {$IF defined(FPC) AND (defined(UNIX) or defined(WINCE))}
-    //UNIX and WINDOWS CE
-    FSocket := fpSocket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if FSocket<0 then begin
-      FActive:=false;
-      //RefreshLastOSError;
-      Exit;
-    end;
-    {$ELSE}
-    //WINDOWS 32 and 64 bits
-    FSocket :=   Socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if FSocket=INVALID_SOCKET then begin
-      FActive:=false;
-      //RefreshLastOSError;
-      Exit;
-    end;
-    {$IFEND}
-
-    {$IF defined(FPC) AND (defined(UNIX) or defined(WINCE))}
-    fpsetsockopt(FSocket, SOL_SOCKET,  SO_REUSEADDR, @reuse_addr, sizeof(reuse_addr));
-    {$IFEND}
-    //WINDOWS
-    {$IF defined(WIN32) or defined(WIN64)}
-    setsockopt(FSocket,   SOL_SOCKET,  SO_REUSEADDR, @reuse_addr, sizeof(reuse_addr));
-    {$IFEND}
-
-    //set the non-blocking mode.
-    setblockingmode(FSocket, MODE_NONBLOCKING);
-
-    channel.sin_family      := AF_INET;
-    channel.sin_addr.S_addr := INADDR_ANY;
-    channel.sin_port        := htons(FPort); //PORT NUMBER
-
-    {$IF defined(FPC) AND (defined(UNIX) OR defined(WINCE))}
-    if fpBind(FSocket,@channel,sizeof(channel))<>0 then begin
+{$IF defined(FPC) AND (defined(UNIX) OR defined(WINCE))}
+    if fpBind(FSocket,@channel,SizeOf(channel)) <> 0 then
+    begin
       CloseSocket(FSocket);
-      FActive:=false;
+      FActive := False;
       Exit;
     end;
 
-    if fpListen(FSocket, SOMAXCONN)<>0 then begin
+    if fpListen(FSocket, SOMAXCONN) <> 0 then
+    begin
       CloseSocket(FSocket);
-      FActive:=false;
+      FActive := False;
       Exit;
     end;
-    {$IFEND}
+{$IFEND}
 
-    {$IF defined(WIN32) OR defined(WIN64)}
-    if bind(FSocket,channel,sizeof(channel))<>0 then begin
+{$IF defined(WIN32) OR defined(WIN64)}
+    if bind(FSocket, Channel, SizeOf(Channel)) <> 0 then
+    begin
       CloseSocket(FSocket);
-      FActive:=false;
+      FActive := False;
       Exit;
     end;
 
-    if listen(FSocket, SOMAXCONN)<>0 then begin
+    if listen(FSocket, SOMAXCONN) <> 0 then
+    begin
       CloseSocket(FSocket);
-      FActive:=false;
+      FActive := False;
       Exit;
     end;
-    {$IFEND}
+{$IFEND}
 
-    //wait for connections?? must be done on another thread, because accept
-    //is a blocking call...
-    FAcceptThread:=TAcceptThread.Create(true, FSocket, FMutex, @AddClientThread, @RemoveClientThread);
+    // wait for connections?? must be done on another thread, because accept
+    // is a blocking call
+    FAcceptThread := TAcceptThread.Create(True, FSocket, FMutex, @AddClientThread, @RemoveClientThread);
     FAcceptThread.WakeUp;
-  end else begin
-    //close the socket...
+  end
+  else
+  begin
+    // close the socket
     closesocket(FSocket);
-    //destroy the threads from all clients and close the socket.
+    // destroy the threads from all clients and close the socket
     FAcceptThread.Terminate;
     FAcceptThread.Destroy;
-    CloseSocket(FSocket);
+    closesocket(FSocket);
 
-    //destroy all client threads...
-    for ct:=High(FClients) downto 0 do begin
-      FClients[ct].Terminate;
-      //FClients[ct].de;
+    // destroy all client threads
+    for i := High(FClients) downto 0 do
+    begin
+      FClients[i].Terminate;
+      //FClients[i].de;
     end;
   end;
-  FActive:=AValue;
+  FActive := AValue;
 end;
 
 procedure TMutexServer.SetPort(AValue: Word);
 begin
   if FActive then
-    raise exception.Create(SimpossibleToChangeWhenActive);
+    raise Exception.Create(SimpossibleToChangeWhenActive);
 
-  if FPort=AValue then Exit;
+  if FPort = AValue then Exit;
 
-  FPort:=AValue;
+  FPort := AValue;
 end;
 
 procedure TMutexServer.AddClientThread(Sender: TObject);
 var
-  i:LongInt;
-  found:Boolean;
+  i: Longint;
+  Found: Boolean;
 begin
-  if not (sender is TClientThread) then
+  if not (Sender is TClientThread) then
     raise Exception.Create(SInvalidClass);
 
-  //find the object in object list.
-  found := false;
-  for i:=0 to High(FClients) do begin
-    if FClients[i]=Sender then begin
-      found:=true;
-      break;
+  // find the object in object list
+  Found := False;
+  for i := 0 to High(FClients) do
+  begin
+    if FClients[i] = Sender then
+    begin
+      Found := True;
+      Break;
     end;
   end;
 
-  if not found then begin
-    i:=Length(FClients);
-    SetLength(FClients, i+1);
-    FClients[i]:=TClientThread(Sender);
+  if not Found then
+  begin
+    i := Length(FClients);
+    SetLength(FClients, i + 1);
+    FClients[i] := TClientThread(Sender);
   end;
 end;
 
 procedure TMutexServer.RemoveClientThread(Sender: TObject);
 var
-  i:LongInt;
-  found:Boolean;
-  h: LongInt;
+  i: Longint;
+  Found: Boolean;
+  H: Longint;
 begin
-  if not (sender is TClientThread) then
+  if not (Sender is TClientThread) then
     raise Exception.Create(SInvalidClass);
 
-  //find the object in object list.
-  found := false;
-  for i:=0 to High(FClients) do begin
-    if FClients[i]=Sender then begin
-      found:=true;
-      break;
+  // find the object in object list
+  Found := False;
+  for i := 0 to High(FClients) do
+  begin
+    if FClients[i] = Sender then
+    begin
+      Found := True;
+      Break;
     end;
   end;
 
-  if found then begin
-    h:=High(FClients);
-    FClients[i]:=FClients[h];
-    SetLength(FClients, h);
+  if Found then
+  begin
+    H := High(FClients);
+    FClients[i] := FClients[H];
+    SetLength(FClients, H);
   end;
 end;
 
 procedure TMutexServer.Loaded;
 begin
   inherited Loaded;
-  setActive(FActiveLoaded);
+  SetActive(FActiveLoaded);
 end;
 
 constructor TMutexServer.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FPort:=51342;
-  FMutex:=syncobjs.TCriticalSection.Create;
+  FPort := MUTEX_SERVER_PORT;//51342;
+  FMutex := syncobjs.TCriticalSection.Create;
 end;
 
 destructor TMutexServer.Destroy;
 begin
-  setActive(false);
+  SetActive(False);
   FMutex.Destroy;
   inherited Destroy;
 end;

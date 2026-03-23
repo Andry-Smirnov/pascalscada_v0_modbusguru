@@ -1,10 +1,4 @@
 {$i ../common/language.inc}
-{$IFDEF PORTUGUES}
-{:
-  @abstract(Implmentação do driver West n6100 ASCII.)
-  @author(Fabio Luis Girardi <fabio@pascalscada.com>)
-}
-{$ELSE}
 {:
   @abstract(Implmentation of West n6100 ASCII protocol driver.)
 
@@ -15,298 +9,180 @@
 
   @author(Fabio Luis Girardi <fabio@pascalscada.com>)
 }
-{$ENDIF}
 unit WestASCIIDriver;
 
 interface
 
 uses
   Classes, SysUtils, ProtocolDriver, Tag, ProtocolTypes, commtypes
-  {$IFNDEF FPC}, Windows{$ENDIF};
+{$IFNDEF FPC}
+  , Windows
+{$ENDIF}
+  ;
 
 type
-  {$IFDEF PORTUGUES}
-  {:
-  Identifica um parametro West n6100.
+  {: Identify a West n6100 parameter.
   @member ParameterID identifica o parametro West.
   @member FunctionAllowed funções West permitidas para esse parametro.
-  @member ReadOnly Identifica um parametro somente leitura.
-  @member Decimal Identifica quantas casas decimais o parametro tem por padrão.
-  }
-  {$ELSE}
-  {:
-  Identify a West n6100 parameter.
-  @member ParameterID identifica o parametro West.
-  @member FunctionAllowed funções West permitidas para esse parametro.
-  @member ReadOnly Identifica um parametro somente leitura.
-  @member Decimal Identifica quantas casas decimais o parametro tem por padrão.
-  }
-  {$ENDIF}
+  @member ReadOnly Identifica um parametro somente reading.
+  @member Decimal Identifica quantas casas decimais o parametro tem por padrão. }
   TParameter = record
-    ParameterID:Byte;
-    FunctionAllowed:Byte;
-    ReadOnly:Boolean;
-    Decimal:Byte;
+    ParameterID: Byte;
+    FunctionAllowed: Byte;
+    ReadOnly: Boolean;
+    Decimal: Byte;
   end;
 
-  {$IFDEF PORTUGUES}
-  //: Tempos de varredura de cada registrador West.
-  {$ELSE}
   //: Update time of a West register.
-  {$ENDIF}
   TScanTime = record
-    ScanTime, RefCount:LongInt;
+    ScanTime: Longint;
+    RefCount: Longint;
   end;
 
-  {$IFDEF PORTUGUES}
-  {:
-  Identifica um registrador West n6100.
-  @member Value Valor do registrador.
-  @member Decimal Casas decimais do registrador.
-  @member Timestamp Data/Hora da última atualização do registrador.
-  @member LastReadResult Resultado da última tentativa de leitura do registrador.
-  @member LastWriteResult Resultado da última tentativa de escrita desse registrador.
-  @member ScanTimes Lista das taxas de atualização do registrador.
-  @member MinScanTime Menor taxa de atualização do registrador.
-  }
-  {$ELSE}
-  {:
-  Identify a West n6100 register.
+  {: Identify a West n6100 register.
   @member Value register value.
   @member Decimal Decimal places of the register.
   @member Timestamp Date/time of the last update of the register.
   @member LastReadResult IO result of the last read request.
   @member LastWriteResult IO result of the last write request.
   @member ScanTimes List of all update times of the register.
-  @member MinScanTime Smaller update time of the register.
-  }
-  {$ENDIF}
+  @member MinScanTime Smaller update time of the register. }
   TWestRegister = record
-    Value:Double;
-    Decimal:Byte;
-    Timestamp:TDateTime;
-    LastReadResult, LastWriteResult:TProtocolIOResult;
-    ScanTimes:Array of TScanTime;
-    MinScanTime:LongInt;
+    Value: Double;
+    Decimal: Byte;
+    Timestamp: TDateTime;
+    LastReadResult: TProtocolIOResult;
+    LastWriteResult: TProtocolIOResult;
+    ScanTimes: array of TScanTime;
+    MinScanTime: Longint;
   end;
 
-  {$IFDEF PORTUGUES}
-  //: Lista de todos os registradores do West n6100.
-  {$ELSE}
   //: List all West n6100 registers.
-  {$ENDIF}
-  TWestRegisters = array[$00..$1b] of TWestRegister;
+  TWestRegisters = array [$00..$1B] of TWestRegister;
 
-  {$IFDEF PORTUGUES}
-  //: Identifica o intervalo de endereços do West n6100.
-  {$ELSE}
   //: Identifies the address range of West n6100.
-  {$ENDIF}
   TWestAddressRange = 0..99;
 
-  {$IFDEF PORTUGUES}
-  //: Identifica um controlador West n6100.
-  {$ELSE}
   //: Identifies a West n6100 device.
-  {$ENDIF}
   TWestDevice = record
-    Address:TWestAddressRange;
-    Registers:TWestRegisters;
+    Address: TWestAddressRange;
+    Registers: TWestRegisters;
   end;
 
-  {$IFDEF PORTUGUES}
-  //: Identifica vários controladores West n6100.
-  {$ELSE}
   //: Identifies a set of West n6100 devices.
-  {$ENDIF}
   TWestDevices = array of TWestDevice;
 
-  {$IFDEF PORTUGUES}
-  //: Identifica cada item retornando pela Tabela de Scan (ScanTable) do West.
-  {$ELSE}
   //: Represents a item of a West ScanTable request.
-  {$ENDIF}
   TScanTableReg = record
-    Value:Double;
-    Decimal:Byte;
-    IOResult:TProtocolIOResult;
-    TimeStamp:TDateTime;
+    Value: Double;
+    Decimal: Byte;
+    IOResult: TProtocolIOResult;
+    Timestamp: TDateTime;
   end;
 
-  {$IFDEF PORTUGUES}
-  //: Identifica os dados retornados por ScanTable do West n6100.
-  {$ELSE}
   //: Represents a West ScanTable request.
-  {$ENDIF}
   TScanTable = record
-    PV,
-    SP,
-    Status,
-    Out1,
-    Out2:TScanTableReg;
-    HaveOut2:Boolean;
+    PV: TScanTableReg;
+    SP: TScanTableReg;
+    Status: TScanTableReg;
+    Out1: TScanTableReg;
+    Out2: TScanTableReg;
+    HaveOut2: Boolean;
   end;
 
-  {$IFDEF PORTUGUES}
-  {:
-  @abstract(Classe driver para West n6100 ASCII.)
-  @author(Fabio Luis Girardi <fabio@pascalscada.com>)
-
-  Para usar este driver, basta configurar as seguintes propriedades do seu tag:
-
-  @unorderedList(
-    @item(@bold(TTag.MemAddress): Endereço do parametro West. Ver tabela abaixo;)
-    @item(@bold(TTag.PLCStation): Endereço do controlador West.)
-  )
-
-  Para a propriedade MemAddres, use os seguintes valores:
-
-  @table(
-    @rowHead( @cell(Valor MemAddres)       @cell(Parametro West) )
-    @row(     @cell(0)                     @cell(SetPoint - SP) )
-    @row(     @cell(1)                     @cell(Process Variable - PV) )
-    @row(     @cell(2)                     @cell(Power Output value) )
-    @row(     @cell(3)                     @cell(Controller status) )
-    @row(     @cell(4)                     @cell(Scale Range Max) )
-    @row(     @cell(5)                     @cell(Scale Range Min) )
-    @row(     @cell(6)                     @cell(Scale Range Decimal Point) )
-    @row(     @cell(7)                     @cell(Input filter time constant) )
-    @row(     @cell(8)                     @cell(Output 1 Power Limit) )
-    @row(     @cell(9)                     @cell(Output 1 cycle time) )
-    @row(     @cell(10)                    @cell(Output 2 cycle time) )
-    @row(     @cell(11)                    @cell(Recorder output scale max) )
-    @row(     @cell(12)                    @cell(Recorder output scale min) )
-    @row(     @cell(13)                    @cell(SetPoint ramp rate) )
-    @row(     @cell(14)                    @cell(Setpoint high limit) )
-    @row(     @cell(15)                    @cell(Setpoint low limit) )
-    @row(     @cell(16)                    @cell(Alarm 1 value) )
-    @row(     @cell(17)                    @cell(Alarm 2 value) )
-    @row(     @cell(18)                    @cell(Rate - Derivative time constant) )
-    @row(     @cell(19)                    @cell(Reset - Integral time constant) )
-    @row(     @cell(20)                    @cell(Manual time reset - BIAS) )
-    @row(     @cell(21)                    @cell(ON/OFF diferential) )
-    @row(     @cell(22)                    @cell(Overlap/Deadband) )
-    @row(     @cell(23)                    @cell(Proportional band 1 value) )
-    @row(     @cell(24)                    @cell(Proportional band 2 value) )
-    @row(     @cell(25)                    @cell(PV Offset) )
-    @row(     @cell(26)                    @cell(Arithmetic deviation) )
-    @row(     @cell(27)                    @cell(Arithmetic deviation) )
-  )
-
-  @bold(Caso um ou mais parametros possam ser lidos por scan table, o driver
-  irá fazer isso para ganhar algum desempenho.)
-  }
-  {$ELSE}
-  {:
-  @abstract(Class of West n6100 ASCII protocol driver.)
+  {: @abstract(Class of West n6100 ASCII protocol driver.)
   @author(Fabio Luis Girardi <fabio@pascalscada.com>)
 
   To use this driver, you must set the following properties of your tag:
 
   @unorderedList(
     @item(@bold(TTag.MemAddress): Address of West  register. See the table below;)
-    @item(@bold(TTag.PLCStation): Address of West n6100 device.)
-  )
+    @item(@bold(TTag.PLCStation): Address of West n6100 device.) )
 
   To set the property MemAddress, use one of the following values:
 
   @table(
-    @rowHead( @cell(MemAddres Value)       @cell(West register) )
-    @row(     @cell(0)                     @cell(SetPoint - SP) )
-    @row(     @cell(1)                     @cell(Process Variable - PV) )
-    @row(     @cell(2)                     @cell(Power Output value) )
-    @row(     @cell(3)                     @cell(Controller status) )
-    @row(     @cell(4)                     @cell(Scale Range Max) )
-    @row(     @cell(5)                     @cell(Scale Range Min) )
-    @row(     @cell(6)                     @cell(Scale Range Decimal Point) )
-    @row(     @cell(7)                     @cell(Input filter time constant) )
-    @row(     @cell(8)                     @cell(Output 1 Power Limit) )
-    @row(     @cell(9)                     @cell(Output 1 cycle time) )
-    @row(     @cell(10)                    @cell(Output 2 cycle time) )
-    @row(     @cell(11)                    @cell(Recorder output scale max) )
-    @row(     @cell(12)                    @cell(Recorder output scale min) )
-    @row(     @cell(13)                    @cell(SetPoint ramp rate) )
-    @row(     @cell(14)                    @cell(Setpoint high limit) )
-    @row(     @cell(15)                    @cell(Setpoint low limit) )
-    @row(     @cell(16)                    @cell(Alarm 1 value) )
-    @row(     @cell(17)                    @cell(Alarm 2 value) )
-    @row(     @cell(18)                    @cell(Rate - Derivative time constant) )
-    @row(     @cell(19)                    @cell(Reset - Integral time constant) )
-    @row(     @cell(20)                    @cell(Manual time reset - BIAS) )
-    @row(     @cell(21)                    @cell(ON/OFF diferential) )
-    @row(     @cell(22)                    @cell(Overlap/Deadband) )
-    @row(     @cell(23)                    @cell(Proportional band 1 value) )
-    @row(     @cell(24)                    @cell(Proportional band 2 value) )
-    @row(     @cell(25)                    @cell(PV Offset) )
-    @row(     @cell(26)                    @cell(Arithmetic deviation) )
-    @row(     @cell(27)                    @cell(Arithmetic deviation) )
-  )
+    @rowHead( @cell(MemAddres Value)  @cell(West register) )
+    @row(     @cell(0)                @cell(SetPoint - SP) )
+    @row(     @cell(1)                @cell(Process Variable - PV) )
+    @row(     @cell(2)                @cell(Power Output value) )
+    @row(     @cell(3)                @cell(Controller status) )
+    @row(     @cell(4)                @cell(Scale Range Max) )
+    @row(     @cell(5)                @cell(Scale Range Min) )
+    @row(     @cell(6)                @cell(Scale Range Decimal Point) )
+    @row(     @cell(7)                @cell(Input filter time constant) )
+    @row(     @cell(8)                @cell(Output 1 Power Limit) )
+    @row(     @cell(9)                @cell(Output 1 cycle time) )
+    @row(     @cell(10)               @cell(Output 2 cycle time) )
+    @row(     @cell(11)               @cell(Recorder output scale max) )
+    @row(     @cell(12)               @cell(Recorder output scale min) )
+    @row(     @cell(13)               @cell(SetPoint ramp rate) )
+    @row(     @cell(14)               @cell(Setpoint high limit) )
+    @row(     @cell(15)               @cell(Setpoint low limit) )
+    @row(     @cell(16)               @cell(Alarm 1 value) )
+    @row(     @cell(17)               @cell(Alarm 2 value) )
+    @row(     @cell(18)               @cell(Rate - Derivative time constant) )
+    @row(     @cell(19)               @cell(Reset - Integral time constant) )
+    @row(     @cell(20)               @cell(Manual time reset - BIAS) )
+    @row(     @cell(21)               @cell(ON/OFF diferential) )
+    @row(     @cell(22)               @cell(Overlap/Deadband) )
+    @row(     @cell(23)               @cell(Proportional band 1 value) )
+    @row(     @cell(24)               @cell(Proportional band 2 value) )
+    @row(     @cell(25)               @cell(PV Offset) )
+    @row(     @cell(26)               @cell(Arithmetic deviation) )
+    @row(     @cell(27)               @cell(Arithmetic deviation) ) )
 
   @bold(Caso um ou mais parametros possam ser lidos por scan table, o driver
-  irá fazer isso para ganhar algum desempenho.)
-  }
-  {$ENDIF}
+  irá fazer isso para ganhar algum desempenho.) }
 
   { TWestASCIIDriver }
 
   TWestASCIIDriver = class(TProtocolDriver)
   private
-    FWestDevices:TWestDevices;
-{d} procedure AssignScanTableToReg(const stablereg:TScanTableReg; var WestReg:TWestRegister);
-{d} function  IOResultToProtocolResult(IORes:TIOResult):TProtocolIOResult;
-{d} procedure AddressToChar(Addr:TWestAddressRange; var ret:Bytes);
-{d} function  WestToDouble(const buffer:Array of byte; var Value:Double):TProtocolIOResult; overload;
-{d} function  WestToDouble(const buffer:Array of byte; var Value:Double; var dec:Byte):TProtocolIOResult; overload;
-{d} function  DoubleToWestAuto(var buffer:Array of Byte; const Value:Double):TProtocolIOResult;
-{d} function  DoubleToWestManual(var buffer:Array of Byte; const Value:Double; const dec:BYTE):TProtocolIOResult;
+    FWestDevices: TWestDevices;
+    {d} procedure AssignScanTableToReg(const StableReg: TScanTableReg; var WestReg: TWestRegister);
+    {d} function IOResultToProtocolResult(IORes: TIOResult): TProtocolIOResult;
+    {d} procedure AddressToChar(Addr: TWestAddressRange; var Ret: Bytes);
+    {d} function WestToDouble(const Buffer: array of Byte; var Value: Double): TProtocolIOResult; overload;
+    {d} function WestToDouble(const Buffer: array of Byte; var Value: Double; var Dec: Byte): TProtocolIOResult; overload;
+    {d} function DoubleToWestAuto(var Buffer: array of Byte; const Value: Double): TProtocolIOResult;
+    {d} function DoubleToWestManual(var Buffer: array of Byte; const Value: Double; const Dec: Byte): TProtocolIOResult;
 
-{d} function  ParameterValue (const DeviceID:TWestAddressRange; const Parameter:BYTE; var   Value:Double; var   dec:BYTE):TProtocolIOResult;
-{d} function  ModifyParameter(const DeviceID:TWestAddressRange; const Parameter:BYTE; const Value:Double; const dec:BYTE):TProtocolIOResult;
+    {d} function ParameterValue(const DeviceID: TWestAddressRange; const Parameter: Byte; var Value: Double; var Dec: Byte): TProtocolIOResult;
+    {d} function ModifyParameter(const DeviceID: TWestAddressRange; const Parameter: Byte; const Value: Double; const Dec: Byte): TProtocolIOResult;
 
-{d} function  ScanTable(DeviceID:TWestAddressRange; var ScanTableValues:TScanTable):TProtocolIOResult;
+    {d} function ScanTable(DeviceID: TWestAddressRange; var ScanTableValues: TScanTable): TProtocolIOResult;
 
-{d} procedure MinScanTimeOfReg(var WestReg:TWestRegister);
-
+    {d} procedure MinScanTimeOfReg(var WestReg: TWestRegister);
   protected
     //: @seealso(TProtocolDriver.DoAddTag)
-{d} procedure DoAddTag(TagObj:TTag; TagValid:Boolean); override;
+    {d} procedure DoAddTag(TagObj: TTag; TagValid: Boolean); override;
     //: @seealso(TProtocolDriver.DoAddTag)
-{d} procedure DoDelTag(TagObj:TTag); override;
+    {d} procedure DoDelTag(TagObj: TTag); override;
     //: @seealso(TProtocolDriver.DoAddTag)
-    procedure DoScanRead(Sender:TObject; var NeedSleep:LongInt); override;
+    procedure DoScanRead(Sender: TObject; var NeedSleep: Longint); override;
     //: @seealso(TProtocolDriver.DoAddTag)
-{d} procedure DoGetValue(TagRec:TTagRec; var values:TScanReadRec); override;
+    {d} procedure DoGetValue(TagRec: TTagRec; var Values: TScanReadRec); override;
     //: @seealso(TProtocolDriver.DoAddTag)
-{d} function  DoWrite(const tagrec:TTagRec; const Values:TArrayOfDouble; Sync:Boolean):TProtocolIOResult; override;
+    {d} function DoWrite(const TagRec: TTagRec; const Values: TArrayOfDouble; Sync: Boolean): TProtocolIOResult; override;
     //: @seealso(TProtocolDriver.DoAddTag)
-{d} function  DoRead (const tagrec:TTagRec; out   Values:TArrayOfDouble; Sync:Boolean):TProtocolIOResult; override;
+    {d} function DoRead(const TagRec: TTagRec; out Values: TArrayOfDouble; Sync: Boolean): TProtocolIOResult; override;
   public
     //: @exclude
-    constructor Create(AOwner:TComponent); override;
+    constructor Create(AOwner: TComponent); override;
     //: @exclude
-    destructor  Destroy; override;
+    destructor Destroy; override;
 
-    {$IFDEF PORTUGUES}
-    {:
-    Verifique se um controlador West esta ativo na rede.
-    @param(DeviceID TWestAddressRange Endereço que se deseja verificar se está ativo na rede.)
-    @returns(ioOk caso o equipamento esteja operando na rede.)
-    }
-    {$ELSE}
-    {:
-    Checks if a West n6100 device is active on network.
+    {: Checks if a West n6100 device is active on network.
     @param(DeviceID TWestAddressRange Address of _West n6100 device to check if is active on network.)
-    @returns(ioOk if the device is active on network.)
-    }
-    {$ENDIF}
-    function    DeviceActive(DeviceID:TWestAddressRange):TProtocolIOResult;
+    @returns(ioOk if the device is active on network.) }
+    function DeviceActive(DeviceID: TWestAddressRange): TProtocolIOResult;
 
     // @seealso(TProtocolDriver.SizeOfTag);
-    function SizeOfTag(aTag: TTag; isWrite: Boolean; var ProtocolTagType: TProtocolTagType): BYTE; override;
+    function SizeOfTag(aTag: TTag; isWrite: Boolean; var ProtocolTagType: TProtocolTagType): Byte; override;
 
     // @seealso(TProtocolDriver.OpenTagEditor);
-    procedure OpenTagEditor(InsertHook: TAddTagInEditorHook;
-      CreateProc: TCreateTagProc); override;
+    procedure OpenTagEditor(InsertHook: TAddTagInEditorHook; CreateProc: TCreateTagProc); override;
 
     // @seealso(TProtocolDriver.HasTabBuilderEditor);
     function HasTabBuilderEditor: Boolean; override;
@@ -317,989 +193,1106 @@ type
     property ReadOnly;
   end;
 
-  procedure SetTagBuilderToolForWest6100Protocol(TagBuilderTool:TOpenTagEditor);
+
+procedure SetTagBuilderToolForWest6100Protocol(TagBuilderTool: TOpenTagEditor);
+
 
 var
-  ParameterList:array[$00..$1b] of TParameter;
+  ParameterList: array [$00..$1B] of TParameter;
+
 
 implementation
 
-uses PLCTagNumber, math, dateutils, hsstrings,
-  crossdatetime, pascalScadaMTPCPU;
 
-constructor TWestASCIIDriver.Create(AOwner:TComponent);
+uses
+  PLCTagNumber,
+  Math,
+  dateutils,
+  hsstrings,
+  crossdatetime,
+  pascalScadaMTPCPU;
+
+
+constructor TWestASCIIDriver.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  PReadSomethingAlways:=true;
+  PReadSomethingAlways := True;
 end;
 
-destructor  TWestASCIIDriver.Destroy;
+destructor TWestASCIIDriver.Destroy;
 begin
   inherited Destroy;
-  SetLength(FWestDevices,0);
+  SetLength(FWestDevices, 0);
 end;
 
-procedure TWestASCIIDriver.DoAddTag(TagObj:TTag; TagValid:Boolean);
+procedure TWestASCIIDriver.DoAddTag(TagObj: TTag; TagValid: Boolean);
 var
-  plc, scanRate:LongInt;
-  foundplc, foundScanRate, valido:boolean;
-  plctagobj:TPLCTagNumber;
+  PLC: Longint;
+  ScanRate: Longint;
+  FoundPLC: Boolean;
+  FoundScanRate: Boolean;
+  IsValid: Boolean;
+  PLCTagObj: TPLCTagNumber;
 begin
   if not (TagObj is TPLCTagNumber) then
     raise Exception.Create(SonlyPLCTagNumber);
 
-  plctagobj:=TPLCTagNumber(TagObj);
+  PLCTagObj := TPLCTagNumber(TagObj);
 
-  valido:=false;
+  IsValid := False;
 
   //se for um tag válido, registra ele no scan. senão só o coloca na lista de
   //tags dependentes...
-  //
+
   //if the tag is valid, register it on scan or on the list of dependent tags
-  if (plctagobj.PLCStation in [1..99]) and (plctagobj.MemAddress in [$00..$1B]) then begin
+  if (PLCTagObj.PLCStation in [1..99])
+    and (PLCTagObj.MemAddress in [$00..$1B]) then
+  begin
+    FoundPLC := False;
+    FoundScanRate := False;
 
-    foundplc:=false;
-    foundScanRate:=false;
-
-    for plc:=0 to High(FWestDevices) do
-      if FWestDevices[plc].Address=plctagobj.PLCStation then begin
-        foundplc:=true;
-        break;
+    for PLC := 0 to High(FWestDevices) do
+      if FWestDevices[PLC].Address = PLCTagObj.PLCStation then
+      begin
+        FoundPLC := True;
+        Break;
       end;
 
-    if not foundplc then begin
-      plc := Length(FWestDevices);
-      SetLength(FWestDevices,plc+1);
-      FWestDevices[plc].Address := plctagobj.PLCStation;
+    if not FoundPLC then
+    begin
+      PLC := Length(FWestDevices);
+      SetLength(FWestDevices, PLC + 1);
+      FWestDevices[PLC].Address := PLCTagObj.PLCStation;
     end;
 
-    with FWestDevices[plc].Registers[plctagobj.MemAddress] do
-      for scanRate := 0 to High(ScanTimes) do
-        if ScanTimes[scanRate].ScanTime=plctagobj.RefreshTime then begin
-          foundScanRate:=true;
-          inc(ScanTimes[scanRate].RefCount);
-          break;
+    with FWestDevices[PLC].Registers[PLCTagObj.MemAddress] do
+      for ScanRate := 0 to High(ScanTimes) do
+        if ScanTimes[ScanRate].ScanTime = PLCTagObj.RefreshTime then
+        begin
+          FoundScanRate := True;
+          Inc(ScanTimes[ScanRate].RefCount);
+          Break;
         end;
 
-    if not foundScanRate then
-      with FWestDevices[plc].Registers[plctagobj.MemAddress] do begin
-        scanRate:=Length(ScanTimes);
-        SetLength(ScanTimes,scanRate+1);
-        ScanTimes[scanRate].ScanTime:=plctagobj.RefreshTime;
-        ScanTimes[scanRate].RefCount:=1;
-        if scanRate=0 then
-          MinScanTime:=plctagobj.RefreshTime;
+    if not FoundScanRate then
+      with FWestDevices[PLC].Registers[PLCTagObj.MemAddress] do
+      begin
+        ScanRate := Length(ScanTimes);
+        SetLength(ScanTimes, ScanRate + 1);
+        ScanTimes[ScanRate].ScanTime := PLCTagObj.RefreshTime;
+        ScanTimes[ScanRate].RefCount := 1;
+        if ScanRate = 0 then
+          MinScanTime := PLCTagObj.RefreshTime;
       end;
 
-    with FWestDevices[plc].Registers[plctagobj.MemAddress] do
-      MinScanTime:=Min(MinScanTime, plctagobj.RefreshTime);
+    with FWestDevices[PLC].Registers[PLCTagObj.MemAddress] do
+      MinScanTime := Min(MinScanTime, PLCTagObj.RefreshTime);
 
-    valido:=true;
+    IsValid := True;
   end;
-
-  inherited DoAddTag(TagObj, valido);
-
+  inherited DoAddTag(TagObj, IsValid);
 end;
 
-procedure TWestASCIIDriver.DoDelTag(TagObj:TTag);
+procedure TWestASCIIDriver.DoDelTag(TagObj: TTag);
 var
-  plc, scanRate, reg, h:LongInt;
-  foundplc, foundScanRate, foundActiveReg:boolean;
-  plctagobj:TPLCTagNumber;
+  PLC: Longint;
+  ScanRate: Longint;
+  Reg: Longint;
+  H: Longint;
+  FoundPLC: Boolean;
+  FoundScanRate: Boolean;
+  FoundActiveReg: Boolean;
+  PLCTagObj: TPLCTagNumber;
 begin
   try
     if not (TagObj is TPLCTagNumber) then
       raise Exception.Create(SonlyPLCTagNumber);
 
-    plctagobj:=TPLCTagNumber(TagObj);
+    PLCTagObj := TPLCTagNumber(TagObj);
 
-    if (plctagobj.PLCStation in [1..99]) and (plctagobj.MemAddress in [$00..$1B]) then begin
+    if (PLCTagObj.PLCStation in [1..99])
+      and (PLCTagObj.MemAddress in [$00..$1B]) then
+    begin
+      FoundPLC := False;
+      FoundScanRate := False;
 
-      foundplc:=false;
-      foundScanRate:=false;
-
-      for plc:=0 to High(FWestDevices) do
-        if FWestDevices[plc].Address=plctagobj.PLCStation then begin
-          foundplc:=true;
-          break;
+      for PLC := 0 to High(FWestDevices) do
+        if FWestDevices[PLC].Address = PLCTagObj.PLCStation then
+        begin
+          FoundPLC := True;
+          Break;
         end;
-
-      //se nao encontrou o CLP, não há nada para fazer,
-      //pq se o clp nao existe, a memoria tbm nao existe.
-      //
-      //if don't found the PLC, has nothing to do,
-      //because if the PLC don't exists, the memory don't exists too.
-      if not foundplc then
+      // if don't found the PLC, has nothing to do,
+      // because if the PLC don't exists, the memory don't exists too
+      if not FoundPLC then
         Exit;
 
-      with FWestDevices[plc].Registers[plctagobj.MemAddress] do begin
-        h:=High(ScanTimes);
-        for scanRate := 0 to High(ScanTimes) do
-          if ScanTimes[scanRate].ScanTime=plctagobj.RefreshTime then begin
-            foundScanRate:=true;
+      with FWestDevices[PLC].Registers[PLCTagObj.MemAddress] do
+      begin
+        H := High(ScanTimes);
+        for ScanRate := 0 to High(ScanTimes) do
+          if ScanTimes[ScanRate].ScanTime = PLCTagObj.RefreshTime then
+          begin
+            FoundScanRate := True;
 
-            dec(ScanTimes[scanRate].RefCount);
+            Dec(ScanTimes[ScanRate].RefCount);
 
-            //caso a taxa de atualização nao tenha mais dependentes, remove...
-            //
-            //if the update time don't has dependents, remove.
-            if ScanTimes[scanRate].RefCount=0 then begin
-              ScanTimes[scanRate] := ScanTimes[h];
-              SetLength(ScanTimes,h);
-              MinScanTime:=$7fffffff;
+            // if the update time don't has dependents, remove
+            if ScanTimes[ScanRate].RefCount = 0 then
+            begin
+              ScanTimes[ScanRate] := ScanTimes[H];
+              SetLength(ScanTimes, H);
+              MinScanTime := $7FFFFFFF;
             end;
-            break;
+            Break;
           end;
-        end;
+      end;
 
-      if not foundScanRate then
+      if not FoundScanRate then
         Exit;
 
-      //procura por registros ativos no scan.
-      //
-      //search active registers on scan.
-      foundActiveReg:=false;
-      for reg:=0 to High(FWestDevices[plc].Registers) do
-        if Length(FWestDevices[plc].Registers[reg].ScanTimes)>0 then begin
-          foundActiveReg:=true;
-          break;
+      // search active registers on scan
+      FoundActiveReg := False;
+      for Reg := 0 to High(FWestDevices[PLC].Registers) do
+        if Length(FWestDevices[PLC].Registers[Reg].ScanTimes) > 0 then
+        begin
+          FoundActiveReg := True;
+          Break;
         end;
 
-      if foundActiveReg then
-        MinScanTimeOfReg(FWestDevices[plc].Registers[plctagobj.MemAddress])
-      else
-        if (Length(FWestDevices)>0) then begin
-          //se nao encontrou mais nenhum outro registrador ativo
-          //no clp, é necessario elimintar tbm o CLP do scan.
-          //
-          //if has not found any other active register on PLC, removes the PLC
-          h:=High(FWestDevices);
-          FWestDevices[plc]:=FWestDevices[h];
-          SetLength(FWestDevices,h);
+      if FoundActiveReg then
+        MinScanTimeOfReg(FWestDevices[PLC].Registers[PLCTagObj.MemAddress])
+      else if (Length(FWestDevices) > 0) then
+        begin
+          // if has not found any other active register on PLC, removes the PLC
+          H := High(FWestDevices);
+          FWestDevices[PLC] := FWestDevices[H];
+          SetLength(FWestDevices, H);
         end;
-
     end;
   finally
     inherited DoDelTag(TagObj);
   end;
 end;
 
-procedure TWestASCIIDriver.DoScanRead(Sender:TObject; var NeedSleep:LongInt);
+procedure TWestASCIIDriver.DoScanRead(Sender: TObject; var NeedSleep: Longint);
 var
-  plc, plcneedy, reg, regneedy, regini, usados, msbetween,minStime:LongInt;
-  somethingdone,firstreg:boolean;
-  res:TProtocolIOResult;
-  stable:TScanTable;
-  tagrec:TTagRec;
-  values:TArrayOfDouble;
+  PLC: Longint;
+  PLCNeedy: Longint;
+  Reg: Longint;
+  RegNeedy: Longint;
+  RegIni: Longint;
+  Usados: Longint;
+  MSBetween: Longint;
+  MinStime: Longint;
+  SomethingDone: Boolean;
+  FirstReg: Boolean;
+  Res: TProtocolIOResult;
+  Stable: TScanTable;
+  TagRec: TTagRec;
+  Values: TArrayOfDouble;
 begin
-  if ([csDestroying]*ComponentState<>[]) then begin
+  if ([csDestroying] * ComponentState <> []) then
+  begin
     CrossThreadSwitch;
     Exit;
   end;
-  plcneedy:=0;
-  regneedy:=0;
-  somethingdone:=false;
-  SetLength(values,1);
-  firstreg:=true;
+  PLCNeedy := 0;
+  RegNeedy := 0;
+  SomethingDone := False;
+  SetLength(Values, 1);
+  FirstReg := True;
   try
-    for plc := 0 to High(FWestDevices) do begin
-      regini := 0;
-      usados := 0;
-      with FWestDevices[plc] do begin
-        usados := ifthen((Length(Registers[0].ScanTimes)>0) and (MilliSecondsBetween(CrossNow,Registers[0].Timestamp)>=Registers[0].MinScanTime),usados+1,usados);
-        usados := ifthen((Length(Registers[1].ScanTimes)>0) and (MilliSecondsBetween(CrossNow,Registers[1].Timestamp)>=Registers[1].MinScanTime),usados+1,usados);
-        usados := ifthen((Length(Registers[2].ScanTimes)>0) and (MilliSecondsBetween(CrossNow,Registers[2].Timestamp)>=Registers[2].MinScanTime),usados+1,usados);
-        usados := ifthen((Length(Registers[3].ScanTimes)>0) and (MilliSecondsBetween(CrossNow,Registers[3].Timestamp)>=Registers[3].MinScanTime),usados+1,usados);
+    for PLC := 0 to High(FWestDevices) do
+    begin
+      RegIni := 0;
+      Usados := 0;
+      with FWestDevices[PLC] do
+      begin
+        Usados := IfThen((Length(Registers[0].ScanTimes) > 0)
+          and (MilliSecondsBetween(CrossNow, Registers[0].Timestamp) >= Registers[0].MinScanTime), Usados + 1, Usados);
+        Usados := IfThen((Length(Registers[1].ScanTimes) > 0)
+          and (MilliSecondsBetween(CrossNow, Registers[1].Timestamp) >= Registers[1].MinScanTime), Usados + 1, Usados);
+        Usados := IfThen((Length(Registers[2].ScanTimes) > 0)
+          and (MilliSecondsBetween(CrossNow, Registers[2].Timestamp) >= Registers[2].MinScanTime), Usados + 1, Usados);
+        Usados := IfThen((Length(Registers[3].ScanTimes) > 0)
+          and (MilliSecondsBetween(CrossNow, Registers[3].Timestamp) >= Registers[3].MinScanTime), Usados + 1, Usados);
       end;
 
-      tagrec.Station:=FWestDevices[plc].Address;
+      TagRec.Station := FWestDevices[PLC].Address;
 
-      //if exist more than one register used, Read it using ScanTable
-      //command to reduce the use of bandwidth...
-      if usados>1 then begin
-        res := ScanTable(FWestDevices[plc].Address,stable);
-        if res = ioOk then begin
-          AssignScanTableToReg(stable.SP,FWestDevices[plc].Registers[0]);
-          AssignScanTableToReg(stable.PV,FWestDevices[plc].Registers[1]);
-          AssignScanTableToReg(stable.Out1,FWestDevices[plc].Registers[2]);
-          AssignScanTableToReg(stable.Status,FWestDevices[plc].Registers[3]);
-        end else begin
-          for reg := 0 to 3 do
-            FWestDevices[plc].Registers[reg].LastReadResult:=res;
-        end;
-        regini:=4;
-        somethingdone:=true;
-      end;
-
-      //le os
-      for reg := regini to High(FWestDevices[plc].Registers) do
-        with FWestDevices[plc].Registers[reg] do
-          if Length(ScanTimes)>0 then begin
-            msbetween:=MilliSecondsBetween(CrossNow,Timestamp);
-            if msbetween>=MinScanTime then begin
-              tagrec.Address:=reg;
-              DoRead(tagrec, values, false);
-              somethingdone:=true;
-            end else begin
-              if firstreg then begin
-                minStime:=msbetween;
-                plcneedy:=plc;
-                regneedy:=reg;
-                firstreg:=false;
-              end else begin
-                if msbetween>minStime then begin
-                  minStime:=msbetween;
-                  plcneedy:=plc;
-                  regneedy:=reg;
-                end;
-              end;
-            end;
+      // if exist more than one register used, Read it using ScanTable
+      // command to reduce the use of bandwidth
+      if Usados > 1 then
+      begin
+        Res := ScanTable(FWestDevices[PLC].Address, Stable);
+        if Res = ioOk then
+          begin
+            AssignScanTableToReg(Stable.SP, FWestDevices[PLC].Registers[0]);
+            AssignScanTableToReg(Stable.PV, FWestDevices[PLC].Registers[1]);
+            AssignScanTableToReg(Stable.Out1, FWestDevices[PLC].Registers[2]);
+            AssignScanTableToReg(Stable.Status, FWestDevices[PLC].Registers[3]);
+          end
+        else
+          begin
+            for Reg := 0 to 3 do
+              FWestDevices[PLC].Registers[Reg].LastReadResult := Res;
           end;
+        RegIni := 4;
+        SomethingDone := True;
+      end;
+
+      // le os
+      for Reg := RegIni to High(FWestDevices[PLC].Registers) do
+        with FWestDevices[PLC].Registers[Reg] do
+          if Length(ScanTimes) > 0 then
+            begin
+              MSBetween := MilliSecondsBetween(CrossNow, Timestamp);
+              if MSBetween >= MinScanTime then
+                begin
+                  TagRec.Address := Reg;
+                  DoRead(TagRec, Values, False);
+                  SomethingDone := True;
+                end
+              else
+                begin
+                  if FirstReg then
+                    begin
+                      MinStime := MSBetween;
+                      PLCNeedy := PLC;
+                      RegNeedy := Reg;
+                      FirstReg := False;
+                    end
+                  else
+                  begin
+                    if MSBetween > MinStime then
+                    begin
+                      MinStime := MSBetween;
+                      PLCNeedy := PLC;
+                      RegNeedy := Reg;
+                    end;
+                  end;
+                end;
+            end;
     end;
 
-    if (not somethingdone) and PReadSomethingAlways and (High(FWestDevices)>=plcneedy) then begin
-      tagrec.Station:=FWestDevices[plcneedy].Address;
-      tagrec.Address:=regneedy;
-      DoRead(tagrec, values, false);
-    end else
+    if (not SomethingDone) and PReadSomethingAlways and (High(FWestDevices) >= PLCNeedy) then
+    begin
+      TagRec.Station := FWestDevices[PLCNeedy].Address;
+      TagRec.Address := RegNeedy;
+      DoRead(TagRec, Values, False);
+    end
+    else
       NeedSleep := 1;
   finally
-    SetLength(values,0);
-  end
+    SetLength(Values, 0);
+  end;
 end;
 
-procedure TWestASCIIDriver.DoGetValue(TagRec:TTagRec; var values:TScanReadRec);
+procedure TWestASCIIDriver.DoGetValue(TagRec: TTagRec; var Values: TScanReadRec);
 var
-  plc:LongInt;
+  PLC: Longint;
 begin
-  if (tagrec.Station<1) or (tagrec.Station>99) then
+  if (TagRec.Station < 1) or (TagRec.Station > 99) then
     Exit;
 
-  if (tagrec.Address<$00) or (tagrec.Address>$1b) then
+  if (TagRec.Address < $00) or (TagRec.Address > $1B) then
     Exit;
 
-  for plc:=0 to High(FWestDevices) do
-    if FWestDevices[plc].Address=TagRec.Station then begin
-      SetLength(values.Values,1);
-      values.Values[0]:=FWestDevices[plc].Registers[TagRec.Address].Value;
-      values.LastQueryResult:=FWestDevices[plc].Registers[TagRec.Address].LastReadResult;
-      values.ValuesTimestamp:=FWestDevices[plc].Registers[TagRec.Address].Timestamp;
-      break;
+  for PLC := 0 to High(FWestDevices) do
+    if FWestDevices[PLC].Address = TagRec.Station then
+    begin
+      SetLength(Values.values, 1);
+      Values.values[0] := FWestDevices[PLC].Registers[TagRec.Address].Value;
+      Values.LastQueryResult := FWestDevices[PLC].Registers[TagRec.Address].LastReadResult;
+      Values.ValuesTimestamp := FWestDevices[PLC].Registers[TagRec.Address].Timestamp;
+      Break;
     end;
 end;
 
-function  TWestASCIIDriver.DoWrite(const tagrec:TTagRec; const Values:TArrayOfDouble; Sync:Boolean):TProtocolIOResult;
+function TWestASCIIDriver.DoWrite(const TagRec: TTagRec; const Values: TArrayOfDouble; Sync: Boolean): TProtocolIOResult;
 var
-  plc:LongInt;
-  dec:BYTE;
-  foundplc:Boolean;
+  PLC: Longint;
+  Dec: Byte;
+  FoundPLC: Boolean;
 begin
-  if (tagrec.Station<1) or (tagrec.Station>99) then begin
+  if (TagRec.Station < 1) or (TagRec.Station > 99) then
+  begin
     Result := ioIllegalStationAddress;
     Exit;
   end;
 
-  if (tagrec.Address<$00) or (tagrec.Address>$1b) then begin
+  if (TagRec.Address < $00) or (TagRec.Address > $1b) then
+  begin
     Result := ioIllegalRegAddress;
     Exit;
   end;
 
-  if ParameterList[tagrec.Address].Decimal=255 then begin
-    foundplc := false;
-    for plc:=0 to High(FWestDevices) do
-      if FWestDevices[plc].Address=tagrec.Station then begin
-        foundplc:=true;
-        dec := FWestDevices[plc].Registers[tagrec.Address].Decimal;
-        break;
-      end;
-    if not foundplc then
-      dec := 255;
-  end else
-    dec := ParameterList[tagrec.Address].Decimal;
+  if ParameterList[TagRec.Address].Decimal = 255 then
+    begin
+      FoundPLC := False;
+      for PLC := 0 to High(FWestDevices) do
+        if FWestDevices[PLC].Address = TagRec.Station then
+        begin
+          FoundPLC := True;
+          Dec := FWestDevices[PLC].Registers[TagRec.Address].Decimal;
+          Break;
+        end;
+      if not FoundPLC then
+        Dec := 255;
+    end
+  else
+    Dec := ParameterList[TagRec.Address].Decimal;
 
-  if Length(Values)>0 then
-    Result := ModifyParameter(tagrec.Station,ParameterList[tagrec.Address].ParameterID,Values[0],dec)
+  if Length(Values) > 0 then
+    Result := ModifyParameter(TagRec.Station, ParameterList[TagRec.Address].ParameterID, Values[0], Dec)
   else
     Result := ioIllegalValue;
 
-  if foundplc then begin
-    with FWestDevices[plc].Registers[tagrec.Address] do begin
-      if (Length(Values)>0) and (Result=ioOk) then begin
-        Value:=Values[0];
-        Timestamp:=CrossNow;
+  if FoundPLC then
+  begin
+    with FWestDevices[PLC].Registers[TagRec.Address] do
+    begin
+      if (Length(Values) > 0) and (Result = ioOk) then
+      begin
+        Value := Values[0];
+        Timestamp := CrossNow;
       end;
-      LastWriteResult:=Result;
+      LastWriteResult := Result;
     end;
   end;
 end;
 
-function  TWestASCIIDriver.DoRead (const tagrec:TTagRec; out   Values:TArrayOfDouble; Sync:Boolean):TProtocolIOResult;
+function TWestASCIIDriver.DoRead(const TagRec: TTagRec; out Values: TArrayOfDouble; Sync: Boolean): TProtocolIOResult;
 var
-  plc:LongInt;
-  dec:Byte;
-  foundplc:Boolean;
+  PLC: Longint;
+  Dec: Byte;
+  FoundPLC: Boolean;
 begin
-  if (tagrec.Station<1) or (tagrec.Station>99) then begin
+  if (TagRec.Station < 1) or (TagRec.Station > 99) then
+  begin
     Result := ioIllegalStationAddress;
     Exit;
   end;
 
-  if (tagrec.Address<$00) or (tagrec.Address>$1b) then begin
+  if (TagRec.Address < $00) or (TagRec.Address > $1b) then
+  begin
     Result := ioIllegalRegAddress;
     Exit;
   end;
 
-  foundplc := false;
-  for plc:=0 to High(FWestDevices) do
-    if FWestDevices[plc].Address=tagrec.Station then begin
-      foundplc:=true;
-      break;
+  FoundPLC := False;
+  for PLC := 0 to High(FWestDevices) do
+    if FWestDevices[PLC].Address = TagRec.Station then
+    begin
+      FoundPLC := True;
+      Break;
     end;
 
-  if Length({%H-}Values)>0 then
-    Result := ParameterValue(tagrec.Station,ParameterList[tagrec.Address].ParameterID,Values[0],dec)
-  else begin
+  if Length({%H-}Values) > 0 then
+    Result := ParameterValue(TagRec.Station, ParameterList[TagRec.Address].ParameterID, Values[0], Dec)
+  else
+  begin
     Result := ioDriverError;
   end;
 
-  if foundplc then
-    with FWestDevices[plc].Registers[tagrec.Address] do begin
-      if (Length(Values)>0) and (Result=ioOk) then begin
-        Value:=Values[0];
-        Decimal := dec;
-        Timestamp:=CrossNow;
+  if FoundPLC then
+    with FWestDevices[PLC].Registers[TagRec.Address] do
+    begin
+      if (Length(Values) > 0) and (Result = ioOk) then
+      begin
+        Value := Values[0];
+        Decimal := Dec;
+        Timestamp := CrossNow;
       end;
-      LastReadResult:=Result;
+      LastReadResult := Result;
     end;
 end;
 
-function TWestASCIIDriver.DeviceActive(DeviceID:TWestAddressRange):TProtocolIOResult;
+function TWestASCIIDriver.DeviceActive(DeviceID: TWestAddressRange): TProtocolIOResult;
 var
-  buffer, No:Bytes;
-  pkg:TIOPacket;
+  Buffer: Bytes;
+  No: Bytes;
+  Pkg: TIOPacket;
 begin
   try
+    SetLength(Buffer, 6);
+    SetLength(No, 2);
 
-    SetLength(buffer,6);
-    SetLength(No,2);
+    AddressToChar(DeviceID, No);
 
-    AddressToChar(DeviceID,No);
+    Buffer[0] := $4C;
+    Buffer[1] := No[0];
+    Buffer[2] := No[1];
+    Buffer[3] := $3F;
+    Buffer[4] := $3F;
+    Buffer[5] := $2A;
 
-    buffer[0]:=$4C;
-    buffer[1]:=No[0];
-    buffer[2]:=No[1];
-    buffer[3]:=$3F;
-    buffer[4]:=$3F;
-    buffer[5]:=$2A;
-
-    if PCommPort=nil then begin
+    if PCommPort = nil then
+    begin
       Result := ioNullDriver;
       Exit;
     end;
 
-    if PCommPort.IOCommandSync(iocWriteRead, 6, buffer, 6, DriverID, 5, @pkg)=0 then begin
-      Result:=ioDriverError;
+    if PCommPort.IOCommandSync(iocWriteRead, 6, Buffer, 6, DriverID, 5, @Pkg) = 0 then
+    begin
+      Result := ioDriverError;
       Exit;
     end;
 
-    Result := IOResultToProtocolResult(pkg.WriteIOResult);
-    if Result <> ioOk then Exit;
-    Result := IOResultToProtocolResult(pkg.ReadIOResult);
-    if Result <> ioOk then Exit;
+    Result := IOResultToProtocolResult(Pkg.WriteIOResult);
+    if Result <> ioOk then
+      Exit;
+    Result := IOResultToProtocolResult(Pkg.ReadIOResult);
+    if Result <> ioOk then
+      Exit;
 
-    SetLength(buffer,0);
-    buffer := pkg.BufferToRead;
+    SetLength(Buffer, 0);
+    Buffer := Pkg.BufferToRead;
 
-    if (buffer[0]=$4C) and (buffer[1]=No[0]) and (buffer[2]=No[1]) and (buffer[3]=$3F) and (buffer[4]=$41) and (buffer[5]=$2A) then begin
-      result := ioOk;
+    if (Buffer[0] = $4C)
+      and (Buffer[1] = No[0])
+      and (Buffer[2] = No[1])
+      and (Buffer[3] = $3F)
+      and (Buffer[4] = $41)
+      and (Buffer[5] = $2A) then
+    begin
+      Result := ioOk;
       Exit;
     end;
 
-    if (buffer[0]=$4C) and (buffer[1]=No[1]) and (buffer[2]=$3F) and (buffer[3]=$41) and (buffer[4]=$2A) then begin
-      result := ioOk;
+    if (Buffer[0] = $4C)
+      and (Buffer[1] = No[1])
+      and (Buffer[2] = $3F)
+      and (Buffer[3] = $41)
+      and (Buffer[4] = $2A) then
+    begin
+      Result := ioOk;
       Exit;
     end;
 
     Result := ioCommError;
   finally
-    SetLength(pkg.BufferToRead,0);
-    SetLength(pkg.BufferToWrite,0);
-    SetLength(buffer,0);
-    SetLength(No,0);
+    SetLength(Pkg.BufferToRead, 0);
+    SetLength(Pkg.BufferToWrite, 0);
+    SetLength(Buffer, 0);
+    SetLength(No, 0);
   end;
 end;
 
-procedure TWestASCIIDriver.AddressToChar(Addr:TWestAddressRange; var ret:Bytes);
+procedure TWestASCIIDriver.AddressToChar(Addr: TWestAddressRange; var Ret: Bytes);
 var
-   Dezenas, Unidades:BYTE;
+  Dozens: Byte;
+  AUnits: Byte;
 begin
-  if not Assigned(ret) then Exit;
+  if not Assigned(Ret) then Exit;
 
-  //testa as condições q fariam esse procedimento falhar
-  if ((Addr<1) or (Addr>98)) then
+  // Test the conditions that would cause this procedure to fail
+  if ((Addr < 1) or (Addr > 98)) then
     raise Exception.Create(SoutOfBounds);
 
-  Unidades := Addr mod 10;
-  Dezenas  := (Addr-Unidades) div 10;
+  AUnits := Addr mod 10;
+  Dozens := (Addr - AUnits) div 10;
 
-  ret[0] := (48 + Dezenas);
-  ret[1] := (48 + Unidades);
+  Ret[0] := (48 + Dozens);
+  Ret[1] := (48 + AUnits);
 end;
 
-function TWestASCIIDriver.WestToDouble(const buffer:Array of byte; var Value:Double; var dec:Byte):TProtocolIOResult;
+function TWestASCIIDriver.WestToDouble(const Buffer: array of Byte; var Value: Double; var Dec: Byte): TProtocolIOResult;
 var
-  a,b,c,d,r:BYTE;
-  i, aux:LongInt;
+  a: Byte;
+  b: Byte;
+  c: Byte;
+  d: Byte;
+  R: Byte;
+  i: Longint;
+  Aux: Longint;
 begin
-  if ((buffer[0]=$3C) and (buffer[1]=$3F) and (buffer[2]=$3F) and (buffer[3]=$3E)) then begin
+  if    (Buffer[0] = $3C)
+    and (Buffer[1] = $3F)
+    and (Buffer[2] = $3F)
+    and (Buffer[3] = $3E) then
+  begin
     Result := ioIllegalValue;
     Exit;
   end;
 
-  for i:=0 to 4 do begin
-    aux := (buffer[i]-48);
-    if ((aux<0) or (aux>9)) then begin
+  for i := 0 to 4 do
+  begin
+    Aux := (Buffer[i] - 48);
+    if ((Aux < 0) or (Aux > 9)) then
+    begin
       Result := ioCommError;
       Exit;
     end;
   end;
 
-  a := buffer[0]-48; //ascii to decimal
-  b := buffer[1]-48;
-  c := buffer[2]-48;
-  d := buffer[3]-48;
-  r := buffer[4];
+  a := Buffer[0] - 48; // ascii to decimal
+  b := Buffer[1] - 48;
+  c := Buffer[2] - 48;
+  d := Buffer[3] - 48;
+  R := Buffer[4];
 
-  case r of
-    $30: begin
-      Value  := (a*1000)+(b*100)+(c*10)+d;
-      dec    := 0;
-      Result := ioOk;
-    end;
-    $31: begin
-      Value  := (a*100)+(b*10)+c+(d/10);
-      dec    := 1;
-      Result := ioOk;
-    end;
-    $32: begin
-      Value  := (a*10)+b+(c/10)+(d/100);
-      dec    := 2;
-      Result := ioOk;
-    end;
-    $33: begin
-      Value  := a+(b/10)+(c/100)+(d/1000);
-      dec    := 3;
-      Result := ioOk;
-    end;
-    $35: begin
-      Value  := ((a*1000)+(b*100)+(c*10)+d)*(-1);
-      dec    := 0;
-      Result := ioOk;
-    end;
-    $36: begin
-      Value  := ((a*100)+(b*10)+c+(d/10))*(-1);
-      dec    := 1;
-      Result := ioOk;
-    end;
-    $37: begin
-      Value := ((a*10)+(b)+(c/10)+(d/100))*(-1);
-      dec    := 2;
-      Result := ioOk;
-    end;
-    $38: begin
-      Value := (a+(b/10)+(c/100)+(d/1000))*(-1);
-      dec    := 3;
-      Result := ioOk;
-    end;
+  case R of
+    $30:  begin
+            Value := (a * 1000) + (b * 100) + (c * 10) + d;
+            Dec := 0;
+            Result := ioOk;
+          end;
+    $31:  begin
+            Value := (a * 100) + (b * 10) + c + (d / 10);
+            Dec := 1;
+            Result := ioOk;
+          end;
+    $32:  begin
+            Value := (a * 10) + b + (c / 10) + (d / 100);
+            Dec := 2;
+            Result := ioOk;
+          end;
+    $33:  begin
+            Value := a + (b / 10) + (c / 100) + (d / 1000);
+            Dec := 3;
+            Result := ioOk;
+          end;
+    $35:  begin
+            Value := ((a * 1000) + (b * 100) + (c * 10) + d) * (-1);
+            Dec := 0;
+            Result := ioOk;
+          end;
+    $36:  begin
+            Value := ((a * 100) + (b * 10) + c + (d / 10)) * (-1);
+            Dec := 1;
+            Result := ioOk;
+          end;
+    $37:  begin
+            Value := ((a * 10) + (b) + (c / 10) + (d / 100)) * (-1);
+            Dec := 2;
+            Result := ioOk;
+          end;
+    $38:  begin
+            Value := (a + (b / 10) + (c / 100) + (d / 1000)) * (-1);
+            Dec := 3;
+            Result := ioOk;
+          end;
     else
       Result := ioCommError;
   end;
 end;
 
-function  TWestASCIIDriver.WestToDouble(const buffer:Array of byte; var Value:Double):TProtocolIOResult;
+function TWestASCIIDriver.WestToDouble(const Buffer: array of Byte; var Value: Double): TProtocolIOResult;
 var
-  cd:BYTE;
+  Cd: Byte;
 begin
-  Result :=  WestToDouble(buffer,Value,cd);
+  Result := WestToDouble(Buffer, Value, Cd);
 end;
 
-function  TWestASCIIDriver.DoubleToWestAuto(var buffer:Array of Byte; const Value:Double):TProtocolIOResult;
+function TWestASCIIDriver.DoubleToWestAuto(var Buffer: array of Byte; const Value: Double): TProtocolIOResult;
 var
-   caso:BYTE;
-   numaux:Extended;
-   c:LongInt;
-   aux:AnsiString;
+  ACase: Byte;
+  NumAux: Extended;
+  i: Longint;
+  Aux: AnsiString;
 begin
-  caso:=255;
+  ACase := 255;
 
-  if (Value>=10000) or (Value<=-10000) then begin
+  if (Value >= 10000) or (Value <= -10000) then
+  begin
     Result := ioIllegalValue;
     Exit;
   end;
 
-  caso:=IfThen((Value>=1000) and (Value<10000),$30,caso);
-  caso:=IfThen((Value>=100) and (Value<1000),$31,caso);
-  caso:=IfThen((Value>=10) and (Value<100),$32,caso);
-  caso:=IfThen((Value>=0) and (Value<10),$33,caso);
+  ACase := IfThen((Value >= 1000) and (Value < 10000), $30, ACase);
+  ACase := IfThen((Value >= 100) and (Value < 1000), $31, ACase);
+  ACase := IfThen((Value >= 10) and (Value < 100), $32, ACase);
+  ACase := IfThen((Value >= 0) and (Value < 10), $33, ACase);
 
-  caso:=IfThen((Value<=-1000) and (Value>-10000),$35,caso);
-  caso:=IfThen((Value<=-100) and (Value>-1000),$36,caso);
-  caso:=IfThen((Value<=-10) and (Value>-100),$37,caso);
-  caso:=IfThen((Value < 0) and (Value>-10),$38,caso);
+  ACase := IfThen((Value <= -1000) and (Value > -10000), $35, ACase);
+  ACase := IfThen((Value <= -100) and (Value > -1000), $36, ACase);
+  ACase := IfThen((Value <= -10) and (Value > -100), $37, ACase);
+  ACase := IfThen((Value < 0) and (Value > -10), $38, ACase);
 
-  case caso of
-    $30:
-      numaux := Value;
-    $31:
-      numaux := Value*10;
-    $32:
-      numaux := Value*100;
-    $33:
-      numaux := Value*1000;
-    $35:
-      numaux := Value*(-1);
-    $36:
-      numaux := Value*(-10);
-    $37:
-      numaux := Value*(-100);
-    $38:
-      numaux := Value*(-1000);
-    else begin
-      Result := ioIllegalValue;
-      Exit;
-    end;
+  case ACase of
+    $30: NumAux := Value;
+    $31: NumAux := Value * 10;
+    $32: NumAux := Value * 100;
+    $33: NumAux := Value * 1000;
+    $35: NumAux := Value * (-1);
+    $36: NumAux := Value * (-10);
+    $37: NumAux := Value * (-100);
+    $38: NumAux := Value * (-1000);
+    else
+      begin
+        Result := ioIllegalValue;
+        Exit;
+      end;
   end;
 
-   aux := FormatFloat('0000',Abs(numaux));
+  Aux := FormatFloat('0000', Abs(NumAux));
 
-   for c:=0 to 3 do
-      buffer[c] := StrToInt(aux[1+c])+48;
+  for i := 0 to 3 do
+    Buffer[i] := StrToInt(Aux[1 + i]) + 48;
 
-   buffer[4] := caso;
-   Result := ioOk;
+  Buffer[4] := ACase;
+  Result := ioOk;
 end;
 
-function  TWestASCIIDriver.DoubleToWestManual(var buffer:Array of Byte; const Value:Double; const dec:BYTE):TProtocolIOResult;
+function TWestASCIIDriver.DoubleToWestManual(var Buffer: array of Byte; const Value: Double; const Dec: Byte): TProtocolIOResult;
 var
-   caso:BYTE;
-   c:LongInt;
-   numaux:Double;
-   aux:AnsiString;
+  ACase: Byte;
+  i: Longint;
+  NumAux: Double;
+  Aux: AnsiString;
 begin
-   caso:=255;
+  ACase := 255;
 
-   if (Value>=10000) or (Value<=-10000) then begin
-       Result := ioIllegalValue;
-       Exit;
-   end;
+  if (Value >= 10000) or (Value <= -10000) then
+  begin
+    Result := ioIllegalValue;
+    Exit;
+  end;
 
-   caso:=IfThen(((caso=255) and (dec<=0) and (Value<10000) and (Value>=0)), $30, caso);
-   caso:=IfThen(((caso=255) and (dec<=1) and (Value<1000) and (Value>=0)), $31, caso);
-   caso:=IfThen(((caso=255) and (dec<=2) and (Value<100) and (Value>=0)), $32, caso);
-   caso:=IfThen(((caso=255) and (dec<=3) and (Value<10) and (Value>=0)), $33, caso);
+  ACase := IfThen(((ACase = 255) and (Dec <= 0) and (Value < 10000) and (Value >= 0)), $30, ACase);
+  ACase := IfThen(((ACase = 255) and (Dec <= 1) and (Value < 1000) and (Value >= 0)), $31, ACase);
+  ACase := IfThen(((ACase = 255) and (Dec <= 2) and (Value < 100) and (Value >= 0)), $32, ACase);
+  ACase := IfThen(((ACase = 255) and (Dec <= 3) and (Value < 10) and (Value >= 0)), $33, ACase);
 
-   caso:=IfThen(((caso=255) and (dec<=0) and (Value>-10000) and (Value<0)), $35, caso);
-   caso:=IfThen(((caso=255) and (dec<=1) and (Value>-1000) and (Value<0)), $36, caso);
-   caso:=IfThen(((caso=255) and (dec<=2) and (Value>-100) and (Value<0)), $37, caso);
-   caso:=IfThen(((caso=255) and (dec<=3) and (Value>-10) and (Value<0)), $38, caso);
+  ACase := IfThen(((ACase = 255) and (Dec <= 0) and (Value > -10000) and (Value < 0)), $35, ACase);
+  ACase := IfThen(((ACase = 255) and (Dec <= 1) and (Value > -1000) and (Value < 0)), $36, ACase);
+  ACase := IfThen(((ACase = 255) and (Dec <= 2) and (Value > -100) and (Value < 0)), $37, ACase);
+  ACase := IfThen(((ACase = 255) and (Dec <= 3) and (Value > -10) and (Value < 0)), $38, ACase);
 
-   if (caso = 255) then begin
-      Result := ioIllegalValue;
-      Exit;
-   end;
+  if (ACase = 255) then
+  begin
+    Result := ioIllegalValue;
+    Exit;
+  end;
 
-   case caso of
-      $30:
-         numaux := Value;
-      $31:
-         numaux := (Value*10);
-      $32:
-         numaux := Value*100;
-      $33:
-         numaux := Value*1000;
-      $35:
-         numaux := Value*(-1);
-      $36:
-         numaux := Value*(-10);
-      $37:
-         numaux := Value*(-100);
-      $38:
-         numaux := Value*(-1000);
-      else begin
-         Result := ioIllegalValue;
-         Exit;
+  case ACase of
+    $30: NumAux := Value;
+    $31: NumAux := Value * 10;
+    $32: NumAux := Value * 100;
+    $33: NumAux := Value * 1000;
+    $35: NumAux := Value * (-1);
+    $36: NumAux := Value * (-10);
+    $37: NumAux := Value * (-100);
+    $38: NumAux := Value * (-1000);
+    else
+      begin
+        Result := ioIllegalValue;
+        Exit;
       end;
-   end;
+  end;
 
-   aux := FormatFloat('0000',Abs(numaux));
+  Aux := FormatFloat('0000', Abs(NumAux));
 
-   for c:=0 to 3 do
-      buffer[c] := StrToInt(aux[1+c])+48;
+  for i := 0 to 3 do
+    Buffer[i] := StrToInt(Aux[1 + i]) + 48;
 
-   buffer[4] := caso;
-   Result := ioOk;
+  Buffer[4] := ACase;
+  Result := ioOk;
 end;
 
-function  TWestASCIIDriver.ParameterValue(const DeviceID:TWestAddressRange;
-                                          const Parameter:BYTE;
-                                          var   Value:Double;
-                                          var   dec:BYTE):TProtocolIOResult;
+function TWestASCIIDriver.ParameterValue(const DeviceID: TWestAddressRange; const Parameter: Byte; var Value: Double; var Dec: Byte): TProtocolIOResult;
 var
-  buffer, No:Bytes;
-  b1, b2:Boolean;
-  pkg:TIOPacket;
+  Buffer: Bytes;
+  No: Bytes;
+  b1: Boolean;
+  b2: Boolean;
+  Pkg: TIOPacket;
 begin
   try
+    SetLength(Buffer, 11);
+    SetLength(No, 2);
 
-    SetLength(buffer,11);
-    SetLength(No,2);
+    AddressToChar(DeviceID, No);
 
-    AddressToChar(DeviceID,No);
+    Buffer[0] := $4C;
+    Buffer[1] := No[0];
+    Buffer[2] := No[1];
+    Buffer[3] := Parameter;
+    Buffer[4] := $3F;
+    Buffer[5] := $2A;
 
-    buffer[0]:=$4C;
-    buffer[1]:=No[0];
-    buffer[2]:=No[1];
-    buffer[3]:=Parameter;
-    buffer[4]:=$3F;
-    buffer[5]:=$2A;
-
-    if PCommPort=nil then begin
+    if PCommPort = nil then
+    begin
       Result := ioNullDriver;
       Exit;
     end;
 
 
-    if PCommPort.IOCommandSync(iocWriteRead, 6, buffer, 11, DriverID, 5, @pkg)=0 then begin
-      Result:=ioDriverError;
+    if PCommPort.IOCommandSync(iocWriteRead, 6, Buffer, 11, DriverID, 5, @Pkg) = 0 then
+    begin
+      Result := ioDriverError;
       Exit;
     end;
 
-    Result := IOResultToProtocolResult(pkg.WriteIOResult);
+    Result := IOResultToProtocolResult(Pkg.WriteIOResult);
     if Result <> ioOk then Exit;
-    Result := IOResultToProtocolResult(pkg.ReadIOResult);
+    Result := IOResultToProtocolResult(Pkg.ReadIOResult);
     if Result <> ioOk then Exit;
 
-    SetLength(buffer,0);
-    buffer := pkg.BufferToRead;
+    SetLength(Buffer, 0);
+    Buffer := Pkg.BufferToRead;
 
-    b1 := (buffer[0]=$4C) and (buffer[1]=No[0]) and (buffer[2]=No[1]) and (buffer[3]=Parameter) and (buffer[9]=$4E) and (buffer[10]=$2A);
-    b2 := (buffer[0]=$4C) and (buffer[1]=No[1]) and (buffer[2]=Parameter) and (buffer[8]=$4E) and (buffer[9]=$2A);
+    b1 := (Buffer[0] = $4C)
+      and (Buffer[1] = No[0])
+      and (Buffer[2] = No[1])
+      and (Buffer[3] = Parameter)
+      and (Buffer[9] = $4E)
+      and (Buffer[10] = $2A);
+    b2 := (Buffer[0] = $4C)
+      and (Buffer[1] = No[1])
+      and (Buffer[2] = Parameter)
+      and (Buffer[8] = $4E)
+      and (Buffer[9] = $2A);
     if (b1 or b2) then
       Result := ioIllegalFunction
-    else begin
-      b1 := (buffer[0]=$4C) and (buffer[1]=No[0]) and (buffer[2]=No[1]) and (buffer[3]=Parameter) and (buffer[9]=$41) and (buffer[10]=$2A);
-      b2 := (buffer[0]=$4C) and (buffer[1]=No[1]) and (buffer[2]=Parameter) and (buffer[8]=$41) and (buffer[9]=$2A);
-      if (b1 or b2) then begin
+    else
+      begin
+        b1 := (Buffer[0] = $4C)
+          and (Buffer[1] = No[0])
+          and (Buffer[2] = No[1])
+          and (Buffer[3] = Parameter)
+          and (Buffer[9] = $41)
+          and (Buffer[10] = $2A);
+        b2 := (Buffer[0] = $4C)
+          and (Buffer[1] = No[1])
+          and (Buffer[2] = Parameter)
+          and (Buffer[8] = $41)
+          and (Buffer[9] = $2A);
+        if (b1 or b2) then
+          begin
+            b1 := (Buffer[4] = $3C)
+              and (Buffer[5] = $3F)
+              and (Buffer[6] = $3F)
+              and (Buffer[7] = $3E);
 
-        b1 := (buffer[4]=$3C) and (buffer[5]=$3F) and (buffer[6]=$3F) and (buffer[7]=$3E);
-
-        if b1 then
-          Result := ioIllegalValue
-        else begin
-          Result := WestToDouble(buffer[4],Value,dec);
-        end;
-      end else
-        Result := ioCommError;
-    end;
+            if b1 then
+              Result := ioIllegalValue
+            else
+              begin
+                Result := WestToDouble(Buffer[4], Value, Dec);
+              end;
+          end
+        else
+          Result := ioCommError;
+      end;
   finally
-    SetLength(pkg.BufferToRead,0);
-    SetLength(pkg.BufferToWrite,0);
-    SetLength(buffer,0);
-    SetLength(No,0);
+    SetLength(Pkg.BufferToRead, 0);
+    SetLength(Pkg.BufferToWrite, 0);
+    SetLength(Buffer, 0);
+    SetLength(No, 0);
   end;
 end;
 
-function  TWestASCIIDriver.ModifyParameter(const DeviceID:TWestAddressRange; const Parameter:BYTE; const Value:Double; const dec:BYTE):TProtocolIOResult;
+function TWestASCIIDriver.ModifyParameter(const DeviceID: TWestAddressRange; const Parameter: Byte; const Value: Double; const Dec: Byte): TProtocolIOResult;
 var
-  buffer, respprog, No:Bytes;
-  flag:Boolean;
-  pkg:TIOPacket;
-  i:LongInt;
+  Buffer: Bytes;
+  RespProg: Bytes;
+  No: Bytes;
+  Flag: Boolean;
+  Pkg: TIOPacket;
+  i: Longint;
 begin
   try
 
-    flag := true;
+    Flag := True;
 
-    SetLength(No,2);
-    SetLength(buffer,20);
-    SetLength(respprog,12);
+    SetLength(No, 2);
+    SetLength(Buffer, 20);
+    SetLength(RespProg, 12);
 
-    AddressToChar(DeviceID,No);
-    buffer[0] := $4C;
-    buffer[1] := No[0];
-    buffer[2] := No[1];
-    buffer[3] := Parameter;
-    buffer[4] := $23;
-    if dec=255 then
-      Result := DoubleToWestAuto(buffer[5],Value)
+    AddressToChar(DeviceID, No);
+    Buffer[0] := $4C;
+    Buffer[1] := No[0];
+    Buffer[2] := No[1];
+    Buffer[3] := Parameter;
+    Buffer[4] := $23;
+    if Dec = 255 then
+      Result := DoubleToWestAuto(Buffer[5], Value)
     else
-      Result := DoubleToWestManual(buffer[5],Value,dec);
+      Result := DoubleToWestManual(Buffer[5], Value, Dec);
 
-    if Result<>ioOk then Exit;
+    if Result <> ioOk then Exit;
 
-    buffer[10] := $2A;
+    Buffer[10] := $2A;
 
-    respprog[0] := $4C;
-    respprog[1] := No[0];
-    respprog[2] := No[1];
-    respprog[3] := Parameter;
-    if dec=255 then
-      Result := DoubleToWestAuto(respprog[4],Value)
+    RespProg[0] := $4C;
+    RespProg[1] := No[0];
+    RespProg[2] := No[1];
+    RespProg[3] := Parameter;
+    if Dec = 255 then
+      Result := DoubleToWestAuto(RespProg[4], Value)
     else
-      Result := DoubleToWestManual(respprog[4],Value,dec);
+      Result := DoubleToWestManual(RespProg[4], Value, Dec);
 
-    if Result<>ioOk then Exit;
+    if Result <> ioOk then Exit;
 
-    respprog[9] := $49;
-    respprog[10] := $2A;
+    RespProg[9] := $49;
+    RespProg[10] := $2A;
 
-    if PCommPort=nil then begin
+    if PCommPort = nil then
+    begin
       Result := ioNullDriver;
       Exit;
     end;
 
-    PCommPort.IOCommandSync(iocWriteRead, 11, buffer, 11, DriverID, 10, @pkg);
+    PCommPort.IOCommandSync(iocWriteRead, 11, Buffer, 11, DriverID, 10, @Pkg);
 
-    Result := IOResultToProtocolResult(pkg.WriteIOResult);
+    Result := IOResultToProtocolResult(Pkg.WriteIOResult);
     if Result <> ioOk then Exit;
-    Result := IOResultToProtocolResult(pkg.ReadIOResult);
+    Result := IOResultToProtocolResult(Pkg.ReadIOResult);
     if Result <> ioOk then Exit;
 
-    for i:=0 to 10 do
-      flag := flag and (respprog[i]=pkg.BufferToRead[i]);
+    for i := 0 to 10 do
+      Flag := Flag and (RespProg[i] = Pkg.BufferToRead[i]);
 
-    if (not flag) then begin
+    if (not Flag) then
+    begin
       Result := ioCommError;
       Exit;
     end;
 
-    SetLength(buffer,0);
-    SetLength(buffer,12);
+    SetLength(Buffer, 0);
+    SetLength(Buffer, 12);
 
-    SetLength(pkg.BufferToRead, 0);
-    SetLength(pkg.BufferToWrite,0);
+    SetLength(Pkg.BufferToRead, 0);
+    SetLength(Pkg.BufferToWrite, 0);
 
-    buffer[0] := $4C;
-    buffer[1] := No[0];
-    buffer[2] := No[1];
-    buffer[3] := Parameter;
-    buffer[4] := $49;
-    buffer[5] := $2A;
+    Buffer[0] := $4C;
+    Buffer[1] := No[0];
+    Buffer[2] := No[1];
+    Buffer[3] := Parameter;
+    Buffer[4] := $49;
+    Buffer[5] := $2A;
 
-    PCommPort.IOCommandSync(iocWriteRead, 6, buffer, 11, DriverID, 10, @pkg);
+    PCommPort.IOCommandSync(iocWriteRead, 6, Buffer, 11, DriverID, 10, @Pkg);
 
-    Result := IOResultToProtocolResult(pkg.WriteIOResult);
+    Result := IOResultToProtocolResult(Pkg.WriteIOResult);
     if Result <> ioOk then Exit;
-    Result := IOResultToProtocolResult(pkg.ReadIOResult);
-    if Result <> ioOk then Exit;
+    Result := IOResultToProtocolResult(Pkg.ReadIOResult);
+    if Result <> ioOk then
+      Exit;
 
-    if ((pkg.BufferToRead[8]=$4E) or (pkg.BufferToRead[9]=$4E)) then begin
+    if ((Pkg.BufferToRead[8] = $4E) or (Pkg.BufferToRead[9] = $4E)) then
+    begin
       Result := ioIllegalFunction;
       Exit;
     end;
     Result := ioOk;
   finally
-    SetLength(pkg.BufferToRead, 0);
-    SetLength(pkg.BufferToWrite,0);
-    SetLength(No,0);
-    SetLength(buffer,0);
-    SetLength(respprog,0);
+    SetLength(Pkg.BufferToRead, 0);
+    SetLength(Pkg.BufferToWrite, 0);
+    SetLength(No, 0);
+    SetLength(Buffer, 0);
+    SetLength(RespProg, 0);
   end;
 end;
 
-function  TWestASCIIDriver.ScanTable(DeviceID:TWestAddressRange; var ScanTableValues:TScanTable):TProtocolIOResult;
+function TWestASCIIDriver.ScanTable(DeviceID: TWestAddressRange; var ScanTableValues: TScanTable): TProtocolIOResult;
 var
-   buffer, No:Bytes;
-   b1, b2:Boolean;
-   pkg:TIOPacket;
-   OffsetSpace, OffsetNo, OffsetSize, res:LongInt;
+  Buffer: Bytes;
+  No: Bytes;
+  b1: Boolean;
+  b2: Boolean;
+  Pkg: TIOPacket;
+  OffsetSpace: Longint;
+  OffsetNo: Longint;
+  OffsetSize: Longint;
+  Res: Longint;
 begin
   try
-    SetLength(buffer,35);
-    SetLength(No,2);
+    SetLength(Buffer, 35);
+    SetLength(No, 2);
 
-    AddressToChar(DeviceID,No);
+    AddressToChar(DeviceID, No);
 
-    buffer[0]:=$4C;
-    buffer[1]:=No[0];
-    buffer[2]:=No[1];
-    buffer[3]:=$5D;
-    buffer[4]:=$3F;
-    buffer[5]:=$2A;
+    Buffer[0] := $4C;
+    Buffer[1] := No[0];
+    Buffer[2] := No[1];
+    Buffer[3] := $5D;
+    Buffer[4] := $3F;
+    Buffer[5] := $2A;
 
-    if PCommPort=nil then begin
+    if PCommPort = nil then
+    begin
       Result := ioNullDriver;
       Exit;
     end;
 
     PCommPort.Lock(DriverID);
 
-    if PCommPort.IOCommandSync(iocWriteRead, 6, buffer, 6, DriverID, 10, @pkg)=0 then begin
-      Result:=ioDriverError;
-      Exit;
-    end;
-
-    if [csDestroying]*ComponentState<>[] then begin
+    if PCommPort.IOCommandSync(iocWriteRead, 6, Buffer, 6, DriverID, 10, @Pkg) = 0 then
+    begin
       Result := ioDriverError;
       Exit;
     end;
 
-    Result := IOResultToProtocolResult(pkg.WriteIOResult);
+    if [csDestroying] * ComponentState <> [] then
+    begin
+      Result := ioDriverError;
+      Exit;
+    end;
+
+    Result := IOResultToProtocolResult(Pkg.WriteIOResult);
     if Result <> ioOk then Exit;
-    Result := IOResultToProtocolResult(pkg.ReadIOResult);
+    Result := IOResultToProtocolResult(Pkg.ReadIOResult);
     if Result <> ioOk then Exit;
 
-    buffer := pkg.BufferToRead;
+    Buffer := Pkg.BufferToRead;
 
-    b2 := (buffer[0]=$4C) and (buffer[1]=No[0]) and (buffer[2]=No[1]) and (buffer[3]=$5D) and (buffer[4]=$32);
-    b1 := (buffer[0]=$4C) and (buffer[1]=No[1]) and (buffer[2]=$5D) and (buffer[3]=$32);
+    b2 := (Buffer[0] = $4C) and (Buffer[1] = No[0]) and (Buffer[2] = No[1]) and (Buffer[3] = $5D) and (Buffer[4] = $32);
+    b1 := (Buffer[0] = $4C) and (Buffer[1] = No[1]) and (Buffer[2] = $5D) and (Buffer[3] = $32);
 
-    if (b1=false) and (b2=false) then begin
+    if (b1 = False) and (b2 = False) then
+    begin
       Result := ioCommError;
       Exit;
     end;
 
-    //se respondeu o endereco com dois byte, incrementa offset da array.
-    //
-    //if the response has two Bytes to device addres, increments the offset of the array.
-    OffsetNo:=0;
+    // if the response has two Bytes to device addres, increments the offset of the array
+    OffsetNo := 0;
     if b2 then
-      OffsetNo:=1;
+      OffsetNo := 1;
 
-    case Chr(buffer[4+OffsetNo]) of
-      '0': begin
-        res := PCommPort.IOCommandSync(iocRead, 0, nil, 21+OffsetNo, DriverID, 10, @pkg);
-        OffsetSize := 0;
-      end;
-      '5': begin
-        res := PCommPort.IOCommandSync(iocRead, 0, Nil, 26+OffsetNo, DriverID, 10, @pkg);
-        OffsetSize := 5;
-      end;
-      else begin
-        Result := ioCommError;
-        Exit;
-      end;
+    case Chr(Buffer[4 + OffsetNo]) of
+      '0':  begin
+              Res := PCommPort.IOCommandSync(iocRead, 0, nil, 21 + OffsetNo, DriverID, 10, @Pkg);
+              OffsetSize := 0;
+            end;
+      '5':  begin
+              Res := PCommPort.IOCommandSync(iocRead, 0, nil, 26 + OffsetNo, DriverID, 10, @Pkg);
+              OffsetSize := 5;
+            end;
+      else
+        begin
+          Result := ioCommError;
+          Exit;
+        end;
     end;
 
-    if res=0 then begin
+    if Res = 0 then
+    begin
       Result := ioDriverError;
       Exit;
     end;
 
-    if [csDestroying]*ComponentState<>[] then begin
+    if [csDestroying] * ComponentState <> [] then
+    begin
       Result := ioDriverError;
       Exit;
     end;
 
     PCommPort.Unlock(DriverID);
 
-    Result := IOResultToProtocolResult(pkg.ReadIOResult);
+    Result := IOResultToProtocolResult(Pkg.ReadIOResult);
     if Result <> ioOk then Exit;
 
-    if b2 and (pkg.BufferToRead[0]=$20) then
+    if b2 and (Pkg.BufferToRead[0] = $20) then
       OffsetSpace := 1
     else
       OffsetSpace := 0;
 
-    buffer := pkg.BufferToRead;
+    Buffer := Pkg.BufferToRead;
 
-    if ((buffer[20+OffsetSize+OffsetSpace]<>$41) or (buffer[21+OffsetSize+OffsetSpace]<>$2A)) then begin
+    if ((Buffer[20 + OffsetSize + OffsetSpace] <> $41) or (Buffer[21 + OffsetSize + OffsetSpace] <> $2A)) then
+    begin
       Result := ioCommError;
       Exit;
     end;
 
-    Result := WestToDouble(buffer[0+OffsetSpace], ScanTableValues.SP.Value, ScanTableValues.SP.Decimal);
-    if (Result=ioCommError) then
+    Result := WestToDouble(Buffer[0 + OffsetSpace], ScanTableValues.SP.Value, ScanTableValues.SP.Decimal);
+    if (Result = ioCommError) then
       Exit;
-    ScanTableValues.SP.TimeStamp:=CrossNow;
-    ScanTableValues.SP.IOResult:=Result;
+    ScanTableValues.SP.Timestamp := CrossNow;
+    ScanTableValues.SP.IOResult := Result;
 
-    Result := WestToDouble(buffer[5+OffsetSpace], ScanTableValues.PV.Value, ScanTableValues.PV.Decimal);
-    if (Result=ioCommError) then
+    Result := WestToDouble(Buffer[5 + OffsetSpace], ScanTableValues.PV.Value, ScanTableValues.PV.Decimal);
+    if (Result = ioCommError) then
       Exit;
-    ScanTableValues.PV.TimeStamp:=CrossNow;
-    ScanTableValues.PV.IOResult:=Result;
+    ScanTableValues.PV.Timestamp := CrossNow;
+    ScanTableValues.PV.IOResult := Result;
 
-    Result := WestToDouble(buffer[10+OffsetSpace], ScanTableValues.Out1.Value, ScanTableValues.Out1.Decimal);
-    if (Result=ioCommError) then
+    Result := WestToDouble(Buffer[10 + OffsetSpace], ScanTableValues.Out1.Value, ScanTableValues.Out1.Decimal);
+    if (Result = ioCommError) then
       Exit;
-    ScanTableValues.Out1.TimeStamp:=CrossNow;
-    ScanTableValues.Out1.IOResult:=Result;
+    ScanTableValues.Out1.Timestamp := CrossNow;
+    ScanTableValues.Out1.IOResult := Result;
 
-    if OffsetSize=0 then begin
-      Result := WestToDouble(buffer[15+OffsetSpace], ScanTableValues.Status.Value, ScanTableValues.Status.Decimal);
-      if (Result=ioCommError) then
-        Exit;
-      ScanTableValues.Status.TimeStamp:=CrossNow;
-      ScanTableValues.Status.IOResult:=Result;
-    end else begin
-      Result := WestToDouble(buffer[15+OffsetSpace], ScanTableValues.Out2.Value, ScanTableValues.Out2.Decimal);
-      if (Result=ioCommError) then
-        Exit;
-      ScanTableValues.Out2.TimeStamp:=CrossNow;
-      ScanTableValues.Out2.IOResult:=Result;
+    if OffsetSize = 0 then
+      begin
+        Result := WestToDouble(Buffer[15 + OffsetSpace], ScanTableValues.Status.Value, ScanTableValues.Status.Decimal);
+        if (Result = ioCommError) then
+          Exit;
+        ScanTableValues.Status.Timestamp := CrossNow;
+        ScanTableValues.Status.IOResult := Result;
+      end
+    else
+      begin
+        Result := WestToDouble(Buffer[15 + OffsetSpace], ScanTableValues.Out2.Value, ScanTableValues.Out2.Decimal);
+        if (Result = ioCommError) then
+          Exit;
+        ScanTableValues.Out2.Timestamp := CrossNow;
+        ScanTableValues.Out2.IOResult := Result;
 
-      Result := WestToDouble(buffer[20+OffsetNo+OffsetSpace], ScanTableValues.Status.Value, ScanTableValues.Status.Decimal);
-      if (Result=ioCommError) then
-        Exit;
-      ScanTableValues.Status.TimeStamp:=CrossNow;
-      ScanTableValues.Status.IOResult:=Result;
-    end;
+        Result := WestToDouble(Buffer[20 + OffsetNo + OffsetSpace], ScanTableValues.Status.Value, ScanTableValues.Status.Decimal);
+        if (Result = ioCommError) then
+          Exit;
+        ScanTableValues.Status.Timestamp := CrossNow;
+        ScanTableValues.Status.IOResult := Result;
+      end;
     Result := ioOk;
   finally
-    if PCommPort<>nil then
-      if PCommPort.LockedBy=DriverID then
-         PCommPort.Unlock(DriverID);
+    if PCommPort <> nil then
+      if PCommPort.LockedBy = DriverID then
+        PCommPort.Unlock(DriverID);
   end;
 end;
 
-procedure TWestASCIIDriver.MinScanTimeOfReg(var WestReg:TWestRegister);
+procedure TWestASCIIDriver.MinScanTimeOfReg(var WestReg: TWestRegister);
 var
-  srate:LongInt;
+  Srate: Longint;
 begin
-  if Length(WestReg.ScanTimes)>0 then begin
-    WestReg.MinScanTime:=WestReg.ScanTimes[0].ScanTime;
-    for srate := 1 to High(WestReg.ScanTimes) do
-      WestReg.MinScanTime := Min(WestReg.MinScanTime, WestReg.ScanTimes[srate].ScanTime);
+  if Length(WestReg.ScanTimes) > 0 then
+  begin
+    WestReg.MinScanTime := WestReg.ScanTimes[0].ScanTime;
+    for Srate := 1 to High(WestReg.ScanTimes) do
+      WestReg.MinScanTime := Min(WestReg.MinScanTime, WestReg.ScanTimes[Srate].ScanTime);
   end;
 end;
 
-function  TWestASCIIDriver.IOResultToProtocolResult(IORes:TIOResult):TProtocolIOResult;
+function TWestASCIIDriver.IOResultToProtocolResult(IORes: TIOResult): TProtocolIOResult;
 begin
   case IORes of
-    iorTimeOut:
-      Result := ioTimeOut;
-    iorOK:
-      Result := ioOk;
+    iorTimeOut: Result := ioTimeOut;
+    iorOK:      Result := ioOk;
     else
       Result := ioDriverError;
   end;
 end;
 
-procedure TWestASCIIDriver.AssignScanTableToReg(const stablereg:TScanTableReg; var WestReg:TWestRegister);
+procedure TWestASCIIDriver.AssignScanTableToReg(const StableReg: TScanTableReg; var WestReg: TWestRegister);
 begin
-  if stablereg.IOResult=ioOk then begin
-    WestReg.Value:=stablereg.Value;
-    WestReg.Timestamp:=stablereg.TimeStamp;
-    WestReg.Decimal:=stablereg.Decimal;
+  if StableReg.IOResult = ioOk then
+  begin
+    WestReg.Value := StableReg.Value;
+    WestReg.Timestamp := StableReg.Timestamp;
+    WestReg.Decimal := StableReg.Decimal;
   end;
-  WestReg.LastReadResult:=stablereg.IOResult;
+  WestReg.LastReadResult := StableReg.IOResult;
 end;
 
-function  TWestASCIIDriver.SizeOfTag(aTag: TTag; isWrite: Boolean; var ProtocolTagType: TProtocolTagType): BYTE;
+function TWestASCIIDriver.SizeOfTag(aTag: TTag; isWrite: Boolean; var ProtocolTagType: TProtocolTagType): Byte;
 begin
-  // todos os registradores do west são de 32 bits (ponto flutuante);
-  //
-  // all west registers are float 32 bits sized.
-  Result:=32;
+  // all west registers are float 32 bits sized
+  Result := 32;
 end;
+
 
 var
-  WestTagBuilderEditor:TOpenTagEditor = nil;
+  WestTagBuilderEditor: TOpenTagEditor = nil;
 
-procedure TWestASCIIDriver.OpenTagEditor(InsertHook: TAddTagInEditorHook;
-                                         CreateProc: TCreateTagProc);
+procedure TWestASCIIDriver.OpenTagEditor(InsertHook: TAddTagInEditorHook; CreateProc: TCreateTagProc);
 begin
   if Assigned(WestTagBuilderEditor) then
     WestTagBuilderEditor(Self, Self.Owner, InsertHook, CreateProc)
@@ -1309,189 +1302,188 @@ end;
 
 function TWestASCIIDriver.HasTabBuilderEditor: Boolean;
 begin
-  Result:=true
+  Result := True;
 end;
 
-procedure SetTagBuilderToolForWest6100Protocol(TagBuilderTool:TOpenTagEditor);
+procedure SetTagBuilderToolForWest6100Protocol(TagBuilderTool: TOpenTagEditor);
 begin
   if Assigned(WestTagBuilderEditor) then
     raise Exception.Create('A Tag Builder editor for West 6100 protocol was already Assigned.')
   else
-    WestTagBuilderEditor:=TagBuilderTool;
+    WestTagBuilderEditor := TagBuilderTool;
 end;
 
 
 initialization
+  // creates a list of valid parameters
 
-   //Cria a lista de Parametros Validos...
-   //
-   //creates a list of valid parameters
+  // SetPoint
+  ParameterList[$00].ParameterID := $53;
+  ParameterList[$00].FunctionAllowed := 0;
+  ParameterList[$00].ReadOnly := False;
+  ParameterList[$00].Decimal := 255;
 
-   //SetPoint
-   ParameterList[$00].ParameterID := $53;
-   ParameterList[$00].FunctionAllowed :=  0;
-   ParameterList[$00].ReadOnly :=  false;
-   ParameterList[$00].Decimal := 255;
+  // PV
+  ParameterList[$01].ParameterID := $4D;   // Parameter ID
+  ParameterList[$01].FunctionAllowed := 2; // Function that can use this register, 0 = all functions
+  ParameterList[$01].ReadOnly := True;     // ReadOnly 1 := yes?
+  ParameterList[$01].Decimal := 255;       // Number of decimal places of the parameter
 
-   //PV
-   ParameterList[$01].ParameterID := $4D; //Parameter ID
-   ParameterList[$01].FunctionAllowed :=  2 ; //Function that can use this register, 0 = all functions
-   ParameterList[$01].ReadOnly :=  true ; //ReadOnly 1 := yes?
-   ParameterList[$01].Decimal := 255; // Number of decimal places of the parameter
+  // Power Output value
+  ParameterList[$02].ParameterID := $57;
+  ParameterList[$02].FunctionAllowed := 0;
+  ParameterList[$02].ReadOnly := False;
+  ParameterList[$02].Decimal := 255;
 
-   //Power Output value
-   ParameterList[$02].ParameterID := $57;
-   ParameterList[$02].FunctionAllowed :=  0;
-   ParameterList[$02].ReadOnly :=  false;
-   ParameterList[$02].Decimal := 255;
+  // Controller status
+  ParameterList[$03].ParameterID := $4C;
+  ParameterList[$03].FunctionAllowed := 2;
+  ParameterList[$03].ReadOnly := True;
+  ParameterList[$03].Decimal := 0;
 
-   //Controller status
-   ParameterList[$03].ParameterID := $4C;
-   ParameterList[$03].FunctionAllowed :=  2;
-   ParameterList[$03].ReadOnly :=  true;
-   ParameterList[$03].Decimal := 0;
+  // Scale Range Max
+  ParameterList[$04].ParameterID := $47;
+  ParameterList[$04].FunctionAllowed := 0;
+  ParameterList[$04].ReadOnly := False;
+  ParameterList[$04].Decimal := 255;
 
-   //Scale Range Max
-   ParameterList[$04].ParameterID := $47;
-   ParameterList[$04].FunctionAllowed :=  0;
-   ParameterList[$04].ReadOnly :=  false;
-   ParameterList[$04].Decimal := 255;
+  // Scale Range Min
+  ParameterList[$05].ParameterID := $48;
+  ParameterList[$05].FunctionAllowed := 0;
+  ParameterList[$05].ReadOnly := False;
+  ParameterList[$05].Decimal := 255;
 
-   //Scale Range Min
-   ParameterList[$05].ParameterID := $48;
-   ParameterList[$05].FunctionAllowed :=  0;
-   ParameterList[$05].ReadOnly :=  false;
-   ParameterList[$05].Decimal := 255;
+  // Scale Range Dec. Point
+  ParameterList[$06].ParameterID := $51;
+  ParameterList[$06].FunctionAllowed := 0;
+  ParameterList[$06].ReadOnly := False;
+  ParameterList[$06].Decimal := 0;
 
-   //Scale Range Dec. Point
-   ParameterList[$06].ParameterID := $51;
-   ParameterList[$06].FunctionAllowed :=  0;
-   ParameterList[$06].ReadOnly :=  false;
-   ParameterList[$06].Decimal := 0;
+  // Input filter time constant
+  ParameterList[$07].ParameterID := $6D;
+  ParameterList[$07].FunctionAllowed := 0;
+  ParameterList[$07].ReadOnly := False;
+  ParameterList[$07].Decimal := 255;
 
-   //Input filter time constant
-   ParameterList[$07].ParameterID := $6D;
-   ParameterList[$07].FunctionAllowed :=  0;
-   ParameterList[$07].ReadOnly :=  false;
-   ParameterList[$07].Decimal := 255;
+  // Output 1 Power Limit
+  ParameterList[$08].ParameterID := $42;
+  ParameterList[$08].FunctionAllowed := 0;
+  ParameterList[$08].ReadOnly := False;
+  ParameterList[$08].Decimal := 255;
 
-   //Output 1 Power Limit
-   ParameterList[$08].ParameterID := $42;
-   ParameterList[$08].FunctionAllowed :=  0;
-   ParameterList[$08].ReadOnly :=  false;
-   ParameterList[$08].Decimal := 255;
+  // Output 1 cycle time
+  ParameterList[$09].ParameterID := $4E;
+  ParameterList[$09].FunctionAllowed := 0;
+  ParameterList[$09].ReadOnly := False;
+  ParameterList[$09].Decimal := 1;
 
-   //Output 1 cycle time
-   ParameterList[$09].ParameterID := $4E;
-   ParameterList[$09].FunctionAllowed :=  0;
-   ParameterList[$09].ReadOnly :=  false;
-   ParameterList[$09].Decimal := 1;
+  // Output 2 cycle time
+  ParameterList[$0a].ParameterID := $4F;
+  ParameterList[$0a].FunctionAllowed := 0;
+  ParameterList[$0a].ReadOnly := False;
+  ParameterList[$0a].Decimal := 1;
 
-   //Output 2 cycle time
-   ParameterList[$0a].ParameterID := $4F;
-   ParameterList[$0a].FunctionAllowed :=  0;
-   ParameterList[$0a].ReadOnly :=  false;
-   ParameterList[$0a].Decimal := 1;
+  // Recorder output scale max
+  ParameterList[$0b].ParameterID := $5B;
+  ParameterList[$0b].FunctionAllowed := 0;
+  ParameterList[$0b].ReadOnly := False;
+  ParameterList[$0b].Decimal := 255;
 
-   //Recorder output scale max
-   ParameterList[$0b].ParameterID := $5B;
-   ParameterList[$0b].FunctionAllowed :=  0;
-   ParameterList[$0b].ReadOnly :=  false;
-   ParameterList[$0b].Decimal := 255;
+  // Recorder output scale min
+  ParameterList[$0c].ParameterID := $5C;
+  ParameterList[$0c].FunctionAllowed := 0;
+  ParameterList[$0c].ReadOnly := False;
+  ParameterList[$0c].Decimal := 255;
 
-   //Recorder output scale min
-   ParameterList[$0c].ParameterID := $5C;
-   ParameterList[$0c].FunctionAllowed :=  0;
-   ParameterList[$0c].ReadOnly :=  false;
-   ParameterList[$0c].Decimal := 255;
+  // SetPoint ramp rate
+  ParameterList[$0d].ParameterID := $5E;
+  ParameterList[$0d].FunctionAllowed := 0;
+  ParameterList[$0d].ReadOnly := False;
+  ParameterList[$0d].Decimal := 255;
 
-   //SetPoint ramp rate
-   ParameterList[$0d].ParameterID := $5E;
-   ParameterList[$0d].FunctionAllowed :=  0;
-   ParameterList[$0d].ReadOnly :=  false;
-   ParameterList[$0d].Decimal := 255;
+  // Setpoint high limit
+  ParameterList[$0e].ParameterID := $41;
+  ParameterList[$0e].FunctionAllowed := 0;
+  ParameterList[$0e].ReadOnly := False;
+  ParameterList[$0e].Decimal := 255;
 
-   //Setpoint high limit
-   ParameterList[$0e].ParameterID := $41;
-   ParameterList[$0e].FunctionAllowed :=  0;
-   ParameterList[$0e].ReadOnly :=  false;
-   ParameterList[$0e].Decimal := 255;
+  // Setpoint low limit
+  ParameterList[$0f].ParameterID := $54;
+  ParameterList[$0f].FunctionAllowed := 0;
+  ParameterList[$0f].ReadOnly := False;
+  ParameterList[$0f].Decimal := 255;
 
-   //Setpoint low limit
-   ParameterList[$0f].ParameterID := $54;
-   ParameterList[$0f].FunctionAllowed :=  0;
-   ParameterList[$0f].ReadOnly :=  false;
-   ParameterList[$0f].Decimal := 255;
+  // alarm 1 value
+  ParameterList[$10].ParameterID := $43;
+  ParameterList[$10].FunctionAllowed := 0;
+  ParameterList[$10].ReadOnly := False;
+  ParameterList[$10].Decimal := 255;
 
-   //alarm 1 value
-   ParameterList[$10].ParameterID := $43;
-   ParameterList[$10].FunctionAllowed :=  0;
-   ParameterList[$10].ReadOnly :=  false;
-   ParameterList[$10].Decimal := 255;
+  // alarm 2 value
+  ParameterList[$11].ParameterID := $45;
+  ParameterList[$11].FunctionAllowed := 0;
+  ParameterList[$11].ReadOnly := False;
+  ParameterList[$11].Decimal := 255;
 
-   //alarm 2 value
-   ParameterList[$11].ParameterID := $45;
-   ParameterList[$11].FunctionAllowed :=  0;
-   ParameterList[$11].ReadOnly :=  false;
-   ParameterList[$11].Decimal := 255;
+  // Rate (Derivative time constant)
+  ParameterList[$12].ParameterID := $44;
+  ParameterList[$12].FunctionAllowed := 0;
+  ParameterList[$12].ReadOnly := False;
+  ParameterList[$12].Decimal := 2;
 
-   //Rate (Derivative time constant)
-   ParameterList[$12].ParameterID := $44;
-   ParameterList[$12].FunctionAllowed :=  0;
-   ParameterList[$12].ReadOnly :=  false;
-   ParameterList[$12].Decimal := 2;
+  // Reset (Integral time constant)
+  ParameterList[$13].ParameterID := $49;
+  ParameterList[$13].FunctionAllowed := 0;
+  ParameterList[$13].ReadOnly := False;
+  ParameterList[$13].Decimal := 2;
 
-   //Reset (Integral time constant)
-   ParameterList[$13].ParameterID := $49;
-   ParameterList[$13].FunctionAllowed :=  0;
-   ParameterList[$13].ReadOnly :=  false;
-   ParameterList[$13].Decimal := 2;
+  // Manual time reset (BIAS)
+  ParameterList[$14].ParameterID := $4A;
+  ParameterList[$14].FunctionAllowed := 0;
+  ParameterList[$14].ReadOnly := False;
+  ParameterList[$14].Decimal := 255;
 
-   //Manual time reset (BIAS)
-   ParameterList[$14].ParameterID := $4A;
-   ParameterList[$14].FunctionAllowed :=  0;
-   ParameterList[$14].ReadOnly :=  false;
-   ParameterList[$14].Decimal := 255;
+  // ON/OFF diferential
+  ParameterList[$15].ParameterID := $46;
+  ParameterList[$15].FunctionAllowed := 0;
+  ParameterList[$15].ReadOnly := False;
+  ParameterList[$15].Decimal := 1;
 
-   //ON/OFF diferential
-   ParameterList[$15].ParameterID := $46;
-   ParameterList[$15].FunctionAllowed :=  0;
-   ParameterList[$15].ReadOnly :=  false;
-   ParameterList[$15].Decimal := 1;
+  // Overlap/Deadband
+  ParameterList[$16].ParameterID := $4B;
+  ParameterList[$16].FunctionAllowed := 0;
+  ParameterList[$16].ReadOnly := False;
+  ParameterList[$16].Decimal := 0;
 
-   //Overlap/Deadband
-   ParameterList[$16].ParameterID := $4B;
-   ParameterList[$16].FunctionAllowed :=  0;
-   ParameterList[$16].ReadOnly :=  false;
-   ParameterList[$16].Decimal := 0;
+  // Proportional band 1 value
+  ParameterList[$17].ParameterID := $50;
+  ParameterList[$17].FunctionAllowed := 0;
+  ParameterList[$17].ReadOnly := False;
+  ParameterList[$17].Decimal := 1;
 
-   //Proportional band 1 value
-   ParameterList[$17].ParameterID := $50;
-   ParameterList[$17].FunctionAllowed :=  0;
-   ParameterList[$17].ReadOnly :=  false;
-   ParameterList[$17].Decimal := 1;
+  // Proportional band 2 value
+  ParameterList[$18].ParameterID := $55;
+  ParameterList[$18].FunctionAllowed := 0;
+  ParameterList[$18].ReadOnly := False;
+  ParameterList[$18].Decimal := 1;
 
-   //Proportional band 2 value
-   ParameterList[$18].ParameterID := $55;
-   ParameterList[$18].FunctionAllowed :=  0;
-   ParameterList[$18].ReadOnly :=  false;
-   ParameterList[$18].Decimal := 1;
+  // PV Offset
+  ParameterList[$19].ParameterID := $76;
+  ParameterList[$19].FunctionAllowed := 0;
+  ParameterList[$19].ReadOnly := False;
+  ParameterList[$19].Decimal := 255;
 
-   //PV Offset
-   ParameterList[$19].ParameterID := $76;
-   ParameterList[$19].FunctionAllowed :=  0 ;
-   ParameterList[$19].ReadOnly :=  false ;
-   ParameterList[$19].Decimal := 255;
+  // Arithmetic deviation
+  ParameterList[$1a].ParameterID := $56;
+  ParameterList[$1a].FunctionAllowed := 2;
+  ParameterList[$1a].ReadOnly := True;
+  ParameterList[$1a].Decimal := 255;
 
-   //Arithmetic deviation
-   ParameterList[$1a].ParameterID := $56;
-   ParameterList[$1a].FunctionAllowed :=  2;
-   ParameterList[$1a].ReadOnly :=  true;
-   ParameterList[$1a].Decimal := 255;
+  // Arithmetic deviation
+  ParameterList[$1b].ParameterID := $5A;
+  ParameterList[$1b].FunctionAllowed := 3;
+  ParameterList[$1b].ReadOnly := False;
+  ParameterList[$1b].Decimal := 0;
 
-   //Arithmetic deviation
-   ParameterList[$1b].ParameterID := $5A;
-   ParameterList[$1b].FunctionAllowed :=  3;
-   ParameterList[$1b].ReadOnly :=  false;
-   ParameterList[$1b].Decimal := 0;
+
 end.

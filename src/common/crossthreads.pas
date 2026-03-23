@@ -147,7 +147,7 @@ end;
 
 procedure TpSCADACoreAffinityThreadWithLoop.WaitForLoopTerminates;
 begin
-  if Assigned(self.FEndLoop) and (MainThreadID=GetCurrentThreadId) then
+  if Assigned(Self.FEndLoop) and (MainThreadID=GetCurrentThreadId) then
     while FEndLoop.WaitFor(1)<>wrSignaled do
       CheckSynchronize(1);
 end;
@@ -195,13 +195,13 @@ end;
   end;
 {$ELSEIF defined(freebsd) or defined(darwin)}
 var
-  mib: array[0..1] of cint;
+  mib: array [0..1] of cint;
   len: cint;
   t: cint;
 begin
   mib[0] := CTL_HW;
   mib[1] := HW_NCPU;
-  len := sizeof(t);
+  len := SizeOf(t);
   fpsysctl(pchar(@mib), 2, @t, @len, Nil, 0);
   Result:=t;
 end;

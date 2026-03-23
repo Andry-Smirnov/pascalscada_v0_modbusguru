@@ -73,10 +73,10 @@ begin
   FControlArea.CanvasBGRA.Rectangle(0, 0, Width, FBodyHeight);
 
   // evita um lado menor que o outro.
-  if (FBodyHeight Mod 2) = 1 then
-    EixoH := (FBodyHeight - (2 * FBorderWidth)) Div 3
+  if (FBodyHeight mod 2) = 1 then
+    EixoH := (FBodyHeight - (2 * FBorderWidth)) div 3
   else
-    EixoH := (FBodyHeight - (2 * FBorderWidth)) Div 4;
+    EixoH := (FBodyHeight - (2 * FBorderWidth)) div 4;
 
   // Smallest shaft size
   if EixoH < 1 then
@@ -89,22 +89,22 @@ begin
   FControlArea.CanvasBGRA.Pen.Color := FBorderColor;
   FControlArea.CanvasBGRA.Pen.Width := FBorderWidth;
 
-  EixoTop := (FBodyHeight - EixoH) Div 2;
+  EixoTop := (FBodyHeight - EixoH) div 2;
 
   // Draw the square of the tape.
   FControlArea.CanvasBGRA.Rectangle(0, EixoTop, Width, EixoTop + EixoH);
 
   // Draws the Redler paddles
   PaH := FBodyHeight - (2 * FBorderWidth) - EixoH;
-  PaX := FBodyHeight Div 2;
+  PaX := FBodyHeight div 2;
   while (PaX + EixoH) < (Width - (2 * FBorderWidth)) do
   begin
     // Draw below the axis
-    if (PaX Mod 12) = 0 then
+    if (PaX mod 12) = 0 then
       FControlArea.CanvasBGRA.Rectangle(PaX, EixoTop + EixoH, PaX + EixoH, EixoTop + EixoH + PaH)
     else
       FControlArea.CanvasBGRA.Rectangle(PaX, 0, PaX + EixoH, PaH - 1);
-    Inc(PaX, FBodyHeight Div 2);
+    Inc(PaX, FBodyHeight div 2);
   end;
 end;
 

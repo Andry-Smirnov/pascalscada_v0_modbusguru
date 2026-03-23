@@ -1,17 +1,8 @@
 {$i ../common/language.inc}
-{$IFDEF PORTUGUES}
 {:
   @author(Fabio Luis Girardi <fabio@pascalscada.com>)
-
-  @abstract(Implementa o componente de escalonamento linear.)
-}
-{$ELSE}
-{:
-  @author(Fabio Luis Girardi <fabio@pascalscada.com>)
-
   @abstract(Unit that implements a linear scale.)
 }
-{$ENDIF}
 unit LinearScaleProcessor;
 
 interface
@@ -21,116 +12,65 @@ uses
 
 type
 
-  {$IFDEF PORTUGUES}
-  {:
-  @author(Fabio Luis Girardi <fabio@pascalscada.com>)
-
-  Componente de escalas lineares.
-  @seealso(TPIPE)
-  @seealso(TScaleProcessor)
-  }
-  {$ELSE}
   {:
   @author(Fabio Luis Girardi <fabio@pascalscada.com>)
 
   Linear scale component.
   @seealso(TPIPE)
-  @seealso(TScaleProcessor)
-  }
-  {$ENDIF}
+  @seealso(TScaleProcessor) }
   TLinearScaleProcessor = class(TScaleProcessor)
   private
-    function GetSysMin:Double;
-    function GetSysMax:Double;
-    function GetPLCMin:Double;
-    function GetPLCMax:Double;
-    procedure SetSysMin(v:double);
-    procedure SetSysMax(v:double);
-    procedure SetPLCMin(v:double);
-    procedure SetPLCMax(v:double);
+    function GetSysMin: Double;
+    function GetSysMax: Double;
+    function GetPLCMin: Double;
+    function GetPLCMax: Double;
+    procedure SetSysMin(AValue: Double);
+    procedure SetSysMax(AValue: Double);
+    procedure SetPLCMin(AValue: Double);
+    procedure SetPLCMax(AValue: Double);
   protected
-    FSysMin,
-    FSysMax,
-    FRawMin,
-    FRawMax,
-    FSysMinLoaded,
-    FSysMaxLoaded,
-    FRawMinLoaded,
-    FRawMaxLoaded:Double;
+    FSysMin: Double;
+    FSysMax: Double;
+    FRawMin: Double;
+    FRawMax: Double;
+    FSysMinLoaded: Double;
+    FSysMaxLoaded: Double;
+    FRawMinLoaded: Double;
+    FRawMaxLoaded: Double;
     //: @exclude
     procedure Loaded; override;
   public
     //: @exclude
-    constructor Create(AOwner:TComponent); override;
-
-    {$IFDEF PORTUGUES}
-    {:
-    Pega um valor na escala do CLP e converte para a escala do sistema.
-    @param(sender Objeto que chamou a função.)
-    @param(Entrada Valor do dispositivo a ser convertido.)
-    @returns(O valor convertido para a escala do sistema)
-    }
-    {$ELSE}
-    {:
-    Convert a value from the device scale to the system scale.
+    constructor Create(AOwner: TComponent); override;
+    {: Convert a value from the device scale to the system scale.
     @param(sender Object that calls the convertion.)
     @param(Entrada Device value to be converted.)
-    @returns(The value converted to the system Scale.)
-    }
-    {$ENDIF}
-    function SetInGetOut(Sender:TComponent; Entrada:Double):Double; override;
-
-    {$IFDEF PORTUGUES}
-    {:
-    Pega um valor na escala do sistema e converte para a escala do CLP.
-    @param(sender Objeto que chamou a função.)
-    @param(Entrada Valor do sistema a ser convertido.)
-    @returns(O valor convertido para a escala do CLP)
-    }
-    {$ELSE}
-    {:
-    Convert a value from the device scale to the system scale.
+    @returns(The value converted to the system Scale.) }
+    function SetInGetOut(Sender: TComponent; Entrada: Double): Double; override;
+    {: Convert a value from the device scale to the system scale.
     @param(sender Object that calls the convertion.)
     @param(Entrada Device value to be converted.)
-    @returns(The value converted to the system Scale.)
-    }
-    {$ENDIF}
-    function SetOutGetIn(Sender:TComponent; Saida:Double):Double; override;
+    @returns(The value converted to the system Scale.) }
+    function SetOutGetIn(Sender: TComponent; Saida: Double): Double; override;
   published
-    {$IFDEF PORTUGUES}
-    //: Valor minimo de escala do sistema (Saida).
-    {$ELSE}
     //: Minimum value of the system scale (output).
-    {$ENDIF}
-    property SysMin:Double read GetSysMin write SetSysMin Stored true;
-
-    {$IFDEF PORTUGUES}
-    //: Valor máximo da escala do dispositivo (entrada).
-    {$ELSE}
+    property SysMin: Double read GetSysMin write SetSysMin stored True;
     //: Maximum value of the device (PLC) scale (input).
-    {$ENDIF}
-    property SysMax:Double read GetSysMax write SetSysMax Stored true;
-
-    {$IFDEF PORTUGUES}
-    //: Valor mínimo da escala do dispositivo (entrada).
-    {$ELSE}
+    property SysMax: Double read GetSysMax write SetSysMax stored True;
     //: Minimum value of the device (PLC) scale (input).
-    {$ENDIF}
-    property PLCMin:Double read GetPLCMin write SetPLCMin Stored true;
-
-    {$IFDEF PORTUGUES}
-    //: Valor máximo da escala do dispositivo (entrada).
-    {$ELSE}
+    property PLCMin: Double read GetPLCMin write SetPLCMin stored True;
     //: Maximum value of the device (PLC) scale (input).
-    {$ENDIF}
-    property PLCMax:Double read GetPLCMax write SetPLCMax Stored true;
+    property PLCMax: Double read GetPLCMax write SetPLCMax stored True;
   end;
+
 
 implementation
 
-uses hsstrings;
 
-constructor TLinearScaleProcessor.Create(AOwner:TComponent);
+uses
+  hsstrings;
+
+constructor TLinearScaleProcessor.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FSysMin := 0;
@@ -139,74 +79,74 @@ begin
   FRawMax := 32000;
 end;
 
-function TLinearScaleProcessor.GetSysMin:Double;
+function TLinearScaleProcessor.GetSysMin: Double;
 begin
   Result := FSysMin;
 end;
 
-function TLinearScaleProcessor.GetSysMax:Double;
+function TLinearScaleProcessor.GetSysMax: Double;
 begin
   Result := FSysMax;
 end;
 
-function TLinearScaleProcessor.GetPLCMin:Double;
+function TLinearScaleProcessor.GetPLCMin: Double;
 begin
   Result := FRawMin;
 end;
 
-function TLinearScaleProcessor.GetPLCMax:Double;
+function TLinearScaleProcessor.GetPLCMax: Double;
 begin
   Result := FRawMax;
 end;
 
-procedure TLinearScaleProcessor.SetSysMin(v:double);
+procedure TLinearScaleProcessor.SetSysMin(AValue: Double);
 begin
-  if [csLoading,csReading]*ComponentState=[] then
-    FSysMin := v
+  if [csLoading, csReading] * ComponentState = [] then
+    FSysMin := AValue
   else
-    FSysMinLoaded := v;
+    FSysMinLoaded := AValue;
 end;
 
-procedure TLinearScaleProcessor.SetSysMax(v:double);
+procedure TLinearScaleProcessor.SetSysMax(AValue: Double);
 begin
-  if [csLoading,csReading]*ComponentState=[] then
-    FSysMax := v
+  if [csLoading, csReading] * ComponentState = [] then
+    FSysMax := AValue
   else
-    FSysMaxLoaded := v;
+    FSysMaxLoaded := AValue;
 end;
 
-procedure TLinearScaleProcessor.SetPLCMin(v:double);
+procedure TLinearScaleProcessor.SetPLCMin(AValue: Double);
 begin
-  if [csLoading,csReading]*ComponentState=[] then
-    FRawMin := v
+  if [csLoading, csReading] * ComponentState = [] then
+    FRawMin := AValue
   else
-    FRawMinLoaded := v;
+    FRawMinLoaded := AValue;
 end;
 
-procedure TLinearScaleProcessor.SetPLCMax(v:double);
+procedure TLinearScaleProcessor.SetPLCMax(AValue: Double);
 begin
-  if [csLoading,csReading]*ComponentState=[] then
-    FRawMax := v
+  if [csLoading, csReading] * ComponentState = [] then
+    FRawMax := AValue
   else
-    FRawMaxLoaded := v;
+    FRawMaxLoaded := AValue;
 end;
 
-function  TLinearScaleProcessor.SetInGetOut(Sender:TComponent; Entrada:Double):Double;
+function TLinearScaleProcessor.SetInGetOut(Sender: TComponent; Entrada: Double): Double;
 var
-  divisor:Double;
+  Divisor: Double;
 begin
-  divisor := (FRawMax-FRawMin);
-  if divisor=0 then divisor:=1;
-  Result := (Entrada-FRawMin)*(FSysMax-FSysMin)/divisor+FSysMin;
+  Divisor := (FRawMax - FRawMin);
+  if Divisor = 0 then Divisor := 1;
+  Result := (Entrada - FRawMin) * (FSysMax - FSysMin) / Divisor + FSysMin;
 end;
 
-function TLinearScaleProcessor.SetOutGetIn(Sender:TComponent; Saida:Double):Double;
+function TLinearScaleProcessor.SetOutGetIn(Sender: TComponent; Saida: Double): Double;
 var
-  divisor:Double;
+  Divisor: Double;
 begin
-  divisor := (FSysMax-FSysMin);
-  if divisor=0 then divisor:=1;
-  Result := (Saida-FSysMin)*(FRawMax-FRawMin)/divisor+FRawMin;
+  Divisor := (FSysMax - FSysMin);
+  if Divisor = 0 then Divisor := 1;
+  Result := (Saida - FSysMin) * (FRawMax - FRawMin) / Divisor + FRawMin;
 end;
 
 procedure TLinearScaleProcessor.Loaded;

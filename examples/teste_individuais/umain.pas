@@ -76,7 +76,7 @@ implementation
 
 procedure TForm1.Button1Click(Sender: TObject);
 var
-  x:array[0..29] of double;
+  x:array [0..29] of double;
   c:Integer;
 begin
   for c:=0 to 29 do

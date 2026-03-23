@@ -1317,11 +1317,11 @@ var
     if BitForm.BitNameStartsFrom1.Checked then
       Inc(BitNum);
 
-    ByteNum := CurBit Div 8;
+    ByteNum := CurBit div 8;
     if BitForm.ByteNameStartsFrom1.Checked then
       Inc(ByteNum);
 
-    WordNum := CurBit Div 16;
+    WordNum := CurBit div 16;
     if BitForm.WordNameStartsFrom1.Checked then
       Inc(WordNum);
   end;
@@ -2058,7 +2058,7 @@ begin
     4,
     5,
     9,
-    10: BlockName.Text := Format(StrBlockName, [GetRealStartOffset Div 2, GetTheLastItemOffset Div 2]);
+    10: BlockName.Text := Format(StrBlockName, [GetRealStartOffset div 2, GetTheLastItemOffset div 2]);
     else
       BlockName.Text := Format(StrBlockName, [GetRealStartOffset, GetTheLastItemOffset]);
   end;

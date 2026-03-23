@@ -57,7 +57,7 @@ var
   p,cc,dsize:integer;
 begin
   cc := 0;
-  dsize := length(delimiter);
+  dsize := Length(delimiter);
   if dsize = 0 then
   begin
     setlength(result,1);

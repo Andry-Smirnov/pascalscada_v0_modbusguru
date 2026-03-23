@@ -74,15 +74,18 @@ end;
 
 function TMelsecTCPDriver.DecodePkg(Pkg: TIOPacket; out Values: TArrayOfDouble): TProtocolIOResult;
 var
-  i, c, c2, plc: Longint;
-  address, len: Cardinal;
+  i: Longint;
+  c: Longint;
+  c2: Longint;
+  PLC: Longint;
+  Address,
+  Len: Cardinal;
   FoundPLC: Boolean;
   {$IFDEF FDEBUG}
    debug:string;
   {$ENDIF}
 begin
-  //se algumas das IOs falhou,
-  //if some IO fail.
+  // if some IO fail
   Result := ioOk;
   case Pkg.WriteIOResult of
     iorTimeOut:   Result := ioTimeOut;
@@ -99,210 +102,203 @@ begin
       iorPortError: Result := ioCommError;
     end;
 
-  //se o endereco retornado nao conferem com o selecionado...
-  //if the address in the incoming packet is different of the requested
+  // if the Address in the incoming packet is different of the requested
   if (Result = ioOk) and (Pkg.BufferToWrite[6] <> Pkg.BufferToRead[6]) then
   begin
     {$IFDEF FDEBUG}
-    debug := '';
-    for c := 0 to High(pkg.BufferToRead) do
-      debug := debug + IntToHex(pkg.BufferToRead[c], 2);
-    DebugLn('Pacotes diferem no endereço. Hex do pacote recebido:');
-    DebugLn(debug);
+    Debug := '';
+    for c := 0 to High(Pkg.BufferToRead) do
+      Debug := Debug + IntToHex(Pkg.BufferToRead[c], 2);
+    DebugLn('Pacotes diferem no endereï¿½o. Hex do pacote recebido:');
+    DebugLn(Debug);
     {$ENDIF}
     Result := ioCommError;
   end;
 
-  //procura o plc
-  //search de PLC
+  // search de PLC
   FoundPLC := False;
-  for plc := 0 to High(PMelsecPLC) do
-    //if PMelsecPLC[plc].Station = Pkg.BufferToWrite[6] then begin
-    if PMelsecPLC[plc].Station = 1 then
+  for PLC := 0 to High(PMelsecPLC) do
+    //if PMelsecPLC[PLC].Station = Pkg.BufferToWrite[6] then begin
+    if PMelsecPLC[PLC].Station = 1 then
     begin
       FoundPLC := True;
       Break;
     end;
 
-  //comeca a decodificar o pacote...
-  //decodes the packet.
+  // decodes the packet
 
-  //se for bit
-  if (Pkg.BufferToWrite[13] = 1) then //byte
+  // se for bit
+  if (Pkg.BufferToWrite[13] = 1) then // byte
   begin
-    if (Pkg.BufferToWrite[12] = 20) then //escrita
+    if (Pkg.BufferToWrite[12] = 20) then // writing
     begin
       if Result = ioOk then
-      begin
-        address := (Pkg.BufferToWrite[15]) + (Pkg.BufferToWrite[16] Shl 8) + (Pkg.BufferToWrite[17] Shl 16);
-        len := (Pkg.BufferToWrite[10] Shl 8) + Pkg.BufferToWrite[11];
-
-        SetLength(Values, len);
-
-        i := 0;
-        while (i < len) do
         begin
-          Values[i] := Pkg.BufferToWrite[21] + Pkg.BufferToWrite[22];
-          Inc(i);
-        end;
+          Address := (Pkg.BufferToWrite[15]) + (Pkg.BufferToWrite[16] shl 8) + (Pkg.BufferToWrite[17] shl 16);
+          Len := (Pkg.BufferToWrite[10] shl 8) + Pkg.BufferToWrite[11];
 
-        if Length(PMelsecPLC) > 0 then
-        begin
-          case Pkg.BufferToWrite[18] of
-            144: PMelsecPLC[0].OutPuts_M.SetValues(address, len, 1, Values, Result);
-            145: PMelsecPLC[0].OutPuts_SM.SetValues(address, len, 1, Values, Result);
-            146: PMelsecPLC[0].OutPuts_L.SetValues(address, len, 1, Values, Result);
-            147: PMelsecPLC[0].OutPuts_F.SetValues(address, len, 1, Values, Result);
-            148: PMelsecPLC[0].OutPuts_V.SetValues(address, len, 1, Values, Result);
-            156: PMelsecPLC[0].OutPuts_X.SetValues(address, len, 1, Values, Result);
-            157: PMelsecPLC[0].OutPuts_Y.SetValues(address, len, 1, Values, Result);
-            160: PMelsecPLC[0].OutPuts_B.SetValues(address, len, 1, Values, Result);
-          end;
-        end;
-      end
-      else
-      if FoundPLC then
-      begin
-        case Pkg.BufferToWrite[18] of
-          144: PMelsecPLC[plc].OutPuts_M.SetFault(address, len, 1, Result);
-          145: PMelsecPLC[plc].OutPuts_SM.SetFault(address, len, 1, Result);
-          146: PMelsecPLC[plc].OutPuts_L.SetFault(address, len, 1, Result);
-          147: PMelsecPLC[plc].OutPuts_F.SetFault(address, len, 1, Result);
-          148: PMelsecPLC[plc].OutPuts_V.SetFault(address, len, 1, Result);
-          156: PMelsecPLC[plc].OutPuts_X.SetFault(address, len, 1, Result);
-          157: PMelsecPLC[plc].OutPuts_Y.SetFault(address, len, 1, Result);
-          160: PMelsecPLC[plc].OutPuts_B.SetFault(address, len, 1, Result);
-        end;
-      end;
-    end;
+          SetLength(Values, Len);
 
-    if (Pkg.BufferToWrite[12] = 4) then //leitura
-    begin
-      //acerta onde vao ser colocados os valores decodificados...
-      //where the data decoded will be stored.
-      if Result = ioOk then
-      begin
-        address := (Pkg.BufferToWrite[15]) + (Pkg.BufferToWrite[16] Shl 8) + (Pkg.BufferToWrite[17] Shl 16);
-        len := Pkg.BufferToWrite[19];
-        SetLength(Values, len);
-
-        i := 0;
-
-        for i := 0 to len - 1 do
-        begin
-          SetLength(Values, 1);
-          c2 := (i Div 2) + 11;
-          if (i Mod 2 = 0) then
-            Values[0] := Byte(Pkg.BufferToRead[c2] Shr 4)
-          else
+          i := 0;
+          while (i < Len) do
           begin
-            c := Longint(Byte(Pkg.BufferToRead[c2]));
-            if c = 17 then
-              c := 1;
-            if c = 16 then
-              c := 0;
-            Values[0] := c;
+            Values[i] := Pkg.BufferToWrite[21] + Pkg.BufferToWrite[22];
+            Inc(i);
           end;
+
           if Length(PMelsecPLC) > 0 then
           begin
             case Pkg.BufferToWrite[18] of
-              144: PMelsecPLC[0].OutPuts_M.SetValues(address, 1, 1, Values, Result);
-              145: PMelsecPLC[0].OutPuts_SM.SetValues(address, 1, 1, Values, Result);
-              146: PMelsecPLC[0].OutPuts_L.SetValues(address, 1, 1, Values, Result);
-              147: PMelsecPLC[0].OutPuts_F.SetValues(address, 1, 1, Values, Result);
-              148: PMelsecPLC[0].OutPuts_V.SetValues(address, 1, 1, Values, Result);
-              156: PMelsecPLC[0].OutPuts_X.SetValues(address, 1, 1, Values, Result);
-              157: PMelsecPLC[0].OutPuts_Y.SetValues(address, 1, 1, Values, Result);
-              160: PMelsecPLC[0].OutPuts_B.SetValues(address, 1, 1, Values, Result);
+              144: PMelsecPLC[0].OutPuts_M.SetValues(Address, Len, 1, Values, Result);
+              145: PMelsecPLC[0].OutPuts_SM.SetValues(Address, Len, 1, Values, Result);
+              146: PMelsecPLC[0].OutPuts_L.SetValues(Address, Len, 1, Values, Result);
+              147: PMelsecPLC[0].OutPuts_F.SetValues(Address, Len, 1, Values, Result);
+              148: PMelsecPLC[0].OutPuts_V.SetValues(Address, Len, 1, Values, Result);
+              156: PMelsecPLC[0].OutPuts_X.SetValues(Address, Len, 1, Values, Result);
+              157: PMelsecPLC[0].OutPuts_Y.SetValues(Address, Len, 1, Values, Result);
+              160: PMelsecPLC[0].OutPuts_B.SetValues(Address, Len, 1, Values, Result);
             end;
           end;
-          address := address + 1;
-        end;
-      end
+        end
       else if FoundPLC then
-      begin
-        case Pkg.BufferToWrite[18] of
-          144: PMelsecPLC[0].OutPuts_M.SetFault(address, len, 1, Result);
-          145: PMelsecPLC[0].OutPuts_SM.SetFault(address, len, 1, Result);
-          146: PMelsecPLC[0].OutPuts_L.SetFault(address, len, 1, Result);
-          147: PMelsecPLC[0].OutPuts_F.SetFault(address, len, 1, Result);
-          148: PMelsecPLC[0].OutPuts_V.SetFault(address, len, 1, Result);
-          156: PMelsecPLC[0].OutPuts_X.SetFault(address, len, 1, Result);
-          157: PMelsecPLC[0].OutPuts_Y.SetFault(address, len, 1, Result);
-          160: PMelsecPLC[0].OutPuts_B.SetFault(address, len, 1, Result);
+        begin
+          case Pkg.BufferToWrite[18] of
+            144: PMelsecPLC[PLC].OutPuts_M.SetFault(Address, Len, 1, Result);
+            145: PMelsecPLC[PLC].OutPuts_SM.SetFault(Address, Len, 1, Result);
+            146: PMelsecPLC[PLC].OutPuts_L.SetFault(Address, Len, 1, Result);
+            147: PMelsecPLC[PLC].OutPuts_F.SetFault(Address, Len, 1, Result);
+            148: PMelsecPLC[PLC].OutPuts_V.SetFault(Address, Len, 1, Result);
+            156: PMelsecPLC[PLC].OutPuts_X.SetFault(Address, Len, 1, Result);
+            157: PMelsecPLC[PLC].OutPuts_Y.SetFault(Address, Len, 1, Result);
+            160: PMelsecPLC[PLC].OutPuts_B.SetFault(Address, Len, 1, Result);
+          end;
         end;
-      end;
+    end;
+
+    if (Pkg.BufferToWrite[12] = 4) then // reading
+    begin
+      // where the data decoded will be stored
+      if Result = ioOk then
+        begin
+          Address := (Pkg.BufferToWrite[15]) + (Pkg.BufferToWrite[16] shl 8) + (Pkg.BufferToWrite[17] shl 16);
+          Len := Pkg.BufferToWrite[19];
+          SetLength(Values, Len);
+
+          i := 0;
+
+          for i := 0 to Len - 1 do
+          begin
+            SetLength(Values, 1);
+            c2 := (i div 2) + 11;
+            if (i mod 2 = 0) then
+              Values[0] := Byte(Pkg.BufferToRead[c2] shr 4)
+            else
+              begin
+                c := Longint(Byte(Pkg.BufferToRead[c2]));
+                if c = 17 then
+                  c := 1;
+                if c = 16 then
+                  c := 0;
+                Values[0] := c;
+              end;
+            if Length(PMelsecPLC) > 0 then
+            begin
+              case Pkg.BufferToWrite[18] of
+                144: PMelsecPLC[0].OutPuts_M.SetValues(Address, 1, 1, Values, Result);
+                145: PMelsecPLC[0].OutPuts_SM.SetValues(Address, 1, 1, Values, Result);
+                146: PMelsecPLC[0].OutPuts_L.SetValues(Address, 1, 1, Values, Result);
+                147: PMelsecPLC[0].OutPuts_F.SetValues(Address, 1, 1, Values, Result);
+                148: PMelsecPLC[0].OutPuts_V.SetValues(Address, 1, 1, Values, Result);
+                156: PMelsecPLC[0].OutPuts_X.SetValues(Address, 1, 1, Values, Result);
+                157: PMelsecPLC[0].OutPuts_Y.SetValues(Address, 1, 1, Values, Result);
+                160: PMelsecPLC[0].OutPuts_B.SetValues(Address, 1, 1, Values, Result);
+              end;
+            end;
+            Address := Address + 1;
+          end;
+        end
+      else if FoundPLC then
+        begin
+          case Pkg.BufferToWrite[18] of
+            144: PMelsecPLC[0].OutPuts_M.SetFault(Address, Len, 1, Result);
+            145: PMelsecPLC[0].OutPuts_SM.SetFault(Address, Len, 1, Result);
+            146: PMelsecPLC[0].OutPuts_L.SetFault(Address, Len, 1, Result);
+            147: PMelsecPLC[0].OutPuts_F.SetFault(Address, Len, 1, Result);
+            148: PMelsecPLC[0].OutPuts_V.SetFault(Address, Len, 1, Result);
+            156: PMelsecPLC[0].OutPuts_X.SetFault(Address, Len, 1, Result);
+            157: PMelsecPLC[0].OutPuts_Y.SetFault(Address, Len, 1, Result);
+            160: PMelsecPLC[0].OutPuts_B.SetFault(Address, Len, 1, Result);
+          end;
+        end;
     end;
   end;
 
   ///////////////////////////////////////
   /// se for float
-  if (Pkg.BufferToWrite[13] = 0) then //float
+  if (Pkg.BufferToWrite[13] = 0) then // float
   begin
-    //escrita
-    if (Pkg.BufferToWrite[12] = 20) then //escrita
+    if (Pkg.BufferToWrite[12] = 20) then // writing
     begin
       if Result = ioOk then
-      begin
-        address := (Pkg.BufferToWrite[15]) + (Pkg.BufferToWrite[16] Shl 8) + (Pkg.BufferToWrite[17] Shl 16);
-        len := (Pkg.BufferToWrite[10] Shl 8) + Pkg.BufferToWrite[11];
-
-        SetLength(Values, len);
-
-        i := 0;
-        while (i < len) do
         begin
-          Values[i] := Pkg.BufferToWrite[21] + Pkg.BufferToWrite[22];
-          Inc(i);
-        end;
+          Address := (Pkg.BufferToWrite[15]) + (Pkg.BufferToWrite[16] shl 8) + (Pkg.BufferToWrite[17] shl 16);
+          Len := (Pkg.BufferToWrite[10] shl 8) + Pkg.BufferToWrite[11];
 
-        if Length(PMelsecPLC) > 0 then
-        begin
-          case Pkg.BufferToWrite[18] of
-            168: PMelsecPLC[0].Registers_D.SetValues(address, len, 1, Values, Result);
-            169: PMelsecPLC[0].Registers_SD.SetValues(address, len, 1, Values, Result);
+          SetLength(Values, Len);
+
+          i := 0;
+          while (i < Len) do
+          begin
+            Values[i] := Pkg.BufferToWrite[21] + Pkg.BufferToWrite[22];
+            Inc(i);
           end;
-        end;
-      end
-      else if FoundPLC then
-      begin
-        case Pkg.BufferToWrite[18] of
-          168: PMelsecPLC[plc].Registers_D.SetFault(address, len, 1, Result);
-          169: PMelsecPLC[plc].Registers_SD.SetFault(address, len, 1, Result);
-        end;
-      end;
-    end;
-
-    //leitura
-    if (Pkg.BufferToWrite[12] = 4) then //leitura
-    begin
-      if Result = ioOk then
-      begin
-        address := (Pkg.BufferToWrite[15]) + (Pkg.BufferToWrite[16] Shl 8) + (Pkg.BufferToWrite[17] Shl 16);
-        len := Pkg.BufferToWrite[19];
-
-        SetLength(Values, len);
-
-        for i := 0 to len - 1 do
-        begin
-          SetLength(Values, 1);
-          Values[0] := (Longint(Pkg.BufferToRead[11 + (i * 2)])) + Longint(Pkg.BufferToRead[12 + i * 2] Shl 8);
 
           if Length(PMelsecPLC) > 0 then
           begin
             case Pkg.BufferToWrite[18] of
-              168: PMelsecPLC[0].Registers_D.SetValues(address, 1, 1, Values, Result);
-              169: PMelsecPLC[0].Registers_SD.SetValues(address, 1, 1, Values, Result);
+              168: PMelsecPLC[0].Registers_D.SetValues(Address, Len, 1, Values, Result);
+              169: PMelsecPLC[0].Registers_SD.SetValues(Address, Len, 1, Values, Result);
             end;
           end;
-          address := address + 1;
+        end
+      else if FoundPLC then
+        begin
+          case Pkg.BufferToWrite[18] of
+            168: PMelsecPLC[PLC].Registers_D.SetFault(Address, Len, 1, Result);
+            169: PMelsecPLC[PLC].Registers_SD.SetFault(Address, Len, 1, Result);
+          end;
+        end;
+    end;
+
+    if (Pkg.BufferToWrite[12] = 4) then // reading
+    begin
+      if Result = ioOk then
+      begin
+        Address := (Pkg.BufferToWrite[15]) + (Pkg.BufferToWrite[16] shl 8) + (Pkg.BufferToWrite[17] shl 16);
+        Len := Pkg.BufferToWrite[19];
+
+        SetLength(Values, Len);
+
+        for i := 0 to Len - 1 do
+        begin
+          SetLength(Values, 1);
+          Values[0] := (Longint(Pkg.BufferToRead[11 + (i * 2)])) + Longint(Pkg.BufferToRead[12 + i * 2] shl 8);
+
+          if Length(PMelsecPLC) > 0 then
+          begin
+            case Pkg.BufferToWrite[18] of
+              168: PMelsecPLC[0].Registers_D.SetValues(Address, 1, 1, Values, Result);
+              169: PMelsecPLC[0].Registers_SD.SetValues(Address, 1, 1, Values, Result);
+            end;
+          end;
+          Address := Address + 1;
         end;
       end
       else if FoundPLC then
       begin
         case Pkg.BufferToWrite[18] of
-          168: PMelsecPLC[0].Registers_D.SetFault(address, len, 1, Result);
-          169: PMelsecPLC[0].Registers_SD.SetFault(address, len, 1, Result);
+          168: PMelsecPLC[0].Registers_D.SetFault(Address, Len, 1, Result);
+          169: PMelsecPLC[0].Registers_SD.SetFault(Address, Len, 1, Result);
         end;
       end;
     end;
@@ -311,222 +307,217 @@ end;
 
 function TMelsecTCPDriver.EncodePkg(TagObj: TTagRec; ToWrite: TArrayOfDouble; var ResultLen: Integer): Bytes;
 var
-  NetworkNumber, PcNumber, IoNumber, ChannelNumber, CpuTimer, iMainCommand, iSubCommand, frame, dataLength: Integer;
+  NetworkNumber: Integer;
+  PCNumber: Integer;
+  IONumber: Integer;
+  ChannelNumber: Integer;
+  CPUTimer: Integer;
+  AMainCommand: Integer;
+  ASubCommand: Integer;
+  Frame: Integer;
+  DataLength: Integer;
 begin
-  //checa se é um pacote de escrita de valores ou de leitura
-  //que está sendo codificado.
+  // Verify if is packet to write data on device that is being encoded
 
-  //Verify if is packet to write data on device that is being encoded.
-
-  //de leitura de valores...
-  //read data from slave.
+  // read data from slave
   if ToWrite = nil then
-  begin
-    case TagObj.ReadFunction of
-      $01..$08: begin
-                  //codifica pedido de leitura de entradas, saidas,
-                  //bloco de registradores e registrador simples.
-                  //encode a packet to read input, outputs, register or analog registers
-                  frame := 80;
-                  NetworkNumber := 0;
-                  PcNumber := 255;
-                  IoNumber := 1023;
-                  ChannelNumber := 0;
-                  dataLength := 12;
-                  CpuTimer := 16;
-                  iMainCommand := 1025;
-                  iSubCommand := 1;
+    begin
+      case TagObj.ReadFunction of
+        $01..$08: begin
+                    //codifica pedido de reading de entradas, saidas,
+                    //bloco de registradores e registrador simples.
+                    //encode a packet to read input, outputs, register or analog registers
+                    Frame := 80;
+                    NetworkNumber := 0;
+                    PCNumber := 255;
+                    IONumber := 1023;
+                    ChannelNumber := 0;
+                    DataLength := 12;
+                    CPUTimer := 16;
+                    AMainCommand := 1025;
+                    ASubCommand := 1;
 
-                  SetLength(Result, 22);
-                  Result[00] := frame;
-                  Result[01] := frame Shr 8;
-                  Result[02] := NetworkNumber;
-                  Result[03] := PcNumber;
-                  Result[04] := IoNumber;
-                  Result[05] := IoNumber Shr 8;
-                  Result[06] := ChannelNumber;
-                  Result[07] := dataLength;
-                  Result[08] := dataLength Shr 8;
-                  Result[09] := CpuTimer;
-                  Result[10] := CpuTimer Shr 8;
-                  Result[11] := iMainCommand;
-                  Result[12] := iMainCommand Shr 8;
-                  Result[13] := iSubCommand;
-                  Result[14] := iSubCommand Shr 8;
+                    SetLength(Result, 22);
+                    Result[00] := Frame;
+                    Result[01] := Frame shr 8;
+                    Result[02] := NetworkNumber;
+                    Result[03] := PCNumber;
+                    Result[04] := IONumber;
+                    Result[05] := IONumber shr 8;
+                    Result[06] := ChannelNumber;
+                    Result[07] := DataLength;
+                    Result[08] := DataLength shr 8;
+                    Result[09] := CPUTimer;
+                    Result[10] := CPUTimer shr 8;
+                    Result[11] := AMainCommand;
+                    Result[12] := AMainCommand shr 8;
+                    Result[13] := ASubCommand;
+                    Result[14] := ASubCommand shr 8;
 
-                  Result[15] := TagObj.address;
-                  Result[16] := TagObj.address Shr 8;
-                  Result[17] := TagObj.address Shr 16;
-                  Result[18] := PlcDeviceType(TagObj.ReadFunction);
-                  Result[19] := TagObj.Size;
-                  Result[20] := TagObj.Size Shr 8;
-                  Result[21] := 0;
-                end;
+                    Result[15] := TagObj.address;
+                    Result[16] := TagObj.address shr 8;
+                    Result[17] := TagObj.address shr 16;
+                    Result[18] := PlcDeviceType(TagObj.ReadFunction);
+                    Result[19] := TagObj.Size;
+                    Result[20] := TagObj.Size shr 8;
+                    Result[21] := 0;
+                  end;
+        $09, $10: begin
+                    // encode a packet to read input, outputs, register or analog registers
+                    // fixed values
+                    Frame := 80;
+                    NetworkNumber := 0;
+                    PCNumber := 255;
+                    IONumber := 1023;
+                    ChannelNumber := 0;
+                    CPUTimer := 16;
+                    AMainCommand := 1025;
+                    DataLength := 12;
+                    ASubCommand := 0;
 
-      $09, $10: begin
-                  //codifica pedido de leitura de entradas, saidas,
-                  //bloco de registradores e registrador simples.
+                    SetLength(Result, 22);
+                    Result[00] := Frame;
+                    Result[01] := Frame shr 8;
+                    Result[02] := NetworkNumber;
+                    Result[03] := PCNumber;
+                    Result[04] := IONumber; //size of the packet, bHi
+                    Result[05] := IONumber shr 8; //size of the packet, bLo
+                    Result[06] := ChannelNumber;
+                    Result[07] := DataLength;
+                    Result[08] := DataLength shr 8;
+                    Result[09] := CPUTimer;
+                    Result[10] := CPUTimer shr 8;
+                    Result[11] := AMainCommand;
+                    Result[12] := AMainCommand shr 8;
+                    Result[13] := ASubCommand;
+                    Result[14] := ASubCommand shr 8;
 
-                  //encode a packet to read input, outputs, register or analog registers
-                  //valores fixos
-                  frame := 80;
-                  NetworkNumber := 0;
-                  PcNumber := 255;
-                  IoNumber := 1023;
-                  ChannelNumber := 0;
-                  CpuTimer := 16;
-                  iMainCommand := 1025;
-                  dataLength := 12;
-                  iSubCommand := 0;
+                    Result[15] := TagObj.address;
+                    Result[16] := TagObj.address shr 8;
+                    Result[17] := TagObj.address shr 16;
+                    Result[18] := PlcDeviceType(TagObj.ReadFunction);
+                    Result[19] := TagObj.Size;
+                    Result[20] := TagObj.Size shr 8;
+                    Result[21] := 0;
+                  end;
 
-                  SetLength(Result, 22);
-                  Result[00] := frame;
-                  Result[01] := frame Shr 8;
-                  Result[02] := NetworkNumber;
-                  Result[03] := PcNumber;
-                  Result[04] := IoNumber; //size of the packet, bHi
-                  Result[05] := IoNumber Shr 8; //size of the packet, bLo
-                  Result[06] := ChannelNumber;
-                  Result[07] := dataLength;
-                  Result[08] := dataLength Shr 8;
-                  Result[09] := CpuTimer;
-                  Result[10] := CpuTimer Shr 8;
-                  Result[11] := iMainCommand;
-                  Result[12] := iMainCommand Shr 8;
-                  Result[13] := iSubCommand;
-                  Result[14] := iSubCommand Shr 8;
+        else
+          begin
+            SetLength(Result, 0);
+          end;
+      end;
 
-                  Result[15] := TagObj.address;
-                  Result[16] := TagObj.address Shr 8;
-                  Result[17] := TagObj.address Shr 16;
-                  Result[18] := PlcDeviceType(TagObj.ReadFunction);
-                  Result[19] := TagObj.Size;
-                  Result[20] := TagObj.Size Shr 8;
-                  Result[21] := 0;
-                end;
-
-      else
-        begin
-          SetLength(Result, 0);
-        end;
-    end;
-
-    // Calcula o tamanho do pacote resposta
-    // computes the size of the incoming packet.
-    case TagObj.ReadFunction of
-      $01..$08: ResultLen := 9 + (TagObj.Size Div 8) + IfThen((TagObj.Size Mod 8) <> 0, 1, 0);
-      $09..$10: ResultLen := 9 + (TagObj.Size * 2);
-      else
-        begin
-          ResultLen := 0;
-        end;
-    end;
-  end
+      // computes the size of the incoming packet
+      case TagObj.ReadFunction of
+        $01..$08: ResultLen := 9 + (TagObj.Size div 8) + IfThen((TagObj.Size mod 8) <> 0, 1, 0);
+        $09..$10: ResultLen := 9 + (TagObj.Size * 2);
+        else
+          begin
+            ResultLen := 0;
+          end;
+      end;
+    end
   else
-  begin
-    case TagObj.WriteFunction of
-      $01..$08: begin
-                  //escreve uma saida...
-                  //encodes a packet to write a single coil.
-                  frame := 80;
-                  NetworkNumber := 0;
-                  PcNumber := 255;
-                  IoNumber := 1023;
-                  ChannelNumber := 0;
-                  CpuTimer := 16;
-                  iMainCommand := 5121;
-                  dataLength := 13;
-                  iSubCommand := 1;
+    begin
+      case TagObj.WriteFunction of
+        $01..$08: begin
+                    //escreve uma saida...
+                    //encodes a packet to write a single coil.
+                    Frame := 80;
+                    NetworkNumber := 0;
+                    PCNumber := 255;
+                    IONumber := 1023;
+                    ChannelNumber := 0;
+                    CPUTimer := 16;
+                    AMainCommand := 5121;
+                    DataLength := 13;
+                    ASubCommand := 1;
 
-                  SetLength(Result, 22);
-                  Result[00] := frame;
-                  Result[01] := frame Shr 8;
-                  Result[02] := NetworkNumber;
-                  Result[03] := PcNumber;
-                  Result[04] := IoNumber; //size of the packet, bHi
-                  Result[05] := IoNumber Shr 8; //size of the packet, bLo
-                  Result[06] := ChannelNumber;
-                  Result[07] := dataLength;
-                  Result[08] := dataLength Shr 8;
-                  Result[09] := CpuTimer;
-                  Result[10] := CpuTimer Shr 8;
-                  Result[11] := iMainCommand;
-                  Result[12] := iMainCommand Shr 8;
-                  Result[13] := iSubCommand;
-                  Result[14] := iSubCommand Shr 8;
+                    SetLength(Result, 22);
+                    Result[00] := Frame;
+                    Result[01] := Frame shr 8;
+                    Result[02] := NetworkNumber;
+                    Result[03] := PCNumber;
+                    Result[04] := IONumber; //size of the packet, bHi
+                    Result[05] := IONumber shr 8; //size of the packet, bLo
+                    Result[06] := ChannelNumber;
+                    Result[07] := DataLength;
+                    Result[08] := DataLength shr 8;
+                    Result[09] := CPUTimer;
+                    Result[10] := CPUTimer shr 8;
+                    Result[11] := AMainCommand;
+                    Result[12] := AMainCommand shr 8;
+                    Result[13] := ASubCommand;
+                    Result[14] := ASubCommand shr 8;
 
-                  Result[15] := TagObj.address;
-                  Result[16] := TagObj.address Shr 8;
-                  Result[17] := TagObj.address Shr 16;
-                  Result[18] := PlcDeviceType(TagObj.WriteFunction);
-                  Result[19] := $01;
-                  Result[20] := Byte($00 Shr 8);
-                  if Trunc(ToWrite[0]) = 0 then
-                    Result[21] := Byte(0)
-                  else
-                    Result[21] := Byte(16);
-                  Result[22] := 0;
-                end;
+                    Result[15] := TagObj.address;
+                    Result[16] := TagObj.address shr 8;
+                    Result[17] := TagObj.address shr 16;
+                    Result[18] := PlcDeviceType(TagObj.WriteFunction);
+                    Result[19] := $01;
+                    Result[20] := Byte($00 shr 8);
+                    if Trunc(ToWrite[0]) = 0 then
+                      Result[21] := Byte(0)
+                    else
+                      Result[21] := Byte(16);
+                    Result[22] := 0;
+                  end;
+        $09, $10: begin
+                    //PFirstRequestLen := 9;
+                    // encode a packet to read input, outputs, register or analog registers
+                    // fixed values
+                    Frame := 80;
+                    NetworkNumber := 0;
+                    PCNumber := 255;
+                    IONumber := 1023;
+                    ChannelNumber := 0;
+                    CPUTimer := 16;
+                    AMainCommand := 5121;
+                    DataLength := 14;
+                    ASubCommand := 0;
 
-      $09, $10: begin
-                  //PFirstRequestLen := 9;
-                  //codifica pedido de leitura de entradas, saidas,
-                  //bloco de registradores e registrador simples.
+                    SetLength(Result, 23);
+                    Result[00] := Frame;
+                    Result[01] := Frame shr 8;
+                    Result[02] := NetworkNumber;
+                    Result[03] := PCNumber;
+                    Result[04] := IONumber; //size of the packet, bHi
+                    Result[05] := IONumber shr 8; //size of the packet, bLo
+                    Result[06] := ChannelNumber;
+                    Result[07] := DataLength;
+                    Result[08] := DataLength shr 8;
+                    Result[09] := CPUTimer;
+                    Result[10] := CPUTimer shr 8;
+                    Result[11] := AMainCommand;
+                    Result[12] := AMainCommand shr 8;
+                    Result[13] := ASubCommand;
+                    Result[14] := ASubCommand shr 8;
 
-                  //encode a packet to read input, outputs, register or analog registers
-                  //valores fixos
-                  frame := 80;
-                  NetworkNumber := 0;
-                  PcNumber := 255;
-                  IoNumber := 1023;
-                  ChannelNumber := 0;
-                  CpuTimer := 16;
-                  iMainCommand := 5121;
-                  dataLength := 14;
-                  iSubCommand := 0;
-
-                  SetLength(Result, 23);
-                  Result[00] := frame;
-                  Result[01] := frame Shr 8;
-                  Result[02] := NetworkNumber;
-                  Result[03] := PcNumber;
-                  Result[04] := IoNumber; //size of the packet, bHi
-                  Result[05] := IoNumber Shr 8; //size of the packet, bLo
-                  Result[06] := ChannelNumber;
-                  Result[07] := dataLength;
-                  Result[08] := dataLength Shr 8;
-                  Result[09] := CpuTimer;
-                  Result[10] := CpuTimer Shr 8;
-                  Result[11] := iMainCommand;
-                  Result[12] := iMainCommand Shr 8;
-                  Result[13] := iSubCommand;
-                  Result[14] := iSubCommand Shr 8;
-
-                  Result[15] := TagObj.address;
-                  Result[16] := TagObj.address Shr 8;
-                  Result[17] := TagObj.address Shr 16;
-                  Result[18] := PlcDeviceType(TagObj.WriteFunction);
-                  Result[19] := $01;
-                  Result[20] := $00;
-                  Result[21] := Trunc(ToWrite[0]);
-                  Result[22] := Trunc(ToWrite[0]) Shr 8;
-                  Result[23] := 0;
-                end;
-      else
-        begin
-          SetLength(Result, 0);
-        end;
+                    Result[15] := TagObj.address;
+                    Result[16] := TagObj.address shr 8;
+                    Result[17] := TagObj.address shr 16;
+                    Result[18] := PlcDeviceType(TagObj.WriteFunction);
+                    Result[19] := $01;
+                    Result[20] := $00;
+                    Result[21] := Trunc(ToWrite[0]);
+                    Result[22] := Trunc(ToWrite[0]) shr 8;
+                    Result[23] := 0;
+                  end;
+        else
+          begin
+            SetLength(Result, 0);
+          end;
+      end;
+      // Calcula o tamanho do pacote resposta
+      // computes the size of the incoming packet.
+      case TagObj.WriteFunction of
+        $01..$10: ResultLen := 12;
+        else
+          begin
+            ResultLen := 0;
+          end;
+      end;
     end;
-    // Calcula o tamanho do pacote resposta
-    // computes the size of the incoming packet.
-    case TagObj.WriteFunction of
-      $01..$10: ResultLen := 12;
-      else
-        begin
-          ResultLen := 0;
-        end;
-    end;
-  end;
 end;
 
 function TMelsecTCPDriver.PlcDeviceType(MemReadWriteFunction: Integer): Integer;
@@ -579,11 +570,11 @@ begin
     if QtTags <= 2 then
       Result := Result + 1
     else
-    begin
-      if (QtTags Mod 2 <> 0) then
-        Result := Result + 1;
-      Result := Result + (QtTags Div 2);
-    end;
+      begin
+        if (QtTags mod 2 <> 0) then
+          Result := Result + 1;
+        Result := Result + (QtTags div 2);
+      end;
   end;
   if (TagObj.ReadFunction in [9, 10, 16]) then //float
   begin

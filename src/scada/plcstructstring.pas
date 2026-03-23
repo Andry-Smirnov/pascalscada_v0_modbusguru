@@ -115,7 +115,7 @@ type
     property PLCBlock: TPLCStruct read PBlock write SetBlock;
 
     {$IFDEF PORTUGUES}
-    //: Tamanho real do bloco (somente-leitura).
+    //: Tamanho real do bloco (somente-reading).
     {$ELSE}
     //: Real block size (read-only).
     {$ENDIF}

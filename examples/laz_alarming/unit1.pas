@@ -97,7 +97,7 @@ type
     procedure PLCBlock1ValueChangeLast(Sender: TObject);
     procedure UpdateActiveAlarmsTimer(Sender: TObject);
   private
-    AlarmBitID:array[0..31] of Integer;
+    AlarmBitID:array [0..31] of Integer;
   public
     function InsertAlarm(dtStart:TDateTime; message, username, tagname:Utf8String; tagValue:Double):Integer;
     procedure FinishAlarm(AlarmID:Integer; dt_finish:TDateTime);
@@ -125,7 +125,7 @@ end;
 procedure TForm1.PLCBlock1ValueChangeLast(Sender: TObject);
 var
   w, b, idx, bitValue: Integer;
-  AlarmMessages:array[0..31] of String;
+  AlarmMessages:array [0..31] of String;
   WordValue: Word;
 begin
   AlarmMessages[0]  := 'Alarm message 1';

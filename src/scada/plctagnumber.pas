@@ -1,10 +1,4 @@
 {$i ../common/language.inc}
-{$IFDEF PORTUGUES}
-{:
-@abstract(Implementa o tag PLC numérico com comunicação.)
-@author(Fabio Luis Girardi fabio@pascalscada.com)
-}
-{$ELSE}
 {:
   @abstract(Unit that implements a numeric tag with communication.)
   @author(Fabio Luis Girardi fabio@pascalscada.com)
@@ -17,7 +11,6 @@
   ***********************************************************************
 
 }
-{$ENDIF}
 unit PLCTagNumber;
 
 interface
@@ -27,46 +20,37 @@ uses
 
 type
 
-  {$IFDEF PORTUGUES}
-  {:
-  @abstract(Tag numérico com comunicação individual.)
-  @author(Fabio Luis Girardi fabio@pascalscada.com)
-  }
-  {$ELSE}
-  {:
-  @abstract(Single numeric tag with communication.)
-  @author(Fabio Luis Girardi fabio@pascalscada.com)
-  }
-  {$ENDIF}
+  {: @abstract(Single numeric tag with communication.)
+     @author(Fabio Luis Girardi fabio@pascalscada.com) }
   TPLCTagNumber = class(TPLCNumberMappable, IScanableTagInterface, ITagInterface, ITagNumeric)
   private
-    function  GetVariantValue:Variant;
-    procedure SetVariantValue(V:Variant);
-    function  IsValidValue(aValue:Variant):Boolean;
-    function  GetValueTimestamp:TDatetime;
+    function GetVariantValue: Variant;
+    procedure SetVariantValue(AValue: Variant);
+    function IsValidValue(AValue: Variant): Boolean;
+    function GetValueTimestamp: TDatetime;
   protected
-    function IsMyCallBack(Cback: TTagCommandCallBack): Boolean; override;
+    function IsMyCallBack(ACallBack: TTagCommandCallBack): Boolean; override;
     //: @seealso(TPLCNumber.SetValueRaw)
-    function  GetValueRaw:Double; override;
+    function GetValueRaw: Double; override;
     //: @seealso(TPLCNumber.SetValueRaw)
-    procedure SetValueRaw(aValue:Double); override;
+    procedure SetValueRaw(AValue: Double); override;
     //: @seealso(TPLCTag.TagCommandCallBack)
-    procedure TagCommandCallBack(const ReqID:LongWord; Values:TArrayOfDouble; ValuesTimeStamp:TDateTime; TagCommand:TTagCommand; LastResult:TProtocolIOResult; Offset:LongInt); override;
+    procedure TagCommandCallBack(const ReqID: Longword; Values: TArrayOfDouble; ValuesTimeStamp: TDatetime; TagCommand: TTagCommand; LastResult: TProtocolIOResult; Offset: Longint); override;
     //: @seealso(TTag.Size)
     property Size nodefault;
   public
     //: @seealso(TPLCTag.ScanRead)
-    function ScanRead:Int64; override;
+    function ScanRead: Int64; override;
     //: @seealso(TPLCTag.ScanWrite)
-    function ScanWrite(Values:TArrayOfDouble; Count, Offset:Cardinal; const IgnoreAutoWrite:Boolean = false):Int64; override;
+    function ScanWrite(Values: TArrayOfDouble; Count, Offset: Cardinal; const IgnoreAutoWrite: Boolean = False): Int64; override;
     //: @seealso(TPLCTag.Read)
     procedure Read; override;
     //: @seealso(TPLCTag.Write)
-    procedure Write(Values:TArrayOfDouble; Count, Offset:Cardinal); override;
+    procedure Write(Values: TArrayOfDouble; Count, Offset: Cardinal); override;
 
-    procedure Write(aValue:Double); overload;
+    procedure Write(AValue: Double); overload;
 
-    procedure SetMinMaxValues(aMin, aMax: Double); override;
+    procedure SetMinMaxValues(AMin, AMax: Double); override;
   published
     //: @seealso(TTag.AutoRead)
     property AutoRead;
@@ -139,229 +123,255 @@ type
     property LastScanWriteReqID;
   end;
 
+
 implementation
 
-uses hsstrings, math, crossdatetime, dateutils;
 
-function TPLCTagNumber.IsMyCallBack(Cback: TTagCommandCallBack): Boolean;
+uses
+  hsstrings, Math, crossdatetime, dateutils;
+
+
+function TPLCTagNumber.IsMyCallBack(ACallBack: TTagCommandCallBack): Boolean;
 begin
-  Result:=inherited IsMyCallBack(Cback) and (TMethod(Cback).Code=Pointer(@TPLCTagNumber.TagCommandCallBack));
+  Result := inherited IsMyCallBack(ACallBack) and (TMethod(ACallBack).Code = Pointer(@TPLCTagNumber.TagCommandCallBack));
 end;
 
-function TPLCTagNumber.GetValueRaw:Double;
+function TPLCTagNumber.GetValueRaw: Double;
 begin
   Result := PValueRaw;
 end;
 
-function  TPLCTagNumber.GetVariantValue:Variant;
+function TPLCTagNumber.GetVariantValue: Variant;
 begin
-   Result := Value;
+  Result := Value;
 end;
 
-procedure TPLCTagNumber.SetVariantValue(V:Variant);
+procedure TPLCTagNumber.SetVariantValue(AValue: Variant);
 var
-   aux:double;
+  Aux: Double;
 begin
-   if VarIsNumeric(v) then begin
-      Value := V
-   end else
-      if VarIsStr(V) then begin
-         if TryStrToFloat(V,aux) then
-            Value := aux
-         else
-            raise exception.Create(SinvalidValue);
-      end else
-         if VarIsType(V,varboolean) then begin
-            if V=true then
-               Value := 1
-            else
-               Value := 0;
-         end else
-            raise exception.Create(SinvalidValue);
-end;
-
-function  TPLCTagNumber.IsValidValue(aValue:Variant):Boolean;
-var
-   aux:Double;
-   aValueStr: AnsiString;
-begin
-   aValueStr:=aValue;
-   Result := VarIsNumeric(aValue) or
-             (VarIsStr(aValue) and TryStrToFloat(aValueStr,aux)) or
-             VarIsType(aValue, varboolean);
-end;
-
-function TPLCTagNumber.GetValueTimestamp:TDatetime;
-begin
-   Result := PValueTimeStamp;
-end;
-
-procedure TPLCTagNumber.SetValueRaw(aValue:Double);
-var
-  towrite:TArrayOfDouble;
-begin
-  PModified:=true;
-  SetLength(towrite,1);
-  towrite[0] := aValue;
-  if FSyncWrites then
-    Write(towrite,1,0)
+  if VarIsNumeric(AValue) then
+    begin
+      Value := AValue;
+    end
+  else if VarIsStr(AValue) then
+    begin
+      if TryStrToFloat(AValue, Aux) then
+        Value := Aux
+      else
+        raise Exception.Create(SinvalidValue);
+    end
+  else if VarIsType(AValue, varboolean) then
+    begin
+      if AValue = True then
+        Value := 1
+      else
+        Value := 0;
+    end
   else
-    ScanWrite(towrite,1,0);
-  SetLength(towrite,0);
+    raise Exception.Create(SinvalidValue);
+end;
+
+function TPLCTagNumber.IsValidValue(AValue: Variant): Boolean;
+var
+  Aux: Double;
+  AValueStr: AnsiString;
+begin
+  AValueStr := AValue;
+  Result := VarIsNumeric(AValue)
+    or (VarIsStr(AValue) and TryStrToFloat(AValueStr, Aux))
+    or VarIsType(AValue, varboolean);
+end;
+
+function TPLCTagNumber.GetValueTimestamp: TDatetime;
+begin
+  Result := PValueTimeStamp;
+end;
+
+procedure TPLCTagNumber.SetValueRaw(AValue: Double);
+var
+  ToWrite: TArrayOfDouble;
+begin
+  PModified := True;
+  SetLength(ToWrite, 1);
+  ToWrite[0] := AValue;
+  if FSyncWrites then
+    Write(ToWrite, 1, 0)
+  else
+    ScanWrite(ToWrite, 1, 0);
+  SetLength(ToWrite, 0);
 end;
 
 function TPLCTagNumber.ScanRead: Int64;
 var
-  tr:TTagRec;
+  TagObj: TTagRec;
 begin
   inherited ScanRead;
-  if (PProtocolDriver<>nil) then begin
-    BuildTagRec(tr,0,0);
-    Result := PProtocolDriver.SingleScanRead(tr);
-  end else
-    Result:=-1;
+  if (PProtocolDriver <> nil) then
+  begin
+    BuildTagRec(TagObj, 0, 0);
+    Result := PProtocolDriver.SingleScanRead(TagObj);
+  end
+  else
+    Result := -1;
 end;
 
-function TPLCTagNumber.ScanWrite(Values: TArrayOfDouble; Count,
-  Offset: Cardinal; const IgnoreAutoWrite: Boolean): Int64;
+function TPLCTagNumber.ScanWrite(Values: TArrayOfDouble; Count, Offset: Cardinal; const IgnoreAutoWrite: Boolean): Int64;
 var
-  tr:TTagRec;
-  PlcValues:TArrayOfDouble;
+  TagObj: TTagRec;
+  PLCValues: TArrayOfDouble;
 begin
-  PlcValues:=TagValuesToPLCValues(Values, Offset);
+  PLCValues := TagValuesToPLCValues(Values, Offset);
   try
-    if (PProtocolDriver<>nil) then begin
-      if PAutoWrite or IgnoreAutoWrite then begin
-        BuildTagRec(tr,0,0);
-        Result:=PProtocolDriver.ScanWrite(tr,PlcValues);
-      end else begin
-        TagCommandCallBack(0, PlcValues,CrossNow,tcScanWrite,ioOk,0);
-        Dec(PCommWriteOk);
-        Result:=-1;
+    if (PProtocolDriver <> nil) then
+      begin
+        if PAutoWrite or IgnoreAutoWrite then
+          begin
+            BuildTagRec(TagObj, 0, 0);
+            Result := PProtocolDriver.ScanWrite(TagObj, PLCValues);
+          end
+        else
+          begin
+            TagCommandCallBack(0, PLCValues, CrossNow, tcScanWrite, ioOk, 0);
+            Dec(PCommWriteOk);
+            Result := -1;
+          end;
+      end
+    else
+      begin
+        TagCommandCallBack(0, PLCValues, CrossNow, tcScanWrite, ioNullDriver, Offset);
+        Result := -1;
       end;
-    end else begin
-      TagCommandCallBack(0, PlcValues, CrossNow, tcScanWrite, ioNullDriver, Offset);
-      Result:=-1;
-    end;
-
   finally
-    SetLength(PlcValues,0);
+    SetLength(PLCValues, 0);
   end;
 end;
 
 procedure TPLCTagNumber.Read;
 var
-  tr:TTagRec;
+  TagObj: TTagRec;
 begin
-  if PProtocolDriver<>nil then begin
-    BuildTagRec(tr,0,0);
-    PProtocolDriver.Read(tr);
+  if PProtocolDriver <> nil then
+  begin
+    BuildTagRec(TagObj, 0, 0);
+    PProtocolDriver.Read(TagObj);
   end;
 end;
 
-procedure TPLCTagNumber.Write(Values:TArrayOfDouble; Count, Offset:Cardinal);
+procedure TPLCTagNumber.Write(Values: TArrayOfDouble; Count, Offset: Cardinal);
 var
-  tr:TTagRec;
-  PlcValues:TArrayOfDouble;
+  TagObj: TTagRec;
+  PLCValues: TArrayOfDouble;
 begin
-  PlcValues:=TagValuesToPLCValues(Values, Offset);
-  if (PProtocolDriver<>nil) then begin
-    BuildTagRec(tr,0,0);
-    PProtocolDriver.Write(tr,PlcValues);
-  end else
-     TagCommandCallBack(0, PlcValues, CrossNow, tcWrite, ioNullDriver, Offset);
-  SetLength(PlcValues,0);
+  PLCValues := TagValuesToPLCValues(Values, Offset);
+  if (PProtocolDriver <> nil) then
+  begin
+    BuildTagRec(TagObj, 0, 0);
+    PProtocolDriver.Write(TagObj, PLCValues);
+  end
+  else
+    TagCommandCallBack(0, PLCValues, CrossNow, tcWrite, ioNullDriver, Offset);
+  SetLength(PLCValues, 0);
 end;
 
-procedure TPLCTagNumber.Write(aValue: Double);
+procedure TPLCTagNumber.Write(AValue: Double);
 var
-  x:TArrayOfDouble;
+  x: TArrayOfDouble;
 begin
-  SetLength(x,1);
+  SetLength(x, 1);
   try
-    x[0]:=aValue;
-    Write(x,1,0);
+    x[0] := AValue;
+    Write(x, 1, 0);
   finally
-    SetLength(x,0);
+    SetLength(x, 0);
   end;
 end;
 
-procedure TPLCTagNumber.SetMinMaxValues(aMin, aMax: Double);
+procedure TPLCTagNumber.SetMinMaxValues(AMin, AMax: Double);
 begin
-  inherited SetMinMaxValues(aMin, aMax);
+  inherited SetMinMaxValues(AMin, AMax);
 end;
 
-procedure TPLCTagNumber.TagCommandCallBack(const ReqID: LongWord;
-  Values: TArrayOfDouble; ValuesTimeStamp: TDateTime; TagCommand: TTagCommand;
-  LastResult: TProtocolIOResult; Offset: LongInt);
+procedure TPLCTagNumber.TagCommandCallBack(const ReqID: Longword; Values: TArrayOfDouble; ValuesTimeStamp: TDatetime; TagCommand: TTagCommand; LastResult: TProtocolIOResult; Offset: Longint);
 var
-  notify:Boolean;
-  TagValues:TArrayOfDouble;
-  PreviousTimestamp:TDateTime;
+  Notify: Boolean;
+  TagValues: TArrayOfDouble;
+  PreviousTimeStamp: TDatetime;
 begin
-  PreviousTimestamp:=PValueTimeStamp;
-  if (csDestroying in ComponentState) then Exit;
+  PreviousTimeStamp := PValueTimeStamp;
+  if (csDestroying in ComponentState) then
+    Exit;
   inherited TagCommandCallBack(ReqID, Values, ValuesTimeStamp, TagCommand, LastResult, Offset);
-  TagValues:=PLCValuesToTagValues(Values, Offset);
+
+  TagValues := PLCValuesToTagValues(Values, Offset);
 
   try
-    notify := false;
+    Notify := False;
     case TagCommand of
       tcScanRead,
       tcRead,
       tcInternalUpdate,
-      tcSingleScanRead:
-      begin
-        PValueTimeStamp := ValuesTimeStamp;
+      tcSingleScanRead: begin
+                          PValueTimeStamp := ValuesTimeStamp;
 
-        if (Length(TagValues)>0) and (LastResult in [ioOk, ioNullDriver]) then begin
-          notify := (PValueRaw<>TagValues[0]) OR (IsNan(TagValues[0]) and (not IsNaN(PValueRaw)));
-          PValueRaw := TagValues[0];
-          if (TagCommand<>tcInternalUpdate) AND (LastResult=ioOk) then begin
-            PModified:=False;
-            IncCommReadOK(1);
-          end;
-        end else begin
-          if (TagCommand<>tcInternalUpdate) then begin
-            IncCommReadFaults(1);
-          end;
-        end;
-      end;
-      tcScanWrite,tcWrite:
-      begin
-        PValueTimeStamp := ValuesTimeStamp;
-        if (Length(TagValues)>0) and (LastResult in [ioOk, ioNullDriver]) then begin
-          if LastResult=ioOk then begin
-            PModified:=False;
-            IncCommWriteOK(1);
-          end;
-          notify := (PValueRaw<>TagValues[0]);
-          PValueRaw := TagValues[0];
-        end else
-          IncCommWriteFaults(1);
-      end;
+                          if (Length(TagValues) > 0) and (LastResult in [ioOk, ioNullDriver]) then
+                            begin
+                              Notify := (PValueRaw <> TagValues[0]) or (IsNan(TagValues[0]) and (not IsNan(PValueRaw)));
+                              PValueRaw := TagValues[0];
+                              if (TagCommand <> tcInternalUpdate) and (LastResult = ioOk) then
+                              begin
+                                PModified := False;
+                                IncCommReadOK(1);
+                              end;
+                            end
+                          else
+                            begin
+                              if (TagCommand <> tcInternalUpdate) then
+                              begin
+                                IncCommReadFaults(1);
+                              end;
+                            end;
+                        end;
+      tcScanWrite,
+      tcWrite:  begin
+                  PValueTimeStamp := ValuesTimeStamp;
+                  if (Length(TagValues) > 0) and (LastResult in [ioOk, ioNullDriver]) then
+                    begin
+                      if LastResult = ioOk then
+                      begin
+                        PModified := False;
+                        IncCommWriteOK(1);
+                      end;
+                      Notify := (PValueRaw <> TagValues[0]);
+                      PValueRaw := TagValues[0];
+                    end
+                  else
+                    IncCommWriteFaults(1);
+                end;
     end;
 
     case TagCommand of
-      tcScanRead, tcSingleScanRead:
-        PLastASyncReadCmdResult := LastResult;
-      tcScanWrite:
-        PLastASyncWriteCmdResult := LastResult;
-      tcRead:
-        PLastSyncReadCmdResult := LastResult;
-      tcWrite:
-        PLastSyncWriteCmdResult := LastResult;
+      tcScanRead,
+      tcSingleScanRead: PLastASyncReadCmdResult := LastResult;
+      tcScanWrite:      PLastASyncWriteCmdResult := LastResult;
+      tcRead:           PLastSyncReadCmdResult := LastResult;
+      tcWrite:          PLastSyncWriteCmdResult := LastResult;
     end;
 
-    if notify or PFirstUpdate then begin
-      if (TagCommand in [tcRead,tcScanRead,tcSingleScanRead]) or (ProtocolDriver=nil) then PFirstUpdate:=false;
+    if Notify or PFirstUpdate then
+    begin
+      if (TagCommand in [tcRead, tcScanRead, tcSingleScanRead])
+        or (ProtocolDriver = nil) then
+        PFirstUpdate := False;
       NotifyChange;
     end;
 
-    if (TagCommand in [tcRead,tcScanRead, tcSingleScanRead]) and (LastResult=ioOk) and (PreviousTimestamp<>PValueTimeStamp) then
+    if (TagCommand in [tcRead, tcScanRead, tcSingleScanRead])
+      and (LastResult = ioOk)
+      and (PreviousTimeStamp <> PValueTimeStamp) then
       NotifyUpdate;
   finally
-    SetLength(TagValues,0);
+    SetLength(TagValues, 0);
   end;
 end;
 

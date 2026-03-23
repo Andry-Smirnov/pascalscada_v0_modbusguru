@@ -191,7 +191,7 @@ end;
 
 function GetStrFromInt(Val: LongInt; const Dst: PChar): LongInt;
 var
-  Temp: array[0..10] of Char;
+  Temp: array [0..10] of Char;
   I, J: LongInt;
 begin
   Val := Abs(Val);
@@ -219,7 +219,7 @@ end;
 
 procedure GetStrFromInt_Width(Val: LongInt; const Width: LongInt; const Dst: PChar; const PadChar: Char);
 var
-  Temp: array[0..10] of Char;
+  Temp: array [0..10] of Char;
   I, J: LongInt;
   NegSign: boolean;
 begin
@@ -230,7 +230,7 @@ end;
 
 procedure GetStrFromInt64_Width(Val: Int64; const Width: LongInt; const Dst: PChar; const PadChar: Char);
 var
-  Temp: array[0..19] of Char;
+  Temp: array [0..19] of Char;
   I, J: LongInt;
   NegSign: boolean;
 begin
@@ -239,7 +239,7 @@ end;
 
 function GetStrFromInt64(Val: Int64; const Dst: PChar): LongInt;
 var
-  Temp: array[0..19] of Char;
+  Temp: array [0..19] of Char;
   I, J: LongInt;
 begin
   Val := Abs(Val);

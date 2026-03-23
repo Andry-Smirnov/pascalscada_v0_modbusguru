@@ -53,7 +53,7 @@ procedure TForm1.Button1Click(Sender: TObject);
 var
   x:THMICheckBox;
 begin
-  x:=THMICheckBox.Create(self);
+  x:=THMICheckBox.Create(Self);
   x.Parent:=Form1;
   x.CaptionTrue := 'teste';
   x.CaptionFalse := 'teste';

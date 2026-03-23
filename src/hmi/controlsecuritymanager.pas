@@ -337,7 +337,7 @@ end;
 destructor TControlSecurityManager.Destroy;
 begin
   if Length(FControls) > 0 then
-    writeln('FIX-ME: ', SSecurityControlBusy, ' ', {$i %FILE%}, ':', {$i %LINE%});
+    WriteLn('FIX-ME: ', SSecurityControlBusy, ' ', {$i %FILE%}, ':', {$i %LINE%});
   inherited Destroy;
 end;
 
@@ -434,7 +434,7 @@ begin
 
   {$IFNDEF WINDOWS}
   if not found then
-    writeln('FIX-ME: Control not found! ', {$i %FILE%}, ':', {$i %LINE%});
+    WriteLn('FIX-ME: Control not found! ', {$i %FILE%}, ':', {$i %LINE%});
   {$ENDIF}
 end;
 
@@ -580,7 +580,7 @@ begin
   if not FRegInSecMan then
   begin
     {$IFNDEF WINDOWS}
-    writeln('FIX-ME: Failed to register class ', ClassName, ' instace with name="', Name, '" in the ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
+    WriteLn('FIX-ME: Failed to register class ', ClassName, ' instace with name="', Name, '" in the ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
     {$ENDIF}
   end;
   FEnabled := True;
@@ -594,7 +594,7 @@ begin
   else
   begin
     {$IFNDEF WINDOWS}
-    writeln('FIX-ME: Why class ', ClassName, ', instace name="', Name, '" ins''t registered in ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
+    WriteLn('FIX-ME: Why class ', ClassName, ', instace name="', Name, '" ins''t registered in ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
     {$ENDIF}
   end;
   inherited Destroy;

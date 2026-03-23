@@ -125,7 +125,7 @@ begin
   FArraysValid:=true;
   // count line ends
   FLineCount:=CountLineEndings(FText);
-  l:=length(FText);
+  l:=Length(FText);
   if (FText<>'') and (not (FText[l] in [#10,#13])) then
     inc(FLineCount);
   FLineCapacity:=FLineCount;
@@ -229,7 +229,7 @@ begin
   if not FArraysValid then BuildArrays;
   OldStartPos:=FLineRanges[Index].StartPos;
   OldEndPos:=FLineRanges[Index].EndPos;
-  NewLineLen:=length(s);
+  NewLineLen:=Length(s);
   OldLineLen:=OldEndPos-OldStartPos;
   Movement:=NewLineLen-OldLineLen;
   NewEndPos:=OldEndPos+Movement;
@@ -282,7 +282,7 @@ begin
   if not IncludeNewLineChars then
     Result:=FLineRanges[Index].EndPos
   else if Index=FLineCount-1 then
-    Result:=length(FText)+1
+    Result:=Length(FText)+1
   else
     Result:=FLineRanges[Index+1].StartPos;
 end;
@@ -304,7 +304,7 @@ var
   l: LongInt;
 begin
   Result:=0;
-  l:=length(s);
+  l:=Length(s);
   p:=1;
   while p<=l do begin
     if s[p] in [#10,#13] then
@@ -354,12 +354,12 @@ var
   SEndsInNewLine: boolean;
 begin
   if not FArraysValid then BuildArrays;
-  NewLineLen:=length(S);
+  NewLineLen:=Length(S);
   SEndsInNewLine:=(S<>'') and (S[NewLineLen] in [#10,#13]);
   if Index<FLineCount then
     NewStartPos:=FLineRanges[Index].StartPos
   else
-    NewStartPos:=length(FText);
+    NewStartPos:=Length(FText);
   NewLineCharCount:=0;
   if SEndsInNewLine then begin
     inc(NewLineCharCount);
@@ -371,7 +371,7 @@ begin
   end else begin
     // append missing newline char
     System.Insert(S+LineEnding,FText,NewStartPos);
-    NewLineCharCount:=length(LineEnding);
+    NewLineCharCount:=Length(LineEnding);
     inc(NewLineLen,NewLineCharCount);
   end;
   // adjust arrays
@@ -460,7 +460,7 @@ begin
   // adjust text
   MakeTextBufferUnique;
 
-  if (Index2=FLineCount-1) and (FLineRanges[Index2].EndPos=length(FText))
+  if (Index2=FLineCount-1) and (FLineRanges[Index2].EndPos=Length(FText))
   then begin
     // The last line should be exchanged,
     // but Text has no new line character(s) at the end
@@ -552,7 +552,7 @@ begin
   if CurIndex<NewIndex then
   begin
     // move to higher index
-    if (NewIndex=FLineCount-1) and (FLineRanges[NewIndex].EndPos>length(FText))
+    if (NewIndex=FLineCount-1) and (FLineRanges[NewIndex].EndPos>Length(FText))
     then begin
       // CurIndex should be moved to the end,
       // but Text has no new line character(s) at the end
@@ -584,7 +584,7 @@ begin
     FLineRanges[NewIndex].TheObject:=Obj;
   end else begin
     // move to lower index
-    if (CurIndex=FLineCount-1) and (FLineRanges[CurIndex].EndPos>length(FText))
+    if (CurIndex=FLineCount-1) and (FLineRanges[CurIndex].EndPos>Length(FText))
     then begin
       // CurIndex should be moved from the end,
       // but Text has no new line character(s) at the end
@@ -667,11 +667,11 @@ var
   l: LongInt;
 begin
   Result:=Count;
-  if (FText<>'') and (not (FText[length(FText)] in [#10,#13])) then
+  if (FText<>'') and (not (FText[Length(FText)] in [#10,#13])) then
     e:=LineEnding
   else
     e:='';
-  OldTxtLen:=length(FText);
+  OldTxtLen:=Length(FText);
   FText:=Text+e+S+LineEnding;
   if AObject<>nil then
     BuildArrays;
@@ -687,8 +687,8 @@ begin
       FillChar(FLineRanges[FLineCount],SizeOf(TTextLineRange)*(FLineCapacity-FLineCount),0);
     end;
     FLineRanges[FLineCount].TheObject:=AObject;
-    p:=OldTxtLen+length(e)+1;
-    l:=length(FText);
+    p:=OldTxtLen+Length(e)+1;
+    l:=Length(FText);
     while FLineCount<NewLineCount do begin
       FLineRanges[FLineCount].StartPos:=p;
       while (p<=l) and (not (FText[p] in [#10,#13])) do
@@ -730,7 +730,7 @@ begin
     for i:=0 to TheStrings.Count-1 do
       AddObject(TheStrings[i],TheStrings.Objects[i]);
   end else begin
-    if (FText<>'') and (not (FText[length(FText)] in [#10,#13])) then
+    if (FText<>'') and (not (FText[Length(FText)] in [#10,#13])) then
       s:=LineEnding
     else
       s:='';

@@ -1,15 +1,4 @@
 {$i ../common/language.inc}
-{$IFDEF PORTUGUES}
-{:
-  @abstract(Implementação do protocolo ISOTCP.)
-  Este driver é baseado no driver ISOTCP da biblioteca
-  LibNODAVE de Thomas Hergenhahn (thomas.hergenhahn@web.de).
-
-  Este driver não usa Libnodave, ele é uma reescrita da mesma.
-
-  @author(Fabio Luis Girardi <fabio@pascalscada.com>)
-}
-{$ELSE}
 {:
   @abstract(Implements the ISOTCP protocol.)
   This driver is based on ISOTCP of LibNODAVE library of
@@ -19,32 +8,15 @@
 
   @author(Fabio Luis Girardi <fabio@pascalscada.com>)
 }
-{$ENDIF}
 unit ISOTCPDriver;
 
 interface
 
 uses
-  classes, sysutils, S7Types, commtypes, s7family, Tag, ProtocolTypes;
+  Classes, SysUtils, S7Types, commtypes, s7family, Tag, ProtocolTypes;
 
 type
 
-  {$IFDEF PORTUGUES}
-  {: Driver IsoTCP. Baseado na biblioteca LibNodave de
-     Thomas Hergenhahn (thomas.hergenhahn@web.de).
-
-  Para endereçar uma memória, veja a documentação da classe
-  TSiemensProtocolFamily.
-
-  @bold(Devido ao ISOTCP permitir conectar a somente um CLP atraves de uma
-        conexao TCP/IP, as propriedades TTag.PLCStation, TTag.PLCSlot e
-        TTag.PLCRack dos tags nao tem efeito. Portanto estas informacoes devem
-        ser configuradas atraves das propriedades PLCStation, PLCSlot e PLCRack
-        de cada instancia deste protocolo.)
-
-  @seealso(TSiemensProtocolFamily).
-  }
-  {$ELSE}
   {: ISOTCP protocol driver. Based on LibNODAVE libray of
      Thomas Hergenhahn (thomas.hergenhahn@web.de).
 
@@ -56,9 +28,7 @@ type
         effect. Therefore these informations must be set through properties
         PLCStation, PLCSlot and PLCRack of each instance of this protocol.)
 
-  @seealso(TSiemensProtocolFamily).
-  }
-  {$ENDIF}
+  @seealso(TSiemensProtocolFamily). }
 
   { TISOTCPDriver }
 
@@ -66,22 +36,18 @@ type
   private
     FISOConnType: TISOTCPConnType;
     procedure SetISOConnType(AValue: TISOTCPConnType);
-    procedure SetPLCRack(AValue: longint);
-    procedure SetPLCSlot(AValue: LongInt);
-    procedure SetPLCStation(AValue: LongInt);
+    procedure SetPLCRack(AValue: Longint);
+    procedure SetPLCSlot(AValue: Longint);
+    procedure SetPLCStation(AValue: Longint);
     procedure UpdatePLCs;
   protected
-    FPLCRack,
-    FPLCSlot,
-    FPLCStation:LongInt;
-    FConnectionWay:TISOTCPConnectionWay;
+    FPLCRack: Longint;
+    FPLCSlot: Longint;
+    FPLCStation: Longint;
+    FConnectionWay: TISOTCPConnectionWay;
 
-    {$IFDEF PORTUGUES}
-    //: Define o meio de conexão com o CLP.
-    {$ELSE}
     //: Defines the way to connect into the PLC.
-    {$ENDIF}
-    procedure SetISOConnectionWay(NewISOConWay:TISOTCPConnectionWay);
+    procedure SetISOConnectionWay(NewISOConWay: TISOTCPConnectionWay);
 
     //: seealso(TSiemensProtocolFamily.GetTagInfo)
     function GetTagInfo(tagobj: TTag): TTagRec; override;
@@ -93,82 +59,36 @@ type
     //: seealso(TProtocolDriver.PortDisconnected)
     procedure PortDisconnected(Sender: TObject); override;
   protected
-    //: seealso(TSiemensProtocolFamily.connectPLC)
-    function  connectPLC(var CPU:TS7CPU):Boolean; override;
-    //: seealso(TSiemensProtocolFamily.exchange)
-    function  exchange(var CPU:TS7CPU; var msgOut:Bytes; var msgIn:Bytes; IsWrite:Boolean):Boolean; override;
+    //: seealso(TSiemensProtocolFamily.ConnectPLC)
+    function connectPLC(var CPU: TS7CPU): Boolean; override;
+    //: seealso(TSiemensProtocolFamily.Exchange)
+    function exchange(var CPU: TS7CPU; var msgOut: Bytes; var MsgIn: Bytes; IsWrite: Boolean): Boolean; override;
     //: seealso(TSiemensProtocolFamily.getResponse)
-    function  getResponse(var msgIn:Bytes; var BytesRead:LongInt):TIOResult; override;
+    function getResponse(var MsgIn: Bytes; var BytesRead: Longint): TIOResult; override;
     //: seealso(TSiemensProtocolFamily.PrepareToSend)
-    procedure PrepareToSend(var msg: Bytes); override;
+    procedure PrepareToSend(var Msg: Bytes); override;
     //: @exclude
     procedure Loaded; override;
 
     //: seealso(TSiemensProtocolFamily.doRead)
-    function DoRead(const tagrec: TTagRec; out Values: TArrayOfDouble;
-      Sync: Boolean): TProtocolIOResult; override;
-    procedure DoGetValue(TagRec: TTagRec; var values: TScanReadRec); override;
+    function DoRead(const TagRec: TTagRec; out Values: TArrayOfDouble; Sync: Boolean): TProtocolIOResult; override;
+    procedure DoGetValue(TagRec: TTagRec; var Values: TScanReadRec); override;
     //: seealso(TSiemensProtocolFamily.doWrite)
-    function DoWrite(const tagrec: TTagRec; const Values: TArrayOfDouble;
-      Sync: Boolean): TProtocolIOResult; override;
+    function DoWrite(const TagRec: TTagRec; const Values: TArrayOfDouble; Sync: Boolean): TProtocolIOResult; override;
   public
-    constructor Create(AOwner:TComponent); override;
+    constructor Create(AOwner: TComponent); override;
 
-    {$IFDEF PORTUGUES}
-    {:
-    Atualiza de uma so vez, Rack, Slot e Station da lista de CPUs, evitando
-    overhead.
-    }
-    {$ELSE}
-    {:
-    Updates in a single call, Rack, Slot and Station, avoiding overhead.
-    }
-    {$ENDIF}
-    procedure UpdatePLCAddress(Rack, Slot, Station:LongInt);
+    //: Updates in a single call, Rack, Slot and Station, avoiding overhead.
+    procedure UpdatePLCAddress(Rack, Slot, Station: Longint);
   published
     //: @seealso(TSiemensProtocolFamily.ReadSomethingAlways)
     property ReadSomethingAlways;
-
-    {$IFDEF PORTUGUES}
-    {:
-    Define o meio de conexão com o CLP.
-    @seealso(TISOTCPConnectionWay)
-    }
-    {$ELSE}
-    {:
-    Defines the way to connect into the PLC.
-    @seealso(TISOTCPConnectionWay)
-    }
-    {$ENDIF}
-    property ConnectionWay:TISOTCPConnectionWay read FConnectionWay write SetISOConnectionWay;
-
-    {$IFDEF PORTUGUES}
-    {:
-    Define o tipo de conexão com o CLP.
-    @seealso(TISOTCPConnType)
-    }
-    {$ELSE}
-    {:
-    Defines connection type to the PLC.
-    @seealso(TISOTCPConnType)
-    }
-    {$ENDIF}
-    Property ISOTCPConnType:TISOTCPConnType read FISOConnType write SetISOConnType default ctOP;
-
-    {$IFDEF PORTUGUES}
-    {:
-      Sobrescreve o valor da propriedade PLCRack do tag pelo valor configurado
-      aqui.
-
-      @bold(Devido ao ISOTCP permitir conectar a somente um CLP atraves de uma
-            conexao TCP/IP, a propriedade TTag.PLCRack do tag nao tem efeito.
-            Portanto esta informacao deve ser configurada atraves da
-            propriedade PLCRack de cada instancia deste protocolo.)
-
-      @seealso(TTag.PLCRack)
-      @seealso(TISOTCPDriver)
-    }
-    {$ELSE}
+    {: Defines the way to connect into the PLC.
+       @seealso(TISOTCPConnectionWay) }
+    property ConnectionWay: TISOTCPConnectionWay read FConnectionWay write SetISOConnectionWay;
+    {: Defines connection type to the PLC.
+       @seealso(TISOTCPConnType) }
+    property ISOTCPConnType: TISOTCPConnType read FISOConnType write SetISOConnType default ctOP;
     {:
       Override the value TTag.PLCRack property by the value set here.
 
@@ -178,25 +98,8 @@ type
             instance of this protocol.)
 
       @seealso(TTag.PLCRack)
-      @seealso(TISOTCPDriver)
-    }
-    {$ENDIF}
-    property PLCRack:longint    read FPLCRack    write SetPLCRack default 0;
-
-    {$IFDEF PORTUGUES}
-    {:
-      Sobrescreve o valor da propriedade PLCSlot do tag pelo valor
-      configurado aqui.
-
-      @bold(Devido ao ISOTCP permitir conectar a somente um CLP atraves de uma
-            conexao TCP/IP, a propriedade TTag.PLCSlot do tag nao tem efeito.
-            Portanto esta informacao deve ser configurada atraves da
-            propriedade PLCSlot de cada instancia deste protocolo.)
-
-      @seealso(TTag.PLCSlot)
-      @seealso(TISOTCPDriver)
-    }
-    {$ELSE}
+      @seealso(TISOTCPDriver) }
+    property PLCRack: Longint read FPLCRack write SetPLCRack default 0;
     {:
       Override the value TTag.PLCSlot property by the value set here.
 
@@ -206,25 +109,8 @@ type
             instance of this protocol.)
 
       @seealso(TTag.PLCSlot)
-      @seealso(TISOTCPDriver)
-    }
-    {$ENDIF}
-    property PLCSlot:LongInt    read FPLCSlot    write SetPLCSlot default 0;
-
-    {$IFDEF PORTUGUES}
-    {:
-      Sobrescreve o valor da propriedade PLCStation do tag pelo valor
-      configurado aqui.
-
-      @bold(Devido ao ISOTCP permitir conectar a somente um CLP atraves de uma
-            conexao TCP/IP, a propriedade TTag.PLCStation do tag nao tem efeito.
-            Portanto esta informacao deve ser configurada atraves da
-            propriedade PLCStation de cada instancia deste protocolo.)
-
-      @seealso(TTag.PLCStation)
-      @seealso(TISOTCPDriver)
-    }
-    {$ELSE}
+      @seealso(TISOTCPDriver) }
+    property PLCSlot: Longint read FPLCSlot write SetPLCSlot default 0;
     {:
       Override the value TTag.PLCStation property by the value set here.
 
@@ -234,127 +120,137 @@ type
             instance of this protocol.)
 
       @seealso(TTag.PLCStation)
-      @seealso(TISOTCPDriver)
-    }
-    {$ENDIF}
-    property PLCStation:LongInt read FPLCStation write SetPLCStation default 2;
+      @seealso(TISOTCPDriver) }
+    property PLCStation: Longint read FPLCStation write SetPLCStation default 2;
 
     property ReadOnly;
   end;
 
+
 const
   ISOTCPMinPacketLen = 16;
 
+
 implementation
 
-uses math, pascalScadaMTPCPU;
 
-constructor TISOTCPDriver.Create(AOwner:TComponent);
+uses
+  Math,
+  pascalScadaMTPCPU;
+
+
+constructor TISOTCPDriver.Create(AOwner: TComponent);
 begin
-  Inherited Create(AOwner);
-  FPLCRack   :=0;
-  FPLCSlot   :=0;
-  FPLCStation:=2;
+  inherited Create(AOwner);
+  FPLCRack := 0;
+  FPLCSlot := 0;
+  FPLCStation := 2;
 
-  PDUIncoming:=7;
-  PDUOutgoing:=7;
-  FISOConnType:=ctOP;
+  PDUIncoming := 7;
+  PDUOutgoing := 7;
+  FISOConnType := ctOP;
 end;
 
-procedure TISOTCPDriver.UpdatePLCAddress(Rack, Slot, Station: LongInt);
+procedure TISOTCPDriver.UpdatePLCAddress(Rack, Slot, Station: Longint);
 begin
-  FPLCRack   :=Rack;
-  FPLCSlot   :=Slot;
-  FPLCStation:=Station;
+  FPLCRack := Rack;
+  FPLCSlot := Slot;
+  FPLCStation := Station;
   UpdatePLCs;
 end;
 
 function TISOTCPDriver.connectPLC(var CPU: TS7CPU): Boolean;
 var
-  IOResult:TIOPacket;
-  msg:Bytes;
-  res:LongInt;
-  len:Cardinal;
-  retries:LongInt;
-  ConnType:array[low(TISOTCPConnType)..high(TISOTCPConnType)] of byte = (1, 2, 3);
+  IOResult: TIOPacket;
+  Msg: Bytes;
+  Res: Longint;
+  Len: Cardinal;
+  Retries: Longint;
+  ConnType: array [low(TISOTCPConnType)..high(TISOTCPConnType)] of Byte = (1, 2, 3);
 begin
-  CPU.Connected:=false;
-  Result:=false;
-  if (PCommPort=nil) or (PCommPort.ReallyActive=false) then Exit;
+  CPU.Connected := False;
+  Result := False;
+  if (PCommPort = nil) or (PCommPort.ReallyActive = False) then Exit;
 
-  //incializa conexao
-  //
   //initiates the connection.
-  SetLength(msg,22);
-  msg[04] := $11;  // $11,
-  msg[05] := $E0;  // $E0,
-  msg[06] := 0;    // 0,
-  msg[07] := 0;    // 0,
-  msg[08] := 0;    // 0,
-  msg[09] := 1;    // 1,
-  msg[10] := 0;    // 0,
-  msg[11] := $C1;  // $C1,
-  msg[12] := 2;    // 2,
-  msg[13] := ifthen(FConnectionWay=ISOTCP, 1, $4D);    //'M',
-  msg[14] := ifthen(FConnectionWay=ISOTCP, 0, $57);    //'W',
-  msg[15] := $C2;  // $C2,
-  msg[16] := 2;
-  msg[17] := ifthen(FConnectionWay=ISOTCP, ConnType[FISOConnType], $4D);
-  msg[18] := ifthen(FConnectionWay=ISOTCP, (CPU.Rack shl 5) or CPU.Slot,    $57);
-  msg[19] := $C0;  // $C0,
-  msg[20] := 1;    // 1,
-  msg[21] := 11;   // 9 = TPDU 512 Bytes, 11=TPDU 2048 Bytes;
-  PrepareToSend(msg);
+  SetLength(Msg, 22);
+  Msg[04] := $11;  // $11,
+  Msg[05] := $E0;  // $E0,
+  Msg[06] := 0;    // 0,
+  Msg[07] := 0;    // 0,
+  Msg[08] := 0;    // 0,
+  Msg[09] := 1;    // 1,
+  Msg[10] := 0;    // 0,
+  Msg[11] := $C1;  // $C1,
+  Msg[12] := 2;    // 2,
+  Msg[13] := IfThen(FConnectionWay = ISOTCP, 1, $4D);    //'M',
+  Msg[14] := IfThen(FConnectionWay = ISOTCP, 0, $57);    //'W',
+  Msg[15] := $C2;  // $C2,
+  Msg[16] := 2;
+  Msg[17] := IfThen(FConnectionWay = ISOTCP, ConnType[FISOConnType], $4D);
+  Msg[18] := IfThen(FConnectionWay = ISOTCP, (CPU.Rack shl 5) or CPU.Slot, $57);
+  Msg[19] := $C0;  // $C0,
+  Msg[20] := 1;    // 1,
+  Msg[21] := 11;   // 9 = TPDU 512 Bytes, 11=TPDU 2048 Bytes;
+  PrepareToSend(Msg);
 
   try
-    res := PCommPort.IOCommandSync(iocWriteRead,22,msg,4,DriverID,ifthen(FConnectionWay=ISOTCP_VIA_CP243,1000,0),@IOResult);
-    if (res=0) then Exit;
-    if (IOResult.ReadIOResult<>iorOK) or (IOResult.Received<>4) then Exit;
+    Res := PCommPort.IOCommandSync(iocWriteRead, 22, Msg, 4, DriverID, IfThen(FConnectionWay = ISOTCP_VIA_CP243, 1000, 0), @IOResult);
+    if (Res = 0) then
+      Exit;
+    if (IOResult.ReadIOResult <> iorOK) or (IOResult.Received <> 4) then
+      Exit;
 
-    len:= IOResult.BufferToRead[2]*$100 + IOResult.BufferToRead[3];
+    Len := IOResult.BufferToRead[2] * $100 + IOResult.BufferToRead[3];
 
-    res := PCommPort.IOCommandSync(iocRead,0,nil,len-4,DriverID,0,@IOResult);
-    if (res=0) then Exit;
-    if (IOResult.ReadIOResult<>iorOK) or (IOResult.Received<>(len-4)) then Exit;
+    Res := PCommPort.IOCommandSync(iocRead, 0, nil, Len - 4, DriverID, 0, @IOResult);
+    if (Res = 0) then
+      Exit;
+    if (IOResult.ReadIOResult <> iorOK) or (IOResult.Received <> (Len - 4)) then
+      Exit;
 
-    retries := 1;
-    while (len<>22) and (retries<3) do begin
-      res := PCommPort.IOCommandSync(iocRead,0,nil,4,DriverID,0,@IOResult);
-      if (res=0) then Exit;
-      if (IOResult.ReadIOResult<>iorOK) or (IOResult.Received<>4) then Exit;
+    Retries := 1;
+    while (Len <> 22) and (Retries < 3) do
+    begin
+      Res := PCommPort.IOCommandSync(iocRead, 0, nil, 4, DriverID, 0, @IOResult);
+      if (Res = 0) then
+        Exit;
+      if (IOResult.ReadIOResult <> iorOK) or (IOResult.Received <> 4) then
+        Exit;
 
-      len:= IOResult.BufferToRead[2]*$100 + IOResult.BufferToRead[3];
+      Len := IOResult.BufferToRead[2] * $100 + IOResult.BufferToRead[3];
 
-      res := PCommPort.IOCommandSync(iocRead,0,nil,len-4,DriverID,0,@IOResult);
-      if (res=0) then Exit;
-      if (IOResult.ReadIOResult<>iorOK) or (IOResult.Received<>(len-4)) then Exit;
+      Res := PCommPort.IOCommandSync(iocRead, 0, nil, Len - 4, DriverID, 0, @IOResult);
+      if (Res = 0) then
+        Exit;
+      if (IOResult.ReadIOResult <> iorOK) or (IOResult.Received <> (Len - 4)) then
+        Exit;
     end;
 
-    //negocia o tamanho da pdu
-    //
-    //negotiates the PDU size
-    if len=22 then
+    // negotiates the PDU size
+    if Len = 22 then
       CPU.Connected := NegotiatePDUSize(CPU);
   finally
-    SetLength(msg,0);
-    SetLength(IOResult.BufferToRead,0);
-    SetLength(IOResult.BufferToWrite,0);
-    Result:=CPU.Connected;
+    SetLength(Msg, 0);
+    SetLength(IOResult.BufferToRead, 0);
+    SetLength(IOResult.BufferToWrite, 0);
+    Result := CPU.Connected;
   end;
 end;
 
-function TISOTCPDriver.exchange(var CPU:TS7CPU; var msgOut:Bytes; var msgIn:Bytes; IsWrite:Boolean):Boolean;
+function TISOTCPDriver.exchange(var CPU: TS7CPU; var msgOut: Bytes; var MsgIn: Bytes; IsWrite: Boolean): Boolean;
 var
-  res:LongInt;
-  retries, BytesRead:LongInt;
-  resget:TIOResult;
+  Res: Longint;
+  Retries: Longint;
+  BytesRead: Longint;
+  ResGet: TIOResult;
 begin
-  if (PCommPort=nil) or (PCommPort.ReallyActive=false) then Exit;
+  if (PCommPort = nil) or (PCommPort.ReallyActive = False) then Exit;
 
-  Result := Inherited exchange(CPU, msgOut, msgIn, IsWrite);
-  Result := false;
+  Result := inherited exchange(CPU, msgOut, MsgIn, IsWrite);
+  Result := False;
 
-  if Length(msgOut)<7 then
+  if Length(msgOut) < 7 then
     SetLength(msgOut, 7);
   msgOut[04] := $02;
   msgOut[05] := $F0;
@@ -364,126 +260,124 @@ begin
 
   HighLatencyOperationWillBegin(nil);
   try
-    res:=PCommPort.IOCommandSync(iocWrite,Length(msgOut),msgOut,0,DriverID,0,nil);
-    if res=0 then begin
-      SetLength(msgIn,0);
-      SetLength(msgOut,0);
-      Result:=false;
+    Res := PCommPort.IOCommandSync(iocWrite, Length(msgOut), msgOut, 0, DriverID, 0, nil);
+    if Res = 0 then
+    begin
+      SetLength(MsgIn, 0);
+      SetLength(msgOut, 0);
+      Result := False;
       Exit;
     end;
-    retries:=0;
+    Retries := 0;
 
-    BytesRead:=0;
-    resget := getResponse(msgIn, BytesRead);
-    while (resget<>iorOk) and (retries<3) do begin
-
-      if resget<>iorTimeOut then
-        Inc(retries)
+    BytesRead := 0;
+    ResGet := getResponse(MsgIn, BytesRead);
+    while (ResGet <> iorOK) and (Retries < 3) do
+    begin
+      if ResGet <> iorTimeOut then
+        Inc(Retries)
       else
         Sleep(5);
 
-      resget := getResponse(msgIn, BytesRead);
+      ResGet := getResponse(MsgIn, BytesRead);
     end;
 
-    Result:= BytesRead>ISOTCPMinPacketLen;
+    Result := BytesRead > ISOTCPMinPacketLen;
   finally
     HighLatencyOperationWasEnded(nil);
   end;
 end;
 
-function  TISOTCPDriver.getResponse(var msgIn:Bytes; var BytesRead:LongInt):TIOResult;
+function TISOTCPDriver.getResponse(var MsgIn: Bytes; var BytesRead: Longint): TIOResult;
 var
-  res, len:LongInt;
-  IOResult1, IOResult2:TIOPacket;
+  Res: Longint;
+  Len: Longint;
+  IOResult1: TIOPacket;
+  IOResult2: TIOPacket;
 begin
-  Result:=iorNotReady;
+  Result := iorNotReady;
 
   try
-    res := PCommPort.IOCommandSync(iocRead,0,nil,7,DriverID,0,@IOResult1);
-    if (res=0) then begin
-      BytesRead:=0;
-      Result:=iorNotReady;
+    Res := PCommPort.IOCommandSync(iocRead, 0, nil, 7, DriverID, 0, @IOResult1);
+    if (Res = 0) then
+    begin
+      BytesRead := 0;
+      Result := iorNotReady;
       Exit;
     end;
 
-    if (IOResult1.ReadIOResult<>iorOK) or (IOResult1.Received<>7) then begin
-      BytesRead:=IOResult1.Received;
-      Result:=IOResult1.ReadIOResult;
+    if (IOResult1.ReadIOResult <> iorOK) or (IOResult1.Received <> 7) then
+    begin
+      BytesRead := IOResult1.Received;
+      Result := IOResult1.ReadIOResult;
       Exit;
     end;
 
-    len := IOResult1.BufferToRead[2]*$100 + IOResult1.BufferToRead[3];
-    //As vezes o CLP manda um pacote de
-    //7 Bytes que não serve para nada
-    //ou se serve pra algo, eu não sei.
-    //
-    //Sometimes the PLC sends a useless
-    //packet, with 7 Bytes of len.
-    while len = 7 do begin
-      //le novamente...
-      //reads again.
-      res := PCommPort.IOCommandSync(iocRead,0,nil,7,DriverID,0,@IOResult1);
-      if (res=0) then begin
-        BytesRead:=0;
-        Result:=iorNotReady;
+    Len := IOResult1.BufferToRead[2] * $100 + IOResult1.BufferToRead[3];
+    // Sometimes the PLC sends a useless packet, with 7 Bytes of Len.
+    while Len = 7 do
+    begin
+      // reads again
+      Res := PCommPort.IOCommandSync(iocRead, 0, nil, 7, DriverID, 0, @IOResult1);
+      if (Res = 0) then
+      begin
+        BytesRead := 0;
+        Result := iorNotReady;
         Exit;
       end;
 
-      if (IOResult1.ReadIOResult<>iorOK) or (IOResult1.Received<>7) then begin
-        BytesRead:=IOResult1.Received;
-        Result:= IOResult1.ReadIOResult;
+      if (IOResult1.ReadIOResult <> iorOK) or (IOResult1.Received <> 7) then
+      begin
+        BytesRead := IOResult1.Received;
+        Result := IOResult1.ReadIOResult;
         Exit;
       end;
-      //calcula o tamanho do pacote recebido.
-      //
-      //calculate the size of the packet
-      len:= IOResult1.BufferToRead[2]*$100 + IOResult1.BufferToRead[3];
+      // calculate the size of the packet
+      Len := IOResult1.BufferToRead[2] * $100 + IOResult1.BufferToRead[3];
     end;
 
-    res := PCommPort.IOCommandSync(iocRead,0,nil,len-7,DriverID,0,@IOResult2);
-    if (res=0) then begin
-      BytesRead:=0;
-      Result:=iorNotReady;
+    Res := PCommPort.IOCommandSync(iocRead, 0, nil, Len - 7, DriverID, 0, @IOResult2);
+    if (Res = 0) then
+    begin
+      BytesRead := 0;
+      Result := iorNotReady;
       Exit;
     end;
-    //se resultado nao der ok,
-    //ou não fechar com o numero de Bytes a ler
-    //e não ter o comprimento minimo do ISOTCP sai.
-    //
-    //if the IO result aren't ok or the packet has less bytes than minimum size.
-    //Exit...
-    if (IOResult2.ReadIOResult<>iorOK) or (IOResult2.Received<>(len-7)) then begin
-      BytesRead:=IOResult2.Received;
-      Result:= IOResult2.ReadIOResult;
+    // if the IO result aren't ok or the packet has less bytes than minimum size
+    // Exit
+    if (IOResult2.ReadIOResult <> iorOK) or (IOResult2.Received <> (Len - 7)) then
+    begin
+      BytesRead := IOResult2.Received;
+      Result := IOResult2.ReadIOResult;
       Exit;
     end;
 
-    SetLength(msgIn,IOResult1.ToRead + IOResult2.ToRead);
+    SetLength(MsgIn, IOResult1.ToRead + IOResult2.ToRead);
 
-    Move(IOResult1.BufferToRead[0], msgIn[0], IOResult1.ToRead);
-    Move(IOResult2.BufferToRead[0], msgIn[IOResult1.ToRead],Length(IOResult2.BufferToRead));
+    Move(IOResult1.BufferToRead[0], MsgIn[0], IOResult1.ToRead);
+    Move(IOResult2.BufferToRead[0], MsgIn[IOResult1.ToRead], Length(IOResult2.BufferToRead));
 
     BytesRead := IOResult1.Received + IOResult2.Received;
-    Result:=iorOK;
+    Result := iorOK;
   finally
-    SetLength(IOResult1.BufferToRead,0);
-    SetLength(IOResult1.BufferToWrite,0);
-    SetLength(IOResult2.BufferToRead,0);
-    SetLength(IOResult2.BufferToWrite,0);
+    SetLength(IOResult1.BufferToRead, 0);
+    SetLength(IOResult1.BufferToWrite, 0);
+    SetLength(IOResult2.BufferToRead, 0);
+    SetLength(IOResult2.BufferToWrite, 0);
   end;
 end;
 
-procedure TISOTCPDriver.PrepareToSend(var msg:Bytes);
+procedure TISOTCPDriver.PrepareToSend(var Msg: Bytes);
 var
-  len:LongInt;
+  Len: Longint;
 begin
-  len := Length(msg);
-  if len<4 then
-    SetLength(msg, 4);
-  msg[00] := 3;
-  msg[01] := 0;
-  msg[02] := len div $100;
-  msg[03] := len mod $100;
+  Len := Length(Msg);
+  if Len < 4 then
+    SetLength(Msg, 4);
+  Msg[00] := 3;
+  Msg[01] := 0;
+  Msg[02] := Len div $100;
+  Msg[03] := Len mod $100;
 end;
 
 procedure TISOTCPDriver.Loaded;
@@ -492,76 +386,73 @@ begin
   UpdatePLCs;
 end;
 
-function TISOTCPDriver.DoRead(const tagrec: TTagRec; out
-  Values: TArrayOfDouble; Sync: Boolean): TProtocolIOResult;
+function TISOTCPDriver.DoRead(const TagRec: TTagRec; out Values: TArrayOfDouble; Sync: Boolean): TProtocolIOResult;
 var
-  atagrec: TTagRec;
+  ATagRec: TTagRec;
 begin
-  atagrec:=tagrec;
-  atagrec.Rack:=FPLCRack;
-  atagrec.Slot:=FPLCSlot;
-  atagrec.Station:=FPLCStation;
-  Result:=inherited DoRead(atagrec, Values, Sync);
+  ATagRec := TagRec;
+  ATagRec.Rack := FPLCRack;
+  ATagRec.Slot := FPLCSlot;
+  ATagRec.Station := FPLCStation;
+  Result := inherited DoRead(ATagRec, Values, Sync);
 end;
 
-procedure TISOTCPDriver.DoGetValue(TagRec: TTagRec; var values: TScanReadRec);
+procedure TISOTCPDriver.DoGetValue(TagRec: TTagRec; var Values: TScanReadRec);
 begin
-  TagRec.Station:=FPLCStation;
-  TagRec.Slot:=FPLCSlot;
-  TagRec.Rack:=FPLCRack;
-  inherited DoGetValue(TagRec, values);
+  TagRec.Station := FPLCStation;
+  TagRec.Slot := FPLCSlot;
+  TagRec.Rack := FPLCRack;
+  inherited DoGetValue(TagRec, Values);
 end;
 
-function TISOTCPDriver.DoWrite(const tagrec: TTagRec;
-  const Values: TArrayOfDouble; Sync: Boolean): TProtocolIOResult;
+function TISOTCPDriver.DoWrite(const TagRec: TTagRec; const Values: TArrayOfDouble; Sync: Boolean): TProtocolIOResult;
 var
-  atagrec: TTagRec;
+  ATagRec: TTagRec;
 begin
-  atagrec:=tagrec;
-  atagrec.Rack:=FPLCRack;
-  atagrec.Slot:=FPLCSlot;
-  atagrec.Station:=FPLCStation;
-  Result:=inherited DoWrite(atagrec, Values, Sync);
+  ATagRec := TagRec;
+  ATagRec.Rack := FPLCRack;
+  ATagRec.Slot := FPLCSlot;
+  ATagRec.Station := FPLCStation;
+  Result := inherited DoWrite(ATagRec, Values, Sync);
 end;
 
 procedure TISOTCPDriver.SetISOConnType(AValue: TISOTCPConnType);
 begin
-  if FISOConnType=AValue then Exit;
-  FISOConnType:=AValue;
+  if FISOConnType = AValue then Exit;
+  FISOConnType := AValue;
   //TODO: reset the conection and stabilish it again using the new way.
 end;
 
-procedure TISOTCPDriver.SetPLCRack(AValue: longint);
+procedure TISOTCPDriver.SetPLCRack(AValue: Longint);
 begin
-  if FPLCRack=AValue then Exit;
-  FPLCRack:=AValue;
-  if [csLoading]*ComponentState=[] then
+  if FPLCRack = AValue then Exit;
+  FPLCRack := AValue;
+  if [csLoading] * ComponentState = [] then
     UpdatePLCs;
 end;
 
-procedure TISOTCPDriver.SetPLCSlot(AValue: LongInt);
+procedure TISOTCPDriver.SetPLCSlot(AValue: Longint);
 begin
-  if FPLCSlot=AValue then Exit;
-  FPLCSlot:=AValue;
-  if [csLoading]*ComponentState=[] then
+  if FPLCSlot = AValue then Exit;
+  FPLCSlot := AValue;
+  if [csLoading] * ComponentState = [] then
     UpdatePLCs;
 end;
 
-procedure TISOTCPDriver.SetPLCStation(AValue: LongInt);
+procedure TISOTCPDriver.SetPLCStation(AValue: Longint);
 begin
-  if FPLCStation=AValue then Exit;
-  FPLCStation:=AValue;
-  if [csLoading]*ComponentState=[] then
+  if FPLCStation = AValue then Exit;
+  FPLCStation := AValue;
+  if [csLoading] * ComponentState = [] then
     UpdatePLCs;
 end;
 
 procedure TISOTCPDriver.UpdatePLCs;
 var
   StillConnected: Boolean;
-  t: Integer;
+  i: Integer;
   CurTag: TTag;
   TagList: TList;
-
 begin
   try
     //tenta entrar no Mutex
@@ -573,42 +464,44 @@ begin
     FReadCS.Enter;
 
     case Length(FPLCs) of
-      0: begin
-        //does nothing...;
-      end;
-      1:
-        with FPLCs[0] do begin
-          StillConnected:=Connected and (Rack=FPLCRack) AND (Slot=FPLCSlot) AND (Station=FPLCStation);
-          Rack     :=FPLCRack;
-          Slot     :=FPLCSlot;
-          Station  :=FPLCStation;
-          Connected:=StillConnected;
-          if not StillConnected then
-            PDUId:=0;
-        end;
-      else begin
-        TagList:=TList.Create;
-        try
-          for t:=TagCount-1 downto 0 do begin
-            CurTag:=Tag[t];
-            TagList.Add(CurTag);
-            DoDelTag(CurTag);
+      0:  begin
+            // does nothing...;
           end;
+      1:  with FPLCs[0] do
+            begin
+              StillConnected := Connected and (Rack = FPLCRack) and (Slot = FPLCSlot) and (Station = FPLCStation);
+              Rack := FPLCRack;
+              Slot := FPLCSlot;
+              Station := FPLCStation;
+              Connected := StillConnected;
+              if not StillConnected then
+                PDUId := 0;
+            end;
+      else
+        begin
+          TagList := TList.Create;
+          try
+            for i := TagCount - 1 downto 0 do
+            begin
+              CurTag := Tag[i];
+              TagList.Add(CurTag);
+              DoDelTag(CurTag);
+            end;
 
-          if Length(FPLCs)>0 then
-            raise Exception.Create('Something went wrong. At this point the '+
-                                   'size of FPLCs must be zero. Please inform '+
-                                   'this error to the PascalSCADA developer.');
+            if Length(FPLCs) > 0 then
+              raise Exception.Create('Something went wrong. At this point the ' +
+                'size of FPLCs must be zero. Please inform ' +
+                'this error to the PascalSCADA developer.');
 
-          for t:=0 to TagList.Count-1 do begin
-            DoAddTag(TTag(TagList.Items[t]), false);
+            for i := 0 to TagList.Count - 1 do
+            begin
+              DoAddTag(TTag(TagList.Items[i]), False);
+            end;
+          finally
+            TagList.Destroy;
           end;
-        finally
-          TagList.Destroy;
         end;
-      end;
     end;
-
   finally
     FReadCS.Leave;
     FWriteCS.Leave;
@@ -616,29 +509,29 @@ begin
   end;
 end;
 
-procedure TISOTCPDriver.SetISOConnectionWay(NewISOConWay:TISOTCPConnectionWay);
+procedure TISOTCPDriver.SetISOConnectionWay(NewISOConWay: TISOTCPConnectionWay);
 begin
   if NewISOConWay = FConnectionWay then Exit;
-  FConnectionWay:=NewISOConWay;
+  FConnectionWay := NewISOConWay;
   //TODO: reset the conection and stabilish it again using the new way.
 end;
 
 function TISOTCPDriver.GetTagInfo(tagobj: TTag): TTagRec;
 begin
-  Result:=inherited GetTagInfo(tagobj);
-  //iso on TCP allows one PLC connection per TCP/IP connection
-  //so, it allow only one Rack, Slot, and Station linked with
-  //this connection. To avoid settings mistakes on user aplication
-  //these method override the Tag settings (Rack, Slot,
-  //and Station) with the settings of current instance of ISO on TCP protocol.
-  Result.Slot   :=FPLCSlot;
-  Result.Station:=FPLCStation;
-  Result.Rack   :=FPLCRack;
+  Result := inherited GetTagInfo(tagobj);
+  // iso on TCP allows one PLC connection per TCP/IP connection
+  // so, it allow only one Rack, Slot, and Station linked with
+  // this connection. To avoid settings mistakes on user aplication
+  // these method override the Tag settings (Rack, Slot,
+  // and Station) with the settings of current instance of ISO on TCP protocol.
+  Result.Slot := FPLCSlot;
+  Result.Station := FPLCStation;
+  Result.Rack := FPLCRack;
 end;
 
 function TISOTCPDriver.NotifyThisEvents: TNotifyThisEvents;
 begin
-  Result:=[ntePortClosed, ntePortDisconnected];
+  Result := [ntePortClosed, ntePortDisconnected];
 end;
 
 procedure TISOTCPDriver.PortClosed(Sender: TObject);
@@ -648,10 +541,10 @@ end;
 
 procedure TISOTCPDriver.PortDisconnected(Sender: TObject);
 var
-  plc:LongInt;
+  PLC: Longint;
 begin
-  for plc := 0 to High(FPLCs) do
-    FPLCs[plc].Connected:=false;
+  for PLC := 0 to high(FPLCs) do
+    FPLCs[PLC].Connected := False;
 end;
 
 end.

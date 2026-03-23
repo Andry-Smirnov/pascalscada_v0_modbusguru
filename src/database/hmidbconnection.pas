@@ -556,9 +556,9 @@ begin
             else
             begin
               if (Err = False) and (FError = nil) then
-                Statements^.ReturnTransactionResult(self, Statements^.Statements, True, -1, nil)
+                Statements^.ReturnTransactionResult(Self, Statements^.Statements, True, -1, nil)
               else
-                Statements^.ReturnTransactionResult(self, Statements^.Statements, False, FLineError, FError);
+                Statements^.ReturnTransactionResult(Self, Statements^.Statements, False, FLineError, FError);
             end;
           end;
         end;
@@ -583,17 +583,17 @@ end;
 procedure TProcessSQLCommandThread.ReturnData;
 begin
   if FError <> nil then
-    Cmd^.ReturnDatasetCallback(self, nil, FError)
+    Cmd^.ReturnDatasetCallback(Self, nil, FError)
   else
-    Cmd^.ReturnDatasetCallback(self, FDs, nil);
+    Cmd^.ReturnDatasetCallback(Self, FDs, nil);
 end;
 
 procedure TProcessSQLCommandThread.ReturnStatementsResults;
 begin
   if FError = nil then
-    Statements^.ReturnTransactionResult(self, Statements^.Statements, True, -1, nil)
+    Statements^.ReturnTransactionResult(Self, Statements^.Statements, True, -1, nil)
   else
-    Statements^.ReturnTransactionResult(self, Statements^.Statements, False, FLineError, FError);
+    Statements^.ReturnTransactionResult(Self, Statements^.Statements, False, FLineError, FError);
 end;
 
 function TProcessSQLCommandThread.WaitEnd(Timeout: Cardinal): TWaitResult;
@@ -712,7 +712,7 @@ end;
 procedure THMIDBConnection.StartTransaction(NewConnection: Boolean);
 begin
   if Assigned(FCustomStartTransaction) then
-    FCustomStartTransaction(self)
+    FCustomStartTransaction(Self)
   else
   begin
     FCS.Enter;
@@ -741,7 +741,7 @@ end;
 procedure THMIDBConnection.CommitTransaction;
 begin
   if Assigned(FCustomCommitTransaction) then
-    FCustomCommitTransaction(self)
+    FCustomCommitTransaction(Self)
   else
   begin
     FCS.Enter;
@@ -756,7 +756,7 @@ end;
 procedure THMIDBConnection.RollBackTransaction;
 begin
   if Assigned(FCustomRollbackTransaction) then
-    FCustomRollbackTransaction(self)
+    FCustomRollbackTransaction(Self)
   else
   begin
     FCS.Enter;

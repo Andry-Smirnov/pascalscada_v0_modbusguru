@@ -585,7 +585,7 @@ end;
 
 procedure TfrmUserManagement.secureAddUserToGroupExecute(Sender: TObject);
 begin
-  if (groupList1.Selected<>NIL) and (AvailableUserList.Selected<>nil) then begin
+  if (groupList1.Selected<>nil) and (AvailableUserList.Selected<>nil) then begin
     AddUserToGroup(PtrInt(AvailableUserList.Selected.Data), PtrInt(groupList1.Selected.Data));
   end;
 end;
@@ -859,7 +859,7 @@ end;
 
 procedure TfrmUserManagement.secureRemoveGroupMemberExecute(Sender: TObject);
 begin
-  if (groupList1.Selected<>NIL) and (userMemberList.Selected<>nil) then begin
+  if (groupList1.Selected<>nil) and (userMemberList.Selected<>nil) then begin
     RemoveUserFromGroup(PtrInt(userMemberList.Selected.Data), PtrInt(groupList1.Selected.Data));
   end;
 end;

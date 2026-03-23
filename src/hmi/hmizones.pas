@@ -68,7 +68,7 @@ type
     procedure SetZoneType(AZoneTypes: TZoneTypes);
 
   protected
-    {: @exclude }
+    //: @exclude
     function GetDisplayName: Ansistring; override;
 
     {$IFDEF PORTUGUES}

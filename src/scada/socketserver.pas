@@ -153,7 +153,7 @@ begin
   begin
     //Linux, BSDs
     {$IF defined(FPC) AND defined(UNIX)}
-    ClientSockInfoLen:=sizeof(ClientSockInfo);
+    ClientSockInfoLen:=SizeOf(ClientSockInfo);
     ClientSocket:=fpAccept(FServerSocket, @ClientSockInfo, @ClientSockInfoLen);
 
     if ClientSocket>0 then

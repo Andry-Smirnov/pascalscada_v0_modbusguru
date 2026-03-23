@@ -100,13 +100,13 @@ type
 
   THMIBasicColletionItem = class(TCollectionItem)
   protected
-    {: @exclude }
+    //: @exclude
     procedure NotifyChange; virtual;
   public
-    {: @exclude }
+    //: @exclude
     constructor Create(ACollection: TCollection); override;
     destructor Destroy; override;
-    {: @exclude }
+    //: @exclude
     procedure Loaded; virtual;
   end;
 

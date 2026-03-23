@@ -93,32 +93,32 @@ begin
   begin
     if ValveType = vtPneumaticDrawer then
     begin
-      Points[0].x := 0 + (FBorderWidth Mod 2);
-      Points[0].y := 0 + (FBorderWidth Mod 2);
+      Points[0].x := 0 + (FBorderWidth mod 2);
+      Points[0].y := 0 + (FBorderWidth mod 2);
 
-      Points[1].x := Width - (FBorderWidth Mod 2);
-      Points[1].y := 0 + (FBorderWidth Mod 2);
+      Points[1].x := Width - (FBorderWidth mod 2);
+      Points[1].y := 0 + (FBorderWidth mod 2);
 
-      Points[2].x := Width - (FBorderWidth Mod 2);
-      Points[2].y := Height - (FBorderWidth Mod 2);
+      Points[2].x := Width - (FBorderWidth mod 2);
+      Points[2].y := Height - (FBorderWidth mod 2);
 
-      Points[3].x := 0 + (FBorderWidth Mod 2);
-      Points[3].y := Height - (FBorderWidth Mod 2);
+      Points[3].x := 0 + (FBorderWidth mod 2);
+      Points[3].y := Height - (FBorderWidth mod 2);
 
       FControlArea.CanvasBGRA.PolygonF(Points);
     end
     else
     begin
-      Points[0].x := FBorderWidth Div 2 + FBorderWidth Mod 2;
+      Points[0].x := FBorderWidth div 2 + FBorderWidth mod 2;
       Points[0].y := (1 - FValveBodyPercent) * Height;
 
-      Points[1].x := Width - (FBorderWidth Div 2) - (FBorderWidth Mod 2);
+      Points[1].x := Width - (FBorderWidth div 2) - (FBorderWidth mod 2);
       Points[1].y := Height - (FBorderWidth / 2);
 
-      Points[2].x := Width - (FBorderWidth Div 2) - (FBorderWidth Mod 2);
+      Points[2].x := Width - (FBorderWidth div 2) - (FBorderWidth mod 2);
       Points[2].y := (1 - FValveBodyPercent) * Height;
 
-      Points[3].x := FBorderWidth Div 2 + FBorderWidth Mod 2;
+      Points[3].x := FBorderWidth div 2 + FBorderWidth mod 2;
       Points[3].y := Height - (FBorderWidth / 2);
 
       FControlArea.CanvasBGRA.PolygonF(Points);
@@ -128,9 +128,9 @@ begin
         vtPneumaticProportional,
         vtPneumaticOnOff,
         vtMotorisedProportional:
-          FControlArea.CanvasBGRA.PolylineF([PointF(ifthen(((Width + FBorderWidth) Mod 2) = 1, Width, Width + 1) / 2,
+          FControlArea.CanvasBGRA.PolylineF([PointF(IfThen(((Width + FBorderWidth) mod 2) = 1, Width, Width + 1) / 2,
             (FBorderWidth)),
-            PointF(ifthen(((Width + FBorderWidth) Mod 2) = 1, Width, Width + 1) / 2,
+            PointF(IfThen(((Width + FBorderWidth) mod 2) = 1, Width, Width + 1) / 2,
             (1 - (FValveBodyPercent / 2)) * Height - (FBorderWidth / 2))]);
       end;
 
@@ -140,13 +140,13 @@ begin
           IdealHeight := (Width / 4) * (FValveBodyPercent * Height) / Width + ((1 - FValveBodyPercent) * Height) - FBorderWidth;
           SquareWidth := min(IdealWidth, IdealHeight);
           Points[0].x := (Width - SquareWidth) / 2;
-          Points[0].y := FBorderWidth Div 2 + FBorderWidth Mod 2;
+          Points[0].y := FBorderWidth div 2 + FBorderWidth mod 2;
 
           Points[1].x := Width - ((Width - SquareWidth) / 2);
           Points[1].y := Points[0].y;
 
           Points[2].x := Points[1].x;
-          Points[2].y := SquareWidth + (FBorderWidth Div 2 + FBorderWidth Mod 2);
+          Points[2].y := SquareWidth + (FBorderWidth div 2 + FBorderWidth mod 2);
 
           Points[3].x := Points[0].x;
           Points[3].y := Points[2].y;
@@ -178,33 +178,33 @@ begin
   begin
     if ValveType = vtPneumaticDrawer then
     begin
-      Points[0].x := 0 + (FBorderWidth Mod 2);
-      Points[0].y := 0 + (FBorderWidth Mod 2);
+      Points[0].x := 0 + (FBorderWidth mod 2);
+      Points[0].y := 0 + (FBorderWidth mod 2);
 
-      Points[1].x := Width - (FBorderWidth Mod 2);
-      Points[1].y := 0 + (FBorderWidth Mod 2);
+      Points[1].x := Width - (FBorderWidth mod 2);
+      Points[1].y := 0 + (FBorderWidth mod 2);
 
-      Points[2].x := Width - (FBorderWidth Mod 2);
-      Points[2].y := Height - (FBorderWidth Mod 2);
+      Points[2].x := Width - (FBorderWidth mod 2);
+      Points[2].y := Height - (FBorderWidth mod 2);
 
-      Points[3].x := 0 + (FBorderWidth Mod 2);
-      Points[3].y := Height - (FBorderWidth Mod 2);
+      Points[3].x := 0 + (FBorderWidth mod 2);
+      Points[3].y := Height - (FBorderWidth mod 2);
 
       FControlArea.CanvasBGRA.PolygonF(Points);
     end
     else
     begin
       Points[0].x := (1 - FValveBodyPercent) * Width;
-      Points[0].y := FBorderWidth Div 2 + FBorderWidth Mod 2;
+      Points[0].y := FBorderWidth div 2 + FBorderWidth mod 2;
 
       Points[1].x := Width - (FBorderWidth / 2);
-      Points[1].y := Height - (FBorderWidth Div 2) - (FBorderWidth Mod 2);
+      Points[1].y := Height - (FBorderWidth div 2) - (FBorderWidth mod 2);
 
       Points[2].x := (1 - FValveBodyPercent) * Width;
-      Points[2].y := Height - (FBorderWidth Div 2) - (FBorderWidth Mod 2);
+      Points[2].y := Height - (FBorderWidth div 2) - (FBorderWidth mod 2);
 
       Points[3].x := Width - (FBorderWidth / 2);
-      Points[3].y := FBorderWidth Div 2 + FBorderWidth Mod 2;
+      Points[3].y := FBorderWidth div 2 + FBorderWidth mod 2;
 
       FControlArea.CanvasBGRA.PolygonF(Points);
 
@@ -213,8 +213,8 @@ begin
         vtPneumaticProportional,
         vtPneumaticOnOff,
         vtMotorisedProportional:
-          FControlArea.CanvasBGRA.PolylineF([PointF(FBorderWidth, ifthen(((Height + FBorderWidth) Mod 2) = 1, Height, Height + 1) / 2),
-            PointF((1 - (FValveBodyPercent / 2)) * Width - (BorderWidth / 2), ifthen(((Height + FBorderWidth) Mod 2) = 1, Height, Height + 1) / 2)]);
+          FControlArea.CanvasBGRA.PolylineF([PointF(FBorderWidth, IfThen(((Height + FBorderWidth) mod 2) = 1, Height, Height + 1) / 2),
+            PointF((1 - (FValveBodyPercent / 2)) * Width - (BorderWidth / 2), IfThen(((Height + FBorderWidth) mod 2) = 1, Height, Height + 1) / 2)]);
       end;
 
       case FValveType of
@@ -222,10 +222,10 @@ begin
           IdealWidth := Height / 2 - FBorderWidth;
           IdealHeight := (Height / 4) * (FValveBodyPercent * Width) / Height + ((1 - FValveBodyPercent) * Width) - FBorderWidth;
           SquareWidth := min(IdealWidth, IdealHeight);
-          Points[0].x := FBorderWidth Div 2 + FBorderWidth Mod 2;
+          Points[0].x := FBorderWidth div 2 + FBorderWidth mod 2;
           Points[0].y := (Height - SquareWidth) / 2;
 
-          Points[1].x := SquareWidth + (FBorderWidth Div 2 + FBorderWidth Mod 2);
+          Points[1].x := SquareWidth + (FBorderWidth div 2 + FBorderWidth mod 2);
           Points[1].y := Points[0].y;
 
           Points[2].x := Points[1].x;

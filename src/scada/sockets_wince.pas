@@ -24,7 +24,7 @@ uses
   receive all requested data on socket.
   }
   {$ENDIF}
-  function socket_recv(sock:Tsocket; buf:PByte; len: Cardinal; flags, timeout: LongInt):LongInt;
+  function SocketRecv(sock:TSocket; buf:PByte; len: Cardinal; flags, timeout: LongInt):LongInt;
 
   {$IFDEF PORTUGUES}
   {:
@@ -39,14 +39,14 @@ uses
   send all requested data.
   }
   {$ENDIF}
-  function socket_send(sock:Tsocket; buf:PByte; len: Cardinal; flags, timeout: LongInt):LongInt;
+  function SocketSend(sock:TSocket; buf:PByte; len: Cardinal; flags, timeout: LongInt):LongInt;
 
   {$IFDEF PORTUGUES}
   //: Seta o modo de operação de socket.
   {$ELSE}
   //: Sets the socket operation mode.
   {$ENDIF}
-  function setblockingmode(fd:TSocket; mode:dword):LongInt;
+  function SetBlockingMode(fd:TSocket; mode:dword):LongInt;
 
   {$IFDEF PORTUGUES}
   {:
@@ -63,7 +63,7 @@ uses
   @returns(0 if the connection was estabilished successful.)
   }
   {$ENDIF}
-  function connect_with_timeout(sock:Tsocket; address:PSockAddr; address_len:t_socklen; timeout:LongInt):LongInt;
+  function ConnectWithTimeout(sock:TSocket; address:PSockAddr; address_len:t_socklen; timeout:LongInt):LongInt;
 
   {$IFDEF PORTUGUES}
   {:
@@ -104,7 +104,7 @@ uses
            buffer, zero if no data on the receive buffer and -1 on error.)
   }
   {$ENDIF}
-  function GetNumberOfBytesInReceiveBuffer(socket:Tsocket):LongInt;
+  function GetNumberOfBytesInReceiveBuffer(socket:TSocket):LongInt;
 
 
 const
@@ -112,7 +112,7 @@ const
 
 implementation
 
-function setblockingmode(fd: TSocket; mode: dword): LongInt;
+function SetBlockingMode(fd: TSocket; mode: dword): LongInt;
 begin
   if ioctlsocket(fd, LongInt(FIONBIO), mode)=SOCKET_ERROR then
     Result:=-1
@@ -120,7 +120,7 @@ begin
     Result:=0;
 end;
 
-function connect_with_timeout(sock: Tsocket; address: sockets.PSockAddr;
+function ConnectWithTimeout(sock: TSocket; address: sockets.PSockAddr;
   address_len: t_socklen; timeout: LongInt): LongInt;
 var
   sel:TFDSet;
@@ -161,7 +161,7 @@ begin
   end;
 end;
 
-function socket_recv(sock: Tsocket; buf: PByte; len: Cardinal; flags,
+function SocketRecv(sock: TSocket; buf: PByte; len: Cardinal; flags,
   timeout: LongInt): LongInt;
 var
   sel:TFDSet;
@@ -202,7 +202,7 @@ begin
   end;
 end;
 
-function socket_send(sock: Tsocket; buf: PByte; len: Cardinal; flags,
+function SocketSend(sock: TSocket; buf: PByte; len: Cardinal; flags,
   timeout: LongInt): LongInt;
 var
   sel:TFDSet;
@@ -350,7 +350,7 @@ begin
     end;
 end;
 
-function GetNumberOfBytesInReceiveBuffer(socket: Tsocket): LongInt;
+function GetNumberOfBytesInReceiveBuffer(socket: TSocket): LongInt;
 var
   retval, nbytes:LongInt;
 begin

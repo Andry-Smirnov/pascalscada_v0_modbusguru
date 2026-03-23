@@ -1,11 +1,4 @@
 {$i ../common/language.inc}
-{$IFDEF PORTUGUES}
-{:
-  @author(Fabio Luis Girardi <fabio@pascalscada.com>)
-
-  @abstract(Implementação de um tag estrutura de comunicação.)
-}
-{$ELSE}
 {:
   @author(Fabio Luis Girardi <fabio@pascalscada.com>)
   @abstract(Unit that implements a structure communication tag.)
@@ -18,7 +11,6 @@
   of Juanjo (do not link with GUI);
   ***********************************************************************
 }
-{$ENDIF}
 unit PLCStruct;
 
 interface
@@ -27,360 +19,357 @@ uses
   Classes, PLCBlock, Tag, ProtocolTypes;
 
 type
-  {$IFDEF PORTUGUES}
-  {:
-    @author(Fabio Luis Girardi <fabio@pascalscada.com>)
-
-    @abstract(Classe de tag estrutura de comunicação.)
-  }
-  {$ELSE}
-  {:
-    @author(Fabio Luis Girardi <fabio@pascalscada.com>)
-
-    @abstract(Class of an structure communication tag.)
-  }
-  {$ENDIF}
+  {: @author(Fabio Luis Girardi <fabio@pascalscada.com>)
+     @abstract(Class of an structure communication tag.) }
 
   { TPLCStruct }
 
   TPLCStruct = class(TPLCBlock)
   protected
     //: @seealso(TPLCTag.IsMyCallBack)
-    function IsMyCallBack(Cback: TTagCommandCallBack): Boolean; override;
+    function IsMyCallBack(CallBack: TTagCommandCallBack): Boolean; override;
     //: @seealso(TPLCTag.TagCommandCallBack)
-    procedure TagCommandCallBack(const ReqID:LongWord; Values:TArrayOfDouble; ValuesTimeStamp:TDateTime; TagCommand:TTagCommand; LastResult:TProtocolIOResult; Offset:LongInt); override;
+    procedure TagCommandCallBack(const ReqID: Longword; Values: TArrayOfDouble; ValuesTimeStamp: TDateTime; TagCommand: TTagCommand; LastResult: TProtocolIOResult; Offset: Longint); override;
     //: @seealso(TPLCTag.SetTagType)
-    procedure SetTagType(newType:TTagType); override;
+    procedure SetTagType(AValue: TTagType); override;
     //: @seealso(TPLCTag.SwapDWords)
-    procedure SetSwapDWords(v:Boolean); override;
+    procedure SetSwapDWords(AValue: Boolean); override;
     //: @seealso(TPLCTag.SetSwapWords)
-    procedure SetSwapWords(v:Boolean); override;
+    procedure SetSwapWords(AValue: Boolean); override;
     //: @seealso(TPLCTag.SetSwapBytes)
-    procedure SetSwapBytes(v:Boolean); override;
+    procedure SetSwapBytes(AValue: Boolean); override;
   public
     //: @xclude
-    constructor Create(AOwner:TComponent); override;
+    constructor Create(AOwner: TComponent); override;
 
     //: @seealso(TPLCBlock.MapElements)
-    procedure MapElements(InsertHook: TAddTagInEditorHook;
-       CreateProc: TCreateTagProc); override;
+    procedure MapElements(InsertHook: TAddTagInEditorHook; CreateProc: TCreateTagProc); override;
 
-    class procedure addByte (aArray: TArrayOfDouble; offset: Integer; aByte:  Byte);
-    class procedure AddDWord(aArray: TArrayOfDouble; offset: Integer; aDWord: LongInt;  aSwapBytes, aSwapWords: Boolean);
-    class procedure AddDWord(aArray: TArrayOfDouble; offset: Integer; aDWord: DWord;    aSwapBytes, aSwapWords: Boolean);
-    class procedure AddDWord(aArray: TArrayOfDouble; offset: Integer; aDWord: Single;   aSwapBytes, aSwapWords: Boolean);
-    class procedure AddQWord(aArray: TArrayOfDouble; offset: Integer; aQWord: QWord;    aSwapBytes, aSwapWords, aSwapDWords: Boolean);
-    class procedure AddQWord(aArray: TArrayOfDouble; offset: Integer; aQWord: Int64;    aSwapBytes, aSwapWords, aSwapDWords: Boolean);
-    class procedure AddQWord(aArray: TArrayOfDouble; offset: Integer; aQWord: Double;   aSwapBytes, aSwapWords, aSwapDWords: Boolean);
-    class procedure AddWord (aArray: TArrayOfDouble; offset: Integer; aWord:  Word;     aSwapBytes: Boolean);
-    class procedure AddWord (aArray: TArrayOfDouble; offset: Integer; aWord:  SmallInt; aSwapBytes: Boolean);
+    class procedure AddByte(AArray: TArrayOfDouble; Offset: Integer; AByte: Byte);
+    class procedure AddDWord(AArray: TArrayOfDouble; Offset: Integer; ADWord: Longint; ASwapBytes, ASwapWords: Boolean);
+    class procedure AddDWord(AArray: TArrayOfDouble; Offset: Integer; ADWord: DWord; ASwapBytes, ASwapWords: Boolean);
+    class procedure AddDWord(AArray: TArrayOfDouble; Offset: Integer; ADWord: Single; ASwapBytes, ASwapWords: Boolean);
+    class procedure AddQWord(AArray: TArrayOfDouble; Offset: Integer; AQWord: QWord; ASwapBytes, ASwapWords, ASwapDWords: Boolean);
+    class procedure AddQWord(AArray: TArrayOfDouble; Offset: Integer; AQWord: Int64; ASwapBytes, ASwapWords, ASwapDWords: Boolean);
+    class procedure AddQWord(AArray: TArrayOfDouble; Offset: Integer; AQWord: Double; ASwapBytes, ASwapWords, ASwapDWords: Boolean);
+    class procedure AddWord(AArray: TArrayOfDouble; Offset: Integer; AWord: Word; ASwapBytes: Boolean);
+    class procedure AddWord(AArray: TArrayOfDouble; Offset: Integer; AWord: Smallint; ASwapBytes: Boolean);
 
-    class procedure AddCString      (var aArray: TArrayOfDouble; offset: Integer; aString: AnsiString);
-    class procedure AddSiemensString(var aArray: TArrayOfDouble; offset: Integer; aString: AnsiString; MaxSize: Byte);
+    class procedure AddCString(var AArray: TArrayOfDouble; Offset: Integer; AString: AnsiString);
+    class procedure AddSiemensString(var AArray: TArrayOfDouble; Offset: Integer; AString: AnsiString; MaxSize: Byte);
 
-    function GetByte(Offset:Integer):Byte;
-    function GetWord(Offset:Integer; aSwapBytes:Boolean):Word;
-    function GetSmallInt(Offset:Integer; aSwapBytes:Boolean):SmallInt;
-    function GetLongWord(Offset:Integer; aSwapBytes, aSwapWords:Boolean):LongWord;
-    function GetLongInt(Offset:Integer; aSwapBytes, aSwapWords:Boolean):LongInt;
-    function GetSingle(Offset:Integer; aSwapBytes, aSwapWords:Boolean):Single;
+    function GetByte(Offset: Integer): Byte;
+    function GetWord(Offset: Integer; ASwapBytes: Boolean): Word;
+    function GetSmallInt(Offset: Integer; ASwapBytes: Boolean): Smallint;
+    function GetLongWord(Offset: Integer; ASwapBytes, ASwapWords: Boolean): Longword;
+    function GetLongInt(Offset: Integer; ASwapBytes, ASwapWords: Boolean): Longint;
+    function GetSingle(Offset: Integer; ASwapBytes, ASwapWords: Boolean): Single;
 
-    function GetQWord (Offset:Integer; aSwapBytes, aSwapWords, aSwapDWords:Boolean):QWord;
-    function GetInt64 (Offset:Integer; aSwapBytes, aSwapWords, aSwapDWords:Boolean):Int64;
-    function GetDouble(Offset:Integer; aSwapBytes, aSwapWords, aSwapDWords:Boolean):Double;
+    function GetQWord(Offset: Integer; ASwapBytes, ASwapWords, ASwapDWords: Boolean): QWord;
+    function GetInt64(Offset: Integer; ASwapBytes, ASwapWords, ASwapDWords: Boolean): Int64;
+    function GetDouble(Offset: Integer; ASwapBytes, ASwapWords, ASwapDWords: Boolean): Double;
 
-    function GetSiemensString(Offset:Integer; MaxStringSize:Integer = 255):String;
+    function GetSiemensString(Offset: Integer; MaxStringSize: Integer = 255): string;
 
   end;
 
-  procedure SetStructItemMapper(StructItemMapperTool:TOpenTagEditor);
+
+procedure SetStructItemMapper(StructItemMapperTool: TOpenTagEditor);
+
 
 implementation
 
-uses sysutils, math, hsstrings;
 
-constructor TPLCStruct.Create(AOwner:TComponent);
+uses
+  SysUtils, Math, hsstrings;
+
+
+constructor TPLCStruct.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  Inherited SetTagType(pttByte);
+  inherited SetTagType(pttByte);
 end;
 
-function TPLCStruct.IsMyCallBack(Cback: TTagCommandCallBack): Boolean;
+function TPLCStruct.IsMyCallBack(CallBack: TTagCommandCallBack): Boolean;
 begin
-  Result:=inherited IsMyCallBack(Cback) and (TMethod(Cback).Code=Pointer(@TPLCStruct.TagCommandCallBack));
+  Result := inherited IsMyCallBack(CallBack) and (TMethod(CallBack).Code = Pointer(@TPLCStruct.TagCommandCallBack));
 end;
 
-procedure TPLCStruct.TagCommandCallBack(const ReqID: LongWord;
-  Values: TArrayOfDouble; ValuesTimeStamp: TDateTime; TagCommand: TTagCommand;
-  LastResult: TProtocolIOResult; Offset: LongInt);
+procedure TPLCStruct.TagCommandCallBack(const ReqID: Longword; Values: TArrayOfDouble; ValuesTimeStamp: TDateTime; TagCommand: TTagCommand; LastResult: TProtocolIOResult; Offset: Longint);
 begin
   inherited TagCommandCallBack(ReqID, Values, ValuesTimeStamp, TagCommand, LastResult, Offset);
 end;
 
-procedure TPLCStruct.SetTagType(newType:TTagType);
+procedure TPLCStruct.SetTagType(AValue: TTagType);
 begin
-  Inherited SetTagType(pttByte);
+  inherited SetTagType(pttByte);
 end;
 
-procedure TPLCStruct.SetSwapDWords(v: Boolean);
+procedure TPLCStruct.SetSwapDWords(AValue: Boolean);
 begin
-  inherited SetSwapDWords(false);
+  inherited SetSwapDWords(False);
 end;
 
-procedure TPLCStruct.SetSwapWords(v:Boolean);
+procedure TPLCStruct.SetSwapWords(AValue: Boolean);
 begin
-  inherited SetSwapWords(false);
+  inherited SetSwapWords(False);
 end;
 
-procedure TPLCStruct.SetSwapBytes(v:Boolean);
+procedure TPLCStruct.SetSwapBytes(AValue: Boolean);
 begin
-  inherited SetSwapBytes(false);
+  inherited SetSwapBytes(False);
 end;
 
-class procedure TPLCStruct.addByte(aArray:TArrayOfDouble; offset:Integer; aByte:Byte);
+class procedure TPLCStruct.AddByte(AArray: TArrayOfDouble; Offset: Integer; AByte: Byte);
 begin
-  if offset<Length(aArray) then
-    aArray[offset]:=aByte;
+  if Offset < Length(AArray) then
+    AArray[Offset] := AByte;
 end;
 
-class procedure TPLCStruct.AddWord(aArray:TArrayOfDouble; offset:Integer; aWord:Word; aSwapBytes:Boolean);
+class procedure TPLCStruct.AddWord(AArray: TArrayOfDouble; Offset: Integer; AWord: Word; ASwapBytes: Boolean);
 var
-  aInvertWordBytes:array[0..1] of byte absolute aWord;
-  aux:Byte;
+  AInvertWordBytes: array [0..1] of Byte absolute AWord;
+  Aux: Byte;
 begin
-  if aSwapBytes then begin
-    aux:=aInvertWordBytes[0];
-    aInvertWordBytes[0]:=aInvertWordBytes[1];
-    aInvertWordBytes[1]:=aux;
+  if ASwapBytes then
+  begin
+    Aux := AInvertWordBytes[0];
+    AInvertWordBytes[0] := AInvertWordBytes[1];
+    AInvertWordBytes[1] := Aux;
   end;
 
-  addByte(aArray, offset+0, aInvertWordBytes[0]);
-  addByte(aArray, offset+1, aInvertWordBytes[1]);
+  AddByte(AArray, Offset + 0, AInvertWordBytes[0]);
+  AddByte(AArray, Offset + 1, AInvertWordBytes[1]);
 end;
 
-class procedure TPLCStruct.AddWord(aArray:TArrayOfDouble; offset:Integer; aWord:SmallInt; aSwapBytes:Boolean);
+class procedure TPLCStruct.AddWord(AArray: TArrayOfDouble; Offset: Integer; AWord: Smallint; ASwapBytes: Boolean);
 begin
-  AddWord(aArray,offset, Word(aWord), aSwapBytes);
+  AddWord(AArray, Offset, Word(AWord), ASwapBytes);
 end;
 
-class procedure TPLCStruct.AddDWord(aArray:TArrayOfDouble; offset:Integer; aDWord:DWord; aSwapBytes, aSwapWords:Boolean);
+class procedure TPLCStruct.AddDWord(AArray: TArrayOfDouble; Offset: Integer; ADWord: DWord; ASwapBytes, ASwapWords: Boolean);
 var
-  InvertedWordsOfDword:array[0..1] of Word absolute aDWord;
-  aux:Word;
+  InvertedWordsOfDword: array [0..1] of Word absolute ADWord;
+  Aux: Word;
 begin
-  if aSwapWords then begin
-    aux:=InvertedWordsOfDword[0];
-    InvertedWordsOfDword[0]:=InvertedWordsOfDword[1];
-    InvertedWordsOfDword[1]:=aux;
+  if ASwapWords then
+  begin
+    Aux := InvertedWordsOfDword[0];
+    InvertedWordsOfDword[0] := InvertedWordsOfDword[1];
+    InvertedWordsOfDword[1] := Aux;
   end;
 
-  AddWord(aArray, offset+0, InvertedWordsOfDword[0], aSwapBytes);
-  AddWord(aArray, offset+2, InvertedWordsOfDword[1], aSwapBytes);
+  AddWord(AArray, Offset + 0, InvertedWordsOfDword[0], ASwapBytes);
+  AddWord(AArray, Offset + 2, InvertedWordsOfDword[1], ASwapBytes);
 end;
 
-class procedure TPLCStruct.AddDWord(aArray:TArrayOfDouble; offset:Integer; aDWord:LongInt; aSwapBytes, aSwapWords:Boolean);
+class procedure TPLCStruct.AddDWord(AArray: TArrayOfDouble; Offset: Integer; ADWord: Longint; ASwapBytes, ASwapWords: Boolean);
 begin
-  AddDWord(aArray,offset,DWord(aDWord),aSwapBytes,aSwapWords);
+  AddDWord(AArray, Offset, DWord(ADWord), ASwapBytes, ASwapWords);
 end;
 
-class procedure TPLCStruct.AddDWord(aArray:TArrayOfDouble; offset:Integer; aDWord:Single; aSwapBytes, aSwapWords:Boolean);
+class procedure TPLCStruct.AddDWord(AArray: TArrayOfDouble; Offset: Integer; ADWord: Single; ASwapBytes, ASwapWords: Boolean);
 var
-  asDWord:DWord absolute aDWord;
+  AsDWord: DWord absolute ADWord;
 begin
-  AddDWord(aArray,offset,asDWord,aSwapBytes,aSwapWords);
+  AddDWord(AArray, Offset, AsDWord, ASwapBytes, ASwapWords);
 end;
 
-class procedure TPLCStruct.AddQWord(aArray:TArrayOfDouble; offset:Integer; aQWord:QWord; aSwapBytes, aSwapWords, aSwapDWords:Boolean);
+class procedure TPLCStruct.AddQWord(AArray: TArrayOfDouble; Offset: Integer; AQWord: QWord; ASwapBytes, ASwapWords, ASwapDWords: Boolean);
 var
-  InvertedWordsOfDword:array[0..1] of DWord absolute aQWord;
-  aux:DWord;
+  InvertedWordsOfDword: array [0..1] of DWord absolute AQWord;
+  Aux: DWord;
 begin
-  if aSwapDWords then begin
-    aux:=InvertedWordsOfDword[0];
-    InvertedWordsOfDword[0]:=InvertedWordsOfDword[1];
-    InvertedWordsOfDword[1]:=aux;
+  if ASwapDWords then
+  begin
+    Aux := InvertedWordsOfDword[0];
+    InvertedWordsOfDword[0] := InvertedWordsOfDword[1];
+    InvertedWordsOfDword[1] := Aux;
   end;
-  AddDWord(aArray,offset+0, InvertedWordsOfDword[0],aSwapBytes, aSwapWords);
-  AddDWord(aArray,offset+4, InvertedWordsOfDword[1],aSwapBytes, aSwapWords);
+  AddDWord(AArray, Offset + 0, InvertedWordsOfDword[0], ASwapBytes, ASwapWords);
+  AddDWord(AArray, Offset + 4, InvertedWordsOfDword[1], ASwapBytes, ASwapWords);
 end;
 
-class procedure TPLCStruct.AddQWord(aArray:TArrayOfDouble; offset:Integer; aQWord:Int64; aSwapBytes, aSwapWords, aSwapDWords:Boolean);
+class procedure TPLCStruct.AddQWord(AArray: TArrayOfDouble; Offset: Integer; AQWord: Int64; ASwapBytes, ASwapWords, ASwapDWords: Boolean);
 begin
-  AddQWord(aArray,offset,QWord(aQWord),aSwapBytes,aSwapWords,aSwapDWords);
+  AddQWord(AArray, Offset, QWord(AQWord), ASwapBytes, ASwapWords, ASwapDWords);
 end;
 
-class procedure TPLCStruct.AddQWord(aArray:TArrayOfDouble; offset:Integer; aQWord:Double; aSwapBytes, aSwapWords, aSwapDWords:Boolean);
+class procedure TPLCStruct.AddQWord(AArray: TArrayOfDouble; Offset: Integer; AQWord: Double; ASwapBytes, ASwapWords, ASwapDWords: Boolean);
 var
-  asQWord:QWord absolute aQWord;
+  AsQWord: QWord absolute AQWord;
 begin
-  AddQWord(aArray,offset,asQWord,aSwapBytes,aSwapWords,aSwapDWords);
+  AddQWord(AArray, Offset, AsQWord, ASwapBytes, ASwapWords, ASwapDWords);
 end;
 
-class procedure TPLCStruct.AddCString(var aArray: TArrayOfDouble;
-  offset: Integer; aString: AnsiString);
+class procedure TPLCStruct.AddCString(var AArray: TArrayOfDouble; Offset: Integer; AString: AnsiString);
 var
   i: Integer;
 begin
-  for i:=1 to Length(aString) do
-    addByte(aArray,offset+(i-1),byte(aString[i]));
-  addByte(aArray,Length(aString),0);
+  for i := 1 to Length(AString) do
+    AddByte(AArray, Offset + (i - 1), Byte(AString[i]));
+  AddByte(AArray, Length(AString), 0);
 end;
 
-class procedure TPLCStruct.AddSiemensString(var aArray: TArrayOfDouble;
-  offset: Integer; aString: AnsiString; MaxSize: Byte);
+class procedure TPLCStruct.AddSiemensString(var AArray: TArrayOfDouble; Offset: Integer; AString: AnsiString; MaxSize: Byte);
 var
-  aSize:Byte;
+  ASize: Byte;
   i: Integer;
 begin
-  aSize:=Min(MaxSize,Length(aString));
+  ASize := Min(MaxSize, Length(AString));
 
-  addByte(aArray,offset+0,MaxSize);
-  addByte(aArray,offset+1,aSize);
+  AddByte(AArray, Offset + 0, MaxSize);
+  AddByte(AArray, Offset + 1, ASize);
 
-  for i:=1 to aSize do
-    addByte(aArray,offset+(i+1),byte(aString[i]));
+  for i := 1 to ASize do
+    AddByte(AArray, Offset + (i + 1), Byte(AString[i]));
 end;
 
 function TPLCStruct.GetByte(Offset: Integer): Byte;
 begin
-  if ((Offset<0) or (Offset>High(PValues))) then
+  if ((Offset < 0) or (Offset > High(PValues))) then
     raise Exception.Create(SoutOfBounds);
-  Result:=trunc(PValues[Offset]);
+  Result := trunc(PValues[Offset]);
 end;
 
-function TPLCStruct.GetWord(Offset: Integer; aSwapBytes: Boolean): Word;
+function TPLCStruct.GetWord(Offset: Integer; ASwapBytes: Boolean): Word;
 var
-  aResult:Word;
-  aBytes:array[0..1] of byte absolute aResult;
+  AResult: Word;
+  ABytes: array [0..1] of Byte absolute AResult;
 begin
-  if ((Offset<0) or ((Offset+1)>High(PValues))) then
-    raise Exception.Create(SoutOfBounds);
-
-  if aSwapBytes then begin
-    aBytes[0]:=GetByte(Offset+1);
-    aBytes[1]:=GetByte(Offset+0);
-  end else begin
-    aBytes[0]:=GetByte(Offset+0);
-    aBytes[1]:=GetByte(Offset+1);
-  end;
-
-  Result:=aResult;
-end;
-
-function TPLCStruct.GetSmallInt(Offset: Integer; aSwapBytes: Boolean): SmallInt;
-begin
-  Result:=SmallInt(GetWord(offset,aSwapBytes));
-end;
-
-function TPLCStruct.GetLongWord(Offset: Integer; aSwapBytes, aSwapWords: Boolean
-  ): LongWord;
-var
-  aResult:LongWord;
-  aWords:array[0..1] of Word absolute aResult;
-begin
-  if ((Offset<0) or ((Offset+3)>High(PValues))) then
+  if ((Offset < 0) or ((Offset + 1) > High(PValues))) then
     raise Exception.Create(SoutOfBounds);
 
-  if aSwapWords then begin
-    aWords[0]:=GetWord(Offset+2,aSwapBytes);
-    aWords[1]:=GetWord(Offset+0,aSwapBytes);
-  end else begin
-    aWords[0]:=GetWord(Offset+0,aSwapBytes);
-    aWords[1]:=GetWord(Offset+2,aSwapBytes);
-  end;
-
-  Result:=aResult;
-end;
-
-function TPLCStruct.GetLongInt(Offset: Integer; aSwapBytes, aSwapWords: Boolean
-  ): LongInt;
-begin
-  Result:=LongInt(GetLongWord(Offset,aSwapBytes,aSwapWords));
-end;
-
-function TPLCStruct.GetSingle(Offset: Integer; aSwapBytes, aSwapWords: Boolean
-  ): Single;
-var
-  aResult:Single;
-  aResDWord:LongWord absolute aResult;
-begin
-  aResDWord:=GetLongWord(Offset,aSwapBytes,aSwapWords);
-  Result:=aResult;
-end;
-
-function TPLCStruct.GetQWord(Offset: Integer; aSwapBytes, aSwapWords,
-  aSwapDWords: Boolean): QWord;
-var
-  aResult:QWord;
-  aDWords:array[0..1] of LongWord absolute aResult;
-begin
-  if ((Offset<0) or ((Offset+7)>High(PValues))) then
-    raise Exception.Create(SoutOfBounds);
-
-  if aSwapDWords then begin
-    aDWords[0]:=GetLongWord(Offset+4,aSwapBytes,SwapWords);
-    aDWords[1]:=GetLongWord(Offset+0,aSwapBytes,SwapWords);
-  end else begin
-    aDWords[0]:=GetLongWord(Offset+0,aSwapBytes,SwapWords);
-    aDWords[1]:=GetLongWord(Offset+4,aSwapBytes,SwapWords);
-  end;
-
-  Result:=aResult;
-end;
-
-function TPLCStruct.GetInt64(Offset: Integer; aSwapBytes, aSwapWords,
-  aSwapDWords: Boolean): Int64;
-begin
-  Result:=Int64(GetQWord(Offset,aSwapBytes,aSwapWords,aSwapDWords));
-end;
-
-function TPLCStruct.GetDouble(Offset: Integer; aSwapBytes, aSwapWords,
-  aSwapDWords: Boolean): Double;
-var
-  aResult:Double;
-  aResQWord:QWord absolute aResult;
-begin
-  aResQWord:=GetQWord(Offset,aSwapBytes,aSwapWords,aSwapDWords);
-  Result:=aResQWord;
-end;
-
-function TPLCStruct.GetSiemensString(Offset: Integer; MaxStringSize: Integer
-  ): String;
-var
-  maxSize, curSize, b: Byte;
-  i: Integer;
-  limit: integer;
-begin
-  maxSize:=GetByte(Offset);
-  curSize:=GetByte(Offset+1);
-
-  Result:='';
-  limit:=min(min(min(curSize,maxSize),MaxStringSize),Size-Offset);
-  for i:=0 to limit-1 do begin
-    b:=GetByte(Offset+2+i);
-    if b=0 then break;
-    Result:=Result+chr(GetByte(Offset+2+i));
-  end;
-end;
-
-var
-  StructItemMapperEditor:TOpenTagEditor = nil;
-
-procedure TPLCStruct.MapElements(InsertHook: TAddTagInEditorHook;
-  CreateProc: TCreateTagProc);
-begin
-    if Assigned(StructItemMapperEditor) then
-    StructItemMapperEditor(Self, Self.Owner,InsertHook,CreateProc)
+  if ASwapBytes then
+  begin
+    ABytes[0] := GetByte(Offset + 1);
+    ABytes[1] := GetByte(Offset + 0);
+  end
   else
-    raise exception.Create('None element mapper tool has been Assigned!');
+  begin
+    ABytes[0] := GetByte(Offset + 0);
+    ABytes[1] := GetByte(Offset + 1);
+  end;
+
+  Result := AResult;
 end;
 
-procedure SetStructItemMapper(StructItemMapperTool:TOpenTagEditor);
+function TPLCStruct.GetSmallInt(Offset: Integer; ASwapBytes: Boolean): Smallint;
+begin
+  Result := Smallint(GetWord(Offset, ASwapBytes));
+end;
+
+function TPLCStruct.GetLongWord(Offset: Integer; ASwapBytes, ASwapWords: Boolean): Longword;
+var
+  AResult: Longword;
+  AWords: array [0..1] of Word absolute AResult;
+begin
+  if ((Offset < 0) or ((Offset + 3) > High(PValues))) then
+    raise Exception.Create(SoutOfBounds);
+
+  if ASwapWords then
+  begin
+    AWords[0] := GetWord(Offset + 2, ASwapBytes);
+    AWords[1] := GetWord(Offset + 0, ASwapBytes);
+  end
+  else
+  begin
+    AWords[0] := GetWord(Offset + 0, ASwapBytes);
+    AWords[1] := GetWord(Offset + 2, ASwapBytes);
+  end;
+
+  Result := AResult;
+end;
+
+function TPLCStruct.GetLongInt(Offset: Integer; ASwapBytes, ASwapWords: Boolean): Longint;
+begin
+  Result := Longint(GetLongWord(Offset, ASwapBytes, ASwapWords));
+end;
+
+function TPLCStruct.GetSingle(Offset: Integer; ASwapBytes, ASwapWords: Boolean): Single;
+var
+  AResult: Single;
+  AResDWord: Longword absolute AResult;
+begin
+  AResDWord := GetLongWord(Offset, ASwapBytes, ASwapWords);
+  Result := AResult;
+end;
+
+function TPLCStruct.GetQWord(Offset: Integer; ASwapBytes, ASwapWords, ASwapDWords: Boolean): QWord;
+var
+  AResult: QWord;
+  ADWords: array [0..1] of Longword absolute AResult;
+begin
+  if ((Offset < 0) or ((Offset + 7) > High(PValues))) then
+    raise Exception.Create(SoutOfBounds);
+
+  if ASwapDWords then
+  begin
+    ADWords[0] := GetLongWord(Offset + 4, ASwapBytes, SwapWords);
+    ADWords[1] := GetLongWord(Offset + 0, ASwapBytes, SwapWords);
+  end
+  else
+  begin
+    ADWords[0] := GetLongWord(Offset + 0, ASwapBytes, SwapWords);
+    ADWords[1] := GetLongWord(Offset + 4, ASwapBytes, SwapWords);
+  end;
+
+  Result := AResult;
+end;
+
+function TPLCStruct.GetInt64(Offset: Integer; ASwapBytes, ASwapWords, ASwapDWords: Boolean): Int64;
+begin
+  Result := Int64(GetQWord(Offset, ASwapBytes, ASwapWords, ASwapDWords));
+end;
+
+function TPLCStruct.GetDouble(Offset: Integer; ASwapBytes, ASwapWords, ASwapDWords: Boolean): Double;
+var
+  AResult: Double;
+  AResQWord: QWord absolute AResult;
+begin
+  AResQWord := GetQWord(Offset, ASwapBytes, ASwapWords, ASwapDWords);
+  Result := AResQWord;
+end;
+
+function TPLCStruct.GetSiemensString(Offset: Integer; MaxStringSize: Integer): string;
+var
+  MaxSize: Byte;
+  CurSize: Byte;
+  B: Byte;
+  i: Integer;
+  Limit: Integer;
+begin
+  MaxSize := GetByte(Offset);
+  CurSize := GetByte(Offset + 1);
+
+  Result := '';
+  Limit := Min(Min(Min(CurSize, MaxSize), MaxStringSize), Size - Offset);
+  for i := 0 to Limit - 1 do
+  begin
+    B := GetByte(Offset + 2 + i);
+    if B = 0 then Break;
+    Result := Result + chr(GetByte(Offset + 2 + i));
+  end;
+end;
+
+
+var
+  StructItemMapperEditor: TOpenTagEditor = nil;
+
+procedure TPLCStruct.MapElements(InsertHook: TAddTagInEditorHook; CreateProc: TCreateTagProc);
+begin
+  if Assigned(StructItemMapperEditor) then
+    StructItemMapperEditor(Self, Self.Owner, InsertHook, CreateProc)
+  else
+    raise Exception.Create('None element mapper tool has been Assigned!');
+end;
+
+procedure SetStructItemMapper(StructItemMapperTool: TOpenTagEditor);
 begin
   if Assigned(StructItemMapperEditor) then
     raise Exception.Create('A Bit Mapper editor was already Assigned.')
   else
-    StructItemMapperEditor:=StructItemMapperTool;
+    StructItemMapperEditor := StructItemMapperTool;
 end;
 
 

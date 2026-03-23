@@ -79,8 +79,8 @@ uses IniFiles;
 
 procedure TCommThread.Execute;
 var
-  bytes:array[1..4] of byte;
-  Values:array[1..2] of word absolute bytes;
+  bytes:array [1..4] of byte;
+  Values:array [1..2] of word absolute bytes;
   pkg:TIOPacket;
   clear_buffer: Boolean;
   state: TCommState;
@@ -319,7 +319,7 @@ begin
     FreeAndNil(conf);
   end;
 
-  //se ativou a porta serial, cria a thread de leitura...
+  //se ativou a porta serial, cria a thread de reading...
   //if serial port has been activated, creates the thread to read data from it.
   if SerialPortDriver1.Active then begin
     commthread:=TCommThread.Create(true,SerialPortDriver1);

@@ -71,7 +71,7 @@ begin
       st.LoadFromFile(ParamStr(c));
 
       item := TBitmapResource.Create(nil,vname);
-      item.RawData.Write((PChar (st.Memory) + sizeof (TBitmapFileHeader))^, st.Size - sizeof (TBitmapFileHeader));
+      item.RawData.Write((PChar (st.Memory) + SizeOf (TBitmapFileHeader))^, st.Size - SizeOf (TBitmapFileHeader));
       colection.Add(item);
     except
     end;

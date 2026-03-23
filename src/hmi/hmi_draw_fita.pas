@@ -48,7 +48,7 @@ begin
   FControlArea.CanvasBGRA.Pen.Width := FBorderWidth;
 
   //desenha o quadrado da fita.
-  FControlArea.CanvasBGRA.Rectangle(FBodyHeight Div 2, 0, Width - (FBodyHeight Div 2), FBodyHeight);
+  FControlArea.CanvasBGRA.Rectangle(FBodyHeight div 2, 0, Width - (FBodyHeight div 2), FBodyHeight);
 
   //desenha o circulo da esquerda
   FControlArea.CanvasBGRA.Ellipse(0, 0, FBodyHeight, FBodyHeight);

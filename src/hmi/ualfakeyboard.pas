@@ -656,7 +656,7 @@ begin
     Top := ATRect.Top - (ARect.Bottom - ARect.Top) - 30  //borda inferior do form com borda superior do target
   else
   begin
-    Top := (ATRect.Top + ((ATRect.Bottom - ATRect.Top) Div 2) - ((ARect.Bottom - ARect.Top) Div 2)); //meio
+    Top := (ATRect.Top + ((ATRect.Bottom - ATRect.Top) div 2) - ((ARect.Bottom - ARect.Top) div 2)); //meio
     if Top < 0 then
       Top := 0;
     if (Top + (ARect.Bottom - ARect.Top)) > Screen.Height then
@@ -670,7 +670,7 @@ begin
     Left := ATRect.Left   //borda esquerda do form com borda esquerda do target
   else
   begin
-    Left := (ATRect.Left + ((ATRect.Right - ATRect.Left) Div 2) - ((ARect.Right - ARect.Left) Div 2)); //meio
+    Left := (ATRect.Left + ((ATRect.Right - ATRect.Left) div 2) - ((ARect.Right - ARect.Left) div 2)); //meio
     if Left < 0 then
       Left := 0;
     if (Left + (ARect.Right - ARect.Left)) > Screen.Width then

@@ -55,12 +55,12 @@ type
   // Neded for  IOPCServerList  (peraps has to be added in struct.inc?)   //
   // *********************************************************************//
    PGUIDList = ^TGUIDList;
-   TGUIDList = array[0..65535] of TGUID;
+   TGUIDList = array [0..65535] of TGUID;
 
 // *********************************************************************//
 // Declaration of structures, unions and aliases.                       //
 // *********************************************************************//
-  LCIDARRAY = array[0..65535] of LCID;
+  LCIDARRAY = array [0..65535] of LCID;
   PLCIDARRAY = ^LCIDARRAY;
 
 // *********************************************************************//

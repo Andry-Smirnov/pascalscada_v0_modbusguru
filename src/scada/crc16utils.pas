@@ -1,39 +1,18 @@
 {$i ../common/language.inc}
-{$IFDEF PORTUGUES}
-{:
-  @author(Fabio Luis Girardi <fabio@pascalscada.com>)
-  @abstract(Unit das funções CRC-16)
-}
-{$ELSE}
 {:
   @author(Fabio Luis Girardi <fabio@pascalscada.com>)
   @abstract(Unit that implement CRC-16 functions)
 }
-{$ENDIF}
 unit crc16utils;
+
 
 interface
 
-uses commtypes;
 
-{$IFDEF PORTUGUES}
-{:
-Testa um pacote de BYTES até o tamanho de Pkg - 2
-e retorna @true caso o calculo retorne o mesmo resultado
-com o que deve estar armazenado nos últimos dois bytes
-do buffer.
+uses
+  commtypes;
 
-Caso o pacote tenha 10 bytes, ele irá calcular com os
-oito primeiros bytes e vai verificar se o calculo resultante
-é igual aos bytes 9 e 10 de Pkg. Byte 9 é o mais significativo.
 
-@param(Pkg BYTES. Buffer que contem os dados que irá ser verificado
-       o CRC16. Deve ter pelo menos 2 bytes de tamanho.)
-
-@returns(@true caso o pacote feche o CRC16 com o CRC16 que
-         está armazenado nos últimos dois bytes.)
-}
-{$ELSE}
 {:
 Verifies an package of BYTES ultil their length - 2 and returns @true
 if the value calculated is the same on that is stored in the last 2 bytes
@@ -46,26 +25,9 @@ The byte number 9 is the most significative.
 @param(Pkg BYTES. Buffer that stores the data that will be checked the CRC-16.
        Must have at least 2 bytes of length.)
 
-@returns(@true if the CRC-16 calculated is the same that is stored on the last 2
-         bytes of Pkg.)
-}
-{$ENDIF}
-function Test_crc(const Pkg: Bytes): Boolean;
+@returns(@true if the CRC-16 calculated is the same that is stored on the last 2 bytes of Pkg.) }
+function Test_CRC(const Pkg: Bytes): Boolean;
 
-{$IFDEF PORTUGUES}
-{:
-Calcula o CRC-16 do pacote até seu tamanho - 2.
-Caso um pacote tenha 10 bytes, ele irá pegar para
-o calculo os 8 primeiros e irá armazenar nos bytes
-9 e 10 o calculo resultante. Byte 9 é o mais significativo.
-
-@param(Pkg BYTES. Buffer que contem os dados que irá ser calculado
-       o CRC16. Deve ter pelo menos 2 bytes de tamanho.)
-
-@returns(Uma Cardinal com o valor CRC16 do calculo feito com
-         o tamanho de pkg - 2)
-}
-{$ELSE}
 {:
 Calculate the CRC-16 of the package until their size - 2. If the package has
 10 bytes of length, it will use to calculate the first 8 bytes and will store
@@ -78,14 +40,15 @@ significative.
 
 @returns(A Cardinal number with the CRC-16 calculated with length of Pkg - 2.)
 }
-{$ENDIF}
 function Calcul_CRC(var Pkg: Bytes): Cardinal;
 function Calculate_CRC8(var Data: Bytes): Byte;
 function Fast_CRC_Cal8Bits(Data: Bytes): Byte;
 
+
 implementation
 
-function Test_crc(const Pkg: Bytes): Boolean;
+
+function Test_CRC(const Pkg: Bytes): Boolean;
 var
   CRC: Cardinal;
   j: Cardinal;
@@ -104,7 +67,7 @@ begin
     begin
       a := CRC;
       CarryFlag := a and $0001;
-      CRC := CRC Shr 1;
+      CRC := CRC shr 1;
       if (CarryFlag = 1) then
         CRC := CRC xor $A001;
     end;
@@ -112,7 +75,7 @@ begin
   end;
 
   //CRC must matches the two Bytes, so should be a AND, not a OR
-  Result := ((n + 2) <= Length(Pkg)) and ((Cardinal(Pkg[n + 1]) = (CRC Shr 8)) and (Cardinal(Pkg[n]) = (CRC and 255)));
+  Result := ((n + 2) <= Length(Pkg)) and ((Cardinal(Pkg[n + 1]) = (CRC shr 8)) and (Cardinal(Pkg[n]) = (CRC and 255)));
 end;
 
 function Calcul_CRC(var Pkg: Bytes): Cardinal;
@@ -134,13 +97,13 @@ begin
     begin
       a := CRC;
       CarryFlag := a and $0001;
-      CRC := CRC Shr 1;
+      CRC := CRC shr 1;
       if (CarryFlag = 1) then
         CRC := CRC xor $A001;
     end;
     Inc(i);
   end;
-  Pkg[n + 1] := ((CRC and $FF00) Shr 8);
+  Pkg[n + 1] := ((CRC and $FF00) shr 8);
   Pkg[n] := (CRC and 255);
   Result := CRC;
 end;
@@ -158,9 +121,9 @@ begin
     for j := 0 to 7 do
     begin
       if ((CRC and $80) <> 0) then
-        CRC := Byte(((Word(CRC) Shl 1) xor $31))
+        CRC := Byte(((Word(CRC) shl 1) xor $31))
       else
-        CRC := Byte(Word(CRC) Shl 1);
+        CRC := Byte(Word(CRC) shl 1);
     end;
   end;
   Exit(CRC);
@@ -168,7 +131,7 @@ end;
 
 function Fast_CRC_Cal8Bits(Data: Bytes): Byte;
 const
-  CRC_TABLE: array[0..255] of Byte = ( // 0x97 Polynomial Table, 8-bit, sourcer32@gmail.com
+  CRC_TABLE: array [0..255] of Byte = ( // 0x97 Polynomial Table, 8-bit, sourcer32@gmail.com
     $00, $97, $B9, $2E, $E5, $72, $5C, $CB,
     $5D, $CA, $E4, $73, $B8, $2F, $01, $96,
     $BA, $2D, $03, $94, $5F, $C8, $E6, $71,

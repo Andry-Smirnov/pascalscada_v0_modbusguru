@@ -682,8 +682,8 @@ begin
   for i := 0 to FPointCoordinates.Count - 1 do
   begin
     PCItem := TPointCollectionItem(FPointCoordinates.Items[i]);
-    Points[i].X := PCItem.X + ifthen((FBorderWidth Mod 2) = 1, ifthen((PCItem.X Mod 2) = 0, 1), 0.5);
-    Points[i].Y := PCItem.Y + ifthen((FBorderWidth Mod 2) = 0, 0.5);
+    Points[i].X := PCItem.X + IfThen((FBorderWidth mod 2) = 1, IfThen((PCItem.X mod 2) = 0, 1), 0.5);
+    Points[i].Y := PCItem.Y + IfThen((FBorderWidth mod 2) = 0, 0.5);
   end;
 
   FControlArea.PenStyle := FPenStyle;
@@ -743,16 +743,16 @@ begin
 
 
   DisableAutoSizing;
-  Left := MinX - (FBorderWidth Div 2);
-  Top := MinY - (FBorderWidth Div 2);
+  Left := MinX - (FBorderWidth div 2);
+  Top := MinY - (FBorderWidth div 2);
   Width := (MaxX - MinX) + 2 * FBorderWidth;
   Height := (MaxY - MinY) + 2 * FBorderWidth;
   EnableAutoSizing;
   for i := 0 to PointCoordinates.Count - 1 do
   begin
     PCItem := TPointCollectionItem(PointCoordinates.Items[i]);
-    PCItem.X := PCItem.X + (FBorderWidth Div 2) - (MinX - sLeft);
-    PCItem.Y := PCItem.Y + (FBorderWidth Div 2) - (MinY - sTop);
+    PCItem.X := PCItem.X + (FBorderWidth div 2) - (MinX - sLeft);
+    PCItem.Y := PCItem.Y + (FBorderWidth div 2) - (MinY - sTop);
   end;
 end;
 
@@ -790,16 +790,16 @@ begin
 
 
   DisableAutoSizing;
-  Left := Max(MinX - (FBorderWidth Div 2), 0);
-  Top := Max(MinY - (FBorderWidth Div 2), 0);
+  Left := Max(MinX - (FBorderWidth div 2), 0);
+  Top := Max(MinY - (FBorderWidth div 2), 0);
   Width := (MaxX - MinX) + 2 * FBorderWidth;
   Height := (MaxY - MinY) + 2 * FBorderWidth;
   EnableAutoSizing;
   for i := 0 to PointCoordinates.Count - 1 do
   begin
     PCItem := TPointCollectionItem(PointCoordinates.Items[i]);
-    PCItem.X := PCItem.X + (FBorderWidth Div 2) - MinX;
-    PCItem.Y := PCItem.Y + (FBorderWidth Div 2) - MinY;
+    PCItem.X := PCItem.X + (FBorderWidth div 2) - MinX;
+    PCItem.Y := PCItem.Y + (FBorderWidth div 2) - MinY;
   end;
 end;
 

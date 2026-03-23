@@ -95,17 +95,17 @@ end;
 
 procedure TDM.ala1ValueChange(Sender: TObject);
 var
-  msgs:array[0..7] of string;
+  msgs:array [0..7] of string;
   id:integer;
   state:double;
   sql:String;
 begin
   msgs[0]:='Chupin desligado';
-  msgs[1]:='Deposito superior não abriu';
-  msgs[2]:='Deposito superior não fechou';
-  msgs[3]:='Balanca não abriu';
-  msgs[4]:='Balanca não fechou';
-  msgs[5]:='Balanca não descarregou';
+  msgs[1]:='Deposito superior nï¿½o abriu';
+  msgs[2]:='Deposito superior nï¿½o fechou';
+  msgs[3]:='Balanca nï¿½o abriu';
+  msgs[4]:='Balanca nï¿½o fechou';
+  msgs[5]:='Balanca nï¿½o descarregou';
   msgs[6]:='Tempo do deposito inferior';
   msgs[7]:='Alarme de pesagem';
 
@@ -196,7 +196,7 @@ begin
   repeat
     if PesoProdutoW1W2.LastSyncReadStatus=ioOk then begin
       pesoprod := PesoProduto.Value;
-      sql := 'SELECT InsereTemp(NOW(), '+FloatToSQLNumer(pesoprod)+', 0, 0, 0, 0, 1, ''Balança Milho'',''Pesagens'','''','' Kg'', 1, 1);';
+      sql := 'SELECT InsereTemp(NOW(), '+FloatToSQLNumer(pesoprod)+', 0, 0, 0, 0, 1, ''Balanï¿½a Milho'',''Pesagens'','''','' Kg'', 1, 1);';
       MySQLConnection.ExecuteDirect(sql);
     end;
     inc(tentativas)

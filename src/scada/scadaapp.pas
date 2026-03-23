@@ -135,7 +135,7 @@ begin
   FieldExists:=ftUnknown;
   if TableExists(tablename) then begin
     try
-      x:=TZQuery.Create(self);
+      x:=TZQuery.Create(Self);
       x.Connection := PZConnection;
       with x.SQL do begin
         Clear;

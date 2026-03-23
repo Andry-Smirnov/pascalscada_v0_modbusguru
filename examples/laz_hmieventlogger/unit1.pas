@@ -72,7 +72,7 @@ procedure TForm1.THMIEventLogger1NewTagEvent(Sender: TObject;
 var
   x: TFormatSettings;
 begin
-  writeln('HMIEventLogger1NewTagEvent');
+  WriteLn('HMIEventLogger1NewTagEvent');
   x.DateSeparator:='-';
   x.TimeSeparator:=':';
   timeStart := FormatDateTime('yyyy-mm-dd hh:nn:ss.zzz', Now, x);
@@ -90,7 +90,7 @@ procedure TForm1.THMIEventLogger1TagEventFinished(Sender: TObject;
 var
   x: TFormatSettings;
 begin
-  writeln('HMIEventLogger1TagEventFinished1');
+  WriteLn('HMIEventLogger1TagEventFinished1');
   x.DateSeparator:='-';
   x.TimeSeparator:=':';
   FinishEventSQL:='UPDATE eventos.tbl_eventos SET dt_termino=''' + timeStart + ''' WHERE dt_termino IS NULL AND uuid_evento='''+GUIDToString(EventGUID)+''';';

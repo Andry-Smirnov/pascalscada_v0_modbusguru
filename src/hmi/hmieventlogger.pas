@@ -278,11 +278,11 @@ begin
 
   if Assigned(FAsyncDBConnection) then
   begin
-    FAsyncDBConnection.RemoveFreeNotification(self);
+    FAsyncDBConnection.RemoveFreeNotification(Self);
   end;
 
   if Assigned(AValue) then
-    AValue.FreeNotification(self);
+    AValue.FreeNotification(Self);
 
   FAsyncDBConnection := AValue;
 end;
@@ -405,7 +405,7 @@ procedure THMICustomEventLogger.FinishAllEventsDelayed;
 var
   SQL: string;
 begin
-  DoFinishAllTagEvents(self, SQL);
+  DoFinishAllTagEvents(Self, SQL);
   if Assigned(FAsyncDBConnection) and FAsyncDBConnection.Connected then
     FAsyncDBConnection.ExecSQL(SQL, nil, False);
 end;
@@ -441,7 +441,7 @@ begin
       AuxItem := TEventTagColletionItem(FEventTags.Items[i]);
       if Assigned(AuxItem.PLCTag) then
       begin
-        AuxItem.PLCTag.FreeNotification(self);
+        AuxItem.PLCTag.FreeNotification(Self);
         AuxItem.PLCTag.AddTagChangeHandler(@TagFromListChanged);
       end;
     end;
@@ -486,8 +486,8 @@ end;
 constructor THMICustomEventLogger.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FEventTags := TEventTagColletion.Create(self);
-  FEventDescriptions := TEventCollection.Create(self);
+  FEventTags := TEventTagColletion.Create(Self);
+  FEventDescriptions := TEventCollection.Create(Self);
 end;
 
 destructor THMICustomEventLogger.Destroy;
@@ -507,7 +507,7 @@ begin
       AuxItem := TEventTagColletionItem(FEventTags.Items[i]);
       if Assigned(AuxItem.PLCTag) then
       begin
-        AuxItem.PLCTag.RemoveFreeNotification(self);
+        AuxItem.PLCTag.RemoveFreeNotification(Self);
       end;
     end;
     FreeAndNil(FEventTags);

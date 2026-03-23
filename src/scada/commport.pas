@@ -1,15 +1,8 @@
 {$i ../common/language.inc}
-{$IFDEF PORTUGUES}
-{:
-  @author(Fabio Luis Girardi <fabio@pascalscada.com>)
-  @abstract(Unit que implementa as bases de um driver de porta de comunicação)
-}
-{$ELSE}
 {:
   @author(Fabio Luis Girardi <fabio@pascalscada.com>)
   @abstract(Unit that implements the basis of a communication port driver)
 }
-{$ENDIF}
 unit CommPort;
 
 {$IFDEF FPC}
@@ -22,37 +15,26 @@ interface
 
 uses
   Commtypes, Classes, MessageSpool, CrossEvent, SyncObjs, crossthreads
-  {$IFNDEF FPC}
+{$IFNDEF FPC}
   , Windows
 {$ENDIF}
-  {$IF defined(WIN32) or defined(WIN64)}
-, windows
+{$IF defined(WIN32) or defined(WIN64)}
+  , windows
 {$IFEND}
   ;
 
 type
-  {$IF defined(WIN32) or defined(WIN64)}
+{$IF defined(WIN32) or defined(WIN64)}
   TPortUniqueID = WINDOWS.LONGLONG;
 {$ELSE}
   TPortUniqueID = QWord;
 {$IFEND}
 
-
-  {$IFDEF PORTUGUES}
-  {:
-  @author(Fabio Luis Girardi <fabio@pascalscada.com>)
-  @name é responsável por notificar a aplicação e os drivers sobre erros de
-  comunicação, abertura, fechamento e desconecção de uma porta de comunicação.
-  É usado internamente por TCommPortDriver.
-  }
-{$ELSE}
   {:
   @author(Fabio Luis Girardi <fabio@pascalscada.com>)
   @name notifies the application and protocol drivers when the following events
   occurs on port driver: communication error and when it was open, closed or disconnected.
-  This class is used internaly by the TCommPortDriver.
-  }
-{$ENDIF}
+  This class is used internaly by the TCommPortDriver. }
   TEventNotificationThread = class(TpSCADACoreAffinityThreadWithLoop)
   private
     PMsg: TMSMsg;
@@ -72,53 +54,12 @@ type
     constructor Create(CreateSuspended: Boolean; AOwner: TComponent);
     destructor Destroy; override;
     procedure Terminate; override;
-    {$IFDEF PORTUGUES}
-    //: Envia uma mensagem de erro de comunicação para a aplicação;
-{$ELSE}
     //: Sends a communication error message to application;
-{$ENDIF}
     procedure DoCommErrorEvent(Event: TCommPortErrorEvent; Error: TIOResult; MainThread: Boolean);
-    {$IFDEF PORTUGUES}
-    //: Envia uma mensagem de evento porta aberta, fechada e disconectada para aplicação;
-{$ELSE}
     //: Sends a port event message (port open, closed or diconnected) to application;
-{$ENDIF}
     procedure DoCommPortEvent(Event: TNotifyEvent; MainThread: Boolean);
   end;
 
-  {$IFDEF PORTUGUES}
-  {:
-  @abstract(Classe base de drivers de portas de comunicação)
-
-  @author(Fabio Luis Girardi <fabio@pascalscada.com>)
-
-  Esta classe foi criada com o intuito de diminuir os esforços na criação de
-  drivers de portas de comunicações tanto no modo mono-tarefa (single thread) quanto
-  no modo multi-tarefa (threads).
-
-  As poucas partes a serem escritas é sobreescrever de cinco métodos virtuais que
-  fazem todo o trabalho (e é lógico as rotinas das propriedades e demais funções
-  de comunicação da sua porta). São eles:
-
-  @code(function  ComSettingsOK:Boolean; virtual;)
-  Sobrescreva a função para verificar se todas as propriedades de sua porta
-  de comunicação estão certas. Retorne @true caso estejam.
-
-  @code(procedure PortStart(var Ok:Boolean); virtual;)
-  Abra a porta e retorne @true caso consiga abrir a porta de comunicação.
-
-  @code(procedure PortStop(var Ok:Boolean); virtual;)
-  Feche a porta e retorne @true caso consiga fechar a porta de comunicação.
-
-  @code(procedure Read(Packet:PIOPacket); virtual; abstract;)
-  Sobrescreva este método para poder executar as funções de leitura de sua porta de comunicação.
-
-  @code(procedure Write(Packet:PIOPacket); virtual; abstract;)
-  Sobrescreva este método para poder escrever dados na sua porta de comunicação.
-
-  Feito isso, sua porta já é thread-safe!
-  }
-{$ELSE}
   {:
   @abstract(The base class of an communication port driver.)
 
@@ -148,54 +89,49 @@ type
   @code(procedure Write(Packet:PIOPacket); virtual; abstract;)
   Overwrite this method to write data on your communication port.
 
-  After do this, your communication port already is thread-safe!
-  }
-{$ENDIF}
+  After do this, your communication port already is thread-safe! }
 
   { TCommPortDriver }
 
   TCommPortDriver = class(TComponent)
   private
-    FLogActions, FReadedLogActions: Boolean;
+    FLogActions: Boolean;
+    FReadedLogActions: Boolean;
     FLogFile: AnsiString;
     FLogFileStream: TFileStream;
     FReadRetries: Cardinal;
     FWriteRetries: Cardinal;
 
-    FTraffic_receiver_1: AnsiString;
-    FTraffic_receiver_2: AnsiString;
-    FTraffic_receiver: AnsiString;
-    FTraffic_send: AnsiString;
+    FTrafficReceiver1: AnsiString;
+    FTrafficReceiver2: AnsiString;
+    FTrafficReceiver: AnsiString;
+    FTrafficSend: AnsiString;
 
-    { @exclude }
+    //: @exclude
     PLockedBy: Cardinal;
-    {: @exclude }
+    //: @exclude
     PPacketID: Cardinal;
-    {: @exclude }
+    //: @exclude
     FReadActive: Boolean;
-    {: @exclude }
+    //: @exclude
     PEventUpdater: TEventNotificationThread;
-    {: @exclude }
-    PIOCmdCS, PLockCS: SyncObjs.TCriticalSection;
-    {: @exclude }
+    //: @exclude
+    PIOCmdCS: SyncObjs.TCriticalSection;
+    PLockCS: SyncObjs.TCriticalSection;
+    //: @exclude
     PLockEvent: TCrossEvent;
-    {: @exclude }
+    //: @exclude
     PUnlocked: Longint;
-    {: @exclude }
+    //: @exclude
     FLastOSErrorNumber: Longint;
-    {: @exclude }
+    //: @exclude
     FLastOSErrorMessage: AnsiString;
-    {: @exclude }
+    //: @exclude
     FLastPkgId: Cardinal;
-    {: @exclude }
+    //: @exclude
     FCommandsSecond: Longint;
-
-    {$IFDEF PORTUGUES}
-    //: Estatisticas de comunicação (total de bytes enviados/recebitos e bytes enviados/recebidos por segundo).
-{$ELSE}
     //: Communication statistics (Bytes sent/received and Bytes sent/received per second).
-{$ENDIF}
-    FTXBytes,
+    FTXBytes: Int64;
     FRXBytes: Int64;
     FTXBytesLast: Int64;
     FRXBytesLast: Int64;
@@ -203,12 +139,7 @@ type
     FRXBytesSecond: Int64;
 
     FOwnerThread: TPSThreadID;
-
-    {$IFDEF PORTUGUES}
-    //: Abertura forcada da porta em edicao
-{$ELSE}
     //: Opens the communication port in design time
-{$ENDIF}
     //FOpenInEditMode:Boolean;
 
     //: @exclude
@@ -227,547 +158,164 @@ type
     procedure OpenInEditMode(v: Boolean);
     procedure SetReadRetries(AValue: Cardinal);
     procedure SetWriteRetries(AValue: Cardinal);
-
-    {$IFDEF PORTUGUES}
-    //: Atualiza as estatisticas de comunicação.
-{$ELSE}
     //: Updates the communication statistics.
-{$ENDIF}
     procedure TimerStatistics(Sender: TObject);
-    {: @exclude }
+    //: @exclude
     function GetLocked: Boolean;
-
-    {$IFDEF PORTUGUES}
-    //: Executa um comandos de IO (thread-safe).
-{$ELSE}
     //: Executes IO commands (thread-safe).
-{$ENDIF}
-    procedure InternalIOCommand(cmd: TIOCommand; Packet: PIOPacket);
-
-    {$IFDEF PORTUGUES}
-    //: Abre a porta de comunicação (thread-safe).
-{$ELSE}
+    procedure InternalIOCommand(Cmd: TIOCommand; Packet: PIOPacket);
     //: Opens the communication port (thread-safe).
-{$ENDIF}
     procedure InternalPortStart(var Ok: Boolean);
-
-    {$IFDEF PORTUGUES}
-    //: Fecha a porta de comunicação (thread-safe).
-{$ELSE}
     //: Closes the communication port (thread-safe).
-{$ENDIF}
     procedure InternalPortStop(var Ok: Boolean);
-    {$IFDEF PORTUGUES}
-    {:
-    @name é o metodo chamado para realizar as leituras/escritas do driver.
+    {: @name is called to do the I/O tasks of the communication port driver.
 
-    @param(cmd TIOCommand. Informa os comandos de Leitura/escrita e sua ordem)
-    @param(Packet PIOPacket. Aponta para uma estrutura TIOPacket que contem os valores a
-           a serem escritos e os valores lidos.)
-    @return(Retorna em Packet os valores lidos.)
-    }
-{$ELSE}
-    {:
-    @name is called to do the I/O tasks of the communication port driver.
-
-    @param(cmd TIOCommand. Contains the I/O commands and the sequence of your execution.)
-    @param(Packet PIOPacket. Record that contains the information about what
-           must be readed and/or write.)
-    @return(Returns on variable Packet the result of the I/O's actions.)
-    }
-{$ENDIF}
-    procedure IOCommand(cmd: TIOCommand; Packet: PIOPacket);
+       @param(cmd TIOCommand. Contains the I/O commands and the sequence of your execution.)
+       @param(Packet PIOPacket. Record that contains the information about what
+              must be readed and/or write.)
+       @return(Returns on variable Packet the result of the I/O's actions.) }
+    procedure IOCommand(Cmd: TIOCommand; Packet: PIOPacket);
 
     //: @seealso(TCommPortDriver.LogIOActions)
     procedure SetLogActions(Log: Boolean);
 
     //: @seealso(TCommPortDriver.LogFile)
-    procedure SetLogFile(nFile: AnsiString);
-
-    {$IFDEF PORTUGUES}
-    //: Registra uma ação de IO no log de comunicações.
-{$ELSE}
+    procedure SetLogFile(NFile: AnsiString);
     //: Register an IO action on communications log.
-{$ENDIF}
-    procedure LogAction(cmd: TIOCommand; Packet: TIOPacket);
+    procedure LogAction(Cmd: TIOCommand; Packet: TIOPacket);
   protected
     FDelayBetweenCmds: Cardinal;
-
-    {$IFDEF PORTUGUES}
-    //: Armazena se a porta é de uso exclusivo (como a porta serial)
-{$ELSE}
     //: Stores if the communication port is exclusive (like serial port)
-{$ENDIF}
     FExclusiveDevice: Boolean;
 
     // recolhe trafego de dados
-    procedure Traffic(cmd: TIOCommand; Packet: TIOPacket);
+    procedure Traffic(Cmd: TIOCommand; Packet: TIOPacket);
 
     ////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////
-    {$IFDEF PORTUGUES}
-    //: Caso v = @true, abre a porta, caso contrario fecha.
-{$ELSE}
     //: If v = @true, opens the communication port, else closes.
-{$ENDIF}
-    procedure SetActive(v: Boolean); virtual;
-
-    {$IFDEF PORTUGUES}
-    //: Envia uma mensagem de erro de comunicação de uma thread para a aplicação
-{$ELSE}
+    procedure SetActive(AValue: Boolean); virtual;
     //: Send a communication error message from the thread to the application.
-{$ENDIF}
     procedure CommError(WriteCmd: Boolean; Error: TIOResult);
-
-    {$IFDEF PORTUGUES}
-    //: Envia uma mensagem de porta aberta para a aplicação/thread de protocolo.
-{$ELSE}
     //: Sends a message to the application/protocol thread when the communication port was open.
-{$ENDIF}
     procedure CommPortOpened;
-
-    {$IFDEF PORTUGUES}
-    //: Envia uma mensagem de falha na abertura da porta para a aplicação/thread de protocolo.
-{$ELSE}
     //: Sends a message to the application/protocol thread, if communication port can't be open.
-{$ENDIF}
     procedure CommPortOpenError;
-
-    {$IFDEF PORTUGUES}
-    //: Envia uma mensagem informando que a porta foi fechada para a aplicação/thread de protocolo.
-{$ELSE}
     //: Sends a message to the application/protocol thread when the communication port was close.
-{$ENDIF}
     procedure CommPortClose;
-
-    {$IFDEF PORTUGUES}
-    //: Envia uma mensagem informando falha fechando a porta de comunicação para a aplicação/thread de protocolo.
-{$ELSE}
     //: Sends a message to the application/protocol thread, if the communication port can't be closed.
-{$ENDIF}
     procedure CommPortCloseError;
-
-    {$IFDEF PORTUGUES}
-    //: Envia uma mensagem de porta desconectada para o aplicação/ thread de protocolo (TCP/IP).
-{$ELSE}
     //: Sends a message to the application/protocol thread, if the communication port was disconnected (TCP/IP).
-{$ENDIF}
     procedure CommPortDisconected;
 
     ////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////
-
-    {$IFDEF PORTUGUES}
-    //: Notifica o evento do usuário a respeito de um erro de leitura
-{$ELSE}
     //: Notifies the OnCommErrorReading event about an read error.
-{$ENDIF}
     procedure DoReadError(Error: TIOResult); virtual;
-
-    {$IFDEF PORTUGUES}
-    //: Notifica o evento do usuário a respeito de um erro de escrita
-{$ELSE}
     //: Notifies the OnCommErrorWriting event about an write error.
-{$ENDIF}
     procedure DoWriteError(Error: TIOResult); virtual;
-
-    {$IFDEF PORTUGUES}
-    //: Notifica o evento do usuário quando a porta é aberta com sucesso.
-{$ELSE}
     //: Notifies the OnCommPortOpened when the communication port opens.
-{$ENDIF}
     procedure DoPortOpened(Sender: TObject); virtual;
-
-    {$IFDEF PORTUGUES}
-    //: Notifica o evento do usuário a respeito de uma falha abrindo a porta
-{$ELSE}
     //: Notifies the OnCommPortOpenError event if a error occurs when opening communication port.
-{$ENDIF}
     procedure DoPortOpenError(Sender: TObject); virtual;
-
-    {$IFDEF PORTUGUES}
-    //: Notifica o evento do usuário quando a porta é fechada com sucesso.
-{$ELSE}
     //: Notifies the OnCommPortClosed event when the communication port was closed.
-{$ENDIF}
     procedure DoPortClose(Sender: TObject); virtual;
-
-    {$IFDEF PORTUGUES}
-    //: Notifica o evento do usuário a respeito de uma falha fechando a porta.
-{$ELSE}
     //: Notifies the OnCommPortCloseError event if a error occurs when closing communication port.
-{$ENDIF}
     procedure DoPortCloseError(Sender: TObject); virtual;
-
-    {$IFDEF PORTUGUES}
-    //: Notifica o evento do usuário a respeito de uma perca de conexão.
-{$ELSE}
     //: Notifies the OnCommPortDisconnected event when a connection is lost (usefull in TCP/IP)
-{$ENDIF}
     procedure DoPortDisconnected(Sender: TObject); virtual;
   protected
-    {$IFDEF PORTUGUES}
-    //: Variável responsável por armazenar o estado atual do driver
-{$ELSE}
     //: Stores the actual state of the communication port driver (Open or closed);
-{$ENDIF}
     PActive: Boolean;
-
-    {$IFDEF PORTUGUES}
-    {: Variável responsável por armazenar se devem ser feitas limpezas após algum erro de comunicação }
-{$ELSE}
     //: Stores if the buffers must be cleared after some communication error.
-{$ENDIF}
     PClearBufOnErr: Boolean;
-
-    {$IFDEF PORTUGUES}
-    {:
-    Array que armazena os drivers de protocolo dependentes.
-    @seealso(TProtocolDriver)
-    }
-{$ELSE}
-    {:
-    Array that stores what's protocols uses this communication port driver.
-    @seealso(TProtocolDriver)
-    }
-{$ENDIF}
+    {: Array that stores what's protocols uses this communication port driver.
+       @seealso(TProtocolDriver) }
     Protocols: array of TComponent;
-
-    {$IFDEF PORTUGUES}
-    {:
-    Array que armazena as notificações que deve fornecer aos protocolos.
-    @seealso(TProtocolDriver)
-    }
-{$ELSE}
-    {:
-    Array que armazena os drivers de protocolo dependentes.
-    @seealso(TProtocolDriver)
-    }
-{$ENDIF}
+    {: Array que armazena os drivers de protocolo dependentes.
+       @seealso(TProtocolDriver) }
     EventInterfaces: IPortDriverEventNotificationArray;
 
-    {$IFDEF PORTUGUES}
-    {:
-    Método chamado quando é necessário ler dados da porta. É necessário
-    sobrescrever este método para criar novos drivers de porta.
-    @param(Packet PIOPacket. Contem as informações necessárias para executar
-           a leitura).
-    @seealso(TIOPacket)
-    }
-{$ELSE}
-    {:
-    Procedure called when is needed to read something on communication port.
-    To create a new communication port, you must overwritten this procedure.
-    @param(Packet PIOPacket. Record with informations to execute the read
-           command.).
-    @seealso(TIOPacket)
-    }
-{$ENDIF}
+    {: Procedure called when is needed to read something on communication port.
+       To create a new communication port, you must overwritten this procedure.
+    @param(Packet PIOPacket. Record with informations to execute the read command.)
+    @seealso(TIOPacket) }
     procedure Read(Packet: PIOPacket); virtual; abstract;
-
-    {$IFDEF PORTUGUES}
-    {:
-    Método chamado quando é necessário escrever dados na porta. É necessário
-    sobrescrever este método para criar novos drivers de porta.
-    @param(Packet PIOPacket. Contem as informações necessárias para executar
-           a escrita).
-    @seealso(TIOPacket)
-    }
-{$ELSE}
-    {:
-    Procedure called when is needed to write something on communication port.
-    To create a new communication port, you must overwritten this procedure.
-    @param(Packet PIOPacket. Record with informations to execute the write
-           command.).
-    @seealso(TIOPacket)
-    }
-{$ENDIF}
+    {: Procedure called when is needed to write something on communication port.
+       To create a new communication port, you must overwritten this procedure.
+    @param(Packet PIOPacket. Record with informations to execute the write command.).
+    @seealso(TIOPacket) }
     procedure Write(Packet: PIOPacket); virtual; abstract;
-
-    {$IFDEF PORTUGUES}
-    {:
-    @name deve ser sobrescrito em portas que desejam oferecer uma espera entre
-    os comandos de leitura e escrita.
-    }
-{$ELSE}
-    {:
-    @name must be overwritten on communication ports that want's a delay between
-    the read and write commands.
-    }
-{$ENDIF}
+    {: @name must be overwritten on communication ports that want's a delay between
+       the read and write commands. }
     procedure NeedSleepBetweenRW; virtual; abstract;
-
-    {$IFDEF PORTUGUES}
-    {:
-    @name é o metodo chamado para realizar a abertura da porta.
-    Para a criação de novos drivers, esse método precisa ser sobrescrito.
-
-    @return(Retorne @true em Ok caso a porta tenha sido aberta com sucesso. @false caso contrário)
-    @seealso(TDriverCommand)
-    }
-{$ELSE}
-    {:
-    @name is called to opens the communication port. To create a new communication
-    port driver, this procedure must be overwritten.
-
+    {: @name is called to opens the communication port. To create a new communication
+             port driver, this procedure must be overwritten.
     @return(Returns @true in Ok param if the communication port was opened sucessfull.)
-    @seealso(TDriverCommand)
-    }
-{$ENDIF}
+    @seealso(TDriverCommand) }
     procedure PortStart(var Ok: Boolean); virtual; abstract;
-
-    {$IFDEF PORTUGUES}
-    {:
-    @name é o metodo chamado para fechar uma porta.
-    Para a criação de novos drivers, esse método precisa ser sobrescrito.
-
-    @return(Retorne @true em Ok caso a porta tenha sido fechada com sucesso. @false caso contrário)
-    @seealso(TDriverCaller)
-    }
-{$ELSE}
-    {:
-    @name is called to closes the communication port. To create a new communication
-    port driver, this procedure must be overwritten.
-
+    {: @name is called to closes the communication port. To create a new communication
+             port driver, this procedure must be overwritten.
     @return(Returns @true in Ok param if the communication port was closed sucessfull.)
-    @seealso(TDriverCommand)
-    }
-{$ENDIF}
+    @seealso(TDriverCommand) }
     procedure PortStop(var Ok: Boolean); virtual; abstract;
-
-    {$IFDEF PORTUGUES}
-    {:
-    @name é o metodo chamado para validar o conjunto de configurações de uma porta.
-    Para a criação de novos drivers, se essa função não for sobrescrita, todas
-    as combinações de configurações serão inválidas e a porta não será aberta.
-
-    @return(Retorne @true caso as configurações da porta estejam Ok. @false caso contrário)
-    @seealso(TDriverCaller)
-    }
-{$ELSE}
-    {:
-    @name is called to check if the communication port settings are right. To
-    create a new communication port driver, if this function was not overwritten,
-    all combinations of settings will be invalidated and the communication port
-    will not open.
-
+    {: @name is called to check if the communication port settings are right. To
+             create a new communication port driver, if this function was
+             not overwritten, all combinations of settings will be invalidated
+             and the communication port will not open.
     @return(Returns @true if the communication port settings are right. @false if not.)
-    @seealso(TDriverCaller)
-    }
-{$ENDIF}
+    @seealso(TDriverCaller) }
     function ComSettingsOK: Boolean; virtual;
-
-    {$IFDEF PORTUGUES}
-    {:
-    @name é o método responsável por fazer a limpeza dos buffers de leitura/escrita
-    da porta.
-    É altamente recomendável você escrever esse método caso esteja criando um novo
-    driver de porta.
-    }
-{$ELSE}
-    {:
-    @name is called when is needed clear the input/output buffers of the
-    communication port.
-
-    Is recommended overwriten this procedure on your communication port driver.
-    }
-{$ENDIF}
+    {: @name is called when is needed clear the input/output buffers of the
+             communication port.
+       Is recommended overwriten this procedure on your communication port driver. }
     procedure ClearALLBuffers; virtual; abstract;
-    {: @exclude }
+    //: @exclude
     procedure Loaded; override;
-    {: @exclude }
+    //: @exclude
     procedure InternalClearALLBuffers;
-
-    {$IFDEF PORTUGUES}
-    {: @name gera uma exceção caso a porta esteja ativa. Use este método para
-       evitar a mudança de valores de certas propriedade que não podem ser
-       alterados com a porta ativa.
-    }
-{$ELSE}
     {: @name raises an exception if the communication port is active. Call this
        procedure to avoid changes in properties that cannot be changed with the
-       communication port activated.
-    }
-{$ENDIF}
+       communication port activated. }
     procedure DoExceptionInActive;
-
-    {$IFDEF PORTUGUES}
-    {:
-      @name atualiza as propriedades LastOSErrorNumber e LastOSErrorMessage com
-      o último erro registrado pelo sistema operacional.
-    }
-{$ELSE}
-    {:
-      @name refresh the properties LastOSErrorNumber and LastOSErrorMessage with
-      the last OS error.
-    }
-{$ENDIF}
+    {: @name refresh the properties LastOSErrorNumber and LastOSErrorMessage with
+             the last OS error. }
     procedure RefreshLastOSError;
-
-    {$IFDEF PORTUGUES}
-    //: Evento chamado quando uma falha de leitura ocorre na porta de comunicação.
-{$ELSE}
     //: Event called when a read error occurs on communication port.
-{$ENDIF}
     property OnCommErrorReading: TCommPortErrorEvent read FOnCommErrorReading write FOnCommErrorReading;
-
-    {$IFDEF PORTUGUES}
-    //: Evento chamado quando uma falha de escrita ocorre na porta de comunicação.
-{$ELSE}
     //: Event called when a write error occurs on communication port.
-{$ENDIF}
     property OnCommErrorWriting: TCommPortErrorEvent read FOnCommErrorWriting write FOnCommErrorWriting;
-
-    {$IFDEF PORTUGUES}
-    //: Evento chamado quando a porta é aberta
-{$ELSE}
     //: Event called when the communication port was open.
-{$ENDIF}
     property OnCommPortOpened: TNotifyEvent read FOnCommPortOpened write FOnCommPortOpened;
-
-    {$IFDEF PORTUGUES}
-    //: Evento chamado quando ocorre uma falha na abetura da porta.
-{$ELSE}
     //: Event called when the communication was not open successfully.
-{$ENDIF}
     property OnCommPortOpenError: TNotifyEvent read FOnCommPortOpenError write FOnCommPortOpenError;
-
-    {$IFDEF PORTUGUES}
-    //: Evento chamado quando a porta é fechada.
-{$ELSE}
     //: Event called when the communication port was closed.
-{$ENDIF}
     property OnCommPortClosed: TNotifyEvent read FOnCommPortClosed write FOnCommPortClosed;
-
-    {$IFDEF PORTUGUES}
-    //: Evento chamado quando ocorre uma falha na fechando a porta.
-{$ELSE}
     //: Event called when the communication was not closed successfully.
-{$ENDIF}
     property OnCommPortCloseError: TNotifyEvent read FOnCommPortCloseError write FOnCommPortCloseError;
-
-    {$IFDEF PORTUGUES}
-    //: Evento chamado quando a porta é desconectada devido a algum erro.
-{$ELSE}
     //: Event called when the communication port has been disconected.
-{$ENDIF}
     property OnCommPortDisconnected: TNotifyEvent read FOnCommPortDisconnected write FOnCommPortDisconnected;
-
-    {$IFDEF PORTUGUES}
-    //: Numero de tentativas de leitura.
-{$ELSE}
     //: Number of read retries.
-{$ENDIF}
     property ReadRetries: Cardinal read FReadRetries write SetReadRetries default 3;
-
-    {$IFDEF PORTUGUES}
-    //: Numero de tentativas de escrita.
-{$ELSE}
     //: Number of write retries.
-{$ENDIF}
     property WriteRetries: Cardinal read FWriteRetries write SetWriteRetries default 3;
   public
-
-    {$IFDEF PORTUGUES}
-    {:
-    Cria o driver de porta, inicializando todas as threads e variaveis internas.
-    }
-{$ELSE}
-    {:
-    Creates the communication port, initializing threads and internal variables.
-    }
-{$ENDIF}
+    //: Creates the communication port, initializing threads and internal variables.
     constructor Create(AOwner: TComponent); override;
-
-    {$IFDEF PORTUGUES}
-    {:
-    Destroi o driver de porta, fechando e informando a todos os drivers de
-    protocolo dependentes sobre a destruição, consequentemente a eliminação da
-    referência com este driver de porta.
+    {: Destroys the communication port, closing and removing all references of protocols to it.
     @seealso(TProtocolDriver)
     @seealso(AddProtocol)
-    @seealso(DelProtocol)
-    }
-{$ELSE}
-    {:
-    Destroys the communication port, closing and removing all references of protocols to it.
-    @seealso(TProtocolDriver)
-    @seealso(AddProtocol)
-    @seealso(DelProtocol)
-    }
-{$ENDIF}
+    @seealso(DelProtocol) }
     destructor Destroy; override;
-
-    {$IFDEF PORTUGUES}
-    {:
-    Adiciona um driver de protocolo a lista de dependentes
-    @param(Prot TProtocolDriver. Driver de protocolo a ser adicionado como dependente)
-    @raises(Exception caso Prot não seja descendente de TProtocolDriver)
-    @seealso(TProtocolDriver)
-    }
-{$ELSE}
-    {:
-    Adds a protocol driver as a dependent of the communicaton port.
+    {: Adds a protocol driver as a dependent of the communicaton port.
     @param(Prot TProtocolDriver. Protocol driver to be added as a dependent.)
     @raises(Exception if the Prot is not a TProtocolDriver.)
-    @seealso(TProtocolDriver)
-    }
-{$ENDIF}
+    @seealso(TProtocolDriver) }
     procedure AddProtocol(Prot: TComponent);
-
-    {$IFDEF PORTUGUES}
-    {:
-    Remove um driver de protocolo a lista de dependentes
-    @param(Prot TProtocolDriver. Driver de protocolo a ser removido da lista de
-           dependentes.)
-    @seealso(TProtocolDriver)
-    }
-{$ELSE}
-    {:
-    Removes a protocol driver of the list of dependents.
-    @param(Prot TProtocolDriver. Protocol driver to be removed of the dependents
-           list.)
-    @seealso(TProtocolDriver)
-    }
-{$ENDIF}
+    {: Removes a protocol driver of the list of dependents.
+    @param(Prot TProtocolDriver. Protocol driver to be removed of the dependents list.)
+    @seealso(TProtocolDriver)constructor }
     procedure DelProtocol(Prot: TComponent);
-
-    {$IFDEF PORTUGUES}
-    {:
-    Faz um pedido de leitura/escrita sincrono para o driver (sua aplicação espera
-    todo o comando terminar para continuar).
-    @param(Cmd TIOCommand. Informa a combinação de comandos de leitura/escrita a
-           executar)
-    @param(ToWrite BYTES. Conteudo que deseja escrever)
-    @param(BytesToRead Cardinal. Informa o número de @noAutoLink(bytes) que deverão ser lidos)
-    @param(BytesToWrite Cardinal. Informa o número de @noAutoLink(bytes) a serem escritos)
-    @param(DriverID Cardinal. Identifica o driver de protocolo que está chamando a função.)
-    @param(DelayBetweenCmds Cardinal. Tempo em milisegundos entre comandos de
-           leitura e escrita)
-    @param(CallBack TDriverCallBack. Procedimento que será chamado para retorno
-           dos dados lidos/escritos)
-    @param(Res1 TObject. Objeto que será passado como parametro ao callback.)
-    @param(Res2 Pointer. Pointeiro que será passado como parametro ao callback.)
-    @param(OnBegin TNotifyEvent. Procedimento chamado pelo driver de porta antes de iniciar
-           suas operações. Pode ser usado como inicio de cronometro ou para liberar o
-           mutex de um driver de protocolo para melhorar as atualizações de tags.)
-    @param(OnEnd TNotifyEvent. Procedimento chamado pelo driver de porta após finalizar
-           suas operações. Pode ser usado como finalização de cronometro ou para pegar
-           novamente o mutex de um driver de protocolo, liberado anteriormente com o OnBegin.)
-
-    @return(Retorna o ID do pacote caso tenha exito. Retorna 0 (zero) caso o
-            componente esteja sendo destruido ou a porta não esteja aberta.)
-    @seealso(TIOCommand)
-    @seealso(BYTES)
-    @seealso(TDriverCallBack)
-    @seealso(IOCommandASync)
-    }
-{$ELSE}
-    {:
-    Do a synchronous I/O request to the communication port (blocks your
-    application until this action is done).
+    {: Do a synchronous I/O request to the communication port (blocks your
+       application until this action is done).
     @param(Cmd TIOCommand. The sequence of I/O to be executed.)
     @param(ToWrite Bytes. Data to be written on the communication port)
     @param(BytesToRead Cardinal. Number of @noAutoLink(Bytes) to be read on communication port.)
@@ -789,43 +337,10 @@ type
     @seealso(TIOCommand)
     @seealso(Bytes)
     @seealso(TDriverCallBack)
-    @seealso(IOCommandASync)
-    }
-{$ENDIF}
+    @seealso(IOCommandASync) }
     function IOCommandSync(Cmd: TIOCommand; ToWrite: Bytes; BytesToRead, BytesToWrite, DriverID, DelayBetweenCmds: Cardinal; CallBack: TDriverCallBack; Res1: TObject; Res2: Pointer; OnBegin: TNotifyEvent = nil; OnEnd: TNotifyEvent = nil): Cardinal; overload; deprecated;
-
-    {$IFDEF PORTUGUES}
-    {:
-    Faz um pedido de leitura/escrita sincrono para o driver (sua aplicação espera
-    todo o comando terminar para continuar).
-    @param(Cmd TIOCommand. Informa a combinação de comandos de leitura/escrita a
-           executar)
-    @param(BytesToWrite Cardinal. Informa o número de @noAutoLink(bytes) a serem escritos)
-    @param(ToWrite BYTES. Conteudo que deseja escrever)
-    @param(BytesToRead Cardinal. Informa o número de @noAutoLink(bytes) que deverão ser lidos)
-    @param(DriverID Cardinal. Identifica o driver de protocolo que está chamando a função.)
-    @param(DelayBetweenCmds Cardinal. Tempo em milisegundos entre comandos de
-           leitura e escrita)
-    @param(pkt PIOPacket. Estrutura que irá retornar as informações da execução do
-           comando. Se @code(Nil) não será possível checar o resultado da ação.)
-    @param(OnBegin TNotifyEvent. Procedimento chamado pelo driver de porta antes de iniciar
-           suas operações. Pode ser usado como inicio de cronometro ou para liberar o
-           mutex de um driver de protocolo para melhorar as atualizações de tags.)
-    @param(OnEnd TNotifyEvent. Procedimento chamado pelo driver de porta após finalizar
-           suas operações. Pode ser usado como finalização de cronometro ou para pegar
-           novamente o mutex de um driver de protocolo, liberado anteriormente com o OnBegin.)
-
-    @return(Retorna o ID do pacote caso tenha exito. Retorna 0 (zero) caso o
-            componente esteja sendo destruido ou a porta não esteja aberta.)
-    @seealso(TIOCommand)
-    @seealso(BYTES)
-    @seealso(TDriverCallBack)
-    @seealso(IOCommandASync)
-    }
-{$ELSE}
-    {:
-    Do a synchronous I/O request to the communication port (blocks your
-    application until this action is done).
+    {: Do a synchronous I/O request to the communication port (blocks your
+       application until this action is done).
     @param(Cmd TIOCommand. The sequence of I/O to be executed.)
     @param(BytesToWrite Cardinal. Number of @noAutoLink(Bytes) to be written on communication port.)
     @param(ToWrite Bytes. Data to be written on the communication port)
@@ -845,188 +360,74 @@ type
     @seealso(TIOCommand)
     @seealso(Bytes)
     @seealso(TDriverCallBack)
-    @seealso(IOCommandASync)
-    }
-{$ENDIF}
-    function IOCommandSync(Cmd: TIOCommand; BytesToWrite: Cardinal; ToWrite: Bytes; BytesToRead, DriverID, DelayBetweenCmds: Cardinal; pkt: PIOPacket; OnBegin: TNotifyEvent = nil; OnEnd: TNotifyEvent = nil): Cardinal; overload;
-
-
-    {$IFDEF PORTUGUES}
-    {:
-    Trava a porta para uso exclusivo
-    @param(DriverID Cardinal. Identifica quem deseja obter uso exclusivo.)
-    @returns(@true caso o função trave o driver para uso exclusivo, @false para o contrário)
-    }
-{$ELSE}
-    {:
-    Locks the communication port for exclusive use.
-    @param(DriverID Cardinal. Identifies who wants exclusive access.)
-    @returns(@true if the communicaton port was locked, @false if not.)
-    }
-{$ENDIF}
+    @seealso(IOCommandASync) }
+    function IOCommandSync(Cmd: TIOCommand; BytesToWrite: Cardinal; ToWrite: Bytes; BytesToRead, DriverID, DelayBetweenCmds: Cardinal; Pkt: PIOPacket; OnBegin: TNotifyEvent = nil; OnEnd: TNotifyEvent = nil): Cardinal; overload;
+    {: Locks the communication port for exclusive use.
+       @param(DriverID Cardinal. Identifies who wants exclusive access.)
+       @returns(@true if the communicaton port was locked, @false if not.) }
     function Lock(DriverID: Cardinal): Boolean;
-
-
-    {$IFDEF PORTUGUES}
-    {:
-    Remove a exclusividade de uso do driver de porta, deixando a porta para ser usada
-    livremente por todos.
-    @param(DriverID Cardinal. Identifica quem tem exclusividade sobre o driver.)
-    @returns(@true caso consiga remover o uso exclusivo do driver.)
-    }
-{$ELSE}
-    {:
-    Remove the exclusive access on communication port.
-    @param(DriverID Cardinal. Identifies who has the exclusive access on communication port.)
-    @returns(@true if the communication port was released to be used on non-exclusive access.)
-    }
-{$ENDIF}
+    {: Remove the exclusive access on communication port.
+       @param(DriverID Cardinal. Identifies who has the exclusive access on communication port.)
+       @returns(@true if the communication port was released to be used on non-exclusive access.) }
     function Unlock(DriverID: Cardinal): Boolean;
-
-    {$IFDEF PORTUGUES}
-    {:
-    Retorna verdadeiro se a porta está realmente aberta.
-    }
-{$ELSE}
-    {:
-    Return true if the communication port is open really.
-    }
-{$ENDIF}
+    //: Return true if the communication port is open really.
     function ReallyActive: Boolean; virtual;
-
-    {$IFDEF PORTUGUES}
-    {:
-    Encerra o handle da porta aberta e abre um novo handle.
-    }
-{$ELSE}
-    {:
-    Closes the current port handle and opens a new one.
-    }
-{$ENDIF}
+    //: Closes the current port handle and opens a new one.
     procedure RenewHandle; virtual;
-
-    {$IFDEF PORTUGUES}
-    {:
-    Retorna um identificador da conexão
-    }
-{$ELSE}
-    {:
-    Returns a connection identifier.
-    }
-{$ENDIF}
-    function getPortId: TPortUniqueID; virtual;
+    //: Returns a connection identifier.
+    function GetPortId: TPortUniqueID; virtual;
   published
-
-    {$IFDEF PORTUGUES}
-    //: Abre (caso @true) ou fecha (caso @false) a porta de comunicação.
-{$ELSE}
     //: Opens (@true) or close (@false) the communication port.
-{$ENDIF}
     property Active: Boolean read PActive write SetActive stored True default False;
-
-    {$IFDEF PORTUGUES}
-    //:Caso @true, limpa os buffers de leitura e escrita quando houver erros de comunicação.
-{$ELSE}
-    //:If @true, clears the input/output buffers of communication port if an I/O error has been found.
-{$ENDIF}
+    //: If @true, clears the input/output buffers of communication port if an I/O error has been found.
     property ClearBuffersOnCommErrors: Boolean read PClearBufOnErr write PClearBufOnErr default True;
-
-    {$IFDEF PORTUGUES}
-    //:Informa o ID (número único) de quem travou para uso exclusivo o driver de porta.
-{$ELSE}
-    //:Identification of who have exclusive access on communication port.
-{$ENDIF}
+    //: Identification of who have exclusive access on communication port.
     property LockedBy: Cardinal read PLockedBy;
-
-    {$IFDEF PORTUGUES}
-    //:Caso @true, informa que o driver está sendo usado exclusivamente por alguem.
-{$ELSE}
-    //:Returns @true if the communication port was locked for exclusive access.
-{$ENDIF}
+    //: Returns @true if the communication port was locked for exclusive access.
     property Locked: Boolean read GetLocked;
-
-    {$IFDEF PORTUGUES}
-     //: Informa o codigo do último erro registrado pelo sistema operacional.
-{$ELSE}
     //: The last error code registered by the OS.
-{$ENDIF}
     property LastOSErrorNumber: Longint read FLastOSErrorNumber;
-
-    {$IFDEF PORTUGUES}
-    //: Informa a mensagem do último erro registrado pelo sistema operacional.
-{$ELSE}
     //: The last error message registered by the OS.
-{$ENDIF}
     property LastOSErrorMessage: AnsiString read FLastOSErrorMessage;
-
-    {$IFDEF PORTUGUES}
-    //: Informa quantos comandos são processados por segundos. Atualizado a cada 1 segundo.
-{$ELSE}
     //: How many I/O commands are processed by second. Updated every 1 second.
-{$ENDIF}
     property CommandsPerSecond: Longint read FCommandsSecond;
-
-    {$IFDEF PORTUGUES}
-    //: Total de @noAutoLink(bytes) transmitidos.
-{$ELSE}
     //: Total of @noAutoLink(Bytes) sent (written).
-{$ENDIF}
     property TXBytes: Int64 read FTXBytes;
-
-    {$IFDEF PORTUGUES}
-    //: Total de @noAutoLink(bytes) transmitidos no último segundo.
-{$ELSE}
     //: Total of @noAutoLink(Bytes) sent on the last second.
-{$ENDIF}
     property TXBytesSecond: Int64 read FTXBytesSecond;
-
-    {$IFDEF PORTUGUES}
-    //: Total de @noAutoLink(bytes) recebidos.
-{$ELSE}
     //: Total of @noAutoLink(Bytes) received (received).
-{$ENDIF}
     property RXBytes: Int64 read FRXBytes;
-
-    {$IFDEF PORTUGUES}
-    //: Total de @noAutoLink(bytes) recebidos no último segundo.
-{$ELSE}
     //: Total of @noAutoLink(Bytes) received on the last second.
-{$ENDIF}
     property RXBytesSecond: Int64 read FRXBytesSecond;
-
-    {$IFDEF PORTUGUES}
-    //: Habilita/desabilita o log de ações de leitura e escrita do driver
-{$ELSE}
     //: Enable/disables the log of I/O actions of the communication port.
-{$ENDIF}
     property LogIOActions: Boolean read FLogActions write SetLogActions default False;
-
-    {$IFDEF PORTUGUES}
-    //: Arquivo onde serão armazenados os logs do driver.
-{$ELSE}
     //: File to store the log of I/O actions of the communication port.
-{$ENDIF}
     property LogFile: AnsiString read FLogFile write SetLogFile;
-
-    // variavel onde vai ser armazenado do Bytes de recebimento e envio para amostra
-    property Traffic_receiver: AnsiString read FTraffic_receiver;
-    property Traffic_send: AnsiString read FTraffic_send;
+    //: Variable where the received and sent bytes for the sample will be stored
+    property Traffic_receiver: AnsiString read FTrafficReceiver;
+    property Traffic_send: AnsiString read FTrafficSend;
   end;
 
-  {$IFNDEF FPC}
+
+{$IFNDEF FPC}
 const
   LineEnding = #13#10;
 {$ENDIF}
 
+
 implementation
 
-uses SysUtils, ProtocolDriver, hsstrings, crossdatetime, pascalScadaMTPCPU;
+
+uses
+  SysUtils,
+  ProtocolDriver,
+  hsstrings,
+  crossdatetime,
+  pascalScadaMTPCPU;
+
 
   ////////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////////////////
-  //  THREAD DE NOTIFICAÇÃO DE EVENTOS DE COMUNICAÇÃO.
   //  THREAD OF NOTIFICATION OF COMMUNICATION EVENTS.
-  ////////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////
 
 constructor TEventNotificationThread.Create(CreateSuspended: Boolean; AOwner: TComponent);
@@ -1064,33 +465,32 @@ end;
 procedure TEventNotificationThread.Loop;
 var
   AtMainThread: Boolean;
-  evt: TNotifyEvent;
+  ANotifyEvent: TNotifyEvent;
 begin
   //try
   WaitToDoSomething;
   while FSpool.PeekMessage(PMsg, PSM_COMMERROR, PSM_PORT_EVENT, True) do
   begin
     case PMsg.MsgID of
-      PSM_COMMERROR:
-      begin
-        FEvent := PMsg.wParam;
-        FError := TIOResult(PtrUint(PMsg.lParam));
-        Synchronize(@SyncCommErrorEvent);
-        Dispose(PCommPortErrorEvent(FEvent));
-      end;
+      PSM_COMMERROR:  begin
+                        FEvent := PMsg.wParam;
+                        FError := TIOResult(PtrUint(PMsg.lParam));
+                        Synchronize(@SyncCommErrorEvent);
+                        Dispose(PCommPortErrorEvent(FEvent));
+                      end;
       PSM_PORT_EVENT: begin
-        FEvent := PMsg.wParam;
-        AtMainThread := PMsg.lParam <> nil;
-        if AtMainThread then
-          Synchronize(@SyncPortEvent)
-        else
-        begin
-          evt := PNotifyEvent(FEvent)^;
-          if Assigned(evt) then
-            evt(nil);
-        end;
-        Dispose(PNotifyEvent(FEvent));
-      end;
+                        FEvent := PMsg.wParam;
+                        AtMainThread := PMsg.lParam <> nil;
+                        if AtMainThread then
+                          Synchronize(@SyncPortEvent)
+                        else
+                          begin
+                            ANotifyEvent := PNotifyEvent(FEvent)^;
+                            if Assigned(ANotifyEvent) then
+                              ANotifyEvent(nil);
+                          end;
+                        Dispose(PNotifyEvent(FEvent));
+                      end;
     end;
   end;
   //except
@@ -1105,59 +505,57 @@ end;
 
 procedure TEventNotificationThread.DoCommErrorEvent(Event: TCommPortErrorEvent; Error: TIOResult; MainThread: Boolean);
 var
-  p: PCommPortErrorEvent;
+  ACommPortErrorEvent: PCommPortErrorEvent;
 begin
-  New(p);
-  p^ := Event;
-  FSpool.PostMessage(PSM_COMMERROR, p, Pointer(PtrUint(Error)), False);
+  New(ACommPortErrorEvent);
+  ACommPortErrorEvent^ := Event;
+  FSpool.PostMessage(PSM_COMMERROR, ACommPortErrorEvent, Pointer(PtrUint(Error)), False);
   DoSomething;
 end;
 
 procedure TEventNotificationThread.DoCommPortEvent(Event: TNotifyEvent; MainThread: Boolean);
 var
-  p: PNotifyEvent;
-  pb: Pointer;
+  ANotifyEvent: PNotifyEvent;
+  APointer: Pointer;
 begin
-  New(p);
-  p^ := Event;
+  New(ANotifyEvent);
+  ANotifyEvent^ := Event;
 
-  pb := nil;
-  if MainThread then pb := Pointer(1);
+  APointer := nil;
+  if MainThread then
+    APointer := Pointer(1);
 
-  FSpool.PostMessage(PSM_PORT_EVENT, p, pb, False);
+  FSpool.PostMessage(PSM_PORT_EVENT, ANotifyEvent, APointer, False);
   DoSomething;
 end;
 
 procedure TEventNotificationThread.SyncCommErrorEvent;
 var
-  ievt: TCommPortErrorEvent;
+  ACommPortErrorEvent: TCommPortErrorEvent;
 begin
   if FEvent = nil then Exit;
   try
-    ievt := TCommPortErrorEvent(FEvent^);
-    ievt(FError);
+    ACommPortErrorEvent := TCommPortErrorEvent(FEvent^);
+    ACommPortErrorEvent(FError);
   finally
   end;
 end;
 
 procedure TEventNotificationThread.SyncPortEvent;
 var
-  ievt: TNotifyEvent;
+  ANotifyEvent: TNotifyEvent;
 begin
   if FEvent = nil then Exit;
   try
-    ievt := TNotifyEvent(FEvent^);
-    ievt(FOwner);
+    ANotifyEvent := TNotifyEvent(FEvent^);
+    ANotifyEvent(FOwner);
   finally
   end;
 end;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-//  DECLARAÇÃO DO COMPONENTE PORTA DE COMUNICAÇÃO
 //  CODE OF THE BASE OF COMMUNICATION PORT DRIVER CLASS.
-////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
 constructor TCommPortDriver.Create(AOwner: TComponent);
@@ -1203,88 +601,90 @@ end;
 procedure TCommPortDriver.AddProtocol(Prot: TComponent);
 var
   i: Longint;
-  found, interfaced: Boolean;
+  Found: Boolean;
+  Interfaced: Boolean;
 begin
-  interfaced := Supports(Prot, IPortDriverEventNotification);
-  if not interfaced then
+  Interfaced := Supports(Prot, IPortDriverEventNotification);
+  if not Interfaced then
     if not (Prot is TProtocolDriver) then
       raise Exception.Create(SCompIsntADriver);
 
-  found := False;
-  if interfaced then
-  begin
-    for i := 0 to High(EventInterfaces) do
-      if EventInterfaces[i] = (Prot as IPortDriverEventNotification) then
-      begin
-        found := True;
-        Break;
-      end;
-  end
-  else
-  begin
-    for i := 0 to High(Protocols) do
-      if Protocols[i] = Prot then
-      begin
-        found := True;
-        Break;
-      end;
-  end;
-
-  if not found then
-  begin
-    if interfaced then
+  Found := False;
+  if Interfaced then
     begin
-      i := length(EventInterfaces);
-      SetLength(EventInterfaces, i + 1);
-      EventInterfaces[i] := (Prot as IPortDriverEventNotification);
+      for i := 0 to High(EventInterfaces) do
+        if EventInterfaces[i] = (Prot as IPortDriverEventNotification) then
+        begin
+          Found := True;
+          Break;
+        end;
     end
-    else
+  else
     begin
-      i := length(Protocols);
-      SetLength(Protocols, i + 1);
-      Protocols[i] := Prot;
+      for i := 0 to High(Protocols) do
+        if Protocols[i] = Prot then
+        begin
+          Found := True;
+          Break;
+        end;
     end;
+
+  if not Found then
+  begin
+    if Interfaced then
+      begin
+        i := Length(EventInterfaces);
+        SetLength(EventInterfaces, i + 1);
+        EventInterfaces[i] := (Prot as IPortDriverEventNotification);
+      end
+    else
+      begin
+        i := Length(Protocols);
+        SetLength(Protocols, i + 1);
+        Protocols[i] := Prot;
+      end;
   end;
 end;
 
 procedure TCommPortDriver.DelProtocol(Prot: TComponent);
 var
-  found, interfaced: Boolean;
+  Found: Boolean;
+  Interfaced: Boolean;
   i: Longint;
 begin
-  interfaced := Supports(Prot, IPortDriverEventNotification);
-  found := False;
-  if interfaced then
-  begin
-    for i := 0 to High(EventInterfaces) do
-      if EventInterfaces[i] = (Prot as IPortDriverEventNotification) then
-      begin
-        found := True;
-        Break;
-      end;
-  end
-  else
-  begin
-    for i := 0 to High(Protocols) do
-      if Protocols[i] = Prot then
-      begin
-        found := True;
-        Break;
-      end;
-  end;
-
-  if found then
-  begin
-    if interfaced then
+  Interfaced := Supports(Prot, IPortDriverEventNotification);
+  Found := False;
+  if Interfaced then
     begin
-      EventInterfaces[i] := EventInterfaces[High(EventInterfaces)];
-      SetLength(EventInterfaces, High(EventInterfaces));
+      for i := 0 to High(EventInterfaces) do
+        if EventInterfaces[i] = (Prot as IPortDriverEventNotification) then
+        begin
+          Found := True;
+          Break;
+        end;
     end
-    else
+  else
     begin
-      Protocols[i] := Protocols[High(Protocols)];
-      SetLength(Protocols, High(Protocols));
+      for i := 0 to High(Protocols) do
+        if Protocols[i] = Prot then
+        begin
+          Found := True;
+          Break;
+        end;
     end;
+
+  if Found then
+  begin
+    if Interfaced then
+      begin
+        EventInterfaces[i] := EventInterfaces[High(EventInterfaces)];
+        SetLength(EventInterfaces, High(EventInterfaces));
+      end
+    else
+      begin
+        Protocols[i] := Protocols[High(Protocols)];
+        SetLength(Protocols, High(Protocols));
+      end;
   end;
 end;
 
@@ -1293,29 +693,25 @@ begin
   Result := False;
 end;
 
-procedure TCommPortDriver.IOCommand(cmd: TIOCommand; Packet: PIOPacket);
+procedure TCommPortDriver.IOCommand(Cmd: TIOCommand; Packet: PIOPacket);
 begin
   if csDestroying in ComponentState then
     Exit;
 
   FDelayBetweenCmds := Packet^.DelayBetweenCommand;
-  case cmd of
-    iocRead:
-      Read(Packet);
-    iocReadWrite:
-    begin
-      Read(Packet);
-      NeedSleepBetweenRW;
-      Write(Packet);
-    end;
-    iocWrite:
-      Write(Packet);
-    iocWriteRead:
-    begin
-      Write(Packet);
-      NeedSleepBetweenRW;
-      Read(Packet);
-    end;
+  case Cmd of
+    iocRead: Read(Packet);
+    iocReadWrite: begin
+                    Read(Packet);
+                    NeedSleepBetweenRW;
+                    Write(Packet);
+                  end;
+    iocWrite: Write(Packet);
+    iocWriteRead: begin
+                    Write(Packet);
+                    NeedSleepBetweenRW;
+                    Read(Packet);
+                  end;
   end;
   FRXBytes := FRXBytes + Packet^.Received;
   FTXBytes := FTXBytes + Packet^.Written;
@@ -1323,22 +719,22 @@ end;
 
 procedure TCommPortDriver.CommError(WriteCmd: Boolean; Error: TIOResult);
 var
-  evt: TCommPortErrorEvent;
+  ACommPortErrorEvent: TCommPortErrorEvent;
 begin
   if WriteCmd then
-  begin
-    evt := @DoWriteError;
-  end
+    begin
+      ACommPortErrorEvent := @DoWriteError;
+    end
   else
-  begin
-    evt := @DoReadError;
-  end;
+    begin
+      ACommPortErrorEvent := @DoReadError;
+    end;
 
-  if Assigned(evt) then
+  if Assigned(ACommPortErrorEvent) then
     if MainThreadID = GetCurrentThreadId then
-      evt(Error)
+      ACommPortErrorEvent(Error)
     else
-      PEventUpdater.DoCommErrorEvent(evt, Error, True);
+      PEventUpdater.DoCommErrorEvent(ACommPortErrorEvent, Error, True);
 end;
 
 procedure TCommPortDriver.CommPortOpened;
@@ -1409,8 +805,6 @@ begin
 end;
 
 ////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
 
 procedure TCommPortDriver.DoReadError(Error: TIOResult);
 begin
@@ -1479,8 +873,7 @@ end;
 
 function TCommPortDriver.Lock(DriverID: Cardinal): Boolean;
 begin
-  //espera todos acabarem seus comandos.
-  //waits everyone finish their commands.
+  // waits everyone finish their commands
   while PUnlocked > 0 do
     CrossThreadSwitch;
 
@@ -1519,16 +912,16 @@ end;
 function TCommPortDriver.ReallyActive: Boolean;
 begin
   if [csDesigning] * ComponentState <> [] then
-  begin
-    if FExclusiveDevice then
     begin
-      Result := False;
+      if FExclusiveDevice then
+        begin
+          Result := False;
+        end
+      else
+        begin
+          Result := PActive;
+        end;
     end
-    else
-    begin
-      Result := PActive;
-    end;
-  end
   else
     Result := PActive;
 end;
@@ -1538,55 +931,50 @@ begin
 
 end;
 
-function TCommPortDriver.getPortId: TPortUniqueID;
+function TCommPortDriver.GetPortId: TPortUniqueID;
 begin
 
 end;
 
-procedure TCommPortDriver.SetActive(v: Boolean);
+procedure TCommPortDriver.SetActive(AValue: Boolean);
 var
   x: Boolean;
 begin
-  //se esta carregando as propriedades
-  //if it is being loading.
+  // if it is being loading
   if csReading in ComponentState then
   begin
-    FReadActive := v;
+    FReadActive := AValue;
     Exit;
   end;
-
-  //evita a abertura/fechamento da porta em edição, quando um dispositivo
-  //e de uso exclusivo (porta serial).
-
-  //avoid the open/close of communication port in design-time if the communication
-  //port is exclusive (like a serial port)
+  // avoid the open/close of communication port in design-time if the communication
+  // port is exclusive (like a serial port)
   if FExclusiveDevice and (csDesigning in ComponentState) then
-  begin
-    if v then
     begin
-      if ComSettingsOK then
-      begin
-        PActive := True;
-      end;
+      if AValue then
+        begin
+          if ComSettingsOK then
+          begin
+            PActive := True;
+          end;
+        end
+      else
+        begin
+          PActive := False;
+        end;
     end
-    else
-    begin
-      PActive := False;
-    end;
-  end
   else
-  begin
-    if v then
     begin
-      InternalPortStart(x);
-      PActive := x;
-    end
-    else
-    begin
-      InternalPortStop(x);
-      PActive := x = False;
+      if AValue then
+        begin
+          InternalPortStart(x);
+          PActive := x;
+        end
+      else
+        begin
+          InternalPortStop(x);
+          PActive := x = False;
+        end;
     end;
-  end;
 end;
 
 procedure TCommPortDriver.OpenInEditMode(v: Boolean);
@@ -1618,10 +1006,11 @@ begin
 
     Result := 0;
 
-    if (csDestroying in ComponentState) or (FExclusiveDevice and (csDesigning in ComponentState)) then
+    if (csDestroying in ComponentState)
+      or (FExclusiveDevice and (csDesigning in ComponentState)) then
       Exit;
 
-    //verify if another driver is the owner of the comm port...
+    // verify if another driver is the owner of the comm port
     PLockCS.Enter;
     InLockCS := True;
     while (PLockedBy <> 0) and (PLockedBy <> DriverID) do
@@ -1646,8 +1035,7 @@ begin
 
     Inc(PPacketID);
 
-    //cria o pacote
-    //creates de command packet.
+    // creates de command packet
     PPacket.PacketID := PPacketID;
     PPacket.WriteIOResult := iorNone;
     PPacket.ToWrite := BytesToWrite;
@@ -1665,16 +1053,16 @@ begin
     PPacket.Res2 := Res2;
     SetLength(PPacket.BufferToRead, BytesToRead);
 
-    //executes the I/O command.
+    // executes the I/O command
     InternalIOCommand(Cmd, @PPacket);
     if Assigned(CallBack) then
       CallBack(PPacket);
 
-    //free the buffers
+    // free the buffers
     SetLength(PPacket.BufferToWrite, 0);
     SetLength(PPacket.BufferToRead, 0);
 
-    //return the command ID.
+    // return the command ID
     Result := PPacketID;
 
     if Assigned(OnEnd) then
@@ -1690,7 +1078,7 @@ begin
   end;
 end;
 
-function TCommPortDriver.IOCommandSync(Cmd: TIOCommand; BytesToWrite: Cardinal; ToWrite: Bytes; BytesToRead, DriverID, DelayBetweenCmds: Cardinal; pkt: PIOPacket; OnBegin: TNotifyEvent; OnEnd: TNotifyEvent): Cardinal;
+function TCommPortDriver.IOCommandSync(Cmd: TIOCommand; BytesToWrite: Cardinal; ToWrite: Bytes; BytesToRead, DriverID, DelayBetweenCmds: Cardinal; Pkt: PIOPacket; OnBegin: TNotifyEvent; OnEnd: TNotifyEvent): Cardinal;
 var
   InLockCS: Boolean;
   InIOCmdCS: Boolean;
@@ -1702,15 +1090,16 @@ begin
 
     Result := 0;
 
-    if pkt = nil then
+    if Pkt = nil then
       New(PPacket)
     else
-      PPacket := pkt;
+      PPacket := Pkt;
 
-    if (csDestroying in ComponentState) or (FExclusiveDevice and (csDesigning in ComponentState)) then
+    if (csDestroying in ComponentState)
+      or (FExclusiveDevice and (csDesigning in ComponentState)) then
       Exit;
 
-    //verify if another driver is the owner of the comm port...
+    // verify if another driver is the owner of the comm port...
     PLockCS.Enter;
     InLockCS := True;
     while (PLockedBy <> 0) and (PLockedBy <> DriverID) do
@@ -1735,8 +1124,7 @@ begin
 
     Inc(PPacketID);
 
-    //cria o pacote
-    //creates de command packet.
+    // creates de command packet
     PPacket^.PacketID := PPacketID;
     PPacket^.WriteIOResult := iorNone;
     PPacket^.ToWrite := BytesToWrite;
@@ -1756,23 +1144,23 @@ begin
 
     if (not ReallyActive) then
       Exit;
-    //executes the I/O command.
+    // executes the I/O command
     InternalIOCommand(Cmd, @PPacket^);
 
-    //free the buffers
-    if pkt = nil then
+    // free the buffers
+    if Pkt = nil then
     begin
       SetLength(PPacket^.BufferToWrite, 0);
       SetLength(PPacket^.BufferToRead, 0);
     end;
 
-    //return the command ID.
+    // return the command ID
     Result := PPacketID;
 
     if Assigned(OnEnd) then
       OnEnd(Self);
   finally
-    if pkt = nil then
+    if Pkt = nil then
       Dispose(PPacket);
 
     if InIOCmdCS then
@@ -1785,34 +1173,34 @@ begin
   end;
 end;
 
-procedure TCommPortDriver.InternalIOCommand(cmd: TIOCommand; Packet: PIOPacket);
+procedure TCommPortDriver.InternalIOCommand(Cmd: TIOCommand; Packet: PIOPacket);
 begin
   try
     PIOCmdCS.Enter;
-    //verify if the communication port is active.
+    // verify if the communication port is active
     if ReallyActive then
-    begin
-      //try
-      //executes the I/O command.
-      IOCommand(cmd, Packet);
-      //except
-      //  if cmd in [iocRead, iocReadWrite, iocWriteRead] then
-      //    Packet^.ReadIOResult := iorPortError;
-      //  if cmd in [iocWrite, iocReadWrite, iocWriteRead] then
-      //    Packet^.WriteIOResult := iorPortError;
-      //end;
-    end
+      begin
+        //try
+        // executes the I/O command.
+        IOCommand(Cmd, Packet);
+        //except
+        //  if Cmd in [iocRead, iocReadWrite, iocWriteRead] then
+        //    Packet^.ReadIOResult := iorPortError;
+        //  if Cmd in [iocWrite, iocReadWrite, iocWriteRead] then
+        //    Packet^.WriteIOResult := iorPortError;
+        //end;
+      end
     else
-    begin
-      if cmd in [iocRead, iocReadWrite, iocWriteRead] then
-        Packet^.ReadIOResult := iorNotReady;
-      if cmd in [iocWrite, iocReadWrite, iocWriteRead] then
-        Packet^.WriteIOResult := iorNotReady;
-    end;
-    // dados de Bytes
-    Traffic(cmd, Packet^);
+      begin
+        if Cmd in [iocRead, iocReadWrite, iocWriteRead] then
+          Packet^.ReadIOResult := iorNotReady;
+        if Cmd in [iocWrite, iocReadWrite, iocWriteRead] then
+          Packet^.WriteIOResult := iorNotReady;
+      end;
+    // Bytes data
+    Traffic(Cmd, Packet^);
     if FLogActions then
-      LogAction(cmd, Packet^);
+      LogAction(Cmd, Packet^);
   finally
     PIOCmdCS.Leave;
   end;
@@ -1869,28 +1257,28 @@ end;
 
 procedure TCommPortDriver.RefreshLastOSError;
 {$IFNDEF FPC}
-{$IF defined(WIN32) or defined(WIN64)}
+  {$IF defined(WIN32) or defined(WIN64)}
 var
   Buffer: PAnsiChar;
-{$IFEND}
+  {$IFEND}
 {$ENDIF}
 begin
-  {$IFDEF FPC}
+{$IFDEF FPC}
   FLastOSErrorNumber := GetLastOSError;
   FLastOSErrorMessage := SysErrorMessage(FLastOSErrorNumber);
-  {$ELSE}
+{$ELSE}
   {$IF defined(WIN32) or defined(WIN64)}
   FLastOSErrorNumber := GetLastError;
   GetMem(Buffer, 512);
   if FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, nil, FLastOSErrorNumber, LANG_NEUTRAL, Buffer, 512, nil) <> 0 then
-  begin
-    FLastOSErrorMessage:=Buffer;
-    FreeMem(Buffer);
-  end
+    begin
+      FLastOSErrorMessage := Buffer;
+      FreeMem(Buffer);
+    end
   else
     FLastOSErrorMessage := SFaultGettingLastOSError;
   {$IFEND}
-  {$ENDIF}
+{$ENDIF}
 end;
 
 procedure TCommPortDriver.SetLogActions(Log: Boolean);
@@ -1915,15 +1303,15 @@ begin
     end;
 
     if Log then
-    begin
-      if not FileExists(FLogFile) then
       begin
-        FLogFileStream := TFileStream.Create(FLogFile, fmCreate);
-        FLogFileStream.Destroy;
-      end;
-      FLogFileStream := TFileStream.Create(FLogFile, fmOpenReadWrite + fmShareDenyWrite);
-      FLogFileStream.Position := FLogFileStream.Size;
-    end
+        if not FileExists(FLogFile) then
+        begin
+          FLogFileStream := TFileStream.Create(FLogFile, fmCreate);
+          FLogFileStream.Destroy;
+        end;
+        FLogFileStream := TFileStream.Create(FLogFile, fmOpenReadWrite + fmShareDenyWrite);
+        FLogFileStream.Position := FLogFileStream.Size;
+      end
     else
       FLogFileStream.Destroy;
     CanOpen := True;
@@ -1933,56 +1321,53 @@ begin
   end;
 end;
 
-procedure TCommPortDriver.SetLogFile(nFile: AnsiString);
+procedure TCommPortDriver.SetLogFile(NFile: AnsiString);
 var
   isLogging: Boolean;
 begin
   PIOCmdCS.Enter;
   try
-    if nFile = FLogFile then Exit;
+    if NFile = FLogFile then Exit;
     isLogging := FLogActions;
     LogIOActions := False;
-    FLogFile := nFile;
+    FLogFile := NFile;
     LogIOActions := isLogging;
   finally
     PIOCmdCS.Leave;
   end;
 end;
 
-procedure TCommPortDriver.LogAction(cmd: TIOCommand; Packet: TIOPacket);
 
-  function bufferToHex(Buf: Bytes): AnsiString;
-  var
-    i: Longint;
-  begin
-    Result := '';
-    for i := 0 to High(Buf) do
-      Result := Result + IntToHex(Buf[i], 2) + ' ';
+const
+  S_WRITE_IO_RESULT: array [TIOResult] of AnsiString = (
+    'iorOK',
+    'iorTimeOut',
+    'iorNotReady',
+    'iorNone',
+    'iorPortError');
+
+
+function BufferToHex(Buf: Bytes): AnsiString;
+var
+  i: Longint;
+begin
+  Result := '';
+  for i := 0 to High(Buf) do
+    Result := Result + IntToHex(Buf[i], 2) + ' ';
+end;
+
+function TranslateCmdName(Cmd: TIOCommand): AnsiString;
+begin
+  case Cmd of
+    iocNone:      Result := 'iocNone     ';
+    iocRead:      Result := 'iocRead     ';
+    iocReadWrite: Result := 'iocReadWrite';
+    iocWrite:     Result := 'iocWrite    ';
+    iocWriteRead: Result := 'iocWriteRead';
   end;
+end;
 
-  function TranslateCmdName(cmd: TIOCommand): AnsiString;
-  begin
-    case cmd of
-      iocNone: Result := 'iocNone     ';
-      iocRead: Result := 'iocRead     ';
-      iocReadWrite: Result := 'iocReadWrite';
-      iocWrite: Result := 'iocWrite    ';
-      iocWriteRead: Result := 'iocWriteRead';
-    end;
-  end;
-
-  function TranslateResultName(res: TIOResult): AnsiString;
-  const
-    ENUM_MAP: array[TIOResult] of AnsiString = (
-      'iorOK',
-      'iorTimeOut',
-      'iorNotReady',
-      'iorNone',
-      'iorPortError');
-  begin
-    Result := ENUM_MAP[res];
-  end;
-
+procedure TCommPortDriver.LogAction(Cmd: TIOCommand; Packet: TIOPacket);
 var
   FS: TStringStream;
   TimeStamp: AnsiString;
@@ -1994,25 +1379,33 @@ begin
   try
     FS := TStringStream.Create('');
     TimeStamp := FormatDateTime('mmm-dd hh:nn:ss.zzz', CrossNow);
-    if cmd = iocRead then
-    begin
-      FS.WriteString(TimeStamp + ', ' + TranslateCmdName(cmd) + ', Result=' + TranslateResultName(Packet.ReadIOResult) + ', Received: ' + bufferToHex(Packet.BufferToRead) + LineEnding);
-    end;
-    if cmd = iocReadWrite then
-    begin
-      FS.WriteString(TimeStamp + ', ' + TranslateCmdName(cmd) + ', Result=' + TranslateResultName(Packet.ReadIOResult) + ', Received: ' + bufferToHex(Packet.BufferToRead) + LineEnding);
-      FS.WriteString(TimeStamp + ', ' + TranslateCmdName(cmd) + ', Result=' + TranslateResultName(Packet.WriteIOResult) + ', Written:    ' + bufferToHex(Packet.BufferToWrite) + LineEnding);
-    end;
-
-    if cmd = iocWriteRead then
-    begin
-      FS.WriteString(TimeStamp + ', ' + TranslateCmdName(cmd) + ', Result=' + TranslateResultName(Packet.WriteIOResult) + ', Written:    ' + bufferToHex(Packet.BufferToWrite) + LineEnding);
-      FS.WriteString(TimeStamp + ', ' + TranslateCmdName(cmd) + ', Result=' + TranslateResultName(Packet.ReadIOResult) + ', Received: ' + bufferToHex(Packet.BufferToRead) + LineEnding);
-    end;
-
-    if cmd = iocWrite then
-    begin
-      FS.WriteString(TimeStamp + ', ' + TranslateCmdName(cmd) + ', Result=' + TranslateResultName(Packet.WriteIOResult) + ', Written:    ' + bufferToHex(Packet.BufferToWrite) + LineEnding);
+    case Cmd of
+      iocRead:      begin
+                      FS.WriteString(TimeStamp + ', ' + TranslateCmdName(Cmd) +
+                        ', Result=' + S_WRITE_IO_RESULT[Packet.ReadIOResult] +
+                        ', Received: ' + BufferToHex(Packet.BufferToRead) + LineEnding);
+                    end;
+      iocReadWrite: begin
+                      FS.WriteString(TimeStamp + ', ' + TranslateCmdName(Cmd) +
+                        ', Result=' + S_WRITE_IO_RESULT[Packet.ReadIOResult] +
+                        ', Received: ' + BufferToHex(Packet.BufferToRead) + LineEnding);
+                      FS.WriteString(TimeStamp + ', ' + TranslateCmdName(Cmd) +
+                        ', Result=' + S_WRITE_IO_RESULT[Packet.WriteIOResult] +
+                        ', Written:    ' + BufferToHex(Packet.BufferToWrite) + LineEnding);
+                    end;
+      iocWriteRead: begin
+                      FS.WriteString(TimeStamp + ', ' + TranslateCmdName(Cmd) +
+                        ', Result=' + S_WRITE_IO_RESULT[Packet.WriteIOResult] +
+                        ', Written:    ' + BufferToHex(Packet.BufferToWrite) + LineEnding);
+                      FS.WriteString(TimeStamp + ', ' + TranslateCmdName(Cmd) +
+                        ', Result=' + S_WRITE_IO_RESULT[Packet.ReadIOResult] +
+                        ', Received: ' + BufferToHex(Packet.BufferToRead) + LineEnding);
+                    end;
+      iocWrite:     begin
+                      FS.WriteString(TimeStamp + ', ' + TranslateCmdName(Cmd) +
+                        ', Result=' + S_WRITE_IO_RESULT[Packet.WriteIOResult] +
+                        ', Written:    ' + BufferToHex(Packet.BufferToWrite) + LineEnding);
+                    end;
     end;
     FS.Position := 0;
     FLogFileStream.CopyFrom(FS, FS.Size);
@@ -2021,31 +1414,21 @@ begin
   end;
 end;
 
-// efetua amostragem do trafefgo recebidos e enviados //////////////////////////
-procedure TCommPortDriver.Traffic(cmd: TIOCommand; Packet: TIOPacket);
 
-  function bufferToHex(Buf: Bytes): AnsiString;
-  var
-    i: Longint;
-  begin
-    Result := '';
-    for i := 0 to High(Buf) do
-      Result := Result + IntToHex(Buf[i], 2) + ' ';
-  end;
-
+procedure TCommPortDriver.Traffic(Cmd: TIOCommand; Packet: TIOPacket);
+// performs sampling of incoming and outgoing traffic
 begin
-  if cmd = iocRead then
-  begin
-    FTraffic_receiver_1 := bufferToHex(Packet.BufferToRead);
+  case Cmd of
+    iocRead:      begin
+                    FTrafficReceiver1 := BufferToHex(Packet.BufferToRead);
+                  end;
+    iocWriteRead: begin
+                    FTrafficSend := BufferToHex(Packet.BufferToWrite);
+                    FTrafficReceiver2 := BufferToHex(Packet.BufferToRead);
+                  end;
   end;
-
-  if cmd = iocWriteRead then
-  begin
-    FTraffic_send := bufferToHex(Packet.BufferToWrite);
-    FTraffic_receiver_2 := bufferToHex(Packet.BufferToRead);
-
-  end;
-  FTraffic_receiver := FTraffic_receiver_2 + FTraffic_receiver_1;
+  FTrafficReceiver := FTrafficReceiver2 + FTrafficReceiver1;
 end;
+
 
 end.

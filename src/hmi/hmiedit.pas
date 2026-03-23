@@ -28,7 +28,7 @@ type
   {$IFDEF PORTUGUES}
   {:
     @author(Fabio Luis Girardi <fabio@pascalscada.com>)
-    Implementa um Edit para leitura/escrita de valores texto/numéricos em tags.
+    Implementa um Edit para reading/escrita de valores texto/numéricos em tags.
 
     @bold(Para maiores informações consulte a documentação da classe TEdit
     de seu ambiente de desenvolvimento.)
@@ -390,7 +390,7 @@ begin
   if not FRegInSecMan then
   begin
     {$IFNDEF WINDOWS}
-    writeln('FIX-ME: Failed to register class ', ClassName, ' instace with name="', Name, '" in the ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
+    WriteLn('FIX-ME: Failed to register class ', ClassName, ' instace with name="', Name, '" in the ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
     {$ENDIF}
   end;
   inherited Color := clWindow;
@@ -419,7 +419,7 @@ begin
   else
   begin
     {$IFNDEF WINDOWS}
-    writeln('FIX-ME: Why class ', ClassName, ', instace name="', Name, '" ins''t registered in ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
+    WriteLn('FIX-ME: Why class ', ClassName, ', instace name="', Name, '" ins''t registered in ControlSecurityManager?', {$i %FILE%}, ':', {$i %LINE%});
     {$ENDIF}
   end;
 
@@ -432,7 +432,7 @@ end;
 {$IFNDEF FPC}
 procedure THMIEdit.CreateParams(var Params: TCreateParams);
 const
-  Alignments: array[TAlignment] of Longint =
+  Alignments: array [TAlignment] of Longint =
     (ES_LEFT, ES_RIGHT, ES_CENTER);
 begin
   inherited CreateParams(Params);

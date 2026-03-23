@@ -131,8 +131,8 @@ begin
       FBorderWidth,
       ColorToBGRA(FBodyColor));
     Aux.CanvasBGRA.Polyline([point(Trunc(0.81 * AWidth) - FBorderWidth,
-      Trunc(48 / 52 * AHeight) - FBorderWidth Div 2),
-      point(Trunc(0.81 * AWidth) - FBorderWidth, Trunc(3 / 52 * AHeight) + FBorderWidth Div 2)]);
+      Trunc(48 / 52 * AHeight) - FBorderWidth div 2),
+      point(Trunc(0.81 * AWidth) - FBorderWidth, Trunc(3 / 52 * AHeight) + FBorderWidth div 2)]);
 
     if Rotate then
     begin

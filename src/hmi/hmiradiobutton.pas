@@ -109,7 +109,7 @@ end;
 procedure THMIRadioButton.Click;
 begin
   if State<>cbChecked then
-     TCheckBox(self).State := cbChecked;
+     TCheckBox(Self).State := cbChecked;
   Inherited DoOnChange;
 end;
 
@@ -117,7 +117,7 @@ end;
 
 procedure THMIRadioButton.CreateParams(var Params: TCreateParams);
 const
-  ALIGNMENTS: array[Boolean, TLeftRight] of Cardinal =
+  ALIGNMENTS: array [Boolean, TLeftRight] of Cardinal =
     ((BS_LEFTTEXT, 0), (0, BS_LEFTTEXT));
 begin
   inherited CreateParams(Params);

@@ -265,7 +265,7 @@ var
 
   procedure CentralUserData(aObj:TJSONObject);
   const
-    bVal:array[low(boolean)..high(Boolean)] of string = ('false', 'true');
+    bVal:array [low(boolean)..high(Boolean)] of string = ('false', 'true');
   begin
     //Result:='';
     if UseCentralUserAsLocalUser and Assigned(aObj) then begin

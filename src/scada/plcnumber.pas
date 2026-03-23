@@ -1,10 +1,4 @@
 {$i ../common/language.inc}
-{$IFDEF PORTUGUES}
-{:
-  @abstract(Implementa um tag PLC numérico para uso geral.)
-  @author(Fabio Luis Girardi fabio@pascalscada.com)
-}
-{$ELSE}
 {:
   @abstract(Unit that implements a numeric tag for general use.)
   @author(Fabio Luis Girardi fabio@pascalscada.com)
@@ -18,7 +12,6 @@
   @author(Juanjo Montero <juanjo.montero@gmail.com>)
   ***********************************************************************
 }
-{$ENDIF}
 unit PLCNumber;
 
 interface
@@ -28,218 +21,88 @@ uses
 
 type
 
-  {$IFDEF PORTUGUES}
-  {:
-    @abstract(Classe base para tags numéricos.)
-    @author(Fabio Luis Girardi fabio@pascalscada.com)
-  }
-  {$ELSE}
-  {:
-    @abstract(Base class of numeric tags.)
-    @author(Fabio Luis Girardi fabio@pascalscada.com)
-  }
-  {$ENDIF}
+  {: @abstract(Base class of numeric tags.)
+     @author(Fabio Luis Girardi fabio@pascalscada.com) }
   TPLCNumber = class(TPLCTag)
   protected
     //: @seealso(ITagInterface.GetValueAsText);
-    function GetValueAsText(Prefix, Sufix, Format: UTF8String; FormatDateTimeOptions:TFormatDateTimeOptions=[]): UTF8String; virtual;
+    function GetValueAsText(Prefix, Sufix, Format: UTF8String; FormatDateTimeOptions: TFormatDateTimeOptions = []): UTF8String; virtual;
     //: @seealso(TTag.AsyncNotifyChange)    
-    procedure AsyncNotifyChange(data:Pointer); override;
+    procedure AsyncNotifyChange(Data: Pointer); override;
     //: @seealso(TTag.GetValueChangeData)
     function GetValueChangeData: Pointer; override;
     //: @seealso(TTag.ReleaseChangeData)
-    procedure ReleaseChangeData(data: Pointer); override;
-    procedure SetMinMaxValues(aMin, aMax: Double); virtual;
+    procedure ReleaseChangeData(Data: Pointer); override;
+    procedure SetMinMaxValues(AMin, AMax: Double); virtual;
   protected
-    {$IFDEF PORTUGUES}
-    //: Armazena se devem ser verificados limites minimos e máximos
-    {$ELSE}
     //: Stores if must be checked the minimum and maximum limits.
-    {$ENDIF}
-    FEnableMin, FEnableMax:Boolean;
-
-    {$IFDEF PORTUGUES}
-    //: Armazena os valores de limites inferior e superior, apenas entrada.
-    {$ELSE}
+    FEnableMin: Boolean;
+    FEnableMax: Boolean;
     //: Stores the minimum and maximum limits.
-    {$ENDIF}
-    FMinLimit, FMaxLimit:Double;
-
-    {$IFDEF PORTUGUES}
-    //: Armazena a sequência de escalas aplicadas a esse tag.
-    {$ELSE}
+    FMinLimit: Double;
+    FMaxLimit: Double;
     //: Store the scales linked with the tag.
-    {$ENDIF}
-    PScaleProcessor:TScaleProcessor;
-
-    {$IFDEF PORTUGUES}
-    //: Armazena o valor puro (sem escalas).
-    {$ELSE}
+    PScaleProcessor: TScaleProcessor;
     //: Stores the raw value (without scales).
-    {$ENDIF}
-    PValueRaw:Double;
+    PValueRaw: Double;
 
-    {$IFDEF PORTUGUES}
-    //: Retorna o valor processado pelas escalas associadas, ou o valor puro caso contrário.
-    {$ELSE}
     //: Returns the value processed by the linked scales or the value raw.
-    {$ENDIF}
-    function GetValue:Double; virtual;
-
-    {$IFDEF PORTUGUES}
-    //: Retorna o valor PURO.
-    {$ELSE}
+    function GetValue: Double; virtual;
     //: Returns the raw value.
-    {$ENDIF}
-    function GetValueRaw:Double; virtual; abstract;
-
-    {$IFDEF PORTUGUES}
-    {: Processa pelas escalas associadas e escreve o valor processado no dispositivo.
-    @param(Value Double: Valor a processar e escrever.)
-    @seealso(SetValueRaw)
-    }
-    {$ELSE}
-    {:
-    Processes the value using linked scales and writes the value processed on device.
+    function GetValueRaw: Double; virtual; abstract;
+    {: Processes the value using linked scales and writes the value processed on device.
     @param(Value Double: Value to be processed and written in device.)
-    @seealso(SetValueRaw)
-    }
-    {$ENDIF}
-    procedure SetValue(Value:Double); virtual;
-
-    {$IFDEF PORTUGUES}
-    {: Escreve o valor puro do tag no dispositivo.
-       @param(Value Double: Valor a escrever.) }
-    {$ELSE}
+    @seealso(SetValueRaw) }
+    procedure SetValue(AValue: Double); virtual;
     {: Write the raw value on device.
        @param(Value Double: Value to be written.) }
-    {$ENDIF}
-    procedure SetValueRaw(Value:Double); virtual; abstract;
-
-    {$IFDEF PORTUGUES}
-    {:
-    Configura a sequência de escalas.
-    @param(sp TPIPE: Nova sequência de escalas.)
-    @seealso(ScaleProcessor)
-    }
-    {$ELSE}
-    {:
-    Sets the new scales sequence.
-    @param(sp TPIPE: The new scale sequence.)
-    @seealso(ScaleProcessor)
-    }
-    {$ENDIF}
-    procedure SetScaleProcessor(sp:TScaleProcessor);
-
-    {$IFDEF PORTUGUES}
-    //: seta o limite minimo
-    {$ELSE}
+    procedure SetValueRaw(AValue: Double); virtual; abstract;
+    {: Sets the new scales sequence.
+       @param(sp TPIPE: The new scale sequence.)
+       @seealso(ScaleProcessor) }
+    procedure SetScaleProcessor(AValue: TScaleProcessor);
     //: set the minimum limit.
-    {$ENDIF}
-    procedure SetMinLimit(v:Double);
-
-    {$IFDEF PORTUGUES}
-    //: seta o limite máximo
-    {$ELSE}
+    procedure SetMinLimit(AValue: Double);
     //: sets the maximum limit.
-    {$ENDIF}
-    procedure SetMaxLimit(v:Double);
+    procedure SetMaxLimit(AValue: Double);
 
     //: @exclude
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
 
-    {$IFDEF PORTUGUES}
-    //: Habilita/desabilita o limite minimo para entrada de dados.
-    {$ELSE}
     //: Enables/disables the minimum limit.
-    {$ENDIF}
-    property EnableMinValue:Boolean read FEnableMin write FEnableMin stored true;
-
-    {$IFDEF PORTUGUES}
-    //: Habilita/desabilita o limite máximo para entrada de dados.
-    {$ELSE}
+    property EnableMinValue: Boolean read FEnableMin write FEnableMin stored True;
     //: Enables/disables the maximum limit.
-    {$ENDIF}
-    property EnableMaxValue:Boolean read FEnableMax write FEnableMax stored true;
-
-    {$IFDEF PORTUGUES}
-    //: Limite minimo para entrada de dados.
-    {$ELSE}
+    property EnableMaxValue: Boolean read FEnableMax write FEnableMax stored True;
     //: Minimum value acceptable if the minimum limit is enabled.
-    {$ENDIF}
-    property MinValue:Double read FMinLimit write SetMinLimit;
-
-    {$IFDEF PORTUGUES}
-    //: Limite máximo para entrada de dados.
-    {$ELSE}
+    property MinValue: Double read FMinLimit write SetMinLimit;
     //: Maximum value acceptable if the maximum limit is enabled.
-    {$ENDIF}
-    property MaxValue:Double read FMaxLimit write SetMaxLimit;
+    property MaxValue: Double read FMaxLimit write SetMaxLimit;
   public
     //: @exclude
     constructor Create(AOwner: TComponent); override;
-
     //: @exclude
     destructor Destroy; override;
 
     //: @seealso(TPLCTag.Write)
     procedure Write; overload; virtual;
     //: @seealso(TPLCTag.Write)
-    function ScanWrite:Int64; overload; virtual;
-    {$IFDEF PORTUGUES}
-    //: Remove a sequência de processamento de escalas.
-    {$ELSE}
+    function ScanWrite: Int64; overload; virtual;
     //: Removes the scales sequence, it's being destroyed.
-    {$ENDIF}
     procedure RemoveScaleProcessor;
-
-    {$IFDEF PORTUGUES}
-    //: Valor do tag escalonado (processado).
-    {$ELSE}
     //: Tag Value processed by the scales.
-    {$ENDIF}
-    property Value:Double read GetValue write SetValue;
-
-    {$IFDEF PORTUGUES}
-    //: Valor puro do tag.
-    {$ELSE}
+    property Value: Double read GetValue write SetValue;
     //: Raw value of the tag.
-    {$ENDIF}
-    property ValueRaw:Double read PValueRaw write SetValueRaw;
+    property ValueRaw: Double read PValueRaw write SetValueRaw;
   published
-    {$IFDEF PORTUGUES}
-    //: Sequência de escalas do Tag.
-    {$ELSE}
     //: Scale sequence of tag.
-    {$ENDIF}
-    property ScaleProcessor:TScaleProcessor read PScaleProcessor write SetScaleProcessor;
-
-    {$IFDEF PORTUGUES}
-    //: Evento chamado ao ocorrer uma mudança no valor do tag. Chamado APÓS notificar os controles dependentes.
-    {$ELSE}
+    property ScaleProcessor: TScaleProcessor read PScaleProcessor write SetScaleProcessor;
     //: Event called when the value of tag changes. Called AFTER updates all dependent components.
-    {$ENDIF}
-    property OnValueChange stored false;
-
-    {$IFDEF PORTUGUES}
-    //: Evento chamado ao ocorrer uma mudança no valor do tag. Chamado ANTES DE notificar os controles dependentes.
-    {$ELSE}
+    property OnValueChange stored False;
     //: Event called when the value of tag changes. Called BEFORE updates all dependent components.
-    {$ENDIF}
     property OnValueChangeFirst;
-
-    {$IFDEF PORTUGUES}
-    //: Evento chamado ao ocorrer uma mudança no valor do tag. Chamado APÓS notificar os controles dependentes.
-    {$ELSE}
     //: Event called when the value of tag changes. Called AFTER updates all dependent components.
-    {$ENDIF}
     property OnValueChangeLast;
-
-    {$IFDEF PORTUGUES}
-    //: Evento assincrono chamado quando o valor do tag sofre uma alteração.
-    {$ELSE}
     //: Asynchronous event called when the tag value changes.
-    {$ENDIF}
     property OnAsyncValueChange;
   end;
 
@@ -249,24 +112,25 @@ type
   { TPLCNumberMappable }
 
   TPLCNumberMappable = class(TPLCNumber)
-    {$IFDEF PORTUGUES}
-    //: Abre o assistente de mapeamento de tags bit.
-    {$ELSE}
     //: Opens the bit mapper wizard.
-    {$ENDIF}
-    procedure OpenBitMapper(InsertHook:TAddTagInEditorHook; CreateProc:TCreateTagProc); virtual;
+    procedure OpenBitMapper(InsertHook: TAddTagInEditorHook; CreateProc: TCreateTagProc); virtual;
   end;
 
-  procedure SetTagBitMapper(BitMapperTool:TOpenTagEditor);
+
+procedure SetTagBitMapper(BitMapperTool: TOpenTagEditor);
+
 
 implementation
 
-uses tag, hsstrings;
+
+uses
+  tag, hsstrings;
+
 
 constructor TPLCNumber.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  PValueRaw:=0;
+  PValueRaw := 0;
 end;
 
 destructor TPLCNumber.Destroy;
@@ -275,177 +139,179 @@ begin
   inherited Destroy;
 end;
 
-function TPLCNumber.GetValueAsText(Prefix, Sufix, Format:UTF8String; FormatDateTimeOptions:TFormatDateTimeOptions=[]):UTF8String;
+function TPLCNumber.GetValueAsText(Prefix, Sufix, Format: UTF8String; FormatDateTimeOptions: TFormatDateTimeOptions = []): UTF8String;
 begin
   //if none of date time format chars is present, format as number.
-  if (Pos('c', format)=0) AND
-     (Pos('f', format)=0) AND
-     (Pos('d', format)=0) AND
-     (Pos('dd', format)=0) AND
-     (Pos('ddd', format)=0) AND
-     (Pos('dddd', format)=0) AND
-     (Pos('ddddd', format)=0) AND
-     (Pos('dddddd', format)=0) AND
-     (Pos('m', format)=0) AND
-     (Pos('mm', format)=0) AND
-     (Pos('mmm', format)=0) AND
-     (Pos('mmmm', format)=0) AND
-     (Pos('y', format)=0) AND
-     (Pos('yy', format)=0) AND
-     (Pos('yyyy', format)=0) AND
-     (Pos('h', format)=0) AND
-     (Pos('hh', format)=0) AND
-     (Pos('n', format)=0) AND
-     (Pos('nn', format)=0) AND
-     (Pos('s', format)=0) AND
-     (Pos('ss', format)=0) AND
-     (Pos('t', format)=0) AND
-     (Pos('tt', format)=0) AND
-     (Pos('am/pm', format)=0) AND
-     (Pos('a/p', format)=0) AND
-     (Pos('/', format)=0) AND
-     (Pos(':', format)=0) AND
-     (Pos('"xx"', format)=0) AND
-     (Pos('''xx''', format)=0) AND
-     (Pos('z', format)=0) AND
-     (Pos('zzz', format)=0) then begin
-
-     if Trim(Format)<>'' then
-        Result := Prefix + FormatFloat(Format,Value)+Sufix
-     else
-        Result := Prefix + FloatToStr(Value)+Sufix;
-
-  end else begin
-    //the datetime number must be in milliseconds (1 unit=1ms)...
+  if    (Pos('c', Format) = 0)
+    and (Pos('f', Format) = 0)
+    and (Pos('d', Format) = 0)
+    and (Pos('dd', Format) = 0)
+    and (Pos('ddd', Format) = 0)
+    and (Pos('dddd', Format) = 0)
+    and (Pos('ddddd', Format) = 0)
+    and (Pos('dddddd', Format) = 0)
+    and (Pos('m', Format) = 0)
+    and (Pos('mm', Format) = 0)
+    and (Pos('mmm', Format) = 0)
+    and (Pos('mmmm', Format) = 0)
+    and (Pos('y', Format) = 0)
+    and (Pos('yy', Format) = 0)
+    and (Pos('yyyy', Format) = 0)
+    and (Pos('h', Format) = 0)
+    and (Pos('hh', Format) = 0)
+    and (Pos('n', Format) = 0)
+    and (Pos('nn', Format) = 0)
+    and (Pos('s', Format) = 0)
+    and (Pos('ss', Format) = 0)
+    and (Pos('t', Format) = 0)
+    and (Pos('tt', Format) = 0)
+    and (Pos('am/pm', Format) = 0)
+    and (Pos('a/p', Format) = 0)
+    and (Pos('/', Format) = 0)
+    and (Pos(':', Format) = 0)
+    and (Pos('"xx"', Format) = 0)
+    and (Pos('''xx''', Format) = 0)
+    and (Pos('z', Format) = 0)
+    and (Pos('zzz', Format) = 0) then
+  begin
+    if Trim(Format) <> '' then
+      Result := Prefix + FormatFloat(Format, Value) + Sufix
+    else
+      Result := Prefix + FloatToStr(Value) + Sufix;
+  end
+  else
+  begin
+    // the datetime number must be in milliseconds (1 unit=1ms)
     {$IF defined(FPC_FULLVERSION) AND (FPC_FULLVERSION < 20701)}
-    Result:=Prefix + FormatDateTime(Format,TimeStampToDateTime(MSecsToTimeStamp(Trunc(Value)))) + Sufix;
+    Result := Prefix + FormatDateTime(Format, TimeStampToDateTime(MSecsToTimeStamp(Trunc(Value)))) + Sufix;
     {$ELSE}
     Result:=Prefix + FormatDateTime(Format,TimeStampToDateTime(MSecsToTimeStamp(Trunc(Value))),FormatDateTimeOptions) + Sufix;
     {$IFEND}
   end;
 end;
 
-procedure TPLCNumber.AsyncNotifyChange(data:Pointer);
+procedure TPLCNumber.AsyncNotifyChange(Data: Pointer);
 var
-  x:PArrayOfDouble;
+  x: PArrayOfDouble;
 begin
   if not Assigned(POnAsyncValueChange) then Exit;
-  x:=data;
-  POnAsyncValueChange(self,x^);
+  x := Data;
+  POnAsyncValueChange(Self, x^);
 end;
 
 function TPLCNumber.GetValueChangeData: Pointer;
 var
-  x:PArrayOfDouble;
+  x: PArrayOfDouble;
 begin
   New(x);
-  SetLength(x^,1);
-  x^[0]:=Value;
-  Result:=x;
+  SetLength(x^, 1);
+  x^[0] := Value;
+  Result := x;
 end;
 
-procedure TPLCNumber.ReleaseChangeData(data: Pointer);
+procedure TPLCNumber.ReleaseChangeData(Data: Pointer);
 var
-  x:PArrayOfDouble;
+  x: PArrayOfDouble;
 begin
-  x:=data;
-  SetLength(x^,0);
+  x := Data;
+  SetLength(x^, 0);
   Dispose(x);
 end;
 
-procedure TPLCNumber.SetMinMaxValues(aMin, aMax: Double);
+procedure TPLCNumber.SetMinMaxValues(AMin, AMax: Double);
 begin
-  if aMin > aMax then raise Exception.Create(SMinIsGreaterThanMax);
-  FMinLimit:=aMin;
-  FMaxLimit:=aMax;
+  if AMin > AMax then
+    raise Exception.Create(SMinIsGreaterThanMax);
+  FMinLimit := AMin;
+  FMaxLimit := AMax;
 end;
 
-function  TPLCNumber.GetValue:Double;
+function TPLCNumber.GetValue: Double;
 begin
   if Assigned(PScaleProcessor) then
-    Result := PScaleProcessor.SetInGetOut(self, GetValueRaw)
+    Result := PScaleProcessor.SetInGetOut(Self, GetValueRaw)
   else
     Result := GetValueRaw;
 end;
 
-procedure TPLCNumber.SetValue(Value:Double);
+procedure TPLCNumber.SetValue(AValue: Double);
 var
-  towrite:Double;
+  ToWrite: Double;
 begin
-  if (FEnableMin and (Value<FMinLimit)) or (FEnableMax and (Value>FMaxLimit)) then
-   begin
-     NotifyWriteFault;
-     raise Exception.Create(SoutOfBounds);
-   end;
+  if (FEnableMin and (AValue < FMinLimit)) or (FEnableMax and (AValue > FMaxLimit)) then
+  begin
+    NotifyWriteFault;
+    raise Exception.Create(SoutOfBounds);
+  end;
 
   if Assigned(PScaleProcessor) then
-    towrite := PScaleProcessor.SetOutGetIn(self, Value)
+    ToWrite := PScaleProcessor.SetOutGetIn(Self, AValue)
   else
-    towrite := value;
+    ToWrite := AValue;
 
-  SetValueRaw(towrite);
+  SetValueRaw(ToWrite);
 end;
 
-procedure TPLCNumber.SetScaleProcessor(sp:TScaleProcessor);
+procedure TPLCNumber.SetScaleProcessor(AValue: TScaleProcessor);
 var
-  oldValue: Double;
+  OldValue: Double;
 begin
-  if sp=PScaleProcessor then Exit;
-  oldValue:=Value;
-  if PScaleProcessor<>nil then
-    PScaleProcessor.RemoveFreeNotification(self);
+  if AValue = PScaleProcessor then Exit;
+  OldValue := Value;
+  if PScaleProcessor <> nil then
+    PScaleProcessor.RemoveFreeNotification(Self);
 
-  if sp<>nil then
-    sp.FreeNotification(self);
+  if AValue <> nil then
+    AValue.FreeNotification(Self);
 
-  PScaleProcessor := sp;
-  if Value<>oldValue then
+  PScaleProcessor := AValue;
+  if Value <> OldValue then
     NotifyChange;
 end;
 
-procedure TPLCNumber.SetMinLimit(v:Double);
+procedure TPLCNumber.SetMinLimit(AValue: Double);
 begin
-  if ([csReading, csLoading]*ComponentState=[]) and  (v>=FMaxLimit) then
+  if ([csReading, csLoading] * ComponentState = []) and (AValue >= FMaxLimit) then
     raise Exception.Create(SminMustBeLessThanMax);
 
-  FMinLimit:=v;
+  FMinLimit := AValue;
 end;
 
-procedure TPLCNumber.SetMaxLimit(v:Double);
+procedure TPLCNumber.SetMaxLimit(AValue: Double);
 begin
-  if ([csReading, csLoading]*ComponentState=[]) and  (v<=FMinLimit) then
+  if ([csReading, csLoading] * ComponentState = []) and (AValue <= FMinLimit) then
     raise Exception.Create(SmaxMustBeGreaterThanMin);
 
-  FMaxLimit:=v;
+  FMaxLimit := AValue;
 end;
 
 procedure TPLCNumber.Notification(AComponent: TComponent; Operation: TOperation);
 begin
-  if (Operation=opRemove) and (AComponent=PScaleProcessor) then
-    PScaleProcessor:=nil;
-  inherited Notification(AComponent,Operation);
+  if (Operation = opRemove) and (AComponent = PScaleProcessor) then
+    PScaleProcessor := nil;
+  inherited Notification(AComponent, Operation);
 end;
 
 procedure TPLCNumber.Write;
 var
-  towrite:TArrayOfDouble;
+  ToWrite: TArrayOfDouble;
 begin
-  SetLength(towrite,1);
-  towrite[0]:=PValueRaw;
-  Write(towrite,1,0);
-  SetLength(towrite,0);
+  SetLength(ToWrite, 1);
+  ToWrite[0] := PValueRaw;
+  Write(ToWrite, 1, 0);
+  SetLength(ToWrite, 0);
 end;
 
 function TPLCNumber.ScanWrite: Int64;
 var
-  towrite:TArrayOfDouble;
+  ToWrite: TArrayOfDouble;
 begin
-  SetLength(towrite,1);
+  SetLength(ToWrite, 1);
   try
-    towrite[0]:=PValueRaw;
-    Result:=ScanWrite(towrite,1,0);
+    ToWrite[0] := PValueRaw;
+    Result := ScanWrite(ToWrite, 1, 0);
   finally
-    SetLength(towrite,0);
+    SetLength(ToWrite, 0);
   end;
 end;
 
@@ -454,26 +320,26 @@ begin
   PScaleProcessor := nil;
 end;
 
+
 var
-  BitMapperEditor:TOpenTagEditor = nil;
+  BitMapperEditor: TOpenTagEditor = nil;
 
-{ TPLCNumberMappable }
+  { TPLCNumberMappable }
 
-procedure TPLCNumberMappable.OpenBitMapper(InsertHook: TAddTagInEditorHook;
-  CreateProc: TCreateTagProc);
+procedure TPLCNumberMappable.OpenBitMapper(InsertHook: TAddTagInEditorHook; CreateProc: TCreateTagProc);
 begin
   if Assigned(BitMapperEditor) then
-    BitMapperEditor(Self, Self.Owner,InsertHook,CreateProc)
+    BitMapperEditor(Self, Self.Owner, InsertHook, CreateProc)
   else
-    raise exception.Create('None bit mapper tool has been Assigned!');
+    raise Exception.Create('None bit mapper tool has been Assigned!');
 end;
 
-procedure SetTagBitMapper(BitMapperTool:TOpenTagEditor);
+procedure SetTagBitMapper(BitMapperTool: TOpenTagEditor);
 begin
   if Assigned(BitMapperEditor) then
     raise Exception.Create('A Bit Mapper editor was already Assigned.')
   else
-    BitMapperEditor:=BitMapperTool;
+    BitMapperEditor := BitMapperTool;
 end;
 
 end.

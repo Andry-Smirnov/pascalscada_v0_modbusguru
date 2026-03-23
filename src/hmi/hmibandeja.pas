@@ -207,8 +207,8 @@ var
   G: Longint;
   B: Longint;
 begin
-  R := (ADInt and $00ff0000) Div $10000;
-  G := (ADInt and $0000ff00) Div $100;
+  R := (ADInt and $00ff0000) div $10000;
+  G := (ADInt and $0000ff00) div $100;
   B := (ADInt and $000000ff);
   Lumin := Trunc((R * 0.3) + (G * 0.59) + (B * 0.11));
   Result := RGBToColor(R, G, B);

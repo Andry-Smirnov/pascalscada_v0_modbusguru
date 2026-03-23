@@ -155,7 +155,7 @@ type
     FActiveLoaded: Boolean;
     FPort: Word;
     FServerPriority: TIPv4Collection;
-    FSocket:Tsocket;
+    FSocket:TSocket;
     //FAcceptThread:TAcceptThread;
     procedure setActive(AValue: Boolean);
     procedure SetPort(AValue: Word);
@@ -209,7 +209,7 @@ end;
 
 procedure TRedundancyServerClient.ThreadLoop;
 var
-  buffer:array[0..1023] of Byte;
+  buffer:array [0..1023] of Byte;
   ImAtList, found: Boolean;
   colItem: TIPv4CollectionItem;
   i: Integer;
@@ -222,7 +222,7 @@ begin
       Unitialized: begin
         FLastCmdSentAt:=Now;
         FPingSeq:=1;
-        if (socket_recv(FSocket,@buffer[0],sizeof(TClientHi),MSG_NOSIGNAL, 1000)=sizeof(TClientHi)) and
+        if (SocketRecv(FSocket,@buffer[0],SizeOf(TClientHi),MSG_NOSIGNAL, 1000)=SizeOf(TClientHi)) and
            (PClientHi(@buffer[0])^.Cmd = ClientHi) and
            (IsEqualGUID(PClientHi(@buffer[0])^.HostUUID, ServerGUID))
            then begin
@@ -285,7 +285,7 @@ begin
         msgQ.Cmd:=ServerQuit;
         msgq.HostUUID:=ServerGUID;
         try
-          socket_send(FSocket,@msgQ,SizeOf(msgQ),MSG_NOSIGNAL, 1000);
+          SocketSend(FSocket,@msgQ,SizeOf(msgQ),MSG_NOSIGNAL, 1000);
         except
         end;
         CurState:=QuitDone;
@@ -301,7 +301,7 @@ begin
 
         //if connection is dead, ignore this and mark this as quitdone, to terminate this thread;
         try
-          socket_send(FSocket,@msgGoto,SizeOf(msgGoto),MSG_NOSIGNAL, 1000);
+          SocketSend(FSocket,@msgGoto,SizeOf(msgGoto),MSG_NOSIGNAL, 1000);
         except
         end;
         CurState:=QuitDone;
@@ -314,7 +314,7 @@ begin
         inc(FPingSeq);
 
         try
-          if socket_send(FSocket,@msgPing,SizeOf(msgPing),MSG_NOSIGNAL, 1000)<SizeOf(msgPing) then
+          if SocketSend(FSocket,@msgPing,SizeOf(msgPing),MSG_NOSIGNAL, 1000)<SizeOf(msgPing) then
             CurState:=QuitDone;
         except
           CurState:=QuitDone;
@@ -323,7 +323,7 @@ begin
       end;
 
       WaitingPong: begin
-        if (socket_recv(FSocket,@buffer[0],sizeof(TPingCmd),MSG_NOSIGNAL, 10000)=sizeof(TPingCmd)) and
+        if (SocketRecv(FSocket,@buffer[0],SizeOf(TPingCmd),MSG_NOSIGNAL, 10000)=SizeOf(TPingCmd)) and
            (PPingCmd(@buffer[0])^.Cmd = PingRply) and
            (IsEqualGUID(PPingCmd(@buffer[0])^.HostUUID, ServerGUID)) and
            (PPingCmd(@buffer[0])^.PingNr = FPingSeq)
@@ -406,7 +406,7 @@ end;
 procedure TRedundancyAcceptSocket.LaunchNewThread;
 begin
   //launch a new thread that will handle this new connection
-  setblockingmode(ClientSocket,MODE_NONBLOCKING);
+  SetBlockingMode(ClientSocket,MODE_NONBLOCKING);
   FClientThread := TRedundancyServerClient.Create(True, FOwner as TRedundancyCtrl, ClientSocket, ClientSockInfo, FRemoveClientThread);
   Synchronize(@AddClientToMainThread);
   FClientThread.WakeUp;
@@ -479,22 +479,22 @@ begin
     {$IFEND}
 
     {$IF defined(FPC) AND (defined(UNIX) or defined(WINCE))}
-    fpsetsockopt(FSocket, SOL_SOCKET,  SO_REUSEADDR, @reuse_addr, sizeof(reuse_addr));
+    fpsetsockopt(FSocket, SOL_SOCKET,  SO_REUSEADDR, @reuse_addr, SizeOf(reuse_addr));
     {$IFEND}
     //WINDOWS
     {$IF defined(WIN32) or defined(WIN64)}
-    setsockopt(FSocket,   SOL_SOCKET,  SO_REUSEADDR, @reuse_addr, sizeof(reuse_addr));
+    setsockopt(FSocket,   SOL_SOCKET,  SO_REUSEADDR, @reuse_addr, SizeOf(reuse_addr));
     {$IFEND}
 
     //set the non-blocking mode.
-    setblockingmode(FSocket, MODE_NONBLOCKING);
+    SetBlockingMode(FSocket, MODE_NONBLOCKING);
 
     channel.sin_family      := AF_INET;
     channel.sin_addr.S_addr := INADDR_ANY;
     channel.sin_port        := htons(FPort); //PORT NUMBER
 
     {$IF defined(FPC) AND (defined(UNIX) OR defined(WINCE))}
-    if fpBind(FSocket,@channel,sizeof(channel))<>0 then begin
+    if fpBind(FSocket,@channel,SizeOf(channel))<>0 then begin
       CloseSocket(FSocket);
       FActive:=false;
       Exit;
@@ -508,7 +508,7 @@ begin
     {$IFEND}
 
     {$IF defined(WIN32) OR defined(WIN64)}
-    if bind(FSocket,channel,sizeof(channel))<>0 then begin
+    if bind(FSocket,channel,SizeOf(channel))<>0 then begin
       CloseSocket(FSocket);
       FActive:=false;
       Exit;
